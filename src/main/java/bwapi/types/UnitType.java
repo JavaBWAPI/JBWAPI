@@ -2,9 +2,12 @@ package bwapi.types;
 
 import bwapi.point.TilePosition;
 
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.List;
+import java.util.stream.Collectors;
+
+import static bwapi.types.TechType.*;
+import static bwapi.types.UnitTypeContainer.*;
 
 public enum UnitType {
     Terran_Marine(0),
@@ -242,325 +245,411 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    private int id;
+    final int id;
 
     UnitType(int id) {
         this.id = id;
     }
 
     public Race getRace() {
-        return null;
+        return unitRace[id];
     }
 
     public Entry<UnitType, Integer> whatBuilds() {
-       return null;
+        // Retrieve the type
+        UnitType type = whatBuilds[id];
+        int count = 1;
+        // Set count to 0 if there is no whatBuilds and 2 if it's an archon
+        if ( type == UnitType.None ) {
+            count = 0;
+        }
+        else if (this == UnitType.Protoss_Archon || this == UnitType.Protoss_Dark_Archon ) {
+            count = 2;
+        }
+        // Return the desired pair
+        return new AbstractMap.SimpleEntry<>(type, count);
     }
 
+    
     public Map<UnitType, Integer> requiredUnits() {
-        return null;
+        return reqUnitsMap.get(id);
     }
 
     public TechType requiredTech() {
-        return null;
+        return (this == Zerg_Lurker || this == Zerg_Lurker_Egg) ? Lurker_Aspect : TechType.None;
     }
 
     public TechType cloakingTech() {
-        return null;
+        switch (this) {
+            case Terran_Ghost:
+            case Hero_Alexei_Stukov:
+            case Hero_Infested_Duran:
+            case Hero_Infested_Kerrigan:
+            case Hero_Sarah_Kerrigan:
+            case Hero_Samir_Duran:
+                return Personnel_Cloaking;
+            case Terran_Wraith:
+            case Hero_Tom_Kazansky:
+                return Cloaking_Field;
+            default:
+                return TechType.None;
+        }
     }
 
-    public List<TechType> abilities() {
-        return null;
+    public Set<TechType> abilities() {
+        return Arrays.stream(unitTechs[id]).collect(Collectors.toSet());
     }
 
-    public List<UpgradeType> upgrades() {
-        return null;
+    public Set<UpgradeType> upgrades() {
+        return Arrays.stream(upgrades[id]).collect(Collectors.toSet());
     }
 
     public UpgradeType armorUpgrade() {
-        return null;
+        return armorUpgrade[id];
     }
 
     public int maxHitPoints() {
-        return -1;
+        return defaultMaxHP[id];
     }
 
     public int maxShields() {
-        return -1;
+        return defaultMaxSP[id];
     }
 
     public int maxEnergy() {
-        return -1;
+        return isSpellcaster() ? (isHero() ? 250 : 200) : 0;
     }
 
     public int armor() {
-        return -1;
+        return defaultArmorAmount[id];
     }
 
     public int mineralPrice() {
-        return -1;
+        return defaultOreCost[id];
     }
 
     public int gasPrice() {
-        return -1;
+        return defaultGasCost[id];
     }
 
     public int buildTime() {
-        return -1;
+        return defaultTimeCost[id];
     }
 
     public int supplyRequired() {
-        return -1;
+        return unitSupplyRequired[id];
     }
 
     public int supplyProvided() {
-        return -1;
+        return unitSupplyProvided[id];
     }
 
     public int spaceRequired() {
-        return -1;
+        return unitSpaceRequired[id];
     }
 
     public int spaceProvided() {
-        return -1;
+        return unitSpaceProvided[id];
     }
 
     public int buildScore() {
-        return -1;
+        return unitBuildScore[id];
     }
 
     public int destroyScore() {
-        return -1;
+        return unitDestroyScore[id];
     }
 
     public UnitSizeType size() {
-        return null;
+        return unitSize[id];
     }
 
     public int tileWidth() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.tileWidth];
     }
 
     public int tileHeight() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.tileHeight];
     }
 
     public TilePosition tileSize() {
-        return null;
+        return new TilePosition(tileWidth(), tileHeight());
     }
 
     public int dimensionLeft() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.left];
     }
 
     public int dimensionUp() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.up];
     }
 
     public int dimensionRight() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.right];
     }
 
     public int dimensionDown() {
-        return -1;
+        return unitDimensions[id][UnitDimensions.down];
     }
 
     public int width() {
-        return -1;
+        return dimensionLeft() + 1 + dimensionRight();
     }
 
     public int height() {
-        return -1;
+        return dimensionUp() + 1 + dimensionDown();
     }
 
     public int seekRange() {
-        return -1;
+        return seekRangeTiles[id] * 32;
     }
 
     public int sightRange() {
-        return -1;
+        return sightRangeTiles[id] * 32;
     }
 
     public WeaponType groundWeapon() {
-        return null;
+        return groundWeapon[id];
     }
 
     public int maxGroundHits() {
-        return -1;
+        return groundWeaponHits[id];
     }
 
     public WeaponType airWeapon() {
-        return null;
+        return airWeapon[id];
     }
 
     public int maxAirHits() {
-        return -1;
+        return airWeaponHits[id];
     }
 
     public double topSpeed() {
-        return -1;
+        return unitTopSpeeds[id];
     }
 
     public int acceleration() {
-        return -1;
+        return unitAcceleration[id];
     }
 
     public int haltDistance() {
-        return -1;
+        return unitHaltDistance[id];
     }
 
     public int turnRadius() {
-        return -1;
+        return unitTurnRadius[id];
     }
 
     public boolean canProduce() {
-        return false;
+        return (unitFlags[id] & ProducesUnits) != 0;
     }
 
     public boolean canAttack() {
-        return false;
+        switch (this) {
+            case Protoss_Carrier:
+            case Hero_Gantrithor:
+            case Protoss_Reaver:
+            case Hero_Warbringer:
+            case Terran_Nuclear_Missile:
+                return true;
+            case Special_Independant_Starport:
+                return false;
+            default:
+                return airWeapon() != WeaponType.None || groundWeapon() != WeaponType.None;
+        }
     }
 
     public boolean canMove() {
-        return false;
+        return (unitFlags[id] & AutoAttackAndMove) != 0;
     }
 
     public boolean isFlyer() {
-        return false;
+        return (unitFlags[id] & Flyer) != 0;
     }
 
     public boolean regeneratesHP() {
-        return false;
+        return (unitFlags[id] & RegeneratesHP) != 0;
     }
 
     public boolean isSpellcaster() {
-        return false;
+        return (unitFlags[id] & Spellcaster) != 0;
     }
 
     public boolean hasPermanentCloak() {
-        return false;
+        return (unitFlags[id] & PermanentCloak) != 0;
     }
 
     public boolean isInvincible() {
-        return false;
+        return (unitFlags[id] & Invincible) != 0;
     }
 
     public boolean isOrganic() {
-        return false;
+        return (unitFlags[id] & OrganicUnit) != 0;
     }
 
     public boolean isMechanical() {
-        return false;
+        return (unitFlags[id] & Mechanical) != 0;
     }
 
     public boolean isRobotic() {
-        return false;
+        return (unitFlags[id] & RoboticUnit) != 0;
     }
 
     public boolean isDetector() {
-        return false;
+        return (unitFlags[id] & Detector) != 0;
     }
 
     public boolean isResourceContainer() {
-        return false;
+        return (unitFlags[id] & ResourceContainer) != 0;
     }
 
     public boolean isResourceDepot() {
-        return false;
+        return (unitFlags[id] & ResourceDepot) != 0;
     }
 
     public boolean isRefinery() {
-        return false;
+        switch (this )  {
+            case Terran_Refinery:
+            case Zerg_Extractor:
+            case Protoss_Assimilator:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean isWorker() {
-        return false;
+        return (unitFlags[id] & Worker) != 0;
     }
 
     public boolean requiresPsi() {
-        return false;
+        return (unitFlags[id] & RequiresPsi) != 0;
     }
 
     public boolean requiresCreep() {
-        return false;
+        return (unitFlags[id] & CreepBuilding) != 0;
     }
 
     public boolean isTwoUnitsInOneEgg() {
-        return false;
+        return (unitFlags[id] & TwoUnitsIn1Egg) != 0;
     }
 
     public boolean isBurrowable() {
-        return false;
+        return (unitFlags[id] & Burrowable) != 0;
     }
 
     public boolean isCloakable() {
-        return false;
+        return (unitFlags[id] & Cloakable) != 0;
     }
 
     public boolean isBuilding() {
-        return false;
+        return (unitFlags[id] & Building) != 0;
     }
 
     public boolean isAddon() {
-        return false;
+        return (unitFlags[id] & Addon) != 0;
     }
 
     public boolean isFlyingBuilding() {
-        return false;
+        return (unitFlags[id] & FlyingBuilding) != 0;
     }
 
     public boolean isNeutral() {
-        return false;
+        return getRace() == Race.None &&
+                (isCritter() || isResourceContainer() || isSpell());
     }
 
     public boolean isHero() {
-        return false;
+        return ((unitFlags[id] & Hero) != 0) ||
+                this == Hero_Dark_Templar ||
+                this == Terran_Civilian;
     }
 
     public boolean isPowerup() {
-        return false;
+        return  this == Powerup_Uraj_Crystal ||
+                this == Powerup_Khalis_Crystal ||
+                (this.id >= Powerup_Flag.id && this.id < None.id);
     }
 
     public boolean isBeacon() {
-        return false;
+        return this == Special_Zerg_Beacon ||
+                this == Special_Terran_Beacon ||
+                this == Special_Protoss_Beacon;
     }
 
     public boolean isFlagBeacon() {
-        return false;
+        return this == Special_Zerg_Flag_Beacon ||
+                this == Special_Terran_Flag_Beacon ||
+                this == Special_Protoss_Flag_Beacon;
     }
 
     public boolean isSpecialBuilding() {
-        return false;
+        return isBuilding() &&
+                whatBuilds().getValue() == 0 &&
+                this != Zerg_Infested_Command_Center;
     }
 
     public boolean isSpell() {
-        return false;
+        return this == Spell_Dark_Swarm ||
+                this == Spell_Disruption_Web ||
+                this == Spell_Scanner_Sweep;
     }
 
     public boolean producesCreep() {
-        return false;
+        return producesLarva() ||
+                this == Zerg_Creep_Colony ||
+                this ==Zerg_Spore_Colony ||
+                this == Zerg_Sunken_Colony;
     }
 
     public boolean producesLarva() {
-        return false;
+        return this == Zerg_Hatchery ||
+                this == Zerg_Lair     ||
+                this == Zerg_Hive;
     }
 
     public boolean isMineralField() {
-        return false;
+        return this == Resource_Mineral_Field        ||
+                this == Resource_Mineral_Field_Type_2 ||
+                this == Resource_Mineral_Field_Type_3;
     }
 
     public boolean isCritter() {
-        return false;
+        switch(this) {
+            case Critter_Bengalaas:
+            case Critter_Kakaru:
+            case Critter_Ragnasaur:
+            case Critter_Rhynadon:
+            case Critter_Scantid:
+            case Critter_Ursadon:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean canBuildAddon() {
-        return false;
+        return this == Terran_Command_Center  ||
+                this == Terran_Factory         ||
+                this == Terran_Starport        ||
+                this == Terran_Science_Facility;
     }
 
-    public List<TechType> researchesWhat() {
-        return null;
+    public static int maxUnitWidth() {
+        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::width)).get().width();
+    }
+    public static int maxUnitHeight() {
+        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::height)).get().height();
     }
 
-    public List<UpgradeType> upgradesWhat() {
-        return null;
+    public Set<UnitType> buildsWhat() {
+        return Arrays.stream(buildsWhat[id]).collect(Collectors.toSet());
+    }
+    public Set<TechType> researchesWhat() {
+        return Arrays.stream(researchesWhat[id]).collect(Collectors.toSet());
+    }
+
+    public Set<UpgradeType> upgradesWhat() {
+        return Arrays.stream(upgradesWhat[id]).collect(Collectors.toSet());
     }
 }
