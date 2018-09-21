@@ -17,7 +17,7 @@ class EventHandler implements Client.EventHandler {
     public void operation(Client.GameData.Event event) {
         switch (event.type()) {
             case 0: //MatchStart
-                //recreate a new game instance every onStart instead of a "clear" method
+                //recreate a new game instance every onStart instead of a "clear" method in Game
                 game = new Game(data);
                 eventListener.onStart();
                 break;
@@ -36,6 +36,7 @@ class EventHandler implements Client.EventHandler {
                 break;
             case 6: //PlayerLeft
                 eventListener.onPlayerLeft(game.getPlayer(event.v1()));
+                //TODO remove the player from the Game?
                 break;
             case 7: //NukeDetect
                 eventListener.onNukeDetect(new Position(event.v1(), event.v2()));

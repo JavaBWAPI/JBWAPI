@@ -1,5 +1,16 @@
 package bwapi.types;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static bwapi.types.Order.*;
+import static bwapi.types.Race.*;
+import static bwapi.types.UnitType.*;
+
+
 public enum TechType {
     Stim_Packs(0),
     Lockdown(1),
@@ -41,58 +52,58 @@ public enum TechType {
     Nuclear_Strike(45),
     Unknown(46);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    TechType(int value) {
-        this.value = value;
+    TechType(int id) {
+        this.id = id;
     }
 
     public Race getRace() {
-        return null;
+        return techRaces[id];
     }
 
     public int mineralPrice() {
-        return -1;
+        return defaultOreCost[id];
     }
 
     public int gasPrice() {
-        return -1;
+        return mineralPrice();
     }
 
     public int researchTime() {
-        return -1;
+        return defaultTimeCost[id];
     }
 
     public int energyCost() {
-        return -1;
+        return defaultEnergyCost[id];
     }
 
     public UnitType whatResearches() {
-        return null;
+        return whatResearches[id];
     }
 
     public WeaponType getWeapon() {
-        return null;
+        return techWeapons[id];
     }
 
     public boolean targetsUnit() {
-        return false;
+        return techTypeFlags[id] == 1 || techTypeFlags[id] == 3;
     }
 
     public boolean targetsPosition() {
-        return false;
+        return techTypeFlags[id] == 2 || techTypeFlags[id] == 3;
+    }
+
+    public Set<UnitType> whatsUses() {
+        return Arrays.stream(techWhatUses[id]).collect(Collectors.toSet());
     }
 
     public Order getOrder() {
-        return null;
+        return techOrders[id];
     }
 
     public UnitType requiredUnit() {
-        return null;
+        return this == Lurker_Aspect ? Zerg_Lair : UnitType.None;
     }
 
     /// IMPLEMENTATION
@@ -103,15 +114,125 @@ public enum TechType {
     private static int defaultEnergyCost[] =
     { 0, 100, 100, 0, 50, 0, 100, 75, 150, 25, 25, 0, 0, 150, 100, 150, 0, 75, 75, 75, 100, 150, 100, 0, 50, 125, 0, 150, 0, 50, 75, 100, 0, 0, 1 };
 
-//    static const int whatResearches[] =
-//    { Terran_Academy, Terran_Covert_Ops, Terran_Science_Facility, Terran_Machine_Shop,
-//            None, Terran_Machine_Shop, None, Terran_Science_Facility, Terran_Physics_Lab,
-//            Terran_Control_Tower, Terran_Covert_Ops, Zerg_Hatchery, None, Zerg_Queens_Nest,
-//            None, Zerg_Defiler_Mound, Zerg_Defiler_Mound, Zerg_Queens_Nest, None,
-//            Protoss_Templar_Archives, Protoss_Templar_Archives, Protoss_Arbiter_Tribunal,
-//            Protoss_Arbiter_Tribunal, None, Terran_Academy, Protoss_Fleet_Beacon, None,
-//            Protoss_Templar_Archives, None, None, Terran_Academy, Protoss_Templar_Archives,
-//            Zerg_Hydralisk_Den, None, None, None, None, None, None, None, None, None, None, None,
-//            None, None, Unknown
-//    };
+    private static UnitType whatResearches[] = {
+            Terran_Academy, Terran_Covert_Ops, Terran_Science_Facility, Terran_Machine_Shop,
+            UnitType.None, Terran_Machine_Shop, UnitType.None, Terran_Science_Facility, Terran_Physics_Lab,
+            Terran_Control_Tower, Terran_Covert_Ops, Zerg_Hatchery, UnitType.None, Zerg_Queens_Nest,
+            UnitType.None, Zerg_Defiler_Mound, Zerg_Defiler_Mound, Zerg_Queens_Nest, UnitType.None,
+            Protoss_Templar_Archives, Protoss_Templar_Archives, Protoss_Arbiter_Tribunal,
+            Protoss_Arbiter_Tribunal, UnitType.None, Terran_Academy, Protoss_Fleet_Beacon, UnitType.None,
+            Protoss_Templar_Archives, UnitType.None, UnitType.None, Terran_Academy, Protoss_Templar_Archives,
+            Zerg_Hydralisk_Den, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
+            UnitType.None, UnitType.None, UnitType.Unknown
+    };
+
+    private static Race techRaces[] = {
+            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
+            Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
+            Protoss, Protoss, Protoss, Protoss, Protoss,
+            Terran, Protoss, Race.None, Protoss, Protoss, Protoss, Terran, Protoss, Zerg, Race.None, Terran,
+            Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Terran, Race.Unknown
+    };
+
+    private static WeaponType techWeapons[] = {
+            WeaponType.None, WeaponType.Lockdown, WeaponType.EMP_Shockwave, WeaponType.Spider_Mines, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Irradiate, WeaponType.Yamato_Gun,
+            WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Spawn_Broodlings, WeaponType.Dark_Swarm, WeaponType.Plague, WeaponType.Consume, WeaponType.Ensnare, WeaponType.Parasite,
+            WeaponType.Psionic_Storm, WeaponType.None, WeaponType.None, WeaponType.Stasis_Field, WeaponType.None, WeaponType.Restoration, WeaponType.Disruption_Web, WeaponType.None, WeaponType.Mind_Control,
+            WeaponType.None, WeaponType.Feedback, WeaponType.Optical_Flare, WeaponType.Maelstrom, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None,
+            WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Nuclear_Strike, WeaponType.Unknown
+    };
+
+    private static int techTypeFlags[] = {
+            0, 1, 3, 2, 3, 0, 1, 1, 1, 0, 0, 0,
+            1, 1, 3, 3, 1, 3, 1, 3, 1,
+            3, 3, 1, 1, 3, 0, 1, 1, 1, 1,
+            3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3
+    };
+
+    private static Order techOrders[] = {
+            Order.None, CastLockdown, CastEMPShockwave, PlaceMine, CastScannerSweep, Order.None, CastDefensiveMatrix,
+            CastIrradiate, FireYamatoGun, Order.None, Order.None, Order.None, CastInfestation, CastSpawnBroodlings,
+            CastDarkSwarm, CastPlague, CastConsume, CastEnsnare, CastParasite, CastPsionicStorm,
+            CastHallucination, CastRecall, CastStasisField, Order.None, CastRestoration, CastDisruptionWeb,
+            Order.None, CastMindControl, Order.None, CastFeedback, CastOpticalFlare, CastMaelstrom, Order.None, Order.None, MedicHeal,
+            Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, NukePaint, Order.Unknown
+    };
+
+    private static UnitType techWhatUses[][] = {
+        // Stimpacks
+        {Terran_Marine, Terran_Firebat, Hero_Jim_Raynor_Marine, Hero_Gui_Montag},
+        // Lockdown
+        { Terran_Ghost, Hero_Alexei_Stukov, Hero_Infested_Duran, Hero_Samir_Duran, Hero_Sarah_Kerrigan },
+        // EMP
+        { Terran_Science_Vessel, Hero_Magellan },
+        // Spider Mine
+        { Terran_Vulture, Hero_Jim_Raynor_Vulture },
+        // Scanner Sweep
+        { Terran_Comsat_Station },
+        // Siege Mode
+        { Terran_Siege_Tank_Tank_Mode, Terran_Siege_Tank_Siege_Mode, Hero_Edmund_Duke_Tank_Mode, Hero_Edmund_Duke_Siege_Mode },
+        // Defensive Matrix
+        { Terran_Science_Vessel, Hero_Magellan },
+        // Irradiate
+        { Terran_Science_Vessel, Hero_Magellan },
+        // Yamato Cannon
+        { Terran_Battlecruiser, Hero_Gerard_DuGalle, Hero_Hyperion, Hero_Norad_II },
+        // Cloaking Field
+        { Terran_Wraith, Hero_Tom_Kazansky },
+        // Personnel Cloaking
+        { Terran_Ghost, Hero_Alexei_Stukov, Hero_Infested_Duran, Hero_Samir_Duran, Hero_Sarah_Kerrigan, Hero_Infested_Kerrigan },
+        // Burrow
+        { Zerg_Zergling, Zerg_Hydralisk, Zerg_Drone, Zerg_Defiler, Zerg_Infested_Terran, Hero_Unclean_One, Hero_Hunter_Killer, Hero_Devouring_One, Zerg_Lurker },
+        // Infestation
+        { Zerg_Queen, Hero_Matriarch },
+        // Spawn Broodlings
+        { Zerg_Queen, Hero_Matriarch },
+        // Dark Swarm
+        { Zerg_Defiler, Hero_Unclean_One },
+        // Plague
+        { Zerg_Defiler, Hero_Unclean_One },
+        // Consume
+        { Zerg_Defiler, Hero_Unclean_One, Hero_Infested_Kerrigan, Hero_Infested_Duran },
+        // Ensnare
+        { Zerg_Queen, Hero_Matriarch, Hero_Infested_Kerrigan },
+        // Parasite
+        { Zerg_Queen, Hero_Matriarch },
+        // Psi Storm
+        { Protoss_High_Templar, Hero_Tassadar, Hero_Infested_Kerrigan },
+        // Hallucination
+        { Protoss_High_Templar, Hero_Tassadar },
+        // Recall
+        { Protoss_Arbiter, Hero_Danimoth },
+        // Stasis Field
+        { Protoss_Arbiter, Hero_Danimoth },
+        // Archon Warp
+        { Protoss_High_Templar },
+        // Restoration
+        { Terran_Medic },
+        // Disruption Web
+        { Protoss_Corsair, Hero_Raszagal },
+        // Unused
+        {},
+        // Mind Control
+        { Protoss_Dark_Archon },
+        // Dark Archon Meld
+        { Protoss_Dark_Templar },
+        // Feedback
+        { Protoss_Dark_Archon },
+        // Optical Flare
+        { Terran_Medic },
+        // Maelstrom
+        { Protoss_Dark_Archon },
+        // Lurker Aspect
+        { Zerg_Hydralisk },
+        // Unused
+        {},
+        // Healing
+        { Terran_Medic },
+        // Unused
+        {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+        // Extra (Nuke)
+        { Terran_Ghost },
+        {}
+    };
 }
