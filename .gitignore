@@ -1,0 +1,6 @@
+#pom/java
+target/
+
+#intellij
+.idea/
+*.iml
