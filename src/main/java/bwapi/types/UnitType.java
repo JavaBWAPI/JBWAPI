@@ -242,14 +242,10 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    UnitType(int value) {
-        this.value = value;
+    UnitType(int id) {
+        this.id = id;
     }
 
     public Race getRace() {

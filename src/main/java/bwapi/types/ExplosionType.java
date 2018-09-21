@@ -27,13 +27,9 @@ public enum ExplosionType {
     Air_Splash(23),
     Unknown(24);
 
-	private int value;
-
-	public int getValue(){
-		return value;
-	}
+	private int id;
 
 	ExplosionType(int value) {
-		this.value = value;
+		this.id = id;
 	}
 }

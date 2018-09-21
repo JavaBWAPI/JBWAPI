@@ -46,13 +46,9 @@ public enum BulletType {
     None(209),
     Unknown(210);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    BulletType(int value){
-        this.value = value;
+    BulletType(int id){
+        this.id = id;
     }
 }

@@ -16,10 +16,6 @@ public enum Race{
 
     private int id;
 
-    public int getId(){
-        return id;
-    }
-
     Race(int id){
         this.id = id;
     }

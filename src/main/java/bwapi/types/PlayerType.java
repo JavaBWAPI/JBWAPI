@@ -15,14 +15,10 @@ public enum PlayerType {
     ComputerLeft(11),
     Unknown(12);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    PlayerType(int value) {
-        this.value = value;
+    PlayerType(int id) {
+        this.id = id;
     }
 
     public boolean isLobbyType() {

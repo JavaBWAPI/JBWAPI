@@ -22,13 +22,9 @@ public enum GameType {
     Pro_Gamer_League(32),  // Not valid
     Unknown(33);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    GameType(int value) {
-        this.value = value;
+    GameType(int id) {
+        this.id = id;
     }
 }

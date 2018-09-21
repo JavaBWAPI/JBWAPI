@@ -193,13 +193,9 @@ public enum Order {
     None(189),
     Unknown(190);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    Order(int value){
-        this.value = value;
+    Order(int id){
+        this.id = id;
     }
 }

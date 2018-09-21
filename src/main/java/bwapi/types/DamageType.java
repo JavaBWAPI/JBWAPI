@@ -9,13 +9,9 @@ public enum DamageType {
     None(5),
     Unknown(6);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    DamageType(int value){
-        this.value = value;
+    DamageType(int id){
+        this.id = id;
     }
 }

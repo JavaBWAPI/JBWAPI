@@ -9,13 +9,9 @@ public enum UnitSizeType {
     None(4),
     Unknown(5);
 
-    private int value;
+    private int id;
 
-    public int getValue(){
-        return value;
-    }
-
-    UnitSizeType(int value) {
-        this.value = value;
+    UnitSizeType(int id) {
+        this.id = id;
     }
 }
