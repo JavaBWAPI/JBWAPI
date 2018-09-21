@@ -11,7 +11,7 @@ class EventHandler implements Client.EventHandler {
     private Set<Integer> visibleUnits = new TreeSet<>();
 
 
-    public EventHandler(BWEventListener eventListener) {
+    public EventHandler(final BWEventListener eventListener) {
         this.eventListener = eventListener;
     }
 
@@ -44,14 +44,18 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onEnd(event.v1() != 0);
                 break;
             case 2: //MatchFrame
+                eventListener.onFrame();
+                break;
 
+            //TODO add the remaining events
             case 10: // UnitShow
                 visibleUnits.add(event.v1());
-
                 //eventListener.onUnitShow();
+                break;
 
             case 11: // UnitHide
                 visibleUnits.add(event.v1());
+                //eventListener.onUnitHide();
                 break;
         }
     }
@@ -90,19 +94,16 @@ public class BWClient {
         final EventHandler handler = new EventHandler(eventListener);
 
         try {
+            game = new Game(client.data());
             while(!client.data().isInGame()) {
-                System.out.println("Game started? " + client.data().isInGame());
                 client.update(handler);
             }
-
-            game = new Game(client.data());
-
-            System.out.println("Game started!");
-
             while(client.data().isInGame()) {
                 client.update(handler);
             }
         }
-        catch (Throwable exception) {}
+        catch (Throwable exception) {
+            exception.printStackTrace();
+        }
     }
 }
