@@ -87,11 +87,11 @@ public enum TechType {
     }
 
     public boolean targetsUnit() {
-        return techTypeFlags[id] == 1 || techTypeFlags[id] == 3;
+        return (techTypeFlags[id] & TARG_UNIT) != 0;
     }
 
     public boolean targetsPosition() {
-        return techTypeFlags[id] == 2 || techTypeFlags[id] == 3;
+        return (techTypeFlags[id] & TARG_POS) != 0;
     }
 
     public Set<UnitType> whatsUses() {
@@ -142,11 +142,15 @@ public enum TechType {
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Nuclear_Strike, WeaponType.Unknown
     };
 
+    private static int TARG_UNIT = 1;
+    private static int TARG_POS =  2;
+    private static int TARG_BOTH = 3;
+
     private static int techTypeFlags[] = {
-            0, 1, 3, 2, 3, 0, 1, 1, 1, 0, 0, 0,
-            1, 1, 3, 3, 1, 3, 1, 3, 1,
-            3, 3, 1, 1, 3, 0, 1, 1, 1, 1,
-            3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3
+            0, TARG_UNIT, TARG_BOTH, TARG_POS, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, 0, 0, 0,
+            TARG_UNIT, TARG_UNIT, TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT,
+            TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_UNIT, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, TARG_UNIT,
+            TARG_BOTH, 0, 0, TARG_BOTH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TARG_BOTH
     };
 
     private static Order techOrders[] = {
