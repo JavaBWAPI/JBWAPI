@@ -10,9 +10,11 @@ import java.util.List;
 
 public class Player {
     private final PlayerData playerData;
+    private final Game game;
 
-    Player(PlayerData playerData) {
+    Player(final PlayerData playerData, final Game game) {
         this.playerData = playerData;
+        this.game = game;
     }
 
     public int getID() {

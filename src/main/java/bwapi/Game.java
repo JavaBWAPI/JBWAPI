@@ -10,35 +10,43 @@ import bwapi.types.UnitType;
 import bwapi.types.UpgradeType;
 import bwapi.values.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Game {
     final GameData gameData;
+    final Map<Integer, Unit> units = new HashMap<>();
+    final Map<Integer, Player> players = new HashMap<>();
+    final Map<Integer, Force> forces = new HashMap<>();
+    final Map<Integer, Bullet> bullets = new HashMap<>();
 
     public Game(GameData gameData) {
         this.gameData = gameData;
+        init();
+    }
+
+    private void init() {
+        for (int id=0; id < gameData.getForceCount(); id++) {
+            forces.put(id, new Force(gameData.getForce(id), this));
+        }
+        for (int id=0; id < gameData.getPlayerCount(); id++) {
+            players.put(id, new Player(gameData.getPlayer(id), this));
+        }
+    }
+
+    public Collection<Force> getForces() {
+        return forces.values();
+    }
+
+    public Collection<Player> getPlayers() {
+        return players.values();
     }
 
 
-
-    public List<Force> getForces() {
-        List<Force> forces = new ArrayList<>();
-        for (int i=0; i < gameData.getForceCount(); i++)
-            forces.add(new Force(gameData.getForce(i)));
-        return forces;
+    public Collection<Unit> getAllUnits() {
+        return units.values();
     }
 
-    public List<Player> getPlayers() {
-        List<Player> players = new ArrayList<>();
-        for (int i=0; i < gameData.getPlayerCount(); i++)
-            players.add(new Player(gameData.getPlayer(i)));
-        return players;
-    }
-
-    /**
-    public List<Unit> getAllUnits();
-
+    /*
     public List<Unit> getMinerals();
 
     public List<Unit> getGeysers();
@@ -54,12 +62,20 @@ public class Game {
     public List<Bullet> getBullets();
 
     public List<Position> getNukeDots();
+    */
 
-    public Force getForce(int forceID);
+    public Force getForce(int forceID) {
+        return forces.get(forceID);
+    }
 
-    public Player getPlayer(int playerID);
+    public Player getPlayer(int playerID) {
+        return players.get(playerID);
+    }
 
-    public Unit getUnit(int unitID);
+    public Unit getUnit(int unitID) {
+        return units.get(unitID);
+    }
+    /*
 
     public Unit indexToUnit(int unitIndex);
 
@@ -229,16 +245,16 @@ public class Game {
     */
 
     public Player self() {
-        return new Player(gameData.getPlayer(gameData.self()));
+        return players.get(gameData.self());
     }
 
 
     public Player enemy() {
-        return new Player(gameData.getPlayer(gameData.enemy()));
+        return players.get(gameData.enemy());
     }
 
     public Player neutral() {
-        return new Player(gameData.getPlayer(gameData.neutral()));
+        return players.get(gameData.neutral());
     }
 
     /*

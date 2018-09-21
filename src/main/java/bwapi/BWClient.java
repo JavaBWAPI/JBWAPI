@@ -1,72 +1,15 @@
 package bwapi;
 
 import JavaBWAPIBackend.Client;
-
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
-class EventHandler implements Client.EventHandler {
-    private final BWEventListener eventListener;
-    private Set<Integer> visibleUnits = new TreeSet<>();
-
-
-    public EventHandler(final BWEventListener eventListener) {
-        this.eventListener = eventListener;
-    }
-
-    /*
-    MatchStart(0),
-	MatchEnd(1),
-	MatchFrame(2),
-	MenuFrame(3),
-	SendText(4),
-	ReceiveText(5),
-	PlayerLeft(6),
-	NukeDetect(7),
-	UnitDiscover(8),
-	UnitEvade(9),
-	UnitShow(10),
-	UnitHide(11),
-	UnitCreate(12),
-	UnitDestroy(13),
-	UnitMorph(14),
-	UnitRenegade(15),
-	SaveGame(16),
-	UnitComplete(17);
-     */
-    public void operation(Client.GameData.Event event) {
-        switch (event.type()) {
-            case 0: //MatchStart
-                eventListener.onStart();
-                break;
-            case 1: //MatchEnd
-                eventListener.onEnd(event.v1() != 0);
-                break;
-            case 2: //MatchFrame
-                eventListener.onFrame();
-                break;
-
-            //TODO add the remaining events
-            case 10: // UnitShow
-                visibleUnits.add(event.v1());
-                //eventListener.onUnitShow();
-                break;
-
-            case 11: // UnitHide
-                visibleUnits.add(event.v1());
-                //eventListener.onUnitHide();
-                break;
-        }
-    }
-}
 
 
 public class BWClient {
     private BWEventListener eventListener;
 
     private Client client;
-    private Game game;
+    private EventHandler handler;
 
 
     public BWClient(final BWEventListener eventListener) {
@@ -75,7 +18,7 @@ public class BWClient {
     }
 
     public Game getGame() {
-        return game;
+        return handler == null ? null : handler.getGame();
     }
 
     public void startGame() {
@@ -91,10 +34,9 @@ public class BWClient {
                 catch (Throwable ignored) { }            }
         }
 
-        final EventHandler handler = new EventHandler(eventListener);
+        handler = new EventHandler(eventListener, client.data());
 
         try {
-            game = new Game(client.data());
             while(!client.data().isInGame()) {
                 client.update(handler);
             }

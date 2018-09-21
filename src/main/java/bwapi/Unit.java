@@ -8,9 +8,11 @@ import java.util.List;
 
 public class Unit {
     private final int id;
+    private final Game game;
 
-    Unit(int id) {
+    Unit(final int id, final Game game) {
         this.id = id;
+        this.game = game;
     }
 
     public int getID() {

@@ -6,9 +6,11 @@ import java.util.List;
 
 public class Force {
     private final ForceData forceData;
+    private final Game game;
 
-    Force(ForceData forceData) {
+    Force(final ForceData forceData, final Game game) {
         this.forceData = forceData;
+        this.game = game;
     }
 
     public int getID() {
