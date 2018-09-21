@@ -1507,10 +1507,10 @@ class UnitTypeContainer {
         List<Map<UnitType, Integer>> req = new ArrayList<>(UnitType.values().length);
         // Add the whatBuilds types to the required units map
         for (UnitType i : UnitType.values()) {
-            reqUnitsMap.add(new HashMap<>());
+            req.add(new HashMap<>());
             Map.Entry<UnitType, Integer> wb = i.whatBuilds();
             if ( wb.getKey() != UnitType.None ) {
-                reqUnitsMap.get(i.id).put(wb.getKey(), wb.getValue());
+                req.get(i.id).put(wb.getKey(), wb.getValue());
             }
         }
 
