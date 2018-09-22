@@ -1,71 +1,73 @@
 package bwapi;
 
+import JavaBWAPIBackend.Client.GameData.BulletData;
 import bwapi.point.Position;
 import bwapi.types.BulletType;
 
 public class Bullet {
-    private final int id;
+    private final BulletData bulletData;
+    private final Game game;
 
-    Bullet(int id) {
-        this.id = id;
+    Bullet(final BulletData bulletData, final Game game) {
+        this.bulletData = bulletData;
+        this.game = game;
     }
 
     public int getID() {
-        return  id;
+        return bulletData.id();
     }
 
     public boolean exists() {
-        return false;
+        return bulletData.exists();
     }
 
     public Player getPlayer() {
-        return null;
+        return game.getPlayer(bulletData.player());
     }
 
     public BulletType getType() {
-        return null;
+        return BulletType.bulletTypes.get(bulletData.type());
     }
 
     public Unit getSource() {
-        return null;
+        return game.getUnit(bulletData.source());
     }
 
     public Position getPosition() {
-        return null;
+        return new Position(bulletData.positionX(), bulletData.positionY());
     }
 
     public double getAngle() {
-        return -1;
+        return bulletData.angle();
     }
 
     public double getVelocityX() {
-        return -1;
+        return bulletData.velocityX();
     }
 
     public double getVelocityY() {
-        return -1;
+        return bulletData.velocityY();
     }
 
     public Unit getTarget() {
-        return null;
+        return game.getUnit(bulletData.target());
     }
 
     public Position getTargetPosition() {
-        return null;
+        return new Position(bulletData.positionX(), bulletData.positionY());
     }
 
     public int getRemoveTimer() {
-        return -1;
+        return bulletData.removeTimer();
     }
 
     public boolean isVisible() {
-        return false;
+        return isVisible(game.self());
     }
 
-    public boolean isVisible(Player player) {
-        return false;
+    public boolean isVisible(final Player player) {
+        return bulletData.isVisible(player.getID());
     }
-
 
     public boolean equals(Object that){
         if(!(that instanceof Bullet)) return false;

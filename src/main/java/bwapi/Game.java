@@ -59,8 +59,17 @@ public class Game {
 
     public List<Unit> getStaticNeutralUnits();
 
-    public List<Bullet> getBullets();
+    */
+    public Collection<Bullet> getBullets() {
+        //TODO cache this in onFrame
+        final List<Bullet> bullets = new ArrayList<>();
+        for (int i=0; i < gameData.bulletCount(); i++) {
+            bullets.add(new Bullet(gameData.bullet(i), this));
+        }
+        return bullets;
+    }
 
+    /*
     public List<Position> getNukeDots();
     */
 

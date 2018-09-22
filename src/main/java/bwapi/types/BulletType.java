@@ -1,5 +1,10 @@
 package bwapi.types;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public enum BulletType {
     Melee(0),
 
@@ -45,6 +50,10 @@ public enum BulletType {
 
     None(209),
     Unknown(210);
+
+    public static Map<Integer, BulletType> bulletTypes = Arrays.stream(BulletType.values())
+            .collect(Collectors.toMap(v-> v.id, v -> v));
+
 
     private int id;
 
