@@ -68,8 +68,10 @@ public enum UpgradeType {
     None(61),
     Unknown(62);
 
-    public static Map<Integer, UpgradeType> upgradeTypes = Arrays.stream(UpgradeType.values())
-            .collect(Collectors.toMap(v-> v.id, v -> v));
+    public static UpgradeType[] upgradeTypes = new UpgradeType[62+1];
+    static {
+        Arrays.stream(UpgradeType.values()).forEach(v -> upgradeTypes[v.id] = v);
+    }
 
     public final int id;
 

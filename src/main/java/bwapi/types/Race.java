@@ -1,6 +1,8 @@
 package bwapi.types;
 
 
+import java.util.Arrays;
+
 import static bwapi.types.UnitType.*;
 
 public enum Race{
@@ -14,9 +16,10 @@ public enum Race{
     None(7),
     Unknown(8);
 
-    public static Race[] races = {
-            Zerg,  Terran, Protoss, Other, Unused, Select, Random, None, Unknown
-    };
+    public static Race[] races = new Race[8+1];
+    static {
+        Arrays.stream(Race.values()).forEach(v -> races[v.id] = v);
+    }
 
     public final int id;
 

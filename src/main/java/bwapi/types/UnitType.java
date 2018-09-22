@@ -245,7 +245,10 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    public static UnitType[] unitTypes = UnitType.values(); //should be in order of declaration
+    public static UnitType[] unitTypes = new UnitType[233+1];
+    static {
+        Arrays.stream(UnitType.values()).forEach(v -> unitTypes[v.id] = v);
+    }
 
     public final int id;
 

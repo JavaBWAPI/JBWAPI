@@ -113,7 +113,7 @@ public class Game {
     }
 
     public GameType getGameType() {
-        return GameType.gameTypes.get(gameData.gameType());
+        return GameType.gameTypes[gameData.gameType()];
     }
 
     public int getLatency() {

@@ -1,5 +1,7 @@
 package bwapi.types;
 
+import java.util.Arrays;
+
 public enum Order {
     Die(0),
     Stop(1),
@@ -193,7 +195,11 @@ public enum Order {
     None(189),
     Unknown(190);
 
-    public static Order[] orders = Order.values();
+    public static Order[] orders = new Order[190+1];
+    static {
+        Arrays.stream(Order.values()).forEach(v -> orders[v.id] = v);
+    }
+
 
     private int id;
 

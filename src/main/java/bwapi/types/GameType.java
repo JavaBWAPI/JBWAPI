@@ -26,8 +26,11 @@ public enum GameType {
     Pro_Gamer_League(32),  // Not valid
     Unknown(33);
 
-    public static Map<Integer, GameType> gameTypes = Arrays.stream(GameType.values())
-            .collect(Collectors.toMap(v-> v.id, v -> v));
+    public static GameType[] gameTypes = new GameType[33+1];
+    static {
+        Arrays.stream(GameType.values()).forEach(v -> gameTypes[v.id] = v);
+    }
+
 
     private int id;
 

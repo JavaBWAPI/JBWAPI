@@ -26,7 +26,7 @@ public class Bullet {
     }
 
     public BulletType getType() {
-        return BulletType.bulletTypes.get(bulletData.type());
+        return BulletType.bulletTypes[bulletData.type()];
     }
 
     public Unit getSource() {

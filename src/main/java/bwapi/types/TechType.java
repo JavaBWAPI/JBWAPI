@@ -49,8 +49,10 @@ public enum TechType {
     Nuclear_Strike(45),
     Unknown(46);
 
-    public static Map<Integer, TechType> techTypes = Arrays.stream(TechType.values())
-            .collect(Collectors.toMap(v-> v.id, v -> v));
+    public static TechType[] techTypes = new TechType[46+1];
+    static {
+        Arrays.stream(TechType.values()).forEach(v -> techTypes[v.id] = v);
+    }
 
     public final int id;
 

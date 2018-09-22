@@ -325,11 +325,11 @@ public class Unit {
     }
 
     public TechType getTech() {
-        return TechType.techTypes.get(unitData.tech());
+        return TechType.techTypes[unitData.tech()];
     }
 
     public UpgradeType getUpgrade() {
-        return UpgradeType.upgradeTypes.get(unitData.upgrade());
+        return UpgradeType.upgradeTypes[unitData.upgrade()];
     }
 
     public int getRemainingBuildTime() {
