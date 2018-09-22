@@ -193,6 +193,8 @@ public enum Order {
     None(189),
     Unknown(190);
 
+    public static Order[] orders = Order.values();
+
     private int id;
 
     Order(int id){

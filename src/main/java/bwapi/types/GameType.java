@@ -1,5 +1,9 @@
 package bwapi.types;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public enum GameType {
     None(0),
     Custom(1),          // Warcraft III
@@ -21,6 +25,9 @@ public enum GameType {
 
     Pro_Gamer_League(32),  // Not valid
     Unknown(33);
+
+    public static Map<Integer, GameType> gameTypes = Arrays.stream(GameType.values())
+            .collect(Collectors.toMap(v-> v.id, v -> v));
 
     private int id;
 

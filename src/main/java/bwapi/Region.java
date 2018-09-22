@@ -4,8 +4,6 @@ import bwapi.point.Position;
 
 import JavaBWAPIBackend.Client.GameData.RegionData;
 
-import java.util.List;
-
 public class Region {
     private final RegionData regionData;
     private final Game game;
@@ -40,9 +38,9 @@ public class Region {
     }
 
     //TODO
-    public List<Region> getNeighbors() {
-        return null;
-    }
+//    public List<Region> getNeighbors() {
+//        return null;
+//    }
 
     public int getBoundsLeft() {
         return regionData.leftMost();
@@ -61,24 +59,24 @@ public class Region {
     }
 
     //TODO
-    public Region getClosestAccessibleRegion() {
-        return null;
-    }
+//    public Region getClosestAccessibleRegion() {
+//        return null;
+//    }
 
     //TODO
-    public Region getClosestInaccessibleRegion() {
-        return null;
-    }
+//    public Region getClosestInaccessibleRegion() {
+//        return null;
+//    }
 
     //TODO
-    public int getDistance(Region other) {
-        return -1;
-    }
+//    public int getDistance(Region other) {
+//        return -1;
+//    }
 
     //TODO
-    public List<Unit> getUnits() {
-        return null;
-    }
+//    public List<Unit> getUnits() {
+//        return null;
+//    }
 
     public boolean equals(Object that){
         if(!(that instanceof Region)){

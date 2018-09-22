@@ -1,9 +1,6 @@
 package bwapi.types;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static bwapi.types.Order.*;
@@ -51,6 +48,9 @@ public enum TechType {
     None(44),
     Nuclear_Strike(45),
     Unknown(46);
+
+    public static Map<Integer, TechType> techTypes = Arrays.stream(TechType.values())
+            .collect(Collectors.toMap(v-> v.id, v -> v));
 
     public final int id;
 

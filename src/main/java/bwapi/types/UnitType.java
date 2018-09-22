@@ -245,6 +245,8 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
+    public static UnitType[] unitTypes = UnitType.values(); //should be in order of declaration
+
     public final int id;
 
     UnitType(int id) {

@@ -1,299 +1,751 @@
 package bwapi;
 
+import JavaBWAPIBackend.Client.GameData.UnitData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
 import bwapi.types.*;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static bwapi.types.Order.*;
+import static bwapi.types.Race.Terran;
+import static bwapi.types.UnitType.*;
 
 public class Unit {
-    private final int id;
+    private final UnitData unitData;
     private final Game game;
 
-    Unit(final int id, final Game game) {
-        this.id = id;
+    private final UnitType initialType;
+    private final int initialResources;
+    private final int initialHitPoints;
+    private final Position initialPosition;
+
+    //TODO
+    private final Set<Unit> connectedUnits = new HashSet<>();
+
+    Unit(final UnitData unitData, final Game game) {
+        this.unitData = unitData;
         this.game = game;
+
+        initialType = getType();
+        initialResources = getResources();
+        initialHitPoints = getHitPoints();
+        initialPosition = getPosition();
     }
 
     public int getID() {
-        return id;
+        return unitData.id();
     }
 
-    /*
 
-    public boolean exists();
+    public boolean exists() {
+        return unitData.exists();
+    }
 
-    public int getReplayID();
+    public int getReplayID() {
+        return unitData.replayID();
+    }
 
-    */
     public Player getPlayer() {
+        return game.getPlayer(unitData.player());
+    }
+
+    public UnitType getType() {
+        return UnitType.unitTypes[unitData.type()];
+    }
+
+    public Position getPosition() {
+        return new Position(unitData.positionX(), unitData.positionY());
+    }
+
+    public TilePosition getTilePosition() {
+        return getPosition().toTilePosition();
+    }
+
+    public double getAngle() {
+        return unitData.angle();
+    }
+
+    public double getVelocityX() {
+        return unitData.velocityX();
+    }
+
+    public double getVelocityY() {
+        return unitData.velocityY();
+    }
+
+    public Region getRegion() {
+        return game.getRegionAt(getPosition());
+    }
+
+    public int getLeft() {
+        return unitData.positionX() - getType().dimensionLeft();
+    }
+
+    public int getTop() {
+        return unitData.positionY() - getType().dimensionUp();
+    }
+
+    public int getRight() {
+        return unitData.positionX() - getType().dimensionRight();
+    }
+
+    public int getBottom() {
+        return unitData.positionY() - getType().dimensionDown();
+    }
+
+    public int getHitPoints() {
+        return unitData.hitPoints();
+    }
+
+    public int getShields() {
+        return unitData.shields();
+    }
+
+    public int getEnergy() {
+        return unitData.energy();
+    }
+
+    public int getResources() {
+        return unitData.resources();
+    }
+
+    public int getResourceGroup() {
+        return unitData.resourceGroup();
+    }
+
+    public int getDistance(final Position target) {
+        // If this unit does not exist or target is invalid
+        if (!exists() || target == null) {
+            return Integer.MAX_VALUE;
+        }
+        /////// Compute distance
+
+        // retrieve left/top/right/bottom values for calculations
+        int left = target.getX() - 1;
+        int top = target.getY() - 1;
+        int right = target.getX() + 1;
+        int bottom = target.getY() + 1;
+
+        // compute x distance
+        int xDist = getLeft() - right;
+        if (xDist < 0) {
+            xDist = left - getRight();
+            if (xDist < 0) {
+                xDist = 0;
+            }
+        }
+
+        // compute y distance
+        int yDist = getTop() - bottom;
+        if (yDist < 0) {
+            yDist = top - getBottom();
+            if (yDist < 0) {
+                yDist = 0;
+            }
+        }
+
+        // compute actual distance
+        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+    }
+
+    public int getDistance(final Unit target) {
+        // If this unit does not exist or target is invalid
+        if (!exists() || target == null || !target.exists()) {
+            return Integer.MAX_VALUE;
+        }
+
+        // If target is the same as the source
+        if (this == target) {
+            return 0;
+        }
+
+        /////// Compute distance
+
+        // retrieve left/top/right/bottom values for calculations
+        int left = target.getLeft() - 1;
+        int top = target.getTop() - 1;
+        int right = target.getRight() + 1;
+        int bottom = target.getBottom() + 1;
+
+        // compute x distance
+        int xDist = getLeft() - right;
+        if (xDist < 0) {
+            xDist = left -getRight();
+            if (xDist < 0) {
+                xDist = 0;
+            }
+        }
+
+        // compute y distance
+        int yDist = getTop() - bottom;
+        if (yDist < 0) {
+            yDist = top - getBottom();
+            if (yDist < 0) {
+                yDist = 0;
+            }
+        }
+
+        // compute actual distance
+        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+    }
+
+    public boolean hasPath(final Position target) {
+        // Return true if this unit is an air unit
+        return isFlying() ||
+                game.hasPath(getPosition(), target) ||
+                game.hasPath(new Position(getLeft(), getTop()), target) ||
+                game.hasPath(new Position(getRight(), getTop()), target) ||
+                game.hasPath(new Position(getLeft(), getBottom()), target) ||
+                game.hasPath(new Position(getRight(), getBottom()), target);
+    }
+
+    public boolean hasPath(final Unit target) {
+        return hasPath(target.getPosition());
+    }
+
+//    //TODO
+//    public int getLastCommandFrame();
+
+//    public UnitCommand getLastCommand();
+
+    public Player getLastAttackingPlayer() {
+        return game.getPlayer(unitData.lastAttackerPlayer());
+    }
+
+    public UnitType getInitialType() {
+        return initialType;
+    }
+
+    public Position getInitialPosition() {
+        return initialPosition;
+    }
+
+    public TilePosition getInitialTilePosition() {
+        return initialPosition.toTilePosition();
+    }
+
+    public int getInitialHitPoints() {
+        return initialHitPoints;
+    }
+
+    public int getInitialResources() {
+        return initialResources;
+    }
+
+    public int getKillCount() {
+        return unitData.killCount();
+    }
+
+    public int getAcidSporeCount() {
+        return unitData.acidSporeCount();
+    }
+
+    public int getInterceptorCount() {
+        return unitData.interceptorCount();
+    }
+
+    public int getScarabCount() {
+        return unitData.scarabCount();
+    }
+
+    public int getSpiderMineCount() {
+        return unitData.spiderMineCount();
+    }
+
+    public int getGroundWeaponCooldown() {
+        return unitData.groundWeaponCooldown();
+    }
+
+    public int getAirWeaponCooldown() {
+        return unitData.airWeaponCooldown();
+    }
+
+    public int getSpellCooldown() {
+        return unitData.spellCooldown();
+    }
+
+    public int getDefenseMatrixPoints() {
+        return unitData.defenseMatrixPoints();
+    }
+
+    public int getDefenseMatrixTimer() {
+        return unitData.defenseMatrixTimer();
+    }
+
+    public int getEnsnareTimer() {
+        return unitData.ensnareTimer();
+    }
+
+    public int getIrradiateTimer() {
+        return unitData.irradiateTimer();
+    }
+
+    public int getLockdownTimer() {
+        return unitData.lockdownTimer();
+    }
+
+    public int getMaelstromTimer() {
+        return unitData.maelstromTimer();
+    }
+
+    public int getOrderTimer() {
+        return unitData.orderTimer();
+    }
+
+    public int getPlagueTimer() {
+        return unitData.plagueTimer();
+    }
+
+    public int getRemoveTimer() {
+        return unitData.removeTimer();
+    }
+
+    public int getStasisTimer() {
+        return unitData.stasisTimer();
+    }
+
+    public int getStimTimer() {
+        return unitData.stimTimer();
+    }
+
+    public UnitType getBuildType() {
+        return UnitType.unitTypes[unitData.buildType()];
+    }
+
+    public List<UnitType> getTrainingQueue() {
+        return IntStream.range(0, unitData.trainingQueueCount())
+                .mapToObj(i -> UnitType.unitTypes[unitData.trainingQueue(i)])
+                .collect(Collectors.toList());
+    }
+
+    public TechType getTech() {
+        return TechType.techTypes.get(unitData.tech());
+    }
+
+    public UpgradeType getUpgrade() {
+        return UpgradeType.upgradeTypes.get(unitData.upgrade());
+    }
+
+    public int getRemainingBuildTime() {
+        return unitData.remainingBuildTime();
+    }
+
+    public int getRemainingTrainTime() {
+        return unitData.remainingTrainTime();
+    }
+
+    public int getRemainingResearchTime() {
+        return unitData.remainingResearchTime();
+    }
+
+    public int getRemainingUpgradeTime() {
+        return unitData.remainingUpgradeTime();
+    }
+
+    public Unit getBuildUnit() {
+        return game.getUnit(unitData.buildUnit());
+    }
+
+    public Unit getTarget() {
+        return game.getUnit(unitData.target());
+    }
+
+    public Position getTargetPosition() {
+        return new Position(unitData.orderTargetPositionX(), unitData.orderTargetPositionY());
+    }
+
+    public Order getOrder() {
+        return Order.orders[unitData.order()];
+    }
+
+    public Order getSecondaryOrder() {
+        return Order.orders[unitData.secondaryOrder()];
+    }
+
+    public Unit getOrderTarget() {
+        return game.getUnit(unitData.orderTarget());
+    }
+
+    public Position getOrderTargetPosition() {
+        return new Position(unitData.orderTargetPositionX(), unitData.orderTargetPositionY());
+    }
+
+    public Position getRallyPosition() {
+        return new Position(unitData.rallyPositionX(), unitData.rallyPositionY());
+    }
+
+    public Unit getRallyUnit() {
+        return game.getUnit(unitData.rallyUnit());
+    }
+
+    public Unit getAddon() {
+        return game.getUnit(unitData.addon());
+    }
+
+    public Unit getNydusExit() {
+        return game.getUnit(unitData.nydusExit());
+    }
+
+    public Unit getPowerUp() {
+        return game.getUnit(unitData.powerUp());
+    }
+
+    public Unit getTransport() {
+        return game.getUnit(unitData.transport());
+    }
+
+    //TODO
+    public List<Unit> getLoadedUnits() {
         return null;
     }
+
+    public int getSpaceRemaining() {
+        int space = getType().spaceProvided();
+
+        // Decrease the space for each loaded unit
+        for (final Unit u : getLoadedUnits()) {
+            space -= u.getType().spaceRequired();
+        }
+        return Math.max(space, 0);
+    }
+
+    public Unit getCarrier() {
+        return game.getUnit(unitData.carrier());
+    }
+
+    public Set<Unit> getInterceptors() {
+        if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
+            return new HashSet<>();
+        }
+        return connectedUnits;
+    }
+
+    public Unit getHatchery() {
+        return game.getUnit(unitData.hatchery());
+    }
+
+    public Set<Unit> getLarva() {
+        if (!getType().producesLarva()) {
+            return new HashSet<>();
+        }
+        return connectedUnits;
+    }
+
+    //TODO
+    //public Set<Unit> getUnitsInRadius(final int radius)
+
+    //TODO
+    //public List<Unit> getUnitsInWeaponRange(final WeaponType weapon);
+
+    public boolean hasNuke() {
+        return unitData.hasNuke();
+    }
+
+    public boolean isAccelerating() {
+        return unitData.isAccelerating();
+    }
+
+    public boolean isAttacking() {
+        return unitData.isAttacking();
+    }
+
+    public boolean isAttackFrame() {
+        return unitData.isAttackFrame();
+    }
+
+    public boolean isBeingConstructed() {
+        if (isMorphing()) {
+            return true;
+        }
+        if (isCompleted()) {
+            return false;
+        }
+        if (getType().getRace() != Terran ) {
+            return true;
+        }
+        return getBuildUnit() != null;
+    }
+
+    public boolean isBeingGathered() {
+        return unitData.isBeingGathered();
+    }
+
+    public boolean isBeingHealed() {
+        return getType().getRace() == Terran && isCompleted() && getHitPoints() > unitData.lastHitPoints();
+    }
+
+    public boolean isBlind() {
+        return unitData.isBlind();
+    }
+
+    public boolean isBraking() {
+        return unitData.isBraking();
+    }
+
+    public boolean isBurrowed() {
+        return unitData.isBurrowed();
+    }
+
+    public boolean isCarryingGas() {
+        return unitData.carryResourceType() == 1;
+    }
+
+    public boolean isCarryingMinerals() {
+        return unitData.carryResourceType() == 2;
+    }
+
+    public boolean isCloaked() {
+        return unitData.isCloaked();
+    }
+
+    public boolean isCompleted() {
+        return unitData.isCompleted();
+    }
+
+    public boolean isConstructing() {
+        return unitData.isConstructing();
+    }
+
+    public boolean isDefenseMatrixed() {
+        return getDefenseMatrixTimer() != 0;
+    }
+
+    public boolean isDetected() {
+        return unitData.isDetected();
+    }
+
+    public boolean isEnsnared() {
+        return getEnsnareTimer() != 0;
+    }
+
+    public boolean isFlying() {
+        return getType().isFlyer() || isLifted();
+    }
+
+    public boolean isFollowing() {
+        return getOrder() == Order.Follow;
+    }
+
+    private static Set<Order> gatheringGasOrders = new HashSet<>(Arrays.asList(
+            Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision));
+
+    private static boolean reallyGatheringGas(final Unit targ, final Player player) {
+        return targ != null && targ.exists() && targ.isCompleted() && targ.getPlayer() == player &&
+                targ.getType() != Resource_Vespene_Geyser && (targ.getType().isRefinery() || targ.getType().isResourceDepot());
+    }
+
+    public boolean isGatheringGas() {
+        if (!unitData.isGathering()) {
+            return false;
+        }
+        final Order order = getOrder();
+        if (!gatheringGasOrders.contains(order)) {
+            return false;
+        }
+        if (order == ResetCollision) {
+            return unitData.carryResourceType() == 1;
+        }
+        //return true if BWOrder is WaitForGas, HarvestGas, or ReturnGas
+        if (order == WaitForGas || order == HarvestGas || order == ReturnGas) {
+            return true;
+        }
+        //if BWOrder is MoveToGas, Harvest1, or Harvest2 we need to do some additional checks to make sure the unit is really gathering
+        return reallyGatheringGas(getTarget(), getPlayer()) || reallyGatheringGas(getOrderTarget(), getPlayer());
+    }
+
+    private static boolean reallyGatheringMinerals(final Unit targ, final Player player) {
+        return targ != null && targ.exists() && (targ.getType().isMineralField() ||
+                (targ.isCompleted() && targ.getPlayer() == player && targ.getType().isResourceDepot()));
+    }
+
+    private static Set<Order> gatheringMineralOrders = new HashSet<>(Arrays.asList(
+            Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision));
+
+    public boolean isGatheringMinerals() {
+        if (!unitData.isGathering()) {
+            return false;
+        }
+        final Order order = getOrder();
+        if (!gatheringMineralOrders.contains(order)) {
+            return false;
+        }
+        if (order == ResetCollision) {
+            return unitData.carryResourceType() == 2;
+        }
+        //return true if BWOrder is WaitForMinerals, MiningMinerals, or ReturnMinerals
+        if (order == WaitForMinerals || order == MiningMinerals || order == ReturnMinerals) {
+            return true;
+        }
+        //if BWOrder is MoveToMinerals, Harvest1, or Harvest2 we need to do some additional checks to make sure the unit is really gathering
+        return reallyGatheringMinerals(getTarget(), getPlayer()) || reallyGatheringMinerals(getOrderTarget(), getPlayer());
+    }
+
+    public boolean isHallucination() {
+        return unitData.isHallucination();
+    }
+
+    public boolean isHoldingPosition() {
+        return getOrder() == HoldPosition;
+    }
+
+    public boolean isIdle() {
+        return unitData.isIdle();
+    }
+
+    public boolean isInterruptible() {
+        return unitData.isInterruptible();
+    }
+
+    public boolean isInvincible() {
+        return unitData.isInvincible();
+    }
+
+    public boolean isInWeaponRange(final Unit target) {
+        // Preliminary checks
+        if ( !exists() || target == null || !target.exists() || this == target) {
+            return false;
+        }
+
+        // Store the types as locals
+        final UnitType thisType = getType();
+        final UnitType targType = target.getType();
+
+        // Obtain the weapon type
+        final WeaponType wpn = target.isFlying() ? thisType.airWeapon() : thisType.groundWeapon();
+
+        // Return if there is no weapon type
+        if (wpn == WeaponType.None || wpn == WeaponType.Unknown) {
+            return false;
+        }
+
+        // Retrieve the min and max weapon ranges
+        int minRange = wpn.minRange();
+        int maxRange = getPlayer().weaponMaxRange(wpn);
+
+        // Check if the distance to the unit is within the weapon range
+        int distance = getDistance(target);
+        return (minRange != 0 ? minRange < distance : true) && distance <= maxRange;
+    }
+
+    public boolean isIrradiated() {
+        return getIrradiateTimer() != 0;
+    }
+
+    public boolean isLifted() {
+        return unitData.isLifted();
+    }
+
+    public boolean isLoaded() {
+        return getTransport() != null;
+    }
+
+    public boolean isLockedDown() {
+        return getLockdownTimer() != 0;
+    }
+
+    public boolean isMaelstrommed() {
+        return getMaelstromTimer() != 0;
+    }
+
+    public boolean isMorphing() {
+        return unitData.isMorphing();
+    }
+
+    public boolean isMoving() {
+        return unitData.isMoving();
+    };
+
+    public boolean isParasited() {
+        return unitData.isParasited();
+    }
+
+    public boolean isPatrolling() {
+        return getOrder() == Patrol;
+    }
+
+    public boolean isPlagued() {
+        return getPlagueTimer() != 0;
+    }
+
+    public boolean isRepairing() {
+        return getOrder() == Repair;
+    }
+
+    public boolean isResearching() {
+        return getOrder() == ResearchTech;
+    }
+
+    public boolean isSelected() {
+        return unitData.isSelected();
+    }
+
+    public boolean isSieged() {
+        final UnitType t = getType();
+        return  t == Terran_Siege_Tank_Siege_Mode || t == Hero_Edmund_Duke_Siege_Mode;
+    }
+
+    public boolean isStartingAttack() {
+        return unitData.isStartingAttack();
+    }
+
+    public boolean isStasised() {
+        return getStasisTimer() != 0;
+    }
+
+    public boolean isStimmed() {
+        return getStimTimer() != 0;
+    }
+
+    public boolean isStuck() {
+        return unitData.isStuck();
+    }
+
+    public boolean isTraining() {
+        return unitData.isTraining();
+    }
+
+    public boolean isUnderAttack() {
+        return unitData.recentlyAttacked();
+    }
+
+    public boolean isUnderDarkSwarm() {
+        return unitData.isUnderDarkSwarm();
+    }
+
+    public boolean isUnderDisruptionWeb() {
+        return unitData.isUnderDWeb();
+    }
+
+    public boolean isUnderStorm() {
+        return unitData.isUnderStorm();
+    }
+
+    public boolean isPowered() {
+        return unitData.isPowered();
+    }
+
+    public boolean isUpgrading() {
+        return getOrder() == Upgrade;
+    }
+
+    public boolean isVisible() {
+        return isVisible(game.self());
+    }
+
+    public boolean isVisible(final Player player) {
+        return unitData.isVisible(player.getID());
+    }
+
+    //TODO
+    //public boolean isTargetable();
+
     /*
-    public UnitType getType();
-
-    public Position getPosition();
-
-    public TilePosition getTilePosition();
-
-    public double getAngle();
-
-    public double getVelocityX();
-
-    public double getVelocityY();
-
-    public Region getRegion();
-
-    public int getLeft();
-
-    public int getTop();
-
-    public int getRight();
-
-    public int getBottom();
-
-    public int getHitPoints();
-
-    public int getShields();
-
-    public int getEnergy();
-
-    public int getResources();
-
-    public int getResourceGroup();
-
-    public int getDistance(Position target);
-
-    public int getDistance(Unit target);
-
-    public boolean hasPath(Position target);
-
-    public boolean hasPath(Unit target);
-
-    public int getLastCommandFrame();
-
-    public UnitCommand getLastCommand();
-
-    public Player getLastAttackingPlayer();
-
-    public UnitType getInitialType();
-
-    public Position getInitialPosition();
-
-    public TilePosition getInitialTilePosition();
-
-    public int getInitialHitPoints();
-
-    public int getInitialResources();
-
-    public int getKillCount();
-
-    public int getAcidSporeCount();
-
-    public int getInterceptorCount();
-
-    public int getScarabCount();
-
-    public int getSpiderMineCount();
-
-    public int getGroundWeaponCooldown();
-
-    public int getAirWeaponCooldown();
-
-    public int getSpellCooldown();
-
-    public int getDefenseMatrixPoints();
-
-    public int getDefenseMatrixTimer();
-
-    public int getEnsnareTimer();
-
-    public int getIrradiateTimer();
-
-    public int getLockdownTimer();
-
-    public int getMaelstromTimer();
-
-    public int getOrderTimer();
-
-    public int getPlagueTimer();
-
-    public int getRemoveTimer();
-
-    public int getStasisTimer();
-
-    public int getStimTimer();
-
-    public UnitType getBuildType();
-
-    public List<UnitType> getTrainingQueue();
-
-    public TechType getTech();
-
-    public UpgradeType getUpgrade();
-
-    public int getRemainingBuildTime();
-
-    public int getRemainingTrainTime();
-
-    public int getRemainingResearchTime();
-
-    public int getRemainingUpgradeTime();
-
-    public Unit getBuildUnit();
-
-    public Unit getTarget();
-
-    public Position getTargetPosition();
-
-    public Order getOrder();
-
-    public Order getSecondaryOrder();
-
-    public Unit getOrderTarget();
-
-    public Position getOrderTargetPosition();
-
-    public Position getRallyPosition();
-
-    public Unit getRallyUnit();
-
-    public Unit getAddon();
-
-    public Unit getNydusExit();
-
-    public Unit getPowerUp();
-
-    public Unit getTransport();
-
-    public List<Unit> getLoadedUnits();
-
-    public int getSpaceRemaining();
-
-    public Unit getCarrier();
-
-    public List<Unit> getInterceptors();
-
-    public Unit getHatchery();
-
-    public List<Unit> getLarva();
-
-    public List<Unit> getUnitsInRadius(int radius);
-
-    public List<Unit> getUnitsInWeaponRange(WeaponType weapon);
-
-    public boolean hasNuke();
-
-    public boolean isAccelerating();
-
-    public boolean isAttacking();
-
-    public boolean isAttackFrame();
-
-    public boolean isBeingConstructed();
-
-    public boolean isBeingGathered();
-
-    public boolean isBeingHealed();
-
-    public boolean isBlind();
-
-    public boolean isBraking();
-
-    public boolean isBurrowed();
-
-    public boolean isCarryingGas();
-
-    public boolean isCarryingMinerals();
-
-    public boolean isCloaked();
-
-    public boolean isCompleted();
-
-    public boolean isConstructing();
-
-    public boolean isDefenseMatrixed();
-
-    public boolean isDetected();
-
-    public boolean isEnsnared();
-
-    public boolean isFlying();
-
-    public boolean isFollowing();
-
-    public boolean isGatheringGas();
-
-    public boolean isGatheringMinerals();
-
-    public boolean isHallucination();
-
-    public boolean isHoldingPosition();
-
-    public boolean isIdle();
-
-    public boolean isInterruptible();
-
-    public boolean isInvincible();
-
-    public boolean isInWeaponRange(Unit target);
-
-    public boolean isIrradiated();
-
-    public boolean isLifted();
-
-    public boolean isLoaded();
-
-    public boolean isLockedDown();
-
-    public boolean isMaelstrommed();
-
-    public boolean isMorphing();
-
-    public boolean isMoving();
-
-    public boolean isParasited();
-
-    public boolean isPatrolling();
-
-    public boolean isPlagued();
-
-    public boolean isRepairing();
-
-    public boolean isResearching();
-
-    public boolean isSelected();
-
-    public boolean isSieged();
-
-    public boolean isStartingAttack();
-
-    public boolean isStasised();
-
-    public boolean isStimmed();
-
-    public boolean isStuck();
-
-    public boolean isTraining();
-
-    public boolean isUnderAttack();
-
-    public boolean isUnderDarkSwarm();
-
-    public boolean isUnderDisruptionWeb();
-
-    public boolean isUnderStorm();
-
-    public boolean isPowered();
-
-    public boolean isUpgrading();
-
-    public boolean isVisible();
-
-    public boolean isVisible(Player player);
-
-    public boolean isTargetable();
-
     public boolean issueCommand(UnitCommand command);
 
     public boolean attack(Position target);
@@ -347,8 +799,6 @@ public class Unit {
     public boolean gather(Unit target);
 
     public boolean gather(Unit target, boolean shiftQueueCommand);
-
-
 
     public boolean repair(Unit target);
 

@@ -11,6 +11,8 @@ import bwapi.types.UpgradeType;
 import bwapi.values.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Game {
     final GameData gameData;
@@ -52,7 +54,12 @@ public class Game {
 
 
     public Collection<Unit> getAllUnits() {
-        return units.values();
+        Set<Unit> units = new HashSet<>();
+        for (int id=0; id < gameData.getInitialUnitCount(); id++) {
+            units.add(new Unit(gameData.unit(id), this));
+        }
+        return units;
+        //return units.values();
     }
 
     /*
@@ -78,9 +85,13 @@ public class Game {
         return bullets;
     }
 
-    /*
-    public List<Position> getNukeDots();
-    */
+
+    public Set<Position> getNukeDots() {
+        return IntStream.range(0, gameData.nukeDotCount())
+                .mapToObj(id -> new Position(gameData.getNukeDotX(id), gameData.getNukeDotY((id))))
+                .collect(Collectors.toSet());
+    }
+
 
     public Force getForce(final int forceID) {
         return forces.get(forceID);
@@ -93,22 +104,26 @@ public class Game {
     public Unit getUnit(final int unitID) {
         return units.get(unitID);
     }
-    /*
 
-    public Unit indexToUnit(int unitIndex);
+    //TODO
+    //public Unit indexToUnit(int unitIndex);
 
-    */
     public Region getRegion(final int regionID) {
         return regions.get(regionID);
     }
 
+    public GameType getGameType() {
+        return GameType.gameTypes.get(gameData.gameType());
+    }
+
+    public int getLatency() {
+        return gameData.latency();
+    }
+
+    public int getFrameCount() {
+        return gameData.frameCount();
+    }
     /*
-    public GameType getGameType() ;
-
-    public int getLatency();
-
-    public int getFrameCount();
-
     public int getReplayFrameCount();
 
     public int getFPS();
@@ -141,7 +156,6 @@ public class Game {
 
      public List<Unit> getUnitsInRectangle(int left, int top, int right, int bottom);
 
-     public List<Unit> getUnitsInRectangle(Position topLeft, Position bottomRight);
 
      public List<Unit> getUnitsInRadius(int x, int y, int radius);
 
@@ -472,8 +486,12 @@ public class Game {
 
     public void setFrameSkip(int frameSkip);
 
-    public boolean hasPath(Position source, Position destination);
-
+    */
+    //TODO
+    public boolean hasPath(Position source, Position destination) {
+        return false;
+    }
+    /*
     public boolean setAlliance(Player player, boolean allied);
 
     public boolean setAlliance(Player player);
@@ -495,11 +513,17 @@ public class Game {
         return regions.values();
     }
 
+    //TODO
+    public Region getRegionAt(final int x, final int y) {
+        return null;
+    }
+
+    //TODO
+    public Region getRegionAt(final Position position) {
+        return null;
+    }
+
     /*
-    public Region getRegionAt(int x, int y);
-
-    public Region getRegionAt(Position position);
-
     public int getLastEventTime();
 
     public boolean setRevealAll();
