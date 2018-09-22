@@ -14,9 +14,15 @@ import java.util.*;
 
 public class Game {
     final GameData gameData;
-    final Map<Integer, Unit> units = new HashMap<>();
+
+    ///CONSTANT
     final Map<Integer, Player> players = new HashMap<>();
+    final Map<Integer, Region> regions = new HashMap<>();
     final Map<Integer, Force> forces = new HashMap<>();
+
+    //CHANGING
+    final Map<Integer, Unit> units = new HashMap<>();
+
     final Map<Integer, Bullet> bullets = new HashMap<>();
 
     public Game(GameData gameData) {
@@ -30,6 +36,9 @@ public class Game {
         }
         for (int id=0; id < gameData.getPlayerCount(); id++) {
             players.put(id, new Player(gameData.getPlayer(id), this));
+        }
+        for (int id=0; id < gameData.regionCount(); id++) {
+            regions.put(id, new Region(gameData.getRegion(id), this));
         }
     }
 
@@ -73,23 +82,27 @@ public class Game {
     public List<Position> getNukeDots();
     */
 
-    public Force getForce(int forceID) {
+    public Force getForce(final int forceID) {
         return forces.get(forceID);
     }
 
-    public Player getPlayer(int playerID) {
+    public Player getPlayer(final int playerID) {
         return players.get(playerID);
     }
 
-    public Unit getUnit(int unitID) {
+    public Unit getUnit(final int unitID) {
         return units.get(unitID);
     }
     /*
 
     public Unit indexToUnit(int unitIndex);
 
-    public Region getRegion(int regionID);
+    */
+    public Region getRegion(final int regionID) {
+        return regions.get(regionID);
+    }
 
+    /*
     public GameType getGameType() ;
 
     public int getLatency();
@@ -477,8 +490,12 @@ public class Game {
 
     public int countdownTimer();
 
-    public List<Region> getAllRegions();
+    */
+    public Collection<Region> getAllRegions() {
+        return regions.values();
+    }
 
+    /*
     public Region getRegionAt(int x, int y);
 
     public Region getRegionAt(Position position);

@@ -2,77 +2,83 @@ package bwapi;
 
 import bwapi.point.Position;
 
-import java.util.Map;
-import java.util.HashMap;
+import JavaBWAPIBackend.Client.GameData.RegionData;
+
 import java.util.List;
 
 public class Region {
-    private final int id;
+    private final RegionData regionData;
+    private final Game game;
 
-    Region(int id) {
-        this.id = id;
+    Region(final RegionData regionData, final Game game) {
+        this.regionData = regionData;
+        this.game = game;
     }
 
     public int getID() {
-        return id;
+        return regionData.id();
     }
 
     public int getRegionGroupID() {
-        return -1;
+        return regionData.islandID();
     }
 
     public Position getCenter() {
-        return null;
+        return new Position(regionData.centerX(), regionData.centerY());
     }
 
     public boolean isHigherGround() {
-        return false;
+        return regionData.isHigherGround();
     }
 
     public int getDefensePriority() {
-        return -1;
+        return regionData.priority();
     }
 
     public boolean isAccessible() {
-        return false;
+        return regionData.isAccessible();
     }
 
+    //TODO
     public List<Region> getNeighbors() {
         return null;
     }
 
     public int getBoundsLeft() {
-        return -1;
+        return regionData.leftMost();
     }
 
     public int getBoundsTop() {
-        return -1;
+        return regionData.topMost();
     }
 
     public int getBoundsRight() {
-        return -1;
+        return regionData.rightMost();
     }
 
     public int getBoundsBottom() {
-        return -1;
+        return regionData.bottomMost();
     }
 
+    //TODO
     public Region getClosestAccessibleRegion() {
         return null;
     }
 
+    //TODO
     public Region getClosestInaccessibleRegion() {
         return null;
     }
 
+    //TODO
     public int getDistance(Region other) {
         return -1;
     }
 
+    //TODO
     public List<Unit> getUnits() {
         return null;
     }
-
 
     public boolean equals(Object that){
         if(!(that instanceof Region)){
