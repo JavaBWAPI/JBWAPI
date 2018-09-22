@@ -52,7 +52,7 @@ public enum TechType {
     Nuclear_Strike(45),
     Unknown(46);
 
-    private int id;
+    public final int id;
 
     TechType(int id) {
         this.id = id;

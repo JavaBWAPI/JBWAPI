@@ -25,8 +25,11 @@ public class Unit {
 
     public int getReplayID();
 
-    public Player getPlayer();
-
+    */
+    public Player getPlayer() {
+        return null;
+    }
+    /*
     public UnitType getType();
 
     public Position getPosition();

@@ -2,7 +2,8 @@ package bwapi;
 
 import JavaBWAPIBackend.Client.GameData.ForceData;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Force {
     private final ForceData forceData;
@@ -21,8 +22,10 @@ public class Force {
         return forceData.name();
     }
 
-    public List<Player> getPlayers() {
-        return null;
+    public Set<Player> getPlayers() {
+        return game.getPlayers().stream()
+                .filter(p -> this.equals(p.getForce()))
+                .collect(Collectors.toSet());
     }
 
     public boolean equals(Object that){

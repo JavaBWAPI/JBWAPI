@@ -14,7 +14,11 @@ public enum Race{
     None(7),
     Unknown(8);
 
-    private int id;
+    public static Race[] races = {
+            Zerg,  Terran, Protoss, Other, Unused, Select, Random, None, Unknown
+    };
+
+    public final int id;
 
     Race(int id){
         this.id = id;

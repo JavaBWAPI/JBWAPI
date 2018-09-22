@@ -67,7 +67,7 @@ public enum UpgradeType {
     None(61),
     Unknown(62);
 
-    private int id;
+    public final int id;
 
     UpgradeType(int id) {
         this.id = id;

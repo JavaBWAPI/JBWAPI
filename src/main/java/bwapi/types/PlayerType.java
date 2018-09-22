@@ -15,6 +15,11 @@ public enum PlayerType {
     ComputerLeft(11),
     Unknown(12);
 
+    public static PlayerType[] playerTypes = {
+            None, Computer, Player, RescuePassive, RescueActive, EitherPreferComputer,
+            EitherPreferHuman, Neutral, Closed, Observer, PlayerLeft, ComputerLeft, Unknown
+    };
+
     private int id;
 
     PlayerType(int id) {

@@ -29,14 +29,10 @@ public enum TextColor {
 	GreyCyan(30),
 	Turquoise(31);
 
-	private int value;
+	public final char value;
 
-	public int getValue(){
-		return value;
-	}
-
-	TextColor(int value){
-		this.value = value;
+	TextColor(final int value){
+		this.value = (char)value;
 	}
 
 	//SINCE 4.2

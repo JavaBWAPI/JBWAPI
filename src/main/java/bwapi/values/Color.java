@@ -1,5 +1,6 @@
 package bwapi.values;
 
+//TODO
 public class Color {
     private int r, g, b;
 
@@ -7,6 +8,10 @@ public class Color {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    public Color(int v) {
+        //TODO
     }
 
     public static Color Red;

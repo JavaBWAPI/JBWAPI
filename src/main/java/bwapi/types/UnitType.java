@@ -245,7 +245,7 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    final int id;
+    public final int id;
 
     UnitType(int id) {
         this.id = id;
