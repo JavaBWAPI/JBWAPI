@@ -281,6 +281,7 @@ public class Client {
         public int remainingLatencyFrames() { return sharedMemory.getInt(GameOffset + 16); }
         public int remainingLatencyTime() { return sharedMemory.getInt(GameOffset + 20); }
         public boolean hasLatCom() { return sharedMemory.get(GameOffset + 24) != 0; }
+        public void setLatcom(boolean enable) { sharedMemory.put(GameOffset + 24, (byte)(enable ? 1 : 0)); }
         public boolean hasGUI() { return sharedMemory.get(GameOffset + 25) != 0; }
         public int replayFrameCount() { return sharedMemory.getInt(GameOffset + 28); }
         public int randomSeed() { return sharedMemory.getInt(GameOffset + 32); }

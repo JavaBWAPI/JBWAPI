@@ -791,8 +791,10 @@ public class Game {
         return gameData.hasLatCom();
     }
 
-    //TODO
-    //public void setLatCom(boolean isEnabled);
+
+    public void setLatCom(final boolean isEnabled) {
+        gameData.setLatcom(isEnabled);
+    }
 
     public int getInstanceNumber() {
         return gameData.getInstanceID();
