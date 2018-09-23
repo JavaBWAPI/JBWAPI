@@ -1,9 +1,12 @@
 package bwapi.point;
 
-public abstract class Point {
+import bwapi.Game;
+
+abstract class Point {
     static final int TILE_WALK_FACTOR = 4; // 32 / 4
 
-    protected int x, y;
+    public final int x;
+    public final int y;
 	private int scalar;
 
 	Point(int x, int y, int type) {
@@ -16,14 +19,6 @@ public abstract class Point {
 		return Math.sqrt(x * x + y * y);
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
 	public String toString() {
 		return "[" + x + ", " + y + "]";
 	}
@@ -32,6 +27,15 @@ public abstract class Point {
 		if (!(o instanceof Point)) return false;
 		Point point = (Position) o;
 		return scalar == point.scalar && x == point.x && y == point.y;
+	}
+
+	/**
+	 * Check if the current point is a valid point for the current game
+	 */
+	public boolean isValid(final Game game) {
+		return x >= 0 && y >= 0 &&
+				scalar * x < game.mapWidth() * TilePosition.SIZE_IN_PIXELS &&
+				scalar * y < game.mapHeight() * TilePosition.SIZE_IN_PIXELS;
 	}
 
 	public int hashCode() {

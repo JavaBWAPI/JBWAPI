@@ -4,7 +4,7 @@ public class WalkPosition extends Point{
 
     public static final int SIZE_IN_PIXELS = 8;
 
-    public WalkPosition(int x, int y) {
+    public WalkPosition(final int x, final int y) {
         super(x, y, SIZE_IN_PIXELS);
     }
 
@@ -16,8 +16,24 @@ public class WalkPosition extends Point{
         return new TilePosition(x / TILE_WALK_FACTOR, y / TILE_WALK_FACTOR);
     }
 
-    public static  WalkPosition Invalid = new WalkPosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
-    public static  WalkPosition None = new WalkPosition(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
-    public static  WalkPosition Unknown = new WalkPosition(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
-    public static  WalkPosition Origin = new WalkPosition(0,0);
+    public WalkPosition subtract(final WalkPosition other) {
+        return new WalkPosition(x - other.x, y - other.y);
+    }
+
+    public WalkPosition add(final WalkPosition other) {
+        return new WalkPosition(x + other.x, y + other.y);
+    }
+
+    public WalkPosition divide(final int divisor) {
+        return new WalkPosition(x / divisor, y / divisor);
+    }
+
+    public WalkPosition multiply(final int multiplier) {
+        return new WalkPosition(x * multiplier, y * multiplier);
+    }
+
+    public static final WalkPosition Invalid = new WalkPosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
+    public static final WalkPosition None = new WalkPosition(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
+    public static final WalkPosition Unknown = new WalkPosition(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
+    public static final WalkPosition Origin = new WalkPosition(0,0);
 }

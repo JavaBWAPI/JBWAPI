@@ -127,10 +127,10 @@ public class Unit {
         /////// Compute distance
 
         // retrieve left/top/right/bottom values for calculations
-        int left = target.getX() - 1;
-        int top = target.getY() - 1;
-        int right = target.getX() + 1;
-        int bottom = target.getY() + 1;
+        int left = target.x - 1;
+        int top = target.y - 1;
+        int right = target.x + 1;
+        int bottom = target.y + 1;
 
         // compute x distance
         int xDist = getLeft() - right;

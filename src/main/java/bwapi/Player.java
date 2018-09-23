@@ -54,7 +54,7 @@ public class Player {
     }
 
     public boolean isEnemy(final Player player) {
-        return !isNeutral() && !isAlly(player);
+        return !(player.isObserver() || player.isNeutral() || isAlly(player));
     }
 
     public boolean isNeutral() {

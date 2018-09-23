@@ -6,13 +6,9 @@ public enum MouseButton {
 	M_MIDDLE(2),
 	M_MAX(3);
 
-	private int value;
+	public final int value;
 
-	public int getValue(){
-		return value;
-	}
-
-	MouseButton(int value){
+	MouseButton(final int value){
 		this.value = value;
 	}
 

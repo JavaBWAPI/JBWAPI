@@ -9,7 +9,7 @@ public class Position extends Point{
 
     public static final int SIZE_IN_PIXELS = 1;
 
-    public Position(int x, int y) {
+    public Position(final int x, final int y) {
         super(x, y, SIZE_IN_PIXELS);
     }
 
@@ -25,8 +25,24 @@ public class Position extends Point{
         return new WalkPosition(x / WalkPosition.SIZE_IN_PIXELS, y / WalkPosition.SIZE_IN_PIXELS);
     }
 
-    public static Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
-    public static Position None = new Position(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
-    public static Position Unknown = new Position(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
-    public static Position Origin = new Position(0, 0);
+    public Position subtract(final Position other) {
+        return new Position(x - other.x, y - other.y);
+    }
+
+    public Position add(final Position other) {
+        return new Position(x + other.x, y + other.y);
+    }
+
+    public Position divide(final int divisor) {
+        return new Position(x / divisor, y / divisor);
+    }
+
+    public Position multiply(final int multiplier) {
+        return new Position(x * multiplier, y * multiplier);
+    }
+
+    public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
+    public static final Position None = new Position(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
+    public static final Position Unknown = new Position(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
+    public static final Position Origin = new Position(0, 0);
 }
