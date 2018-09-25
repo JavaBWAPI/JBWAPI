@@ -27,10 +27,6 @@ public enum Race{
         this.id = id;
     }
 
-    public String toString() {
-        return null;
-    }
-
     public UnitType getWorker() {
         return workerTypes[id];
     }
