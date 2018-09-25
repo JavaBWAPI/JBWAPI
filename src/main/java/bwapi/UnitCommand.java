@@ -13,12 +13,12 @@ import static bwapi.types.UnitCommandType.*;
 import java.util.*;
 
 public class UnitCommand {
-    private final Unit unit;
-    private final UnitCommandType type;
-    private final Unit target;
-    private final int x;
-    private final int y;
-    private final int extra;
+    Unit unit;
+    final UnitCommandType type;
+    final Unit target;
+    final int x;
+    final int y;
+    final int extra;
 
     private UnitCommand(final Unit unit, final UnitCommandType type, final Unit target, final int x, final int y, final int extra) {
         this.unit = unit;

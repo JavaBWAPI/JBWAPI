@@ -1,5 +1,6 @@
 package bwapi;
 
+import JavaBWAPIBackend.Client;
 import JavaBWAPIBackend.Client.GameData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
@@ -68,6 +69,14 @@ public class Game {
 
     void unitHide(final int id) {
         visibleUnits.remove(id);
+    }
+
+    void addUnitCommand(final Client.UnitCommand unitCommand) {
+        gameData.addUnitCommand(unitCommand);
+    }
+
+    void addCommand(final Client.Command command) {
+        gameData.addCommand(command);
     }
 
     private void init() {
@@ -171,9 +180,6 @@ public class Game {
     public Unit getUnit(final int unitID) {
         return units.get(unitID);
     }
-
-    //TODO
-    //public Unit indexToUnit(int unitIndex);
 
     public Region getRegion(final int regionID) {
         return regions.get(regionID);
@@ -835,7 +841,6 @@ public class Game {
     public boolean isLatComEnabled() {
         return gameData.hasLatCom();
     }
-
 
     public void setLatCom(final boolean isEnabled) {
         gameData.setLatcom(isEnabled);

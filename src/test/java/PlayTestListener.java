@@ -1,6 +1,8 @@
 import bwapi.BWClient;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
+import bwapi.Player;
+import bwapi.types.UnitType;
 
 public class PlayTestListener extends DefaultBWListener {
     final BWClient bwClient;
@@ -14,8 +16,10 @@ public class PlayTestListener extends DefaultBWListener {
 
     public void onStart() {
         game = bwClient.getGame();
+        final Player self = game.self();
+        self.getUnits().stream().filter(u -> u.getType().isResourceDepot()).forEach(u -> u.train(self.getRace().getWorker()));
         System.out.println(game.getAllUnits().size());
-        System.out.println(game.getStaticMinerals().size());
+
     }
 
     public void onFrame() {

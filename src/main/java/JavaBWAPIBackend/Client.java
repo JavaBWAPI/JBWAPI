@@ -18,6 +18,16 @@ public class Client {
     private ByteBuffer sharedMemory;
     private LittleEndianPipe pipe;
 
+    public static class UnitCommand {
+        public int type, unit, target, x, y, extra;
+        private static final int SIZE = 24;
+    }
+
+    public static class Command {
+        public int type, value1, value2;
+        private static final int SIZE = 12;
+    }
+
     public final class GameData {
         private String parseString(int offset, int maxLen) {
             byte[] buf = new byte[maxLen];
@@ -433,13 +443,6 @@ public class Client {
 
         private static final int CommandOffset = 0x1ebfbcc;
 
-        public class Command {
-            int type, value1, value2;
-            public Command(int type, int value1, int value2) { this.type = type; this.value1 = value1; this.value2 = value2; }
-
-            private static final int SIZE = 12;
-        }
-
         public void addCommand(Command command) {
             int at = sharedMemory.getInt(CommandOffset);
             sharedMemory.putInt(CommandOffset + at * Command.SIZE + 4, command.type);
@@ -449,15 +452,6 @@ public class Client {
         }
 
         private static final int UnitCommandOffset = 0x1efa550;
-
-
-        public class UnitCommand {
-            int type, unit, target, x, y, extra;
-            public UnitCommand(int type, int unit, int target, int x, int y, int extra)
-            { this.type = type; this.unit = unit; this.target = target; this.x = x; this.y = y; this.extra = extra; }
-
-            private static final int SIZE = 24;
-        }
 
         public void addUnitCommand(UnitCommand command) {
             int at = sharedMemory.getInt(UnitCommandOffset);

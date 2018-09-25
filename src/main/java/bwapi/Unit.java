@@ -1,5 +1,6 @@
 package bwapi;
 
+import JavaBWAPIBackend.Client;
 import JavaBWAPIBackend.Client.GameData.UnitData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
@@ -20,10 +21,15 @@ public class Unit {
     private final UnitData unitData;
     private final Game game;
 
+    // static
     private final UnitType initialType;
     private final int initialResources;
     private final int initialHitPoints;
     private final Position initialPosition;
+
+    // variable
+    private int lastCommandFrame = 0;
+    private UnitCommand lastCommand;
 
     //TODO
     private final Set<Unit> connectedUnits = new HashSet<>();
@@ -210,9 +216,13 @@ public class Unit {
     }
 
 //    //TODO
-//    public int getLastCommandFrame();
+    public int getLastCommandFrame() {
+        return lastCommandFrame;
+    }
 
-//    public UnitCommand getLastCommand();
+    public UnitCommand getLastCommand() {
+        return lastCommand;
+    }
 
     public Player getLastAttackingPlayer() {
         return game.getPlayer(unitData.lastAttackerPlayer());
@@ -745,144 +755,310 @@ public class Unit {
     //TODO
     //public boolean isTargetable();
 
+
+    public boolean issueCommand(final UnitCommand command) {
+        if ( !canIssueCommand(command) ) {
+            return false;
+        }
+        command.unit = this;
+
+        // If using train or morph on a hatchery, automatically switch selection to larva
+        // (assuming canIssueCommand ensures that there is a larva)
+        if ( (command.type == UnitCommandType.Train || command.type == UnitCommandType.Morph) &&
+                getType().producesLarva() && command.getUnitType().whatBuilds().getKey() == UnitType.Zerg_Larva) {
+            for (final Unit larva : getLarva()) {
+                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() )  {
+                    command.unit = larva;
+                    break;
+                }
+            }
+            if (command.unit == this) {
+                return false;
+            }
+        }
+
+        Client.UnitCommand c = new Client.UnitCommand();
+        c.type      = command.getType().id;
+
+        c.unit = command.getUnit().getID();
+        if ( command.getTarget() != null ) {
+            c.target = command.getTarget().getID();
+        }
+        else {
+            c.target = -1;
+        }
+        c.x     = command.x;
+        c.y     = command.y;
+        c.extra = command.extra;
+        game.addUnitCommand(c);
+        lastCommandFrame = game.getFrameCount();
+        lastCommand = command;
+        return true;
+    }
+
+
+    public boolean attack(final Position target) {
+        return issueCommand(UnitCommand.attack(this, target));
+    }
+
+    public boolean attack(final Unit target) {
+        return issueCommand(UnitCommand.attack(this, target));
+    }
+
+    public boolean attack(final Position target, final boolean shiftQueueCommand) {
+        return issueCommand(UnitCommand.attack(this, target, shiftQueueCommand));
+    }
+
+    public boolean attack(final Unit target, final boolean shiftQueueCommand) {
+        return issueCommand(UnitCommand.attack(this, target,shiftQueueCommand));
+    }
+
+    public boolean build(final UnitType type){
+        return issueCommand(UnitCommand.train(this, type));
+    }
+
+    public boolean build(final UnitType type, final TilePosition target){
+        return issueCommand(UnitCommand.build(this, target, type));
+    }
+
+    public boolean buildAddon(final UnitType type){
+        return issueCommand(UnitCommand.buildAddon(this, type));
+    }
+
+    public boolean train(final UnitType type){
+        return issueCommand(UnitCommand.train(this, type));
+    }
+
+    public boolean morph(final UnitType type){
+        return issueCommand(UnitCommand.morph(this, type));
+    }
+
+    public boolean research(final TechType tech){
+        return issueCommand(UnitCommand.research(this, tech));
+    }
+
+    public boolean upgrade(final UpgradeType upgrade){
+        return issueCommand(UnitCommand.upgrade(this, upgrade));
+    }
+
+    public boolean setRallyPoint(final Position target){
+        return issueCommand(UnitCommand.setRallyPoint(this, target));
+    }
+
+    public boolean setRallyPoint(final Unit target){
+        return issueCommand(UnitCommand.setRallyPoint(this, target));
+    }
+
+    public boolean move(final Position target){
+        return issueCommand(UnitCommand.move(this, target));
+    }
+
+    public boolean move(final Position target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.move(this, target, shiftQueueCommand));
+    }
+
+    public boolean patrol(final Position target){
+        return issueCommand(UnitCommand.patrol(this, target));
+    }
+
+    public boolean patrol(final Position target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.patrol(this, target, shiftQueueCommand));
+    }
+
+    public boolean holdPosition(){
+        return issueCommand(UnitCommand.holdPosition(this));
+    }
+
+    public boolean holdPosition(final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.holdPosition(this, shiftQueueCommand));
+    }
+
+    public boolean stop(){
+        return issueCommand(UnitCommand.stop(this));
+    }
+
+    public boolean stop(final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.stop(this, shiftQueueCommand));
+    }
+
+    public boolean follow(final Unit target){
+        return issueCommand(UnitCommand.follow(this, target));
+    }
+    public boolean follow(final Unit target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.follow(this, target, shiftQueueCommand));
+    }
+
+    public boolean gather(final Unit target){
+        return issueCommand(UnitCommand.gather(this, target));
+    }
+
+    public boolean gather(final Unit target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.gather(this, target, shiftQueueCommand));
+    }
+
+    public boolean repair(final Unit target){
+        return issueCommand(UnitCommand.repair(this, target));
+    }
+
+    public boolean repair(final Unit target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.repair(this, target, shiftQueueCommand));
+    }
+
+    public boolean burrow(){
+        return issueCommand(UnitCommand.burrow(this));
+    }
+
+    public boolean unburrow(){
+        return issueCommand(UnitCommand.unburrow(this));
+    }
+
+    public boolean cloak(){
+        return issueCommand(UnitCommand.cloak(this));
+    }
+
+    public boolean decloak(){
+        return issueCommand(UnitCommand.decloak(this));
+    }
+
+    public boolean siege(){
+        return issueCommand(UnitCommand.siege(this));
+    }
+
+    public boolean unsiege(){
+        return issueCommand(UnitCommand.unsiege(this));
+    }
+
+    public boolean lift(){
+        return issueCommand(UnitCommand.lift(this));
+    }
+
+    public boolean land(final TilePosition target){
+        return issueCommand(UnitCommand.land(this, target));
+    }
+
+    public boolean load(final Unit target){
+        return issueCommand(UnitCommand.load(this, target));
+    }
+
+    public boolean load(final Unit target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.load(this, target, shiftQueueCommand));
+    }
+
+    public boolean unload(final Unit target){
+        return issueCommand(UnitCommand.unload(this, target));
+    }
+
+    public boolean unloadAll(){
+        return issueCommand(UnitCommand.unloadAll(this));
+    }
+
+    public boolean unloadAll(final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.unloadAll(this, shiftQueueCommand));
+    }
+
+    public boolean unloadAll(final Position target){
+        return issueCommand(UnitCommand.unloadAll(this, target));
+    }
+
+    public boolean unloadAll(final Position target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.unloadAll(this, target, shiftQueueCommand));
+    }
+
+    public boolean rightClick(final Position target){
+        return issueCommand(UnitCommand.rightClick(this, target));
+    }
+
+    public boolean rightClick(final Unit target){
+        return issueCommand(UnitCommand.rightClick(this, target));
+    }
+
+    public boolean rightClick(final Position target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.rightClick(this, target, shiftQueueCommand));
+    }
+
+    public boolean rightClick(final Unit target, final boolean shiftQueueCommand){
+        return issueCommand(UnitCommand.rightClick(this, target, shiftQueueCommand));
+    }
+
+    public boolean haltConstruction(){
+        return issueCommand(UnitCommand.haltConstruction(this));
+    }
+
+    public boolean cancelConstruction(){
+        return issueCommand(UnitCommand.cancelConstruction(this));
+    }
+
+    public boolean cancelAddon(){
+        return issueCommand(UnitCommand.cancelAddon(this));
+    }
+
+    public boolean cancelTrain(){
+        return issueCommand(UnitCommand.cancelTrain(this));
+    }
+
+    public boolean cancelTrain(final int slot){
+        return issueCommand(UnitCommand.cancelTrain(this, slot));
+    }
+
+    public boolean cancelMorph(){
+        return issueCommand(UnitCommand.cancelMorph(this));
+    }
+
+    public boolean cancelResearch(){
+        return issueCommand(UnitCommand.cancelResearch(this));
+    }
+
+    public boolean cancelUpgrade(){
+        return issueCommand(UnitCommand.cancelUpgrade(this));
+    }
+
+    public boolean useTech(final TechType tech){
+        return issueCommand(UnitCommand.useTech(this, tech));
+    }
+
+    public boolean useTech(final TechType tech, final Position target){
+        return issueCommand(UnitCommand.useTech(this, tech, target));
+    }
+
+    public boolean useTech(final TechType tech, final Unit target) {
+        return issueCommand(UnitCommand.useTech(this, tech, target));
+    }
+
+    public boolean placeCOP(final TilePosition target) {
+        return issueCommand(UnitCommand.placeCOP(this, target));
+    }
+
+
+    //TODO
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command) {
+        return true;
+    }
+
+    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        return true;
+    }
+
     /*
-    public boolean issueCommand(UnitCommand command);
-
-    public boolean attack(Position target);
-
-    public boolean attack(Unit target);
-
-    public boolean attack(Position target, boolean shiftQueueCommand);
-
-    public boolean attack(Unit target, boolean shiftQueueCommand);
-
-    public boolean build(UnitType type);
-
-    public boolean build(UnitType type, TilePosition target);
-
-    public boolean buildAddon(UnitType type);
-
-    public boolean train();
-
-    public boolean train(UnitType type);
-
-    public boolean morph(UnitType type);
-
-    public boolean research(TechType tech);
-
-    public boolean upgrade(UpgradeType upgrade);
-
-    public boolean setRallyPoint(Position target);
-
-    public boolean setRallyPoint(Unit target);
-
-    public boolean move(Position target);
-
-    public boolean move(Position target, boolean shiftQueueCommand);
-
-    public boolean patrol(Position target);
-
-    public boolean patrol(Position target, boolean shiftQueueCommand);
-
-    public boolean holdPosition();
-
-    public boolean holdPosition(boolean shiftQueueCommand);
-
-    public boolean stop();
-
-    public boolean stop(boolean shiftQueueCommand);
-
-    public boolean follow(Unit target);
-
-    public boolean follow(Unit target, boolean shiftQueueCommand);
-
-    public boolean gather(Unit target);
-
-    public boolean gather(Unit target, boolean shiftQueueCommand);
-
-    public boolean repair(Unit target);
-
-    public boolean repair(Unit target, boolean shiftQueueCommand);
-
-    public boolean burrow();
-
-    public boolean unburrow();
-
-    public boolean cloak();
-
-    public boolean decloak();
-
-    public boolean siege();
-
-    public boolean unsiege();
-
-    public boolean lift();
-
-    public boolean land(TilePosition target);
-
-    public boolean load(Unit target);
-
-    public boolean load(Unit target, boolean shiftQueueCommand);
-
-    public boolean unload(Unit target);
-
-    public boolean unloadAll();
-
-    public boolean unloadAll(boolean shiftQueueCommand);
-
-    public boolean unloadAll(Position target);
-
-    public boolean unloadAll(Position target, boolean shiftQueueCommand);
-
-    public boolean rightClick(Position target);
-
-    public boolean rightClick(Unit target);
-
-    public boolean rightClick(Position target, boolean shiftQueueCommand);
-
-    public boolean rightClick(Unit target, boolean shiftQueueCommand);
-
-    public boolean haltConstruction();
-
-    public boolean cancelConstruction();
-
-    public boolean cancelAddon();
-
-    public boolean cancelTrain();
-
-    public boolean cancelTrain(int slot);
-
-    public boolean cancelMorph();
-
-    public boolean cancelResearch();
-
-    public boolean cancelUpgrade();
-
-    public boolean useTech(TechType tech);
-
-    public boolean useTech(TechType tech, Position target);
-
-    public boolean useTech(TechType tech, Unit target);
-
-    public boolean placeCOP(TilePosition target);
-
-    */
-
-    /*
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit);
-
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType);
-
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits);
-
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions);
-
-    public boolean canIssueCommand(UnitCommand command);
-
-    public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
 
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
@@ -897,8 +1073,12 @@ public class Unit {
 
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
 
-    public boolean canCommand();
-
+    */
+    //TODO
+    public boolean canCommand() {
+        return true;
+    }
+    /*
     public boolean canCommandGrouped();
 
     public boolean canCommandGrouped(boolean checkCommandibility);
