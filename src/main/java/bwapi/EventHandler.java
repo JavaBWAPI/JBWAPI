@@ -5,11 +5,11 @@ import JavaBWAPIBackend.Client;
 import bwapi.point.Position;
 
 class EventHandler implements Client.EventHandler {
-    private final BWEventListener eventListener;
+    private final BWListener eventListener;
     private final Client.GameData data;
     private Game game;
 
-    public EventHandler(final BWEventListener eventListener, final Client.GameData data) {
+    public EventHandler(final BWListener eventListener, final Client.GameData data) {
         this.eventListener = eventListener;
         this.data = data;
     }

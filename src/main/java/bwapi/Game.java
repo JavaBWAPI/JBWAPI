@@ -1,7 +1,6 @@
 package bwapi;
 
 import JavaBWAPIBackend.Client.GameData;
-import bwapi.filter.UnitFilter;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
 import bwapi.point.WalkPosition;
@@ -404,14 +403,13 @@ public class Game {
          // Ground unit dimension check
          if (type != Special_Start_Location) {
              final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-             Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(), new UnitFilter(
-                     "!IsFlying    &&"
-                             + "!IsLoaded   &&"
-                             + " [&builder, &type](Unit u){ return u != builder || type == UnitTypes::Zerg_Nydus_Canal;} &&"
-                             + "GetLeft   <= targPos.x + type.dimensionRight()  &&"
-                             + " GetTop    <= targPos.y + type.dimensionDown()   &&"
-                             + "GetRight  >= targPos.x - type.dimensionLeft()   &&"
-                             + "GetBottom >= targPos.y - type.dimensionUp() )    "));
+             Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
+                     (u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
+                             && u.getLeft() <= targPos.x + type.dimensionRight()
+                             && u.getTop() <= targPos.y + type.dimensionDown()
+                             && u.getRight() <= targPos.x + type.dimensionLeft()
+                             && u.getBottom() <= targPos.y + type.dimensionUp()));
+
              for (Unit u : unitsInRect){
                  // Addons can be placed over units that can move, pushing them out of the way
                  if ( !(type.isAddon() && u.getType().canMove()) )

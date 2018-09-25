@@ -3,7 +3,7 @@ package bwapi;
 
 import bwapi.point.Position;
 
-public interface BWEventListener {
+public interface BWListener {
 
     void onStart();
 

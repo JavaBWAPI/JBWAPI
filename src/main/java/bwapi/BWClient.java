@@ -6,13 +6,13 @@ import java.util.Objects;
 
 
 public class BWClient {
-    private BWEventListener eventListener;
+    private BWListener eventListener;
 
     private Client client;
     private EventHandler handler;
 
 
-    public BWClient(final BWEventListener eventListener) {
+    public BWClient(final BWListener eventListener) {
         Objects.requireNonNull(eventListener);
         this.eventListener = eventListener;
     }
