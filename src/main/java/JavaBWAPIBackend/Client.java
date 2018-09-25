@@ -235,7 +235,7 @@ public class Client {
             static final int SIZE = 336;
         }
 
-        public UnitData unit(int id) { return new UnitData(id); }
+        public UnitData getUnit(int id) { return new UnitData(id); }
 
         private static final int BulletOffset = 0x346fa8;
 

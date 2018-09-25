@@ -6,19 +6,17 @@ import bwapi.point.Position;
 
 class EventHandler implements Client.EventHandler {
     private final BWListener eventListener;
-    private final Client.GameData data;
     private Game game;
 
     public EventHandler(final BWListener eventListener, final Client.GameData data) {
         this.eventListener = eventListener;
-        this.data = data;
+        game = new Game(data);
     }
 
     public void operation(Client.GameData.Event event) {
         switch (event.type()) {
             case 0: //MatchStart
-                //recreate a new game instance every onStart instead of a "clear" method in Game
-                game = new Game(data);
+                game.reset();
                 eventListener.onStart();
                 break;
             case 1: //MatchEnd
@@ -48,9 +46,11 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitEvade(game.getUnit(event.v1()));
                 break;
             case 10: // UnitShow
+                game.unitShow(event.v1());
                 eventListener.onUnitShow(game.getUnit(event.v1()));
                 break;
             case 11: //UnitHide
+                game.unitHide(event.v1());
                 eventListener.onUnitHide(game.getUnit(event.v1()));
                 break;
             case 12: //UnitCreate

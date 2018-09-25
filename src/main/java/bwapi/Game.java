@@ -18,21 +18,56 @@ import static bwapi.types.Race.Zerg;
 import static bwapi.types.UnitType.*;
 
 public class Game {
-    final GameData gameData;
+    private final GameData gameData;
 
-    ///CONSTANT
-    final Map<Integer, Player> players = new HashMap<>();
-    final Map<Integer, Region> regions = new HashMap<>();
-    final Map<Integer, Force> forces = new HashMap<>();
+    // CONSTANT
+    private final Map<Integer, Player> players = new HashMap<>();
+    private final Map<Integer, Region> regions = new HashMap<>();
+    private final Map<Integer, Force> forces = new HashMap<>();
 
-    //CHANGING
+    private final Set<Unit> staticMinerals = new HashSet<>();
+    private final Set<Unit> staticGeysers = new HashSet<>();
+    private final Set<Unit> staticNeutralUnits = new HashSet<>();
+
+// CHANGING
     final Map<Integer, Unit> units = new HashMap<>();
+    final Set<Integer> visibleUnits = new HashSet<>();
 
     final Map<Integer, Bullet> bullets = new HashMap<>();
 
     public Game(GameData gameData) {
         this.gameData = gameData;
+    }
+
+    /*
+    Call this method in EventHander::OnMatchStart
+     */
+    void reset() {
+        clear();
         init();
+    }
+
+    private void clear() {
+        players.clear();
+        regions.clear();
+        forces.clear();
+        staticMinerals.clear();
+        staticGeysers.clear();
+        staticNeutralUnits.clear();
+        units.clear();
+        visibleUnits.clear();
+        bullets.clear();
+    }
+
+    void unitShow(final int id) {
+        if (!units.containsKey(id)) {
+            units.put(id, new Unit(gameData.getUnit(id), this));
+        }
+        visibleUnits.add(id);
+    }
+
+    void unitHide(final int id) {
+        visibleUnits.remove(id);
     }
 
     private void init() {
@@ -45,66 +80,78 @@ public class Game {
         for (int id=0; id < gameData.regionCount(); id++) {
             regions.put(id, new Region(gameData.getRegion(id), this));
         }
-    }
 
-    public Collection<Force> getForces() {
-        return forces.values();
-    }
-
-    public Collection<Player> getPlayers() {
-        return players.values();
-    }
-
-
-    public Collection<Unit> getAllUnits() {
-        Set<Unit> units = new HashSet<>();
         for (int id=0; id < gameData.getInitialUnitCount(); id++) {
-            units.add(new Unit(gameData.unit(id), this));
+            final Unit unit = new Unit(gameData.getUnit(id), this);
+
+            units.put(id, unit);
+
+            if (unit.getType().isMineralField()) {
+                staticMinerals.add(unit);
+            }
+            if (unit.getType() == Resource_Vespene_Geyser) {
+                staticGeysers.add(unit);
+            }
+            if (unit.getPlayer().equals(neutral())) {
+                staticNeutralUnits.add(unit);
+            }
         }
-        return units;
-        //return units.values();
     }
 
-    //TODO
-    public List<Unit> getMinerals() {
-        return null;
+    public Set<Force> getForces() {
+        return new HashSet<>(forces.values());
     }
 
-    //TODO
-    public List<Unit> getGeysers() {
-        return null;
-    }
-
-    //TODO
-    public List<Unit> getNeutralUnits() {
-        return null;
-    }
-
-    //TODO
-    public List<Unit> getStaticMinerals() {
-        return null;
-    }
-
-    //TODO
-    public List<Unit> getStaticGeysers() {
-        return null;
-    }
-
-    //TODO
-    public List<Unit> getStaticNeutralUnits() {
-        return null;
+    public Set<Player> getPlayers() {
+        return new HashSet<>(players.values());
     }
 
 
-    public Collection<Bullet> getBullets() {
-        //TODO cache this in onFrame
-        final List<Bullet> bullets = new ArrayList<>();
-        for (int i=0; i < gameData.bulletCount(); i++) {
-            bullets.add(new Bullet(gameData.bullet(i), this));
+    public Set<Unit> getAllUnits() {
+        // simulate current BWAPI behavior
+        if (getFrameCount() == 0) {
+            return new HashSet<>(units.values());
         }
-        return bullets;
+        return visibleUnits.stream()
+                .map(units::get)
+                .collect(Collectors.toSet());
     }
 
+    public Set<Unit> getMinerals() {
+        return getAllUnits().stream()
+                .filter(u ->u.getType().isMineralField())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Unit> getGeysers() {
+        return getAllUnits().stream()
+                .filter(u ->u.getType() == Resource_Vespene_Geyser)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Unit> getNeutralUnits() {
+        return getAllUnits().stream()
+                .filter(u ->u.getPlayer().equals(neutral()))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Unit> getStaticMinerals() {
+        return new HashSet<>(staticMinerals);
+    }
+
+    public Set<Unit> getStaticGeysers() {
+        return new HashSet<>(staticGeysers);
+    }
+
+    public Set<Unit> getStaticNeutralUnits() {
+        return new HashSet<>(staticNeutralUnits);
+    }
+
+    public Set<Bullet> getBullets() {
+        // TODO
+        // for (int i=0; i < gameData.bulletCount(); i++) {bullets.add(new Bullet(gameData.bullet(i), this))};
+        return null;
+    }
 
     public Set<Position> getNukeDots() {
         return IntStream.range(0, gameData.nukeDotCount())
@@ -365,7 +412,7 @@ public class Game {
              return false;
          }
 
-         //if the unit is a refinery, we just need to check the set of geysers to see if the position
+         //if the getUnit is a refinery, we just need to check the set of geysers to see if the position
          //matches one of them (and the type is still vespene geyser)
          if ( type.isRefinery() ) {
              for (final Unit g : getGeysers()) {
@@ -400,7 +447,7 @@ public class Game {
              }
          }
 
-         // Ground unit dimension check
+         // Ground getUnit dimension check
          if (type != Special_Start_Location) {
              final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
              Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
