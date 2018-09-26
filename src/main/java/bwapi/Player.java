@@ -33,7 +33,7 @@ public class Player {
 
     public Set<Unit> getUnits() {
         return game.getAllUnits().stream()
-                .filter(u -> this.equals(u.getPlayer()))
+                .filter(u -> equals(u.getPlayer()))
                 .collect(Collectors.toSet());
     }
 

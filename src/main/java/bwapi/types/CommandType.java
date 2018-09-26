@@ -21,11 +21,7 @@ public enum CommandType {
 	SetCommandOptimizerLevel(17),
 	SetRevealAll(18);
 
-	private int value;
-
-	public int getValue(){
-		return value;
-	}
+	public final int value;
 
 	CommandType(int value){
 		this.value = value;

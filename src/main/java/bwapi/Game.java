@@ -5,16 +5,14 @@ import JavaBWAPIBackend.Client.GameData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
 import bwapi.point.WalkPosition;
-import bwapi.types.GameType;
-import bwapi.types.TechType;
-import bwapi.types.UnitType;
-import bwapi.types.UpgradeType;
+import bwapi.types.*;
 import bwapi.values.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static bwapi.types.CommandType.*;
 import static bwapi.types.Race.Zerg;
 import static bwapi.types.UnitType.*;
 
@@ -30,7 +28,7 @@ public class Game {
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
 
-// CHANGING
+    // CHANGING
     final Map<Integer, Unit> units = new HashMap<>();
     final Set<Integer> visibleUnits = new HashSet<>();
 
@@ -71,12 +69,12 @@ public class Game {
         visibleUnits.remove(id);
     }
 
-    void addUnitCommand(final Client.UnitCommand unitCommand) {
-        gameData.addUnitCommand(unitCommand);
+    void unitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
+        gameData.addUnitCommand(new Client.UnitCommand(type, unit, target, x, y, extra));
     }
 
-    void addCommand(final Client.Command command) {
-        gameData.addCommand(command);
+    void command(final int type, final int value1, final int value2) {
+        gameData.addCommand(new Client.Command(type, value1, value2));
     }
 
     private void init() {
@@ -89,6 +87,8 @@ public class Game {
         for (int id=0; id < gameData.regionCount(); id++) {
             regions.put(id, new Region(gameData.getRegion(id), this));
         }
+
+        regions.values().forEach(Region::updateNeighbours);
 
         for (int id=0; id < gameData.getInitialUnitCount(); id++) {
             final Unit unit = new Unit(gameData.getUnit(id), this);
@@ -226,13 +226,21 @@ public class Game {
      }
 
      //TODO
-     //public void setScreenPosition(final int x, final int y);
+     public void setScreenPosition(final int x, final int y) {
+        command(SetScreenPosition.value, x, y);
+     }
 
-    //public void setScreenPosition(final Position p);
+     public void setScreenPosition(final Position p) {
+        setScreenPosition(p.x, p.y);
+     }
 
-    //public void pingMinimap(final int x, final int y);
+     public void pingMinimap(final int x, final int y) {
+        command(PingMinimap.value, x, y);
+     }
 
-    //public void pingMinimap(final Position p);
+     public void pingMinimap(final Position p) {
+        pingMinimap(p.x, p.y);
+     }
 
      public boolean isFlagEnabled(final Flag flag) {
         return gameData.getFlag(flag.value);
@@ -287,6 +295,7 @@ public class Game {
 
      public boolean isWalkable(final int walkX, final int walkY) {
         //TODO bounds check
+
         return gameData.walkable(walkX, walkY);
      }
 
@@ -569,13 +578,18 @@ public class Game {
                  .collect(Collectors.toList());
      }
 
-     /*
-     public void printf(final String cstr_format);
 
-     public void sendText(final String cstr_format);
+     public void printf(final String cstr_format) {
+        command(Printf.value, gameData.addString(cstr_format), 0);
+     }
 
-     public void sendTextEx(final boolean toAllies, final String cstr_format);
-    */
+     public void sendText(final String cstr_format) {
+        command(SendText.value, gameData.addString(cstr_format), 0);
+     }
+
+     public void sendTextEx(final boolean toAllies, final String cstr_format) {
+        command(SendText.value, gameData.addString(cstr_format), toAllies ? 1 : 0);
+     }
 
      public boolean isInGame() {
          return gameData.isInGame();
@@ -597,23 +611,37 @@ public class Game {
          return gameData.isReplay();
      }
 
-     //TODO
-//     public void pauseGame();
-//
-//     public void resumeGame();
-//
-//     public void leaveGame();
-//
-//     public void restartGame();
-//
-//     public void setLocalSpeed(int speed);
-//
-//     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
-//         units.forEach(u -> u.issueCommand(command));
-//     }
+     public void pauseGame() {
+        command(PauseGame.value, 0, 0);
+     }
+
+     public void resumeGame() {
+        command(ResumeGame.value, 0, 0);
+     }
+
+     public void leaveGame() {
+        command(LeaveGame.value, 0, 0);
+     }
+
+     public void restartGame() {
+        command(RestartGame.value, 0, 0);
+     }
+
+     public void setLocalSpeed(final int speed) {
+        command(SetLocalSpeed.value, speed, 0);
+     }
+
+     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
+         return ! units.stream()
+                 .map(u -> u.issueCommand(command))
+                 .collect(Collectors.toList())
+                 .contains(false);
+     }
 
      public Set<Unit> getSelectedUnits() {
-         return getAllUnits().stream().filter(Unit::isSelected).collect(Collectors.toSet());
+         return IntStream.range(0, gameData.selectedUnitCount())
+                 .mapToObj(i -> units.get(gameData.selectedUnit(i)))
+                 .collect(Collectors.toSet());
      }
 
     public Player self() {
@@ -648,15 +676,6 @@ public class Game {
         return getPlayers().stream()
                 .filter(Player::isObserver)
                 .collect(Collectors.toSet());
-    }
-
-
-    public void setTextSize() {
-        setTextSize(TextSize.Default);
-    }
-
-    public void setTextSize(final TextSize size) {
-        //TODO
     }
 
     /*
@@ -854,38 +873,46 @@ public class Game {
         return includeSelects ? gameData.getBotAPM_selects() : gameData.getBotAPM_noselects();
     }
 
-    //TODO
-    //public boolean setMap(final String cstr_mapFileName);
+    //please just use a valid map here, not going to add checks for this to the java client
+    public boolean setMap(final String cstr_mapFileName) {
+        command(SetMap.value, gameData.addString(cstr_mapFileName), 0);
+        return true;
+    }
 
-    //public void setFrameSkip(int frameSkip)
+    public void setFrameSkip(int frameSkip) {
+        command(SetFrameSkip.value, frameSkip, 0);
+    }
+
 
     //TODO
     public boolean hasPath(Position source, Position destination) {
         return false;
     }
 
-//    public boolean setAlliance(Player player, boolean allied);
-//
-//    public boolean setAlliance(Player player);
-//
-//    public boolean setAlliance(Player player, boolean allied, boolean alliedVictory);
-//
-//    public boolean setVision(Player player);
-//
-//    public boolean setVision(Player player, boolean enabled);
+    // If you need these please implement (see command and make a PR to the github repo)
+    // public boolean setAlliance(Player player, boolean allied);
+    // public boolean setAlliance(Player player);
+    // public boolean setAlliance(Player player, boolean allied, boolean alliedVictory);
+    // public boolean setVision(Player player, boolean enabled);
+    // public void setGUI(bool enabled);
+    // public int getLastEventTime();
+    // public void setTextSize();
+    // public void setTextSize(final TextSize size);
 
     public int elapsedTime() {
         return gameData.elapsedTime();
     }
 
-    //public void setCommandOptimizationLevel(int level)
+    public void setCommandOptimizationLevel(final int level) {
+        command(SetCommandOptimizerLevel.value, level, 0);
+    }
 
     public int countdownTimer() {
         return gameData.countdownTimer();
     }
 
-    public Collection<Region> getAllRegions() {
-        return regions.values();
+    public Set<Region> getAllRegions() {
+        return new HashSet<>(regions.values());
     }
 
     //TODO
@@ -898,13 +925,20 @@ public class Game {
         return null;
     }
 
+
+
+    public boolean setRevealAll() {
+        setRevealAll(false);
+        return true;
+    }
+
+    public boolean setRevealAll(boolean reveal) {
+        command(SetRevealAll.value, reveal ? 1 : 0, 0);
+        return true;
+    }
+
+
     /*
-    public int getLastEventTime();
-
-    public boolean setRevealAll();
-
-    public boolean setRevealAll(boolean reveal);
-
     public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange);
 
     public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition);

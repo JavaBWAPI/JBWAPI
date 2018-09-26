@@ -24,7 +24,7 @@ public class Force {
 
     public Set<Player> getPlayers() {
         return game.getPlayers().stream()
-                .filter(p -> this.equals(p.getForce()))
+                .filter(p -> equals(p.getForce()))
                 .collect(Collectors.toSet());
     }
 

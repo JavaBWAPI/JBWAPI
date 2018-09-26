@@ -4,13 +4,42 @@ import bwapi.point.Position;
 
 import JavaBWAPIBackend.Client.GameData.RegionData;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.IntStream;
+
 public class Region {
     private final RegionData regionData;
     private final Game game;
 
+    private final Set<Region> neighbours = new HashSet<>();
+    private Region closestAccessibleRegion;
+    private Region closestInaccessibleRegion;
+
     Region(final RegionData regionData, final Game game) {
         this.regionData = regionData;
         this.game = game;
+    }
+
+    void updateNeighbours() {
+        int accessibleBestDist = Integer.MAX_VALUE;
+        int inaccessibleBestDist = Integer.MAX_VALUE;
+
+        for (int i=0; i < regionData.neighborCount(); i++) {
+            final Region region = game.getRegion(regionData.neighbor(i));
+            neighbours.add(region);
+            int d = getDistance(region);
+            if (region.isAccessible()) {
+                if (d < accessibleBestDist) {
+                    closestAccessibleRegion = region;
+                    accessibleBestDist = d;
+                }
+            }
+            else if (d < inaccessibleBestDist) {
+                closestInaccessibleRegion = region;
+                inaccessibleBestDist = d;
+            }
+        }
     }
 
     public int getID() {
@@ -37,10 +66,10 @@ public class Region {
         return regionData.isAccessible();
     }
 
-    //TODO
-//    public List<Region> getNeighbors() {
-//        return null;
-//    }
+
+    public Set<Region> getNeighbors() {
+        return new HashSet<>(neighbours);
+    }
 
     public int getBoundsLeft() {
         return regionData.leftMost();
@@ -58,25 +87,22 @@ public class Region {
         return regionData.bottomMost();
     }
 
-    //TODO
-//    public Region getClosestAccessibleRegion() {
-//        return null;
-//    }
+    public Region getClosestAccessibleRegion() {
+        return closestAccessibleRegion;
+    }
 
-    //TODO
-//    public Region getClosestInaccessibleRegion() {
-//        return null;
-//    }
+    public Region getClosestInaccessibleRegion() {
+        return closestInaccessibleRegion;
+    }
 
-    //TODO
-//    public int getDistance(Region other) {
-//        return -1;
-//    }
+    public int getDistance(final Region other) {
+        return getCenter().getApproxDistance(other.getCenter());
+    }
 
-    //TODO
-//    public List<Unit> getUnits() {
-//        return null;
-//    }
+    public Set<Unit> getUnits() {
+        return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),
+                (u -> equals(u.getRegion())));
+    }
 
     public boolean equals(Object that){
         if(!(that instanceof Region)){
@@ -88,5 +114,4 @@ public class Region {
     public int hashCode(){
         return getID();
     }
-
 }

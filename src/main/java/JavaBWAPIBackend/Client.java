@@ -19,12 +19,25 @@ public class Client {
     private LittleEndianPipe pipe;
 
     public static class UnitCommand {
-        public int type, unit, target, x, y, extra;
+        public UnitCommand(int type, int unit, int target, int x, int y, int extra) {
+            this.type = type;
+            this.unit = unit;
+            this.target = target;
+            this.x = x;
+            this.y = y;
+            this.extra = extra;
+        }
+        int type, unit, target, x, y, extra;
         private static final int SIZE = 24;
     }
 
     public static class Command {
-        public int type, value1, value2;
+        public Command(int type, int value1, int value2) {
+            this.type = type;
+            this.value1 = value1;
+            this.value2 = value2;
+        }
+        int type, value1, value2;
         private static final int SIZE = 12;
     }
 

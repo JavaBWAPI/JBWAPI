@@ -777,20 +777,14 @@ public class Unit {
             }
         }
 
-        Client.UnitCommand c = new Client.UnitCommand();
-        c.type      = command.getType().id;
-
-        c.unit = command.getUnit().getID();
-        if ( command.getTarget() != null ) {
-            c.target = command.getTarget().getID();
-        }
-        else {
-            c.target = -1;
-        }
-        c.x     = command.x;
-        c.y     = command.y;
-        c.extra = command.extra;
-        game.addUnitCommand(c);
+        game.unitCommand(
+                command.getType().id,
+                command.getUnit().getID(),
+                command.getTarget() != null ? command.getTarget().getID() : -1,
+                command.x,
+                command.y,
+                command.extra
+        );
         lastCommandFrame = game.getFrameCount();
         lastCommand = command;
         return true;
