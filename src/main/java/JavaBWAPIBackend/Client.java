@@ -344,7 +344,7 @@ public class Client {
         public short mapSplitTilesRegion1(int idx) { return sharedMemory.getShort(GameOffset + 1780416 + idx * 2); }
         public short mapSplitTilesRegion2(int idx) { return sharedMemory.getShort(GameOffset + 1790416 + idx * 2); }
 
-        private static final int RegionOffset = 0x1b78e0;
+        private static final int RegionOffset = 0x500e0c;
 
         public int regionCount() { return sharedMemory.getInt(RegionOffset); }
 
