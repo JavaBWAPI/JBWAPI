@@ -3,7 +3,7 @@ import bwapi.BWClient;
 import bwapi.Game;
 import bwapi.Player;
 
-public class MinimalListener extends DefaultBWListener {
+class MinimalListener extends DefaultBWListener {
 	final BWClient bwClient;
 
 	Game game;

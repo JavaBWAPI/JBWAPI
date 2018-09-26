@@ -4,7 +4,7 @@ import bwapi.types.UnitType;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PlayTestListener extends DefaultBWListener {
+class PlayTestListener extends DefaultBWListener {
     final BWClient bwClient;
 
     Game game;

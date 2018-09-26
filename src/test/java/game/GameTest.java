@@ -4,7 +4,7 @@ import bwapi.BWClient;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
 
-public class GameTest extends DefaultBWListener {
+class GameTest extends DefaultBWListener {
     final BWClient bwClient;
 
     Game game;
