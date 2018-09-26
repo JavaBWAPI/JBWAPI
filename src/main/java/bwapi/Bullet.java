@@ -54,7 +54,7 @@ public class Bullet {
     }
 
     public Position getTargetPosition() {
-        return new Position(bulletData.positionX(), bulletData.positionY());
+        return new Position(bulletData.targetPositionX(), bulletData.targetPositionY());
     }
 
     public int getRemoveTimer() {

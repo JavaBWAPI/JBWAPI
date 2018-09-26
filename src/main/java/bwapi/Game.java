@@ -957,4 +957,9 @@ public class Game {
 
     public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer, Player fromPlayer);
     */
+
+    //Since 4.2.0
+    public int getRandomSeed() {
+        return gameData.randomSeed();
+    }
 }
