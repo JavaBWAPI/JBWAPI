@@ -433,7 +433,9 @@ public class Unit {
         if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
             return new HashSet<>();
         }
-        return connectedUnits;
+        return game.getAllUnits().stream()
+                .filter(u -> equals(u.getCarrier()))
+                .collect(Collectors.toSet());
     }
 
     public Unit getHatchery() {
@@ -444,7 +446,9 @@ public class Unit {
         if (!getType().producesLarva()) {
             return new HashSet<>();
         }
-        return connectedUnits;
+        return game.getAllUnits().stream()
+                .filter(u -> equals(u.getHatchery()))
+                .collect(Collectors.toSet());
     }
 
     //TODO
@@ -500,6 +504,10 @@ public class Unit {
 
     public boolean isBurrowed() {
         return unitData.isBurrowed();
+    }
+
+    public boolean isCarrying() {
+        return isCarryingGas() || isCarryingMinerals();
     }
 
     public boolean isCarryingGas() {
