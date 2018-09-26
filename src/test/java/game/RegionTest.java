@@ -19,7 +19,7 @@ class RegionTest extends DefaultBWListener {
         game = bwClient.getGame();
 
         for (final Region region : game.getAllRegions()) {
-            System.out.println(region.getID() + ": {(" + region.getBoundsLeft() + ", " + region.getBoundsTop() + "), (" + region.getBoundsRight() + ", " + region.getBoundsBottom() + ")}");
+            System.out.println(region.getID() + ": {(" + region.getBoundsLeft() + ", " + region.getBoundsTop() + "), (" + region.getBoundsRight() + ", " + region.getBoundsBottom() + ")}, neighbours: " + region.getNeighbors().size());
         }
     }
 
