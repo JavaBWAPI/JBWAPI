@@ -34,7 +34,7 @@ public class Game {
 
     final Map<Integer, Bullet> bullets = new HashMap<>();
 
-    public Game(GameData gameData) {
+    public Game(final GameData gameData) {
         this.gameData = gameData;
     }
 
@@ -58,25 +58,6 @@ public class Game {
         bullets.clear();
     }
 
-    void unitShow(final int id) {
-        if (!units.containsKey(id)) {
-            units.put(id, new Unit(gameData.getUnit(id), this));
-        }
-        visibleUnits.add(id);
-    }
-
-    void unitHide(final int id) {
-        visibleUnits.remove(id);
-    }
-
-    void unitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
-        gameData.addUnitCommand(new Client.UnitCommand(type, unit, target, x, y, extra));
-    }
-
-    void command(final int type, final int value1, final int value2) {
-        gameData.addCommand(new Client.Command(type, value1, value2));
-    }
-
     private void init() {
         for (int id=0; id < gameData.getForceCount(); id++) {
             forces.put(id, new Force(gameData.getForce(id), this));
@@ -84,6 +65,11 @@ public class Game {
         for (int id=0; id < gameData.getPlayerCount(); id++) {
             players.put(id, new Player(gameData.getPlayer(id), this));
         }
+
+        for (int id=0; id < gameData.bulletCount(); id++) {
+            bullets.put(id, new Bullet(gameData.getBullet(id), this));
+        }
+
         for (int id=0; id < gameData.regionCount(); id++) {
             regions.put(id, new Region(gameData.getRegion(id), this));
         }
@@ -107,6 +93,25 @@ public class Game {
         }
     }
 
+    void unitShow(final int id) {
+        if (!units.containsKey(id)) {
+            units.put(id, new Unit(gameData.getUnit(id), this));
+        }
+        visibleUnits.add(id);
+    }
+
+    void unitHide(final int id) {
+        visibleUnits.remove(id);
+    }
+
+    void unitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
+        gameData.addUnitCommand(new Client.UnitCommand(type, unit, target, x, y, extra));
+    }
+
+    void command(final int type, final int value1, final int value2) {
+        gameData.addCommand(new Client.Command(type, value1, value2));
+    }
+
     public Set<Force> getForces() {
         return new HashSet<>(forces.values());
     }
@@ -117,7 +122,6 @@ public class Game {
 
 
     public Set<Unit> getAllUnits() {
-        // simulate current BWAPI behavior
         if (getFrameCount() == 0) {
             return new HashSet<>(units.values());
         }
@@ -157,9 +161,9 @@ public class Game {
     }
 
     public Set<Bullet> getBullets() {
-        // TODO
-        // for (int i=0; i < gameData.bulletCount(); i++) {bullets.add(new Bullet(gameData.bullet(i), this))};
-        return null;
+        return bullets.values().stream()
+                .filter(Bullet::exists)
+                .collect(Collectors.toSet());
     }
 
     public Set<Position> getNukeDots() {
@@ -873,19 +877,12 @@ public class Game {
         return includeSelects ? gameData.getBotAPM_selects() : gameData.getBotAPM_noselects();
     }
 
-    //please just use a valid map here, not going to add checks for this to the java client
-    public boolean setMap(final String cstr_mapFileName) {
-        command(SetMap.value, gameData.addString(cstr_mapFileName), 0);
-        return true;
-    }
-
     public void setFrameSkip(int frameSkip) {
         command(SetFrameSkip.value, frameSkip, 0);
     }
 
-
     //TODO
-    public boolean hasPath(Position source, Position destination) {
+    public boolean hasPath(final Position source, final Position destination) {
         return false;
     }
 
@@ -898,6 +895,9 @@ public class Game {
     // public int getLastEventTime();
     // public void setTextSize();
     // public void setTextSize(final TextSize size);
+    // public boolean setMap(final String cstr_mapFileName);
+    // public boolean setRevealAll();return true;
+    // public boolean setRevealAll(boolean reveal);
 
     public int elapsedTime() {
         return gameData.elapsedTime();
@@ -922,21 +922,8 @@ public class Game {
 
     //TODO
     public Region getRegionAt(final Position position) {
-        return null;
+        return getRegionAt(position.x, position.y);
     }
-
-
-
-    public boolean setRevealAll() {
-        setRevealAll(false);
-        return true;
-    }
-
-    public boolean setRevealAll(boolean reveal) {
-        command(SetRevealAll.value, reveal ? 1 : 0, 0);
-        return true;
-    }
-
 
     /*
     public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange);

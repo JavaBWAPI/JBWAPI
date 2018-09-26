@@ -287,7 +287,7 @@ public class Client {
             static final int SIZE = 80;
         }
 
-        public BulletData bullet(int index) { return new BulletData(index); }
+        public BulletData getBullet(int index) { return new BulletData(index); }
 
         private static final int NukeOffset = 0x348ee8;
 
