@@ -30,9 +30,6 @@ public class Unit {
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
 
-    //TODO
-    private final Set<Unit> connectedUnits = new HashSet<>();
-
     Unit(final UnitData unitData, final Game game) {
         this.unitData = unitData;
         this.game = game;
@@ -214,7 +211,6 @@ public class Unit {
         return hasPath(target.getPosition());
     }
 
-//    //TODO
     public int getLastCommandFrame() {
         return lastCommandFrame;
     }
@@ -409,9 +405,13 @@ public class Unit {
         return game.getUnit(unitData.transport());
     }
 
-    //TODO
-    public List<Unit> getLoadedUnits() {
-        return null;
+    public Set<Unit> getLoadedUnits() {
+        if (getType().spaceProvided() < 1) {
+            return new HashSet<>();
+        }
+        return game.getAllUnits().stream()
+                .filter(u -> equals(u.getTransport()))
+                .collect(Collectors.toSet());
     }
 
     public int getSpaceRemaining() {
@@ -450,11 +450,55 @@ public class Unit {
                 .collect(Collectors.toSet());
     }
 
-    //TODO
-    //public Set<Unit> getUnitsInRadius(final int radius)
+    public Set<Unit> getUnitsInRadius(final int radius) {
+        if (!exists()) {
+            return new HashSet<>();
+        }
+        return game.getUnitsInRectangle(
+                getLeft() - radius,
+                getTop() - radius,
+                getRight() + radius,
+                getBottom() + radius,
+                (u -> getDistance(u) <= radius));
+    }
 
-    //TODO
-    //public List<Unit> getUnitsInWeaponRange(final WeaponType weapon);
+    public Set<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
+        // Return if this unit does not exist
+        if ( !exists() ) {
+            return new HashSet<>();
+        }
+
+        int max = getPlayer().weaponMaxRange(weapon);
+
+        return game.getUnitsInRectangle(
+                getLeft() - max,
+                getTop() - max,
+                getRight() + max,
+                getBottom() + max,
+                (u -> {
+                    // Unit check and unit status
+                    if ( u == this || u.isInvincible() ) {
+                        return false;
+                    }
+
+                    // Weapon distance check
+                    final int dist = getDistance(u);
+                    if ( (weapon.minRange() != 0 && dist < weapon.minRange()) || dist > max ) {
+                        return false;
+                    }
+
+                    // Weapon behavioural checks
+                    final UnitType ut = u.getType();
+                    return (!weapon.targetsOwn() || u.getPlayer().equals(getPlayer())) &&
+                            (weapon.targetsAir() || u.isFlying()) &&
+                            (weapon.targetsGround() || !u.isFlying()) &&
+                            (!weapon.targetsMechanical() || !ut.isMechanical()) &&
+                            (!weapon.targetsOrganic() || !ut.isOrganic()) &&
+                            (!weapon.targetsNonBuilding() || ut.isBuilding()) &&
+                            (!weapon.targetsNonRobotic() || ut.isRobotic()) &&
+                            (!weapon.targetsOrgOrMech() || (!ut.isOrganic() && !ut.isMechanical()));
+                }));
+    }
 
     public boolean hasNuke() {
         return unitData.hasNuke();
@@ -759,8 +803,24 @@ public class Unit {
         return unitData.isVisible(player.getID());
     }
 
-    //TODO
-    //public boolean isTargetable();
+    public boolean isTargetable() {
+        if (!exists()) {
+            return false;
+        }
+        final UnitType ut = getType();
+        if (!isCompleted() &&
+                !ut.isBuilding() &&
+                !isMorphing() &&
+                ut != Protoss_Archon &&
+                ut != Protoss_Dark_Archon) {
+            return false;
+
+        }
+        return ut != Spell_Scanner_Sweep &&
+                ut != Spell_Dark_Swarm &&
+                ut != Spell_Disruption_Web &&
+                ut != Special_Map_Revealer;
+    }
 
 
     public boolean issueCommand(final UnitCommand command) {
@@ -1029,102 +1089,487 @@ public class Unit {
         return issueCommand(UnitCommand.placeCOP(this, target));
     }
 
-
-    //TODO
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
-        return true;
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanBuildUnitType, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit) {
-        return true;
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanBuildUnitType, checkCanTargetUnit, true);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType) {
-        return true;
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanBuildUnitType);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits) {
-        return true;
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, true);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions) {
-        return true;
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, true);
     }
 
     public boolean canIssueCommand(UnitCommand command) {
-        return true;
+        return canIssueCommand(command, true);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( ! checkCommandibility ) {
+            return true;
+        }
+        else if ( !canCommand() ) {
+            return false;
+        }
+
+        final UnitCommandType ct = command.type;
+        if ( checkCanIssueCommandType && !canIssueCommandType(ct, false)) {
+            return false;
+        }
+
+        switch (ct)  {
+            case Attack_Move: return true;
+            case Attack_Unit: return canAttackUnit(command.target, checkCanTargetUnit, false, false);
+            case Build: return canBuild(command.getUnitType(), new TilePosition(command.x, command.y), checkCanBuildUnitType, false, false);
+            case Build_Addon: return canBuildAddon( command.getUnitType(), false, false);
+            case Train: return canTrain( command.getUnitType(), false, false);
+            case Morph: return canMorph( command.getUnitType(), false, false);
+            case Research: return game.canResearch(command.getTechType(), this,  false);
+            case Upgrade: return game.canUpgrade(command.getUpgradeType(),  this,false);
+            case Set_Rally_Position: return true;
+            case Set_Rally_Unit: return canSetRallyUnit(command.target, checkCanTargetUnit, false, false);
+            case Move: return true;
+            case Patrol: return true;
+            case Hold_Position:  return true;
+            case Stop: return true;
+            case Follow: return canFollow(command.target, checkCanTargetUnit, false, false);
+            case Gather: return canGather(command.target, checkCanTargetUnit, false, false);
+            case Return_Cargo: return true;
+            case Repair:  return canRepair(command.target, checkCanTargetUnit, false, false);
+            case Burrow: return true;
+            case Unburrow: return true;
+            case Cloak: return true;
+            case Decloak: return true;
+            case Siege: return true;
+            case Unsiege: return true;
+            case Lift: return true;
+            case Land: return canLand(new TilePosition(command.x, command.y), false, false);
+            case Load: return canLoad(command.target, checkCanTargetUnit, false, false);
+            case Unload:  return canUnload( command.target, checkCanTargetUnit, false, false, false);
+            case Unload_All: return true;
+            case Unload_All_Position:  return canUnloadAllPosition( command.getTargetPosition(), false, false);
+            case Right_Click_Position:  return true;
+            case Right_Click_Unit:  return canRightClickUnit( command.target, checkCanTargetUnit, false, false);
+            case Halt_Construction: return true;
+            case Cancel_Construction: return true;
+            case Cancel_Addon: return true;
+            case Cancel_Train:  return true;
+            case Cancel_Train_Slot: return canCancelTrainSlot( command.extra, false, false);
+            case Cancel_Morph: return true;
+            case Cancel_Research: return true;
+            case Cancel_Upgrade: return true;
+            case Use_Tech: return canUseTechWithoutTarget( TechType.techTypes[command.extra], false, false);
+            case Use_Tech_Unit: return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+            case Use_Tech_Position: return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+            case Place_COP: return canPlaceCOP(new TilePosition(command.x, command.y), false, false);
+        }
         return true;
     }
 
-    /*
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+        return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit);
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, checkCanIssueCommandType, true);
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits);
+    }
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions);
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit){
+        return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, true);
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand);
+    }
 
-    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits){
+        return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, true);
+    }
 
-    */
-    //TODO
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions){
+        return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, true);
+    }
+
+    public boolean canIssueCommandGrouped(UnitCommand command) {
+        return canIssueCommandGrouped(command, true);
+    }
+
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility){
+        if (!checkCommandibility ) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+
+        final UnitCommandType ct = command.type;
+        if ( checkCanIssueCommandType && !canIssueCommandTypeGrouped(ct, false, false) ) {
+            return false;
+        }
+
+        switch (ct)  {
+            case Attack_Move: return true;
+            case Attack_Unit:  return canAttackUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
+            case Build: return false;
+            case Build_Addon:  return false;
+            case Train: return canTrain(command.getUnitType(), false, false);
+            case Morph:  return canMorph(command.getUnitType(), false, false);
+            case Research: return false;
+            case Upgrade: return false;
+            case Set_Rally_Position: return false;
+            case Set_Rally_Unit: return false;
+            case Move: return true;
+            case Patrol: return true;
+            case Hold_Position: return true;
+            case Stop: return true;
+            case Follow: return canFollow(command.target, checkCanTargetUnit, false, false);
+            case Gather: return canGather(command.target, checkCanTargetUnit, false, false);
+            case Return_Cargo: return true;
+            case Repair: return canRepair(command.target, checkCanTargetUnit, false, false);
+            case Burrow: return true;
+            case Unburrow: return true;
+            case Cloak: return true;
+            case Decloak: return true;
+            case Siege: return true;
+            case Unsiege: return true;
+            case Lift: return false;
+            case Land: return false;
+            case Load: return canLoad(command.target, checkCanTargetUnit, false, false);
+            case Unload: return false;
+            case Unload_All: return false;
+            case Unload_All_Position: return canUnloadAllPosition(command.getTargetPosition(), false, false);
+            case Right_Click_Position: return true;
+            case Right_Click_Unit: return canRightClickUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
+            case Halt_Construction: return true;
+            case Cancel_Construction: return false;
+            case Cancel_Addon: return false;
+            case Cancel_Train: return false;
+            case Cancel_Train_Slot: return false;
+            case Cancel_Morph: return true;
+            case Cancel_Research: return false;
+            case Cancel_Upgrade: return false;
+            case Use_Tech: return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
+            case Use_Tech_Unit: return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+            case Use_Tech_Position: return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+            case Place_COP: return false;
+        }
+        return true;
+    }
+
+
     public boolean canCommand() {
+        if (!exists() || !getPlayer().equals(game.self())) {
+            return false;
+        }
+
+        // Global can be ordered check
+        if ( isLockedDown() || isMaelstrommed() || isStasised() ||
+                !isPowered() || getOrder() == Order.ZergBirth || isLoaded() ) {
+            if ( !getType().producesLarva() ) {
+                return false;
+            }
+            else {
+                for (Unit larva : getLarva())  {
+                    if (larva.canCommand() ) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        final UnitType uType = getType();
+        if ( uType == Protoss_Interceptor ||
+                uType == Terran_Vulture_Spider_Mine ||
+                uType == Spell_Scanner_Sweep ||
+                uType == Special_Map_Revealer ) {
+            return false;
+        }
+
+        if (isCompleted() &&
+                ( uType == Protoss_Pylon ||
+                        uType == Terran_Supply_Depot ||
+                        uType.isResourceContainer() ||
+                        uType == Protoss_Shield_Battery ||
+                        uType == Terran_Nuclear_Missile ||
+                        uType.isPowerup() ||
+                        ( uType.isSpecialBuilding() && !uType.isFlagBeacon()))) {
+            return false;
+        }
+        return isCompleted() || uType.isBuilding() || isMorphing();
+    }
+    
+    public boolean canCommandGrouped() {
+        return canCommandGrouped(true);
+    }
+
+    public boolean canCommandGrouped(boolean checkCommandibility) {
+        if ( !checkCommandibility ) {
+            return true;
+        }
+        else if (!canCommand() ) {
+            return false;
+        }
+
+        return !getType().isBuilding() && !getType().isCritter();
+    }
+
+    public boolean canIssueCommandType(UnitCommandType ct) {
+        return canIssueCommandType(ct, true);
+    }
+
+    public boolean canIssueCommandType(UnitCommandType ct, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
+        switch (ct) {
+            case Attack_Move: return canAttackMove(false);
+            case Attack_Unit: return canAttackUnit(false);
+            case Build: return canBuild(false);
+            case Build_Addon: return canBuildAddon(false);
+            case Train: return canTrain(false);
+            case Morph: return canMorph(false);
+            case Research: return canResearch(false);
+            case Upgrade: return canUpgrade(false);
+            case Set_Rally_Position: return canSetRallyPosition(false);
+            case Set_Rally_Unit: return canSetRallyUnit(false);
+            case Move: return canMove(false);
+            case Patrol: return canPatrol(false);
+            case Hold_Position: return canHoldPosition(false);
+            case Stop: return canStop(false);
+            case Follow: return canFollow(false);
+            case Gather: return canGather(false);
+            case Return_Cargo: return canReturnCargo(false);
+            case Repair: return canRepair(false);
+            case Burrow: return canBurrow(false);
+            case Unburrow: return canUnburrow(false);
+            case Cloak: return canCloak(false);
+            case Decloak: return canDecloak(false);
+            case Siege: return canSiege(false);
+            case Unsiege: return canUnsiege(false);
+            case Lift: return canLift(false);
+            case Land: return canLand(false);
+            case Load: return canLoad(false);
+            case Unload: return canUnload(false);
+            case Unload_All: return canUnloadAll(false);
+            case Unload_All_Position: return canUnloadAllPosition(false);
+            case Right_Click_Position: return canRightClickPosition(false);
+            case Right_Click_Unit: return canRightClickUnit(false);
+            case Halt_Construction: return canHaltConstruction(false);
+            case Cancel_Construction: return canCancelConstruction(false);
+            case Cancel_Addon: return canCancelAddon(false);
+            case Cancel_Train: return canCancelTrain(false);
+            case Cancel_Train_Slot: return canCancelTrainSlot(false);
+            case Cancel_Morph: return canCancelMorph(false);
+            case Cancel_Research: return canCancelResearch(false);
+            case Cancel_Upgrade: return canCancelUpgrade(false);
+            case Use_Tech:
+            case Use_Tech_Unit:
+            case Use_Tech_Position: return canUseTechWithOrWithoutTarget(false);
+            case Place_COP: return canPlaceCOP(false);
+        }
+
         return true;
     }
-    /*
-    public boolean canCommandGrouped();
 
-    public boolean canCommandGrouped(boolean checkCommandibility);
+    public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped) {
+        return canIssueCommandTypeGrouped(ct, checkCommandibilityGrouped, true);
+    }
 
-    public boolean canIssueCommandType(UnitCommandType ct);
+    public boolean canIssueCommandTypeGrouped(UnitCommandType ct) {
+        return canIssueCommandTypeGrouped(ct, true);
+    }
 
-    public boolean canIssueCommandType(UnitCommandType ct, boolean checkCommandibility);
+    public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
 
-    public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped);
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
+            return false;
+        }
 
-    public boolean canIssueCommandTypeGrouped(UnitCommandType ct);
+        switch (ct) {
+            case Attack_Move: return canAttackMoveGrouped(false, false);
+            case Attack_Unit: return canAttackUnitGrouped(false, false);
+            case Build: return false;
+            case Build_Addon: return false;
+            case Train: return canTrain(false);
+            case Morph: return canMorph(false);
+            case Research: return false;
+            case Upgrade: return false;
+            case Set_Rally_Position: return false;
+            case Set_Rally_Unit: return false;
+            case Move: return canMoveGrouped(false, false);
+            case Patrol: return canPatrolGrouped(false, false);
+            case Hold_Position: return canHoldPosition(false);
+            case Stop: return canStop(false);
+            case Follow: return canFollow(false);
+            case Gather: return canGather(false);
+            case Return_Cargo: return canReturnCargo(false);
+            case Repair: return canRepair(false);
+            case Burrow: return canBurrow(false);
+            case Unburrow: return canUnburrow(false);
+            case Cloak: return canCloak(false);
+            case Decloak: return canDecloak(false);
+            case Siege: return canSiege(false);
+            case Unsiege: return canUnsiege(false);
+            case Lift: return false;
+            case Land: return false;
+            case Load: return canLoad(false);
+            case Unload: return false;
+            case Unload_All: return false;
+            case Unload_All_Position: return canUnloadAllPosition(false);
+            case Right_Click_Position: return canRightClickPositionGrouped(false, false);
+            case Right_Click_Unit: return canRightClickUnitGrouped(false, false);
+            case Halt_Construction: return canHaltConstruction(false);
+            case Cancel_Construction: return false;
+            case Cancel_Addon: return false;
+            case Cancel_Train: return false;
+            case Cancel_Train_Slot: return false;
+            case Cancel_Morph: return canCancelMorph(false);
+            case Cancel_Research: return false;
+            case Cancel_Upgrade: return false;
+            case Use_Tech:
+            case Use_Tech_Unit:
+            case Use_Tech_Position: return canUseTechWithOrWithoutTarget(false);
+            case Place_COP: return false;
+        }
+        return true;
+    }
 
-    public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canTargetUnit(Unit targetUnit) {
+        if ( targetUnit == null || !targetUnit.exists() ) {
+            return false;
+        }
+        final UnitType targetType = targetUnit.getType();
+        if (!targetUnit.isCompleted() && !targetType.isBuilding() && !targetUnit.isMorphing() &&
+                targetType != Protoss_Archon && targetType != Protoss_Dark_Archon ) {
+            return false;
+        }
+        return targetType != Spell_Scanner_Sweep &&
+                targetType != Spell_Dark_Swarm &&
+                targetType != Spell_Disruption_Web &&
+                targetType != Special_Map_Revealer;
+    }
 
-    public boolean canTargetUnit(Unit targetUnit);
+    public boolean canTargetUnit(Unit targetUnit, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
+        return canTargetUnit(targetUnit);
+    }
 
-    public boolean canTargetUnit(Unit targetUnit, boolean checkCommandibility);
+    public boolean canAttack() {
+        return canAttack(true);
+    }
 
-    public boolean canAttack();
+    public boolean canAttack(boolean checkCommandibility) {
+        if ( !checkCommandibility ) {
+            return true;
+        }
+        else if ( !canCommand() ) {
+            return false;
+        }
 
-    public boolean canAttack(boolean checkCommandibility);
+        return canAttackMove(false) || canAttackUnit(false);
+    }
 
-    public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canAttack(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canAttack(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canAttack(Position target, boolean checkCanTargetUnit);
+    public boolean canAttack(Position target, boolean checkCanTargetUnit) {
+        return canAttack(target, checkCanTargetUnit, true);
+    }
 
-    public boolean canAttack(Unit target, boolean checkCanTargetUnit);
+    public boolean canAttack(Unit target, boolean checkCanTargetUnit) {
+        return canAttack(target, checkCanTargetUnit, true);
+    }
 
+    public boolean canAttack(Position target) {
+        return canAttack(target, true);
+    }
 
-    public boolean canAttack(Position target);
+    public boolean canAttack(Unit target) {
+        return canAttack(target, true);
+    }
 
-    public boolean canAttack(Unit target);
+    public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
 
-    public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
+        return canAttackMove(false);
+    }
 
-    public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackGrouped(boolean checkCommandibilityGrouped);
+        if ( target == null ) {
+            return false;
+        }
+        return canAttackUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
+    }
 
-    public boolean canAttackGrouped();
+    public boolean canAttackGrouped(boolean checkCommandibilityGrouped) {
+        return canAttackGrouped(checkCommandibilityGrouped, true);
 
-    public boolean canAttackGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    }
 
+    public boolean canAttackGrouped() {
+        return canAttackGrouped(true);
+    }
+
+    public boolean canAttackGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (!checkCommandibility) {
+            return true;
+        }
+        else if (!canCommand()) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+
+        return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
+    }
+    //TODO
+    //https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/Shared/Templates.h#L540
     public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
 
     public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
@@ -1132,7 +1577,6 @@ public class Unit {
     public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
 
     public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
 
     public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit);
 
@@ -1641,7 +2085,6 @@ public class Unit {
 
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility);
 
-    */
 
     public boolean equals(Object that){
         if(!(that instanceof Unit)){

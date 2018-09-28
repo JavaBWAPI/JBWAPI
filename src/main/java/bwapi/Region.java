@@ -66,7 +66,6 @@ public class Region {
         return regionData.isAccessible();
     }
 
-
     public Set<Region> getNeighbors() {
         return new HashSet<>(neighbours);
     }
