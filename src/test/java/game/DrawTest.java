@@ -3,6 +3,7 @@ package game;
 import bwapi.BWClient;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
+import bwapi.point.Position;
 import bwapi.values.Color;
 
 class DrawTest extends DefaultBWListener {
@@ -21,10 +22,16 @@ class DrawTest extends DefaultBWListener {
 
     @Override
     public void onFrame() {
-        Color color = Color.Purple;
-        
-        game.drawCircleScreen(200, 200, 10, color);
         game.drawTextScreen(50, 50, "frame: " + game.getFrameCount());
+
+
+        game.drawCircleScreen(200, 110, 80, Color.Purple, true);
+        game.drawCircleScreen(350, 110, 80, Color.Purple, true);
+
+        game.drawTriangleScreen(143, 167,407, 167, 275, 350, Color.Purple, true);
+
+        game.drawBoxScreen(200, 110, 350, 210, Color.Purple, true);
+
     }
 
     public static void main(String[] args) {

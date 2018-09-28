@@ -44,9 +44,10 @@ public class Client {
     }
 
     public static class Shape {
-        final int type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid;
+        final int type, coordType, x1, y1, x2, y2, extra1, extra2, color;
+        final byte isSolid;
 
-        public Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, int isSolid)  {
+        public Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, boolean isSolid)  {
             this.type = type;
             this.coordType = coordType;
             this.x1 = x1;
@@ -56,7 +57,7 @@ public class Client {
             this.extra1 = extra1;
             this.extra2 = extra2;
             this.color = color;
-            this.isSolid = isSolid;
+            this.isSolid = (byte)(isSolid ? 1 : 0);
         }
         private static final int SIZE = 40;
     }
@@ -460,7 +461,8 @@ public class Client {
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 24, shape.y2);
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 28, shape.extra1);
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 32, shape.extra2);
-            sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 36, shape.isSolid);
+            sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 36, shape.color);
+            sharedMemory.put(ShapeOffset + at * Shape.SIZE + 40, shape.isSolid);
             sharedMemory.putInt(ShapeOffset, at + 1);
         }
 
