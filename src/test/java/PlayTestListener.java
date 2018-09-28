@@ -50,7 +50,6 @@ class PlayTestListener extends DefaultBWListener {
             }
         }
         avgMineralPos = avgMineralPos.divide(count);
-        System.out.println(avgMineralPos);
 
         // make workers gather minerals if idle
         self.getUnits().stream()
@@ -58,6 +57,7 @@ class PlayTestListener extends DefaultBWListener {
                 .forEach(u -> u.gather(minerals.poll()));
 
 
+        // create extra supply
         if (self.supplyTotal() - self.supplyUsed() <= 2) {
             final UnitType supplyProvider = race.getSupplyProvider();
             if (self.minerals() >= supplyProvider.mineralPrice()) {

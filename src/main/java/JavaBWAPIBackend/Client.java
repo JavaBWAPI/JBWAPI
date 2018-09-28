@@ -19,6 +19,8 @@ public class Client {
     private LittleEndianPipe pipe;
 
     public static class UnitCommand {
+        final int type, unit, target, x, y, extra;
+
         public UnitCommand(int type, int unit, int target, int x, int y, int extra) {
             this.type = type;
             this.unit = unit;
@@ -27,18 +29,36 @@ public class Client {
             this.y = y;
             this.extra = extra;
         }
-        int type, unit, target, x, y, extra;
         private static final int SIZE = 24;
     }
 
     public static class Command {
+        final int type, value1, value2;
+
         public Command(int type, int value1, int value2) {
             this.type = type;
             this.value1 = value1;
             this.value2 = value2;
         }
-        int type, value1, value2;
         private static final int SIZE = 12;
+    }
+
+    public static class Shape {
+        final int type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid;
+
+        public Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, int isSolid)  {
+            this.type = type;
+            this.coordType = coordType;
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+            this.extra1 = extra1;
+            this.extra2 = extra2;
+            this.color = color;
+            this.isSolid = isSolid;
+        }
+        private static final int SIZE = 40;
     }
 
     public final class GameData {
@@ -304,7 +324,6 @@ public class Client {
         public int remainingLatencyFrames() { return sharedMemory.getInt(GameOffset + 16); }
         public int remainingLatencyTime() { return sharedMemory.getInt(GameOffset + 20); }
         public boolean hasLatCom() { return sharedMemory.get(GameOffset + 24) != 0; }
-        public void setLatcom(boolean enable) { sharedMemory.put(GameOffset + 24, (byte)(enable ? 1 : 0)); }
         public boolean hasGUI() { return sharedMemory.get(GameOffset + 25) != 0; }
         public int replayFrameCount() { return sharedMemory.getInt(GameOffset + 28); }
         public int randomSeed() { return sharedMemory.getInt(GameOffset + 32); }
@@ -430,15 +449,6 @@ public class Client {
         }
 
         private static final int ShapeOffset = 0x1dfc6c8;
-
-        public class Shape {
-            int type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid;
-            Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, int isSolid)
-            { this.type = type; this.coordType = coordType; this.x1 = x1; this.y1 = y1; this.x2 = x2; this.y2 = y2;
-                this.extra1 = extra1; this.extra2 = extra2; this.color = color; this.isSolid = isSolid; }
-
-            private static final int SIZE = 40;
-        }
 
         public void addShape(Shape shape) {
             int at = sharedMemory.getInt(ShapeOffset);

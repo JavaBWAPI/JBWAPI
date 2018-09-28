@@ -1,6 +1,5 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client;
 import JavaBWAPIBackend.Client.GameData.UnitData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
@@ -785,7 +784,7 @@ public class Unit {
             }
         }
 
-        game.unitCommand(
+        game.addUnitCommand(
                 command.getType().id,
                 command.getUnit().getID(),
                 command.getTarget() != null ? command.getTarget().getID() : -1,
@@ -1061,19 +1060,19 @@ public class Unit {
     }
 
     /*
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit);
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits);
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions);
 
-    public boolean canIssueCommandGrouped(UnitCommand command);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand);
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canIssueCommandGrouped(UnitCommand addCommand, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
 
     */
     //TODO

@@ -7,15 +7,12 @@ public enum Shape {
 	Triangle(3),
 	Circle(4),
 	Ellipse(5),
-	Dot(6);
+	Dot(6),
+	Line(7);
 
-	private int value;
+	public final int value;
 
-	public int getValue(){
-		return value;
-	}
-
-	Shape(int value){
+	Shape(final int value){
 		this.value = value;
 	}
 }

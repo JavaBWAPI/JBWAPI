@@ -23,16 +23,15 @@ public class Game {
     private final Map<Integer, Player> players = new HashMap<>();
     private final Map<Integer, Region> regions = new HashMap<>();
     private final Map<Integer, Force> forces = new HashMap<>();
+    private final Map<Integer, Bullet> bullets = new HashMap<>();
 
     private final Set<Unit> staticMinerals = new HashSet<>();
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
 
     // CHANGING
-    final Map<Integer, Unit> units = new HashMap<>();
-    final Set<Integer> visibleUnits = new HashSet<>();
-
-    final Map<Integer, Bullet> bullets = new HashMap<>();
+    private final Map<Integer, Unit> units = new HashMap<>();
+    private final Set<Integer> visibleUnits = new HashSet<>();
 
     public Game(final GameData gameData) {
         this.gameData = gameData;
@@ -104,12 +103,16 @@ public class Game {
         visibleUnits.remove(id);
     }
 
-    void unitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
+    void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
         gameData.addUnitCommand(new Client.UnitCommand(type, unit, target, x, y, extra));
     }
 
-    void command(final int type, final int value1, final int value2) {
+    void addCommand(final int type, final int value1, final int value2) {
         gameData.addCommand(new Client.Command(type, value1, value2));
+    }
+
+    void addShape(final int type, final int coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final int isSolid) {
+        gameData.addShape(new Client.Shape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
     }
 
     public Set<Force> getForces() {
@@ -231,7 +234,7 @@ public class Game {
 
      //TODO
      public void setScreenPosition(final int x, final int y) {
-        command(SetScreenPosition.value, x, y);
+        addCommand(SetScreenPosition.value, x, y);
      }
 
      public void setScreenPosition(final Position p) {
@@ -239,7 +242,7 @@ public class Game {
      }
 
      public void pingMinimap(final int x, final int y) {
-        command(PingMinimap.value, x, y);
+        addCommand(PingMinimap.value, x, y);
      }
 
      public void pingMinimap(final Position p) {
@@ -584,15 +587,15 @@ public class Game {
 
 
      public void printf(final String cstr_format) {
-        command(Printf.value, gameData.addString(cstr_format), 0);
+        addCommand(Printf.value, gameData.addString(cstr_format), 0);
      }
 
      public void sendText(final String cstr_format) {
-        command(SendText.value, gameData.addString(cstr_format), 0);
+        addCommand(SendText.value, gameData.addString(cstr_format), 0);
      }
 
      public void sendTextEx(final boolean toAllies, final String cstr_format) {
-        command(SendText.value, gameData.addString(cstr_format), toAllies ? 1 : 0);
+        addCommand(SendText.value, gameData.addString(cstr_format), toAllies ? 1 : 0);
      }
 
      public boolean isInGame() {
@@ -616,23 +619,23 @@ public class Game {
      }
 
      public void pauseGame() {
-        command(PauseGame.value, 0, 0);
+        addCommand(PauseGame.value, 0, 0);
      }
 
      public void resumeGame() {
-        command(ResumeGame.value, 0, 0);
+        addCommand(ResumeGame.value, 0, 0);
      }
 
      public void leaveGame() {
-        command(LeaveGame.value, 0, 0);
+        addCommand(LeaveGame.value, 0, 0);
      }
 
      public void restartGame() {
-        command(RestartGame.value, 0, 0);
+        addCommand(RestartGame.value, 0, 0);
      }
 
      public void setLocalSpeed(final int speed) {
-        command(SetLocalSpeed.value, speed, 0);
+        addCommand(SetLocalSpeed.value, speed, 0);
      }
 
      public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
@@ -682,161 +685,326 @@ public class Game {
                 .collect(Collectors.toSet());
     }
 
-    /*
-    public void drawText(Coordinate ctype, int x, int y, String cstr_format);
 
-    public void drawTextMap(int x, int y, String cstr_format);
+    //if someone implements the textSize stuff, replace TextSize.Default with getTextSize
+    public void drawText(final Coordinate ctype, final int x, final int y, final String cstr_format) {
+        final int stringId = gameData.addString(cstr_format);
+        addShape(Shape.Text.value, ctype.value, x, y, 0,0, stringId, TextSize.Default.value,0,0);
+    }
 
-    public void drawTextMap(Position p, String cstr_format);
 
-    public void drawTextMouse(int x, int y, String cstr_format);
+    public void drawTextMap(final int x, final int y, final String cstr_format) {
+        drawText(Coordinate.Map, x, y, cstr_format);
+    }
 
-    public void drawTextMouse(Position p, String cstr_format);
+    public void drawTextMap(final Position p, final String cstr_format) {
+        drawTextMap(p.x, p.y, cstr_format);
+    }
 
-    public void drawTextScreen(int x, int y, String cstr_format);
+    public void drawTextMouse(final int x, final int y, final String cstr_format) {
+        drawText(Coordinate.Mouse, x, y, cstr_format);
+    }
 
-    public void drawTextScreen(Position p, String cstr_format);
+    public void drawTextMouse(final Position p, final String cstr_format){
+        drawTextMouse(p.x, p.y, cstr_format);
 
-    public void drawBox(Coordinate ctype, int left, int top, int right, int bottom, Color color);
+    }
 
-    public void drawBox(Coordinate ctype, int left, int top, int right, int bottom, Color color, boolean isSolid);
+    public void drawTextScreen(final int x, final int y, final String cstr_format) {
+        drawText(Coordinate.Screen, x, y, cstr_format);
+    }
 
-    public void drawBoxMap(int left, int top, int right, int bottom, Color color);
+    public void drawTextScreen(final Position p, final String cstr_format) {
+        drawTextScreen(p.x, p.y, cstr_format);
+    }
 
-    public void drawBoxMap(int left, int top, int right, int bottom, Color color, boolean isSolid);
 
-    public void drawBoxMap(Position leftTop, Position rightBottom, Color color);
+    public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color) {
+        drawBox(ctype, left, top, right, bottom, color, false);
+    }
 
-    public void drawBoxMap(Position leftTop, Position rightBottom, Color color, boolean isSolid);
+    public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
+        addShape(ctype.value, Shape.Box.value, left, top, right, bottom, 0,0, color.value, isSolid ? 1 : 0);
+    }
 
-    public void drawBoxMouse(int left, int top, int right, int bottom, Color color);
+    public void drawBoxMap(int left, int top, int right, int bottom, Color color) {
+        drawBox(Coordinate.Map, left, top, right, bottom, color);
+    }
 
-    public void drawBoxMouse(int left, int top, int right, int bottom, Color color, boolean isSolid);
+    public void drawBoxMap(int left, int top, int right, int bottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Map, left, top, right, bottom, color, isSolid);
+    }
 
-    public void drawBoxMouse(Position leftTop, Position rightBottom, Color color);
+    public void drawBoxMap(Position leftTop, Position rightBottom, Color color) {
+        drawBox(Coordinate.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+    }
 
-    public void drawBoxMouse(Position leftTop, Position rightBottom, Color color, boolean isSolid);
+    public void drawBoxMap(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+    }
 
-    public void drawBoxScreen(int left, int top, int right, int bottom, Color color);
+    public void drawBoxMouse(int left, int top, int right, int bottom, Color color) {
+        drawBox(Coordinate.Mouse, left, top, right, bottom, color);
+    }
 
-    public void drawBoxScreen(int left, int top, int right, int bottom, Color color, boolean isSolid);
+    public void drawBoxMouse(int left, int top, int right, int bottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Mouse, left, top, right, bottom, color, isSolid);
+    }
 
-    public void drawBoxScreen(Position leftTop, Position rightBottom, Color color);
+    public void drawBoxMouse(Position leftTop, Position rightBottom, Color color) {
+        drawBox(Coordinate.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+    }
 
-    public void drawBoxScreen(Position leftTop, Position rightBottom, Color color, boolean isSolid);
+    public void drawBoxMouse(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+    }
 
-    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color);
+    public void drawBoxScreen(int left, int top, int right, int bottom, Color color) {
+        drawBox(Coordinate.Screen, left, top, right, bottom, color);
+    }
 
-    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid);
+    public void drawBoxScreen(int left, int top, int right, int bottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Screen, left, top, right, bottom, color, isSolid);
+    }
 
-    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color);
+    public void drawBoxScreen(Position leftTop, Position rightBottom, Color color) {
+        drawBox(Coordinate.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+    }
 
-    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid);
+    public void drawBoxScreen(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
+        drawBox(Coordinate.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+    }
 
-    public void drawTriangleMap(Position a, Position b, Position c, Color color);
 
-    public void drawTriangleMap(Position a, Position b, Position c, Color color, boolean isSolid);
+    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color) {
+        drawTriangle(ctype, ax, ay, bx, by, cx, cy, color, false);
+    }
 
-    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color);
+    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
+        addShape(ctype.value, Shape.Triangle.value, ax, ay, bx, by, cx, cy, color.value, isSolid ? 1 : 0);
+    }
 
-    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid);
+    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
+        drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color);
+    }
 
-    public void drawTriangleMouse(Position a, Position b, Position c, Color color);
+    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color, isSolid);
+    }
 
-    public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid);
+    public void drawTriangleMap(Position a, Position b, Position c, Color color){
+        drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color);
+    }
 
-    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color);
+    public void drawTriangleMap(Position a, Position b, Position c, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
+    }
 
-    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid);
+    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color){
+        drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color);
+    }
 
-    public void drawTriangleScreen(Position a, Position b, Position c, Color color);
+    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color, isSolid);
+    }
 
-    public void drawTriangleScreen(Position a, Position b, Position c, Color color, boolean isSolid);
+    public void drawTriangleMouse(Position a, Position b, Position c, Color color){
+        drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color);
+    }
 
-    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color);
+    public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
 
-    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color, boolean isSolid);
+    }
 
-    public void drawCircleMap(int x, int y, int radius, Color color);
+    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color){
+        drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color);
+    }
 
-    public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid);
+    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color, isSolid);
+    }
 
-    public void drawCircleMap(Position p, int radius, Color color);
+    public void drawTriangleScreen(Position a, Position b, Position c, Color color){
+        drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color);
+    }
 
-    public void drawCircleMap(Position p, int radius, Color color, boolean isSolid);
+    public void drawTriangleScreen(Position a, Position b, Position c, Color color, boolean isSolid){
+        drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
+    }
 
-    public void drawCircleMouse(int x, int y, int radius, Color color);
 
-    public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid);
+    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color) {
+        drawCircle(ctype, x, y, radius, color, false);
+    }
 
-    public void drawCircleMouse(Position p, int radius, Color color);
+    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color, boolean isSolid) {
+        addShape(Shape.Circle.value, ctype.value, x ,y,0,0, radius,0, color.value, isSolid ? 1 : 0);
+    }
 
-    public void drawCircleMouse(Position p, int radius, Color color, boolean isSolid);
+    public void drawCircleMap(int x, int y, int radius, Color color) {
+        drawCircle(Coordinate.Map, x, y, radius, color);
+    }
 
-    public void drawCircleScreen(int x, int y, int radius, Color color);
+    public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Map, x, y, radius, color, isSolid);
+    }
 
-    public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid);
+    public void drawCircleMap(Position p, int radius, Color color){
+        drawCircle(Coordinate.Map, p.x, p.y, radius, color);
+    }
 
-    public void drawCircleScreen(Position p, int radius, Color color);
+    public void drawCircleMap(Position p, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Map, p.x, p.y, radius, color, isSolid);
+    }
 
-    public void drawCircleScreen(Position p, int radius, Color color, boolean isSolid);
+    public void drawCircleMouse(int x, int y, int radius, Color color){
+        drawCircle(Coordinate.Mouse, x, y, radius, color);
+    }
 
-    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color);
+    public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Mouse, x, y, radius, color, isSolid);
+    }
 
-    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawCircleMouse(Position p, int radius, Color color){
+        drawCircle(Coordinate.Mouse, p.x, p.y, radius, color);
+    }
 
-    public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color);
+    public void drawCircleMouse(Position p, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Mouse,p. x, p.y, radius, color, isSolid);
+    }
 
-    public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawCircleScreen(int x, int y, int radius, Color color){
+        drawCircle(Coordinate.Screen, x, y, radius, color);
+    }
 
-    public void drawEllipseMap(Position p, int xrad, int yrad, Color color);
+    public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Screen, x, y, radius, color, isSolid);
+    }
 
-    public void drawEllipseMap(Position p, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawCircleScreen(Position p, int radius, Color color){
+        drawCircle(Coordinate.Screen, p.x, p.y, radius, color);
+    }
 
-    public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color);
+    public void drawCircleScreen(Position p, int radius, Color color, boolean isSolid){
+        drawCircle(Coordinate.Screen, p.x, p.y, radius, color, isSolid);
+    }
 
-    public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color, boolean isSolid);
 
-    public void drawEllipseMouse(Position p, int xrad, int yrad, Color color);
+    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color) {
+        drawEllipse(ctype,x, y, xrad, yrad, color, false);
+    }
 
-    public void drawEllipseMouse(Position p, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
+        addShape(Shape.Ellipse.value, ctype.value, x, y,0,0, xrad, yrad, color.value, isSolid ? 1 : 0);
+    }
 
-    public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color);
+    public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Map, x, y, xrad, yrad, color);
+    }
 
-    public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Map, x, y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawEllipseScreen(Position p, int xrad, int yrad, Color color);
+    public void drawEllipseMap(Position p, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Map, p.x, p.y, xrad, yrad, color);
+    }
 
-    public void drawEllipseScreen(Position p, int xrad, int yrad, Color color, boolean isSolid);
+    public void drawEllipseMap(Position p, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Map, p.x, p.y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawDot(Coordinate ctype, int x, int y, Color color);
+    public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color);
+    }
 
-    public void drawDotMap(int x, int y, Color color);
+    public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawDotMap(Position p, Color color);
+    public void drawEllipseMouse(Position p, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color);
+    }
 
-    public void drawDotMouse(int x, int y, Color color);
+    public void drawEllipseMouse(Position p, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawDotMouse(Position p, Color color);
+    public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Screen, x, y, xrad, yrad, color);
+    }
 
-    public void drawDotScreen(int x, int y, Color color);
+    public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawDotScreen(Position p, Color color);
+    public void drawEllipseScreen(Position p, int xrad, int yrad, Color color) {
+        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color);
+    }
 
-    public void drawLine(Coordinate ctype, int x1, int y1, int x2, int y2, Color color);
+    public void drawEllipseScreen(Position p, int xrad, int yrad, Color color, boolean isSolid) {
+        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+    }
 
-    public void drawLineMap(int x1, int y1, int x2, int y2, Color color);
+    public void drawDot(Coordinate ctype, int x, int y, Color color) {
+        addShape(Shape.Dot.value, ctype.value, x, y, 0, 0, 0, 0, color.value, 0);
+    }
 
-    public void drawLineMap(Position a, Position b, Color color);
+    public void drawDotMap(int x, int y, Color color) {
+        drawDot(Coordinate.Map, x, y, color);
+    }
 
-    public void drawLineMouse(int x1, int y1, int x2, int y2, Color color);
+    public void drawDotMap(Position p, Color color) {
+        drawDot(Coordinate.Map, p.x, p.y, color);
+    }
 
-    public void drawLineMouse(Position a, Position b, Color color);
+    public void drawDotMouse(int x, int y, Color color) {
+        drawDot(Coordinate.Mouse, x, y, color);
+    }
 
-    public void drawLineScreen(int x1, int y1, int x2, int y2, Color color);
+    public void drawDotMouse(Position p, Color color) {
+        drawDot(Coordinate.Mouse, p.x, p.y, color);
+    }
 
-    public void drawLineScreen(Position a, Position b, Color color);
-    */
+    public void drawDotScreen(int x, int y, Color color) {
+        drawDot(Coordinate.Screen, x, y, color);
+    }
+
+    public void drawDotScreen(Position p, Color color) {
+        drawDot(Coordinate.Screen, p.x, p.y, color);
+    }
+
+    public void drawLine(Coordinate ctype, int x1, int y1, int x2, int y2, Color color) {
+        addShape(Shape.Line.value, ctype.value, x1, y1, x2, y2, 0, 0, color.value, 0);
+    }
+
+    public void drawLineMap(int x1, int y1, int x2, int y2, Color color) {
+        drawLine(Coordinate.Map, x1, y1, x2, y2, color);
+    }
+
+    public void drawLineMap(Position a, Position b, Color color) {
+        drawLine(Coordinate.Map, a.x, a.y, b.x, b.y, color);
+    }
+
+    public void drawLineMouse(int x1, int y1, int x2, int y2, Color color) {
+        drawLine(Coordinate.Mouse, x1, y1, x2, y2, color);
+
+    }
+
+    public void drawLineMouse(Position a, Position b, Color color) {
+        drawLine(Coordinate.Mouse, a.x, a.y, b.x, b.y, color);
+
+    }
+
+    public void drawLineScreen(int x1, int y1, int x2, int y2, Color color) {
+        drawLine(Coordinate.Screen, x1, y1, x2, y2, color);
+    }
+
+    public void drawLineScreen(Position a, Position b, Color color) {
+        drawLine(Coordinate.Screen, a.x, a.y, b.x, b.y, color);
+    }
+
     public int getLatencyFrames() {
         return gameData.latencyFrames();
     }
@@ -866,7 +1034,7 @@ public class Game {
     }
 
     public void setLatCom(final boolean isEnabled) {
-        gameData.setLatcom(isEnabled);
+        addCommand(SetLatCom.value, isEnabled ? 1 : 0, 0);
     }
 
     public int getInstanceNumber() {
@@ -878,7 +1046,7 @@ public class Game {
     }
 
     public void setFrameSkip(int frameSkip) {
-        command(SetFrameSkip.value, frameSkip, 0);
+        addCommand(SetFrameSkip.value, frameSkip, 0);
     }
 
     //TODO
@@ -886,7 +1054,7 @@ public class Game {
         return false;
     }
 
-    // If you need these please implement (see command and make a PR to the github repo)
+    // If you need these please implement (see addCommand and make a PR to the github repo)
     // public boolean setAlliance(Player player, boolean allied);
     // public boolean setAlliance(Player player);
     // public boolean setAlliance(Player player, boolean allied, boolean alliedVictory);
@@ -904,7 +1072,7 @@ public class Game {
     }
 
     public void setCommandOptimizationLevel(final int level) {
-        command(SetCommandOptimizerLevel.value, level, 0);
+        addCommand(SetCommandOptimizerLevel.value, level, 0);
     }
 
     public int countdownTimer() {

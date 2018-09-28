@@ -2,16 +2,21 @@ package bwapi.values;
 
 //TODO
 public class Color {
-    private int r, g, b;
+    private final int r, g, b;
+    public final int value;
 
-    public Color(int r, int g, int b) {
+    public Color(final int r, final int g, final int b) {
         this.r = r;
         this.g = g;
         this.b = b;
+        value = 0;
     }
 
-    public Color(int v) {
-        //TODO
+    public Color(final int value) {
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+        this.value = value;
     }
 
     public static Color Red;
