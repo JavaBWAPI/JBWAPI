@@ -724,7 +724,7 @@ public class Game {
     }
 
     public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
-        addShape(ctype.value, Shape.Box.value, left, top, right, bottom, 0,0, color.value, isSolid ? 1 : 0);
+        addShape(ctype.value, Shape.Box.value, left, top, right, bottom, 0,0, color.id, isSolid ? 1 : 0);
     }
 
     public void drawBoxMap(int left, int top, int right, int bottom, Color color) {
@@ -781,7 +781,7 @@ public class Game {
     }
 
     public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
-        addShape(ctype.value, Shape.Triangle.value, ax, ay, bx, by, cx, cy, color.value, isSolid ? 1 : 0);
+        addShape(ctype.value, Shape.Triangle.value, ax, ay, bx, by, cx, cy, color.id, isSolid ? 1 : 0);
     }
 
     public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
@@ -839,7 +839,7 @@ public class Game {
     }
 
     public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color, boolean isSolid) {
-        addShape(Shape.Circle.value, ctype.value, x ,y,0,0, radius,0, color.value, isSolid ? 1 : 0);
+        addShape(Shape.Circle.value, ctype.value, x ,y,0,0, radius,0, color.id, isSolid ? 1 : 0);
     }
 
     public void drawCircleMap(int x, int y, int radius, Color color) {
@@ -896,7 +896,7 @@ public class Game {
     }
 
     public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        addShape(Shape.Ellipse.value, ctype.value, x, y,0,0, xrad, yrad, color.value, isSolid ? 1 : 0);
+        addShape(Shape.Ellipse.value, ctype.value, x, y,0,0, xrad, yrad, color.id, isSolid ? 1 : 0);
     }
 
     public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color) {
@@ -948,7 +948,7 @@ public class Game {
     }
 
     public void drawDot(Coordinate ctype, int x, int y, Color color) {
-        addShape(Shape.Dot.value, ctype.value, x, y, 0, 0, 0, 0, color.value, 0);
+        addShape(Shape.Dot.value, ctype.value, x, y, 0, 0, 0, 0, color.id, 0);
     }
 
     public void drawDotMap(int x, int y, Color color) {
@@ -976,7 +976,7 @@ public class Game {
     }
 
     public void drawLine(Coordinate ctype, int x1, int y1, int x2, int y2, Color color) {
-        addShape(Shape.Line.value, ctype.value, x1, y1, x2, y2, 0, 0, color.value, 0);
+        addShape(Shape.Line.value, ctype.value, x1, y1, x2, y2, 0, 0, color.id, 0);
     }
 
     public void drawLineMap(int x1, int y1, int x2, int y2, Color color) {
