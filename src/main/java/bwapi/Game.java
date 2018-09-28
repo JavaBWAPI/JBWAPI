@@ -33,6 +33,9 @@ public class Game {
     private final Map<Integer, Unit> units = new HashMap<>();
     private final Set<Integer> visibleUnits = new HashSet<>();
 
+    // USER DEFINED
+    private TextSize textSize = TextSize.Default;
+
     public Game(final GameData gameData) {
         this.gameData = gameData;
     }
@@ -686,10 +689,9 @@ public class Game {
     }
 
 
-    //if someone implements the textSize stuff, replace TextSize.Default with getTextSize
     public void drawText(final Coordinate ctype, final int x, final int y, final String cstr_format) {
         final int stringId = gameData.addString(cstr_format);
-        addShape(Shape.Text.value, ctype.value, x, y, 0,0, stringId, TextSize.Default.value,0,false);
+        addShape(Shape.Text.value, ctype.value, x, y, 0,0, stringId, textSize.value,0,false);
     }
 
 
@@ -1058,11 +1060,16 @@ public class Game {
     // public boolean setVision(Player player, boolean enabled);
     // public void setGUI(bool enabled);
     // public int getLastEventTime();
-    // public void setTextSize();
-    // public void setTextSize(final TextSize size);
     // public boolean setMap(final String cstr_mapFileName);
     // public boolean setRevealAll();return true;
     // public boolean setRevealAll(boolean reveal);
+
+     public void setTextSize() {
+         textSize = TextSize.Default;
+     }
+     public void setTextSize(final TextSize size) {
+        textSize = size;
+     }
 
     public int elapsedTime() {
         return gameData.elapsedTime();

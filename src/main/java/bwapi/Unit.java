@@ -1114,10 +1114,7 @@ public class Unit {
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( ! checkCommandibility ) {
-            return true;
-        }
-        else if ( !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1203,10 +1200,7 @@ public class Unit {
     }
 
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility){
-        if (!checkCommandibility ) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1316,10 +1310,7 @@ public class Unit {
     }
 
     public boolean canCommandGrouped(boolean checkCommandibility) {
-        if ( !checkCommandibility ) {
-            return true;
-        }
-        else if (!canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1331,10 +1322,7 @@ public class Unit {
     }
 
     public boolean canIssueCommandType(UnitCommandType ct, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         switch (ct) {
@@ -1396,10 +1384,7 @@ public class Unit {
     }
 
     public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1472,10 +1457,7 @@ public class Unit {
     }
 
     public boolean canTargetUnit(Unit targetUnit, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         return canTargetUnit(targetUnit);
@@ -1486,10 +1468,7 @@ public class Unit {
     }
 
     public boolean canAttack(boolean checkCommandibility) {
-        if ( !checkCommandibility ) {
-            return true;
-        }
-        else if ( !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1521,10 +1500,7 @@ public class Unit {
     }
 
     public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1532,10 +1508,7 @@ public class Unit {
     }
 
     public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1555,10 +1528,7 @@ public class Unit {
     }
 
     public boolean canAttackGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (!checkCommandibility) {
-            return true;
-        }
-        else if (!canCommand()) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -1568,114 +1538,572 @@ public class Unit {
 
         return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
     }
-    //TODO
-    //https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/Shared/Templates.h#L540
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+        return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+        return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit);
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit);
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit){
+        return canAttackGrouped(target, checkCanTargetUnit, true);
+    }
 
-    public boolean canAttackGrouped(Position target);
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit) {
+        return canAttackGrouped(target, checkCanTargetUnit, true);
+    }
 
-    public boolean canAttackGrouped(Unit target);
+    public boolean canAttackGrouped(Position target) {
+        return canAttackGrouped(target, true);
+    }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canAttackGrouped(Unit target) {
+        return canAttackGrouped(target, true);
+    }
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackMove();
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+        return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
+    }
 
-    public boolean canAttackMove(boolean checkCommandibility);
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped);
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
+            return false;
+        }
 
-    public boolean canAttackMoveGrouped();
+        if ( target == null ) {
+            return false;
+        }
+        return canAttackUnitGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, false, false);
+    }
 
-    public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canAttackMove() {
+        return canAttackMove(true);
+    }
 
-    public boolean canAttackUnit();
+    public boolean canAttackMove(boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackUnit(boolean checkCommandibility);
+        if ( (getType() != Terran_Medic && !canAttackUnit( false) ) || !canMove(false) )
+            return false;
 
-    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+        return true;
+    }
 
-    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit);
+    public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped) {
+        return canAttackMoveGrouped(checkCommandibilityGrouped, true);
+    }
 
-    public boolean canAttackUnit(Unit targetUnit);
+    public boolean canAttackMoveGrouped() {
+        return canAttackMoveGrouped(true);
+    }
 
-    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped);
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false)) {
+            return false;
+        }
+        final UnitType ut = getType();
+        return ut.canMove() || ut == Terran_Siege_Tank_Siege_Mode || ut == Zerg_Cocoon || ut == Zerg_Lurker_Egg;
+    }
 
-    public boolean canAttackUnitGrouped();
+    public boolean canAttackUnit() {
+        return canAttackUnit(true);
+    }
 
-    public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canAttackUnit(boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
+        final UnitType ut = getType();
+        if ( !ut.isBuilding() && !isInterruptible() ) {
+            return false;
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+        }
+        if ( ut.groundWeapon() == WeaponType.None && ut.airWeapon() == WeaponType.None ) {
+            if ( ut == Protoss_Carrier || ut == Hero_Gantrithor ) {
+                if ( getInterceptorCount() <= 0 ) {
+                    return false;
+                }
+            }
+            else if ( ut == Protoss_Reaver || ut == Hero_Warbringer ) {
+                if ( getScarabCount() <= 0 ) {
+                    return false;
+                }
+            }
+            else
+                return false;
+        }
+        if (ut == Zerg_Lurker ) {
+            if ( !isBurrowed() ) {
+                return false;
+            }
+        }
+        else if (isBurrowed() ) {
+            return false;
+        }
+        if ( !isCompleted() ) {
+            return false;
+        }
+        return getOrder() != Order.ConstructingBuilding;
+    }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit);
+    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canAttackUnit(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit);
+    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit){
+        return canAttackUnit(targetUnit, checkCanTargetUnit, true);
+    }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
+    public boolean canAttackUnit(Unit targetUnit) {
+        return canAttackUnit(targetUnit, true);
+    }
 
-    public boolean canBuild();
+    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
+            return false;
+        }
 
-    public boolean canBuild(boolean checkCommandibility);
+        if ( checkCanIssueCommandType && !canAttackUnit( false) ) {
+            return false;
+        }
 
-    public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType);
+        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ) {
+            return false;
+        }
+        if ( targetUnit.isInvincible() ) {
+            return false;
+        }
 
-    public boolean canBuild(UnitType uType);
+        final UnitType type = getType();
+        final boolean targetInAir = targetUnit.isFlying();
+        WeaponType weapon = targetInAir ? type.airWeapon() : type.groundWeapon();
 
-    public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility);
+        if (weapon == WeaponType.None) {
+            switch (type) {
+                case Protoss_Carrier:
+                case Hero_Gantrithor:
+                    break;
+                case Protoss_Reaver:
+                case Hero_Warbringer:
+                    if (targetInAir) {
+                        return false;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+        }
 
-    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType);
+        if ( !type.canMove() && !isInWeaponRange(targetUnit) )
+            return false;
 
-    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType);
+        if ( type == Zerg_Lurker && !isInWeaponRange(targetUnit) )
+            return false;
 
-    public boolean canBuild(UnitType uType, TilePosition tilePos);
+        return !equals(targetUnit);
+    }
 
-    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped) {
+        return canAttackUnitGrouped(checkCommandibilityGrouped, true);
+    }
 
-    public boolean canBuildAddon();
+    public boolean canAttackUnitGrouped() {
+        return canAttackUnitGrouped(true);
+    }
 
-    public boolean canBuildAddon(boolean checkCommandibility);
+    public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
 
-    public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType);
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+        if ( !isInterruptible() ) {
+            return false;
+        }
+        final UnitType ut = getType();
+        if ( !ut.canMove() &&  ut != Terran_Siege_Tank_Siege_Mode ) {
+            return false;
+        }
+        if ( !isCompleted() ) {
+             return false;
+        }
+        if ( getType() == Zerg_Lurker ) {
+            if ( !isBurrowed() ) {
+                return false;
+            }
+        }
+        else if ( isBurrowed() ) {
+            return false;
+        }
+        return getOrder() != ConstructingBuilding;
+    }
 
-    public boolean canBuildAddon(UnitType uType);
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+        return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
 
-    public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
 
-    public boolean canTrain();
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit){
+        return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, true);
+    }
 
-    public boolean canTrain(boolean checkCommandibility);
+    public boolean canAttackUnitGrouped(Unit targetUnit) {
+        return canAttackUnitGrouped(targetUnit, true);
+    }
 
-    public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType);
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
 
-    public boolean canTrain(UnitType uType);
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
 
-    public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility);
+        if ( checkCanIssueCommandTypeGrouped && !canAttackUnitGrouped(false, false) ) {
+            return false;
+        }
 
-    public boolean canMorph();
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ) {
+            return false;
+        }
 
-    public boolean canMorph(boolean checkCommandibility);
+        if ( isInvincible() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+        if ( ut == Zerg_Lurker && !isInWeaponRange(targetUnit) ) {
+            return false;
+        }
+
+        if ( ut == Zerg_Queen &&
+                ( targetUnit.getType() != Terran_Command_Center ||
+                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0 ) ) {
+            return false;
+        }
+
+        return !equals(targetUnit);
+    }
+
+    public boolean canBuild() {
+        return canBuild(true);
+    }
+
+    public boolean canBuild(boolean checkCommandibility) {
+        if ( checkCommandibility  && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+        if ( !ut.isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        if ( isConstructing() ||
+                !isCompleted()   ||
+                        (ut.isBuilding() && !isIdle()) ) {
+            return false;
+        }
+        return !isHallucination();
+    }
+
+    public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType) {
+        return canBuild(uType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canBuild(UnitType uType) {
+        return canBuild(uType, true);
+    }
+
+    public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canBuild(false) ) {
+            return false;
+        }
+        if ( !game.canMake(uType, this) ) {
+            return false;
+        }
+
+        if ( !uType.isBuilding() ) {
+            return false;
+        }
+        return getAddon() == null;
+    }
+
+    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType) {
+        return canBuild(uType, tilePos, checkTargetUnitType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType) {
+        return canBuild(uType, tilePos, checkTargetUnitType, true);
+    }
+
+    public boolean canBuild(UnitType uType, TilePosition tilePos) {
+        return canBuild(uType, tilePos, true);
+    }
+
+    public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility  && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canBuild(false) ){
+            return false;
+        }
+
+        if ( checkTargetUnitType && !canBuild(uType, false, false) ){
+            return false;
+        }
+
+        if ( !tilePos.isValid(game)){
+            return false;
+        }
+
+        return game.canBuildHere(tilePos, uType, this, true);
+    }
+
+    public boolean canBuildAddon() {
+        return canBuildAddon(true);
+    }
+
+    public boolean canBuildAddon(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (isConstructing() || !isCompleted() || isLifted() || (getType().isBuilding() && !isIdle()) ) {
+            return false;
+        }
+        if ( getAddon() != null ) {
+            return false;
+        }
+        return getType().canBuildAddon();
+    }
+
+    public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType) {
+        return canBuildAddon(uType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canBuildAddon(UnitType uType) {
+        return canBuildAddon(uType, true);
+    }
+
+    public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        if ( checkCanIssueCommandType && !canBuildAddon(this, false) ) {
+            return false;
+        }
+        if ( !game.canMake(uType, this) ) {
+            return false;
+        }
+        if ( !uType.isAddon() ) {
+            return false;
+        }
+        return game.canBuildHere(getTilePosition(), uType, this);
+    }
+
+    public boolean canTrain() {
+        return canTrain(true);
+    }
+
+    public boolean canTrain(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        final UnitType ut = getType();
+        if ( ut.producesLarva() ) {
+            if ( !isConstructing() && isCompleted() ) {
+                return true;
+            }
+            for (Unit larva : getLarva()) {
+                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if ( isConstructing() || !isCompleted() || isLifted() ) {
+            return false;
+        }
+        if ( !ut.canProduce() &&
+                ut != Terran_Nuclear_Silo &&
+                ut != Zerg_Hydralisk &&
+                ut != Zerg_Mutalisk &&
+                ut != Zerg_Creep_Colony &&
+                ut != Zerg_Spire &&
+                ut != Zerg_Larva ) {
+            return false;
+        }
+        return !isHallucination();
+    }
+
+    public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType) {
+        return canTrain(uType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canTrain(UnitType uType) {
+        return canTrain(uType, true);
+    }
+
+    public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canTrain(false) ){
+            return false;
+        }
+
+        Unit thisUnit = this;
+        if (getType().producesLarva() ) {
+            if ( uType.whatBuilds().getKey() == Zerg_Larva ) {
+                boolean foundCommandableLarva = false;
+                for (Unit larva : getLarva()) {
+                    if ( larva.canTrain(true) ) {
+                        foundCommandableLarva = true;
+                        thisUnit = larva;
+                        break;
+                    }
+                }
+                if (!foundCommandableLarva){
+                    return false;
+                }
+            }
+            else if (isConstructing() || !isCompleted() ){
+                return false;
+            }
+        }
+
+        if ( !game.canMake(uType, thisUnit) ){
+            return false;
+        }
+
+        if ( uType.isAddon() || ( uType.isBuilding() && !thisUnit.getType().isBuilding() ) ){
+            return false;
+        }
+        return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
+    }
+
+    public boolean canMorph() {
+        return canMorph(true);
+    }
+
+    public boolean canMorph(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+        if (ut.producesLarva() ) {
+            if ( !isConstructing() && isCompleted() && ( !ut.isBuilding() || isIdle() ) ) {
+                return true;
+            }
+            for (Unit larva : getLarva()) {
+                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if ( isConstructing() || !isCompleted()   || (ut.isBuilding() && !isIdle()) ) {
+            return false;
+        }
+
+        if ( ut != Zerg_Hydralisk &&
+                ut != Zerg_Mutalisk &&
+                ut != Zerg_Creep_Colony &&
+                ut != Zerg_Spire &&
+                ut != Zerg_Hatchery &&
+                ut != Zerg_Lair &&
+                ut != Zerg_Hive &&
+                ut != Zerg_Larva ) {
+            return false;
+        }
+        return !isHallucination();
+    }
 
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType);
 
-    public boolean canMorph(UnitType uType);
+    public boolean canMorph(UnitType uType) {
 
-    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    }
 
+    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canMorph( false) )
+            return false;
+
+        Unit thisUnit = this;
+        if ( getType().producesLarva()) {
+            if ( uType.whatBuilds().getKey() == Zerg_Larva ) {
+                boolean foundCommandableLarva = false;
+                for (Unit larva : getLarva()) {
+                    if ( larva.canMorph(true) ) {
+                        foundCommandableLarva = true;
+                        thisUnit = larva;
+                        break;
+                    }
+                }
+                if (!foundCommandableLarva) {
+                    return false;
+                }
+            }
+            else if ( isConstructing() || !isCompleted() || (getType().isBuilding() && !isIdle()) ) {
+                return false;
+            }
+        }
+
+        if ( !game.canMake(uType, thisUnit) ) {
+            return false;
+        }
+        return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
+    }
+
+    //TODO
+    // https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/Shared/Templates.h#L1033
     public boolean canResearch();
 
     public boolean canResearch(boolean checkCommandibility);
