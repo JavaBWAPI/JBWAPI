@@ -15,6 +15,14 @@ abstract class Point {
 		this.scalar = type;
 	}
 
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
 	public double getLength() {
 		return Math.sqrt(x * x + y * y);
 	}
