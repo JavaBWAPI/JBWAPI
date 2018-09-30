@@ -235,7 +235,6 @@ public class Game {
         return new Position(gameData.screenX(), gameData.screenY());
      }
 
-     //TODO
      public void setScreenPosition(final int x, final int y) {
         addCommand(SetScreenPosition.value, x, y);
      }
@@ -261,23 +260,31 @@ public class Game {
      }
 
      //TODO
-//     public List<Unit> getUnitsOnTile(int tileX, int tileY);
-//
-//     public List<Unit> getUnitsOnTile(TilePosition tile);
-//
+     public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
+        return new HashSet<>();
+     }
+
+     public Set<Unit> getUnitsOnTile(final TilePosition tile) {
+         return getUnitsOnTile(tile.x, tile.y);
+     }
+
     //TODO
-     public Set<Unit> getUnitsInRectangle(int left, int top, int right, int bottom, final UnitFilter filter) {
+     public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
         return new HashSet<>();
      }
 
     public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
     }
-//
-//
-//     public List<Unit> getUnitsInRadius(int x, int y, int radius);
-//
-//     public List<Unit> getUnitsInRadius(Position center, int radius);
+
+    //TODO
+     public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
+        return new HashSet<>();
+     }
+
+     public Set<Unit> getUnitsInRadius(final Position center, final int radius) {
+        return getUnitsInRadius(center.x, center.y, radius);
+     }
 
      public int mapWidth() {
         return gameData.mapWidth();
@@ -1057,7 +1064,7 @@ public class Game {
     // public void setGUI(bool enabled);
     // public int getLastEventTime();
     // public boolean setMap(final String cstr_mapFileName);
-    // public boolean setRevealAll();return true;
+    // public boolean setRevealAll();
     // public boolean setRevealAll(boolean reveal);
 
      public void setTextSize() {
@@ -1093,25 +1100,24 @@ public class Game {
         return getRegionAt(position.x, position.y);
     }
 
-    /*
-    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange);
 
-    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition);
-
-    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange, boolean creep);
-
-    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer);
-
-    public int getDamageFrom(UnitType fromType, UnitType toType);
-
-    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer);
-
-    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer);
-
-    public int getDamageTo(UnitType toType, UnitType fromType);
-
-    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer, Player fromPlayer);
-    */
+//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange);
+//
+//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition)
+//
+//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange, boolean creep);
+//
+//    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer);
+//
+//    public int getDamageFrom(UnitType fromType, UnitType toType);
+//
+//    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer);
+//
+//    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer);
+//
+//    public int getDamageTo(UnitType toType, UnitType fromType);
+//
+//    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer, Player fromPlayer);
 
     //Since 4.2.0
     public int getRandomSeed() {

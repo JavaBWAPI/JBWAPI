@@ -2105,8 +2105,6 @@ public class Unit {
         return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
     }
 
-    //TODO
-    // https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/Shared/Templates.h#L1033
     public boolean canResearch() {
         return canResearch(true);
     }

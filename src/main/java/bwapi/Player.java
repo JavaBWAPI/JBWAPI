@@ -5,6 +5,7 @@ import bwapi.types.*;
 import bwapi.values.Color;
 
 import JavaBWAPIBackend.Client.GameData.PlayerData;
+import bwapi.values.TextColor;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public class Player {
     }
 
     public boolean isAlly(final Player player) {
-        return getForce() == player.getForce();
+        return getForce().equals(player.getForce());
     }
 
     public boolean isEnemy(final Player player) {
@@ -201,35 +202,34 @@ public class Player {
         return new Color(playerData.color());
     }
 
-    //TODO
-    public char getTextColor() {
+    public TextColor getTextColor() {
         switch (playerData.color()) {
             case 111: // red
-                return BrightRed.value;
+                return BrightRed;
             case 165: // blue
-                return Blue.value;
+                return Blue;
             case 159: // teal
-                return Teal.value;
+                return Teal;
             case 164: // purp
-                return Purple.value;
+                return Purple;
             case 179: // oj
-                return Orange.value;
+                return Orange;
             case 19:  // brown
-                return Brown.value;
+                return Brown;
             case 84:  // white
-                return PlayerWhite.value;
+                return PlayerWhite;
             case 135: // yellow
-                return PlayerYellow.value;
+                return PlayerYellow;
             case 185: // green p9
-                return DarkGreen.value;
+                return DarkGreen;
             case 136: // p10
-                return LightYellow.value;
+                return LightYellow;
             case 134: // p11
-                return Tan.value;
+                return Tan;
             case 51:  // p12
-                return GreyBlue.value;
+                return GreyBlue;
             default:
-                return Default.value;
+                return Default;
         }
     }
 

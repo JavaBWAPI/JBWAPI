@@ -29,10 +29,10 @@ public enum TextColor {
 	GreyCyan(30),
 	Turquoise(31);
 
-	public final char value;
+	public final byte value;
 
 	TextColor(final int value){
-		this.value = (char)value;
+		this.value = (byte)value;
 	}
 
 	//SINCE 4.2
