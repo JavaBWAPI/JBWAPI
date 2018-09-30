@@ -267,7 +267,7 @@ public class Game {
 //
     //TODO
      public Set<Unit> getUnitsInRectangle(int left, int top, int right, int bottom, final UnitFilter filter) {
-        return null;
+        return new HashSet<>();
      }
 
     public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
@@ -473,7 +473,7 @@ public class Game {
          // Ground getUnit dimension check
          if (type != Special_Start_Location) {
              final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-             Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
+             final Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
                      (u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
                              && u.getLeft() <= targPos.x + type.dimensionRight()
                              && u.getTop() <= targPos.y + type.dimensionDown()

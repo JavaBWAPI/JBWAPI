@@ -33,7 +33,7 @@ class PlayTestListener extends DefaultBWListener {
                 .findFirst().get();
 
         // train workers
-        if (depot.isIdle()) {
+        if (depot.isIdle() && self.minerals() >= race.getWorker().mineralPrice()) {
             depot.train(race.getWorker());
         }
 
@@ -53,7 +53,7 @@ class PlayTestListener extends DefaultBWListener {
 
         // make workers gather minerals if idle
         self.getUnits().stream()
-                .filter(u -> u.getType().isWorker() && u.isIdle())
+                .filter(u -> u.getType().isWorker() && u.isIdle() && u.isCompleted())
                 .forEach(u -> u.gather(minerals.poll()));
 
 
