@@ -259,31 +259,47 @@ public class Game {
         gameData.setFlag(flag.value, true);
      }
 
-     //TODO
      public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
-        return new HashSet<>();
+        return getAllUnits().stream().filter(u -> {
+            final TilePosition tp = u.getTilePosition();
+            return tp.x == tileX && tp.y == tileY;
+        }).collect(Collectors.toSet());
      }
 
      public Set<Unit> getUnitsOnTile(final TilePosition tile) {
          return getUnitsOnTile(tile.x, tile.y);
      }
 
-    //TODO
      public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-        return new HashSet<>();
+        return getAllUnits().stream().filter( u -> {
+            final Position p = u.getPosition();
+            return left <= p.x && top <= p.y && p.x < right && p.y < bottom && filter.operation(u);
+        }).collect(Collectors.toSet());
      }
 
     public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
     }
 
-    //TODO
-     public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
+     public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
         return new HashSet<>();
      }
 
-     public Set<Unit> getUnitsInRadius(final Position center, final int radius) {
-        return getUnitsInRadius(center.x, center.y, radius);
+     public Set<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
+         return getAllUnits().stream().filter( u -> {
+             final Position p = u.getPosition();
+             return center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u);
+         }).collect(Collectors.toSet());
+     }
+
+     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+         return getUnitsInRectangle(left, top, right, bottom, filter).stream()
+                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
+     }
+
+     public Unit getClosestUnitInRadius(final Position center, final int radius, final UnitFilter filter) {
+        return getUnitsInRadius(center, radius, filter).stream()
+                .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
      }
 
      public int mapWidth() {
@@ -311,68 +327,77 @@ public class Game {
      }
 
      public boolean isWalkable(final int walkX, final int walkY) {
-        //TODO bounds check
-
-        return gameData.walkable(walkX, walkY);
+        return isWalkable(new WalkPosition(walkX, walkY));
      }
 
      public boolean isWalkable(final WalkPosition position) {
-        return isWalkable(position.x, position.y);
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return gameData.walkable(position.x, position.y);
      }
 
      public int getGroundHeight(final int tileX, final int tileY) {
-         //TODO bounds check
-         return gameData.groundHeight(tileX, tileY);
+         return getGroundHeight(new TilePosition(tileX, tileY));
      }
 
      public int getGroundHeight(final TilePosition position) {
-        return getGroundHeight(position.x, position.y);
+         if (!position.isValid(this)) {
+             return -1;
+         }
+         return gameData.groundHeight(position.x, position.y);
      }
 
      public boolean isBuildable(final int tileX, final int tileY) {
-         //TODO bounds check
-         return gameData.buildable(tileX, tileY);
+         return isBuildable(tileX, tileY, false);
      }
 
      public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
-        //TODO add building checks
-         //https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/BWAPIClient/Source/GameImpl.cpp#L589
-        return isBuildable(tileX, tileY);
+        return isBuildable(new TilePosition(tileX, tileY), includeBuildings);
      }
 
      public boolean isBuildable(final TilePosition position) {
-        return isBuildable(position.x, position.y);
+        return isBuildable(position, false);
      }
 
      public boolean isBuildable(final TilePosition position, final boolean includeBuildings) {
-        return isBuildable(position.x, position.y, includeBuildings);
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return gameData.buildable(position.x, position.y) && ( includeBuildings ? !gameData.occupied(position.x,  position.y) : true );
      }
 
      public boolean isVisible(final int tileX, final int tileY) {
-         //TODO add bound checks
-         return gameData.visible(tileX, tileY);
+         return isVisible(new TilePosition(tileX, tileY));
      }
 
      public boolean isVisible(final TilePosition position) {
-        return isVisible(position.x, position.y);
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return gameData.visible(position.x, position.y);
      }
 
      public boolean isExplored(final int tileX, final int tileY) {
-         //TODO add bound checks
-         return gameData.explored(tileX, tileY);
+         return isExplored(new TilePosition(tileX, tileY));
      }
 
      public boolean isExplored(final TilePosition position) {
-        return isExplored(position.x, position.y);
+         if (!position.isValid(this)) {
+             return false;
+         }
+         return gameData.explored(position.x, position.y);
      }
 
      public boolean hasCreep(final int tileX, final int tileY) {
-         //TODO add bound checks
-         return gameData.hasCreep(tileX, tileY);
+         return hasCreep(new TilePosition(tileX, tileY));
      }
 
      public boolean hasCreep(final TilePosition position) {
-        return hasCreep(position.x, position.y);
+         if (!position.isValid(this)) {
+             return false;
+         }
+        return  gameData.hasCreep(position.x, position.y);
      }
 
     //TODO
@@ -1051,9 +1076,15 @@ public class Game {
         addCommand(SetFrameSkip.value, frameSkip, 0);
     }
 
-    //TODO
     public boolean hasPath(final Position source, final Position destination) {
-        return true;
+        if (source.isValid(this) && destination.isValid(this)) {
+            final Region rgnA = getRegionAt(source);
+            final Region rgnB = getRegionAt(destination);
+            if (rgnA != null && rgnB != null && rgnA.getRegionGroupID() == rgnB.getRegionGroupID()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // If you need these please implement (see addCommand and make a PR to the github repo)
@@ -1090,23 +1121,28 @@ public class Game {
         return new HashSet<>(regions.values());
     }
 
-    //TODO
     public Region getRegionAt(final int x, final int y) {
-        return null;
+        return regions.get((int)gameData.mapTileRegionID(x, y));
     }
 
-    //TODO
     public Region getRegionAt(final Position position) {
         return getRegionAt(position.x, position.y);
     }
 
 
-//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange);
-//
-//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition)
-//
-//    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange, boolean creep);
-//
+    public TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition, final int maxRange) {
+        return getBuildLocation(type, desiredPosition, maxRange, false);
+    }
+
+    public TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition) {
+        return getBuildLocation(type, desiredPosition, 64);
+    }
+
+
+
+    public TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep) {
+        return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
+    }
 
     private static final int damageRatio[][] = {
             // Ind, Sml, Med, Lrg, Non, Unk
