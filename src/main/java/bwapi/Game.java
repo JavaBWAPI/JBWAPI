@@ -370,51 +370,51 @@ public class Game {
 
     //TODO
     public boolean hasPowerPrecise(final int x, final int y) {
-        return false;
+        return true;
      }
     //TODO
      public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPowerPrecise(final Position position){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPowerPrecise(final Position position, final UnitType unitType){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final int tileX, final int tileY){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final int tileX, final int tileY, final UnitType unitType){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final TilePosition position){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final TilePosition position, final UnitType unitType){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight){
-         return false;
+         return true;
      }
     //TODO
      public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return false;
+         return true;
      }
 
      public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
@@ -442,9 +442,7 @@ public class Game {
          if ( type.isRefinery() ) {
              for (final Unit g : getGeysers()) {
                  if (g.getTilePosition().equals(lt)) {
-                     if (g.isVisible() && g.getType() != Resource_Vespene_Geyser)
-                         return false;
-                     return true;
+                     return !g.isVisible() || g.getType() == Resource_Vespene_Geyser;
                  }
              }
              return false;
@@ -552,7 +550,7 @@ public class Game {
 
      //TODO
      public boolean canMake(final UnitType type, final Unit builder) {
-        return false;
+        return true;
      }
 
      public boolean canResearch(final TechType type, final Unit unit) {
@@ -565,7 +563,7 @@ public class Game {
 
      //TODO
      public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
-         return false;
+         return true;
      }
 
      public boolean canUpgrade(final UpgradeType type, final Unit unit) {
@@ -578,7 +576,7 @@ public class Game {
 
      //TODO
      public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
-        return false;
+        return true;
      }
 
      public List<TilePosition> getStartLocations() {
@@ -1050,7 +1048,7 @@ public class Game {
 
     //TODO
     public boolean hasPath(final Position source, final Position destination) {
-        return false;
+        return true;
     }
 
     // If you need these please implement (see addCommand and make a PR to the github repo)
