@@ -585,7 +585,7 @@ public class Game {
          if (type.isResourceDepot())  {
              for (final Unit m : getStaticMinerals()) {
                  final TilePosition tp = m.getInitialTilePosition();
-                 if ( (isVisible(tp) || isVisible(tp.x + 1, tp.y)) && !m.isVisible()) {
+                 if ( (isVisible(tp) || isVisible(tp.x + 1, tp.y)) && !m.exists()) {
                      continue; // tile position is visible, but mineral is not => mineral does not exist
                  }
                  if (tp.x > lt.x - 5 &&
