@@ -9,7 +9,7 @@ public enum UnitSizeType {
     None(4),
     Unknown(5);
 
-    private int id;
+    public final int id;
 
     UnitSizeType(int id) {
         this.id = id;

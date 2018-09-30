@@ -1107,17 +1107,59 @@ public class Game {
 //
 //    public TilePosition getBuildLocation(UnitType type, TilePosition desiredPosition, int maxRange, boolean creep);
 //
-//    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer);
-//
-//    public int getDamageFrom(UnitType fromType, UnitType toType);
-//
-//    public int getDamageFrom(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer);
-//
-//    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer);
-//
-//    public int getDamageTo(UnitType toType, UnitType fromType);
-//
-//    public int getDamageTo(UnitType toType, UnitType fromType, Player toPlayer, Player fromPlayer);
+
+    private static final int damageRatio[][] = {
+            // Ind, Sml, Med, Lrg, Non, Unk
+            {  0,   0,   0,   0,   0,   0 }, // Independent
+            {  0, 128, 192, 256,   0,   0 }, // Explosive
+            {  0, 256, 128,  64,   0,   0 }, // Concussive
+            {  0, 256, 256, 256,   0,   0 }, // Normal
+            {  0, 256, 256, 256,   0,   0 }, // Ignore_Armor
+            {  0,   0,   0,   0,   0,   0 }, // None
+            {  0,   0,   0,   0,   0,   0 }  // Unknown
+    };
+
+    private int getDamageFromImpl(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer) {
+        // Retrieve appropriate weapon
+        final WeaponType wpn = toType.isFlyer() ? fromType.airWeapon() : fromType.groundWeapon();
+        if ( wpn == WeaponType.None || wpn == WeaponType.Unknown )
+            return 0;
+
+        // Get initial weapon damage
+        int dmg = fromPlayer != null ? fromPlayer.damage(wpn) : wpn.damageAmount() * wpn.damageFactor();
+
+        // If we need to calculate using armor
+        if ( wpn.damageType() != DamageType.Ignore_Armor && toPlayer != null ) {
+            dmg -= Math.min(dmg, toPlayer.armor(toType));
+        }
+
+        return dmg * damageRatio[wpn.damageType().id][toType.size().id] / 256;
+    }
+
+
+    public int getDamageFrom(final UnitType fromType, final UnitType toType, final Player fromPlayer) {
+        return getDamageFrom(fromType, toType, fromPlayer, null);
+    }
+
+    public int getDamageFrom(final UnitType fromType, UnitType toType) {
+        return getDamageFrom(fromType, toType, null);
+    }
+
+    public int getDamageFrom(final UnitType fromType, final UnitType toType, final Player fromPlayer, final Player toPlayer) {
+        return getDamageFromImpl(fromType, toType, fromPlayer, toPlayer == null ? self() : toPlayer);
+    }
+
+    public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer){
+        return getDamageTo(toType, fromType, toPlayer, null);
+    }
+
+    public int getDamageTo(final UnitType toType, final UnitType fromType) {
+        return getDamageTo(toType, fromType, null);
+    }
+
+    public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer, final Player fromPlayer) {
+        return getDamageFromImpl(fromType, toType, fromPlayer == null ? self() : fromPlayer, toPlayer);
+    }
 
     //Since 4.2.0
     public int getRandomSeed() {

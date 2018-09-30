@@ -9,7 +9,7 @@ public enum DamageType {
     None(5),
     Unknown(6);
 
-    private int id;
+    public final int id;
 
     DamageType(int id){
         this.id = id;
