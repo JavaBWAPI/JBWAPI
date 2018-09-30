@@ -88,7 +88,6 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    //TODO this is UNSIGNED in bwapi-c++ (ask n00byedge to be sure)
     static int Building                = 0x00000001;
     static int Addon                   = 0x00000002;
     static int Flyer                   = 0x00000004;

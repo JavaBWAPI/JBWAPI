@@ -621,9 +621,114 @@ public class Game {
         return canMake(type, null);
      }
 
-     //TODO
      public boolean canMake(final UnitType type, final Unit builder) {
-        return true;
+         Player pSelf = self();
+         // Error checking
+         if (pSelf == null) {
+             return false;
+         }
+
+         // Check if the unit type is available (UMS game)
+         if ( !pSelf.isUnitAvailable(type) ) {
+             return false;
+         }
+
+         // Get the required UnitType
+         final UnitType requiredType = type.whatBuilds().getKey();
+
+         // do checks if a builder is provided
+         if ( builder != null ) {
+             // Check if the owner of the unit is you
+             if (!pSelf.equals(builder.getPlayer())) {
+                 return false;
+             }
+
+             final UnitType builderType = builder.getType();
+             if ( type == Zerg_Nydus_Canal && builderType == Zerg_Nydus_Canal ) {
+                 if ( !builder.isCompleted() ) {
+                     return false;
+                 }
+                 return builder.getNydusExit() == null;
+             }
+
+             // Check if this unit can actually build the unit type
+             if ( requiredType == Zerg_Larva && builderType.producesLarva() ) {
+                 if ( builder.getLarva().size() == 0 ) {
+                     return false;
+                 }
+             }
+             else if ( builderType != requiredType ) {
+                 return false;
+             }
+
+             // Carrier/Reaver space checking
+             int max_amt;
+             switch ( builderType ) {
+                 case Protoss_Carrier:
+                 case Hero_Gantrithor:
+                    // Get max interceptors
+                     max_amt = 4;
+                     if ( pSelf.getUpgradeLevel(UpgradeType.Carrier_Capacity) > 0 || builderType == Hero_Gantrithor ) {
+                         max_amt += 4;
+                     }
+
+                     // Check if there is room
+                     if ( builder.getInterceptorCount() + builder.getTrainingQueue().size() >= max_amt ) {
+                         return false;
+                     }
+                     break;
+                 case Protoss_Reaver:
+                 case Hero_Warbringer:
+                 // Get max scarabs
+                 max_amt = 5;
+                     if ( pSelf.getUpgradeLevel(UpgradeType.Reaver_Capacity) > 0 || builderType == Hero_Warbringer ) {
+                         max_amt += 5;
+                     }
+
+                     // check if there is room
+                     if (builder.getScarabCount() + builder.getTrainingQueue().size() >= max_amt) {
+                         return false;
+                     }
+                 break;
+             }
+         } // if builder != nullptr
+
+         // Check if player has enough minerals
+         if ( pSelf.minerals() < type.mineralPrice() ) {
+             return false;
+         }
+
+         // Check if player has enough gas
+         if ( pSelf.gas() < type.gasPrice() ) {
+             return false;
+         }
+
+         // Check if player has enough supplies
+         Race typeRace = type.getRace();
+         final int supplyRequired = type.supplyRequired() * (type.isTwoUnitsInOneEgg() ? 2 : 1);
+         if (supplyRequired > 0 && pSelf.supplyTotal(typeRace) < pSelf.supplyUsed(typeRace) + supplyRequired - (requiredType.getRace() == typeRace ? requiredType.supplyRequired() : 0)) {
+             return false;
+         }
+
+         UnitType addon = UnitType.None;
+         Map<UnitType, Integer> reqUnits = type.requiredUnits();
+         for (final UnitType ut : type.requiredUnits().keySet()) {
+             if (ut.isAddon())
+                 addon = ut;
+
+             if (!pSelf.hasUnitTypeRequirement(ut, reqUnits.get(ut))) {
+                 return false;
+             }
+         }
+
+         if (type.requiredTech() != TechType.None && !pSelf.hasResearched(type.requiredTech())) {
+             return false;
+         }
+
+         return builder == null ||
+                 addon == UnitType.None ||
+                 addon.whatBuilds().getKey() != type.whatBuilds().getKey() ||
+                 (builder.getAddon() != null && builder.getAddon().getType() == addon);
      }
 
      public boolean canResearch(final TechType type, final Unit unit) {
@@ -634,8 +739,50 @@ public class Game {
         return canResearch(type, null);
      }
 
-     //TODO
      public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
+        final Player self = self();
+         // Error checking
+         if ( self == null ) {
+             return false;
+         }
+
+         if ( unit != null ) {
+             if (!unit.getPlayer().equals(self)) {
+                 return false;
+             }
+
+             if (!unit.getType().isSuccessorOf(type.whatResearches())) {
+                 return false;
+             }
+
+             if ( checkCanIssueCommandType && ( unit.isLifted() || !unit.isIdle() || !unit.isCompleted() ) ) {
+                 return false;
+             }
+         }
+         if (self.isResearching(type)) {
+             return false;
+         }
+
+         if (self.hasResearched(type)) {
+             return false;
+         }
+
+         if ( !self.isResearchAvailable(type) ) {
+             return false;
+         }
+
+         if (self.minerals() < type.mineralPrice()) {
+             return false;
+         }
+
+         if (self.gas() < type.gasPrice()) {
+             return false;
+         }
+
+         if (!self.hasUnitTypeRequirement(type.requiredUnit())) {
+             return false;
+         }
+
          return true;
      }
 
@@ -647,13 +794,51 @@ public class Game {
          return canUpgrade(type, null);
      }
 
-     //TODO
      public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
-        return true;
+         final Player self = self();
+         if ( self == null) {
+             return false;
+         }
+
+         if ( unit != null ) {
+             if (!unit.getPlayer().equals(self)) {
+                 return false;
+             }
+
+             if (!unit.getType().isSuccessorOf(type.whatUpgrades())) {
+                 return false;
+             }
+
+             if ( checkCanIssueCommandType && ( unit.isLifted() || !unit.isIdle() || !unit.isCompleted())) {
+                 return false;
+             }
+         }
+         int nextLvl = self.getUpgradeLevel(type) + 1;
+
+         if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
+             return false;
+         }
+
+         if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
+             return false;
+         }
+
+         if (self.isUpgrading(type)) {
+             return false;
+         }
+
+         if ( self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type)) {
+             return false;
+         }
+
+         if ( self.minerals() < type.mineralPrice(nextLvl)) {
+             return false;
+         }
+
+         return self.gas() >= type.gasPrice(nextLvl);
      }
 
      public List<TilePosition> getStartLocations() {
-         //TODO cache this?
          return IntStream.range(0, gameData.startLocationCount())
                  .mapToObj(i -> new TilePosition(gameData.startLocationX(i), gameData.startLocationY(i)))
                  .collect(Collectors.toList());
