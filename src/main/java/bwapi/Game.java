@@ -400,53 +400,96 @@ public class Game {
         return  gameData.hasCreep(position.x, position.y);
      }
 
-    //TODO
-    public boolean hasPowerPrecise(final int x, final int y) {
-        return true;
+     private static boolean bPsiFieldMask[][] = {
+        { false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false },
+        { false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
+        { false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
+        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
+        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
+        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
+        { false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+        { false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
+        { false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false }
+    };
+
+    private static boolean hasPower(int x, int y, final UnitType unitType, final Set<Unit> pylons) {
+        if ( unitType.id >= 0 && unitType.id < UnitType.None.id && (!unitType.requiresPsi() || !unitType.isBuilding()) ) {
+            return true;
+        }
+
+        // Loop through all pylons for the current player
+        for (Unit i : pylons) {
+            if ( !i.exists() || !i.isCompleted() ) {
+                continue;
+            }
+            final Position p = i.getPosition();
+            if (Math.abs(p.x - x) >= 256 ) {
+                continue;
+            }
+            if (Math.abs(p.y - y) >= 160 ) {
+                continue;
+            }
+
+            if ( bPsiFieldMask[(y - p.y + 160) / 32][(x - p.x + 256) / 32] ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+     public boolean hasPowerPrecise(final int x, final int y) {
+        return hasPowerPrecise(new Position(x, y));
      }
-    //TODO
-     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType){
-         return true;
+
+     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
+         return hasPowerPrecise(new Position(x, y), unitType);
      }
-    //TODO
+
      public boolean hasPowerPrecise(final Position position){
-         return true;
+         return hasPowerPrecise(position, UnitType.None);
      }
-    //TODO
+
      public boolean hasPowerPrecise(final Position position, final UnitType unitType){
-         return true;
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return hasPower(position.x, position.y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toSet()));
      }
-    //TODO
+
      public boolean hasPower(final int tileX, final int tileY){
-         return true;
+         return hasPower(new TilePosition(tileX, tileY));
      }
-    //TODO
+
      public boolean hasPower(final int tileX, final int tileY, final UnitType unitType){
-         return true;
+         return hasPower(new TilePosition(tileX, tileY), unitType);
      }
-    //TODO
+
      public boolean hasPower(final TilePosition position){
-         return true;
+         return hasPower(position.x, position.y, UnitType.None);
      }
-    //TODO
+
      public boolean hasPower(final TilePosition position, final UnitType unitType){
-         return true;
+         if ( unitType.id >= 0 && unitType.id < UnitType.None.id ) {
+             return hasPowerPrecise(position.x * 32 + unitType.tileWidth() * 16, position.y * 32 + unitType.tileHeight() * 16, unitType);
+         }
+         return hasPowerPrecise( position.x*32, position.y*32, UnitType.None);
      }
-    //TODO
+
      public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight){
-         return true;
+         return hasPower(tileX, tileY, tileWidth, tileHeight, UnitType.Unknown);
      }
-    //TODO
+
      public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return true;
+         return hasPowerPrecise( tileX*32 + tileWidth*16, tileY*32 + tileHeight*16, unitType);
      }
-    //TODO
+
      public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight){
-         return true;
+         return hasPower(position.x, position.y, tileWidth, tileHeight);
      }
-    //TODO
+
      public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return true;
+         return hasPower(position.x, position.y, tileWidth, tileHeight, unitType);
      }
 
      public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
