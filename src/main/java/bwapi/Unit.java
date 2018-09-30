@@ -3,6 +3,7 @@ package bwapi;
 import JavaBWAPIBackend.Client.GameData.UnitData;
 import bwapi.point.Position;
 import bwapi.point.TilePosition;
+import bwapi.point.WalkPosition;
 import bwapi.types.*;
 
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static bwapi.types.Order.*;
-import static bwapi.types.Race.Terran;
+import static bwapi.types.Race.*;
 import static bwapi.types.UnitType.*;
 
 public class Unit {
@@ -1098,7 +1099,7 @@ public class Unit {
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType) {
-        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanBuildUnitType);
+        return canIssueCommand(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanBuildUnitType, true);
     }
 
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits) {
@@ -1928,7 +1929,7 @@ public class Unit {
         if ( checkCommandibility && !canCommand() ) {
             return false;
         }
-        if ( checkCanIssueCommandType && !canBuildAddon(this, false) ) {
+        if ( checkCanIssueCommandType && !canBuildAddon(uType, false) ) {
             return false;
         }
         if ( !game.canMake(uType, this) ) {
@@ -2062,10 +2063,12 @@ public class Unit {
         return !isHallucination();
     }
 
-    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType);
+    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType){
+        return canMorph(uType, checkCanIssueCommandType, true);
+    }
 
     public boolean canMorph(UnitType uType) {
-
+        return canMorph(uType, true);
     }
 
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -2104,414 +2107,1805 @@ public class Unit {
 
     //TODO
     // https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/Shared/Templates.h#L1033
-    public boolean canResearch();
+    public boolean canResearch() {
+        return canResearch(true);
+    }
 
-    public boolean canResearch(boolean checkCommandibility);
+    public boolean canResearch(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
 
-    public boolean canResearch(TechType type);
+        return !isLifted() && isIdle() && isCompleted();
+    }
 
-    public boolean canResearch(TechType type, boolean checkCanIssueCommandType);
+    public boolean canResearch(TechType type) {
+        return canResearch(type, true);
+    }
 
-    public boolean canUpgrade();
+    public boolean canResearch(TechType type, boolean checkCanIssueCommandType) {
+        final Player self = game.self();
+        if (!getPlayer().equals(self)) {
+            return false;
+        }
 
-    public boolean canUpgrade(boolean checkCommandibility);
+        if (!getType().isSuccessorOf(type.whatResearches())) {
+            return false;
+        }
 
-    public boolean canUpgrade(UpgradeType type);
+        if ( checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted() ) ) {
+            return false;
+        }
 
-    public boolean canUpgrade(UpgradeType type, boolean checkCanIssueCommandType);
+        if (self.isResearching(type)) {
+            return false;
+        }
 
-    public boolean canSetRallyPoint();
+        if (self.hasResearched(type)) {
+            return false;
+        }
 
-    public boolean canSetRallyPoint(boolean checkCommandibility);
+        if ( !self.isResearchAvailable(type) ) {
+            return false;
+        }
 
-    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+        if (self.minerals() < type.mineralPrice()) {
+            return false;
+        }
 
-    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
+        if (self.gas() < type.gasPrice()) {
+            return false;
+        }
 
-    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit);
+        return self.hasUnitTypeRequirement(type.requiredUnit());
+    }
 
-    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit);
+    public boolean canUpgrade() {
+        return canUpgrade(true);
+    }
 
-    public boolean canSetRallyPoint(Position target);
+    public boolean canUpgrade(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return !isLifted() && isIdle() && isCompleted();
+    }
 
-    public boolean canSetRallyPoint(Unit target);
+    public boolean canUpgrade(UpgradeType type) {
+        return canUpgrade(type, true);
+    }
 
-    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canSetRallyPosition();
-
-    public boolean canSetRallyPosition(boolean checkCommandibility);
-
-    public boolean canSetRallyUnit();
-
-    public boolean canSetRallyUnit(boolean checkCommandibility);
-
-    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canSetRallyUnit(Unit targetUnit);
-
-    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canMove();
-
-    public boolean canMove(boolean checkCommandibility);
-
-    public boolean canMoveGrouped(boolean checkCommandibilityGrouped);
-
-    public boolean canMoveGrouped();
-
-    public boolean canMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canPatrol();
-
-    public boolean canPatrol(boolean checkCommandibility);
-
-    public boolean canPatrolGrouped(boolean checkCommandibilityGrouped);
-
-    public boolean canPatrolGrouped();
-
-    public boolean canPatrolGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canFollow();
-
-    public boolean canFollow(boolean checkCommandibility);
-
-    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canFollow(Unit targetUnit);
-
-    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canGather();
-
-    public boolean canGather(boolean checkCommandibility);
-
-    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canGather(Unit targetUnit);
-
-    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canReturnCargo();
-
-    public boolean canReturnCargo(boolean checkCommandibility);
-
-    public boolean canHoldPosition();
-
-    public boolean canHoldPosition(boolean checkCommandibility);
-
-    public boolean canStop();
-
-    public boolean canStop(boolean checkCommandibility);
-
-    public boolean canRepair();
-
-    public boolean canRepair(boolean checkCommandibility);
-
-    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canRepair(Unit targetUnit);
-
-    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canBurrow();
-
-    public boolean canBurrow(boolean checkCommandibility);
-
-    public boolean canUnburrow();
-
-    public boolean canUnburrow(boolean checkCommandibility);
-
-    public boolean canCloak();
-
-    public boolean canCloak(boolean checkCommandibility);
-
-    public boolean canDecloak();
-
-    public boolean canDecloak(boolean checkCommandibility);
-
-    public boolean canSiege();
-
-    public boolean canSiege(boolean checkCommandibility);
-
-    public boolean canUnsiege();
-
-    public boolean canUnsiege(boolean checkCommandibility);
-
-    public boolean canLift();
-
-    public boolean canLift(boolean checkCommandibility);
-
-    public boolean canLand();
-
-    public boolean canLand(boolean checkCommandibility);
-
-    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType);
-
-    public boolean canLand(TilePosition target);
-
-    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canLoad();
-
-    public boolean canLoad(boolean checkCommandibility);
-
-    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canLoad(Unit targetUnit);
-
-    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUnloadWithOrWithoutTarget();
-
-    public boolean canUnloadWithOrWithoutTarget(boolean checkCommandibility);
-
-    public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType);
-
-    public boolean canUnloadAtPosition(Position targDropPos);
-
-    public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUnload();
-
-    public boolean canUnload(boolean checkCommandibility);
-
-    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType);
-
-    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition);
-
-    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canUnload(Unit targetUnit);
-
-    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUnloadAll();
-
-    public boolean canUnloadAll(boolean checkCommandibility);
-
-    public boolean canUnloadAllPosition();
-
-    public boolean canUnloadAllPosition(boolean checkCommandibility);
-
-    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType);
-
-    public boolean canUnloadAllPosition(Position targDropPos);
-
-    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canRightClick();
-
-    public boolean canRightClick(boolean checkCommandibility);
-
-    public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClick(Position target, boolean checkCanTargetUnit);
-
-    public boolean canRightClick(Unit target, boolean checkCanTargetUnit);
-
-
-    public boolean canRightClick(Position target);
-
-    public boolean canRightClick(Unit target);
-
-    public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canRightClickGrouped(boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickGrouped();
-
-    public boolean canRightClickGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit);
-
-    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit);
-
-    public boolean canRightClickGrouped(Position target);
-
-    public boolean canRightClickGrouped(Unit target);
-
-    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canRightClickPosition();
-
-    public boolean canRightClickPosition(boolean checkCommandibility);
-
-    public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickPositionGrouped();
-
-    public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canRightClickUnit();
-
-    public boolean canRightClickUnit(boolean checkCommandibility);
-
-    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canRightClickUnit(Unit targetUnit);
-
-    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickUnitGrouped();
-
-    public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped);
-
-    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType);
-
-    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canRightClickUnitGrouped(Unit targetUnit);
-
-    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility);
-
-    public boolean canHaltConstruction();
-
-    public boolean canHaltConstruction(boolean checkCommandibility);
-
-    public boolean canCancelConstruction();
-
-    public boolean canCancelConstruction(boolean checkCommandibility);
-
-    public boolean canCancelAddon();
-
-    public boolean canCancelAddon(boolean checkCommandibility);
-
-    public boolean canCancelTrain();
-
-    public boolean canCancelTrain(boolean checkCommandibility);
-
-    public boolean canCancelTrainSlot();
-
-    public boolean canCancelTrainSlot(boolean checkCommandibility);
-
-    public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType);
-
-    public boolean canCancelTrainSlot(int slot);
-
-    public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canCancelMorph();
-
-    public boolean canCancelMorph(boolean checkCommandibility);
-
-    public boolean canCancelResearch();
-
-    public boolean canCancelResearch(boolean checkCommandibility);
-
-    public boolean canCancelUpgrade();
-
-    public boolean canCancelUpgrade(boolean checkCommandibility);
-
-    public boolean canUseTechWithOrWithoutTarget();
-
-    public boolean canUseTechWithOrWithoutTarget(boolean checkCommandibility);
-
-    public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechWithOrWithoutTarget(TechType tech);
-
-    public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType);
-
-    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType);
-
-    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType);
-
-    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType);
-
-    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit);
-
-    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit);
-
-    public boolean canUseTech(TechType tech, Position target);
-
-    public boolean canUseTech(TechType tech, Unit target);
-
-    public boolean canUseTech(TechType tech);
-
-    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechWithoutTarget(TechType tech);
-
-    public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechUnit(TechType tech);
-
-    public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits);
-
-    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit);
-
-    public boolean canUseTechUnit(TechType tech, Unit targetUnit);
-
-    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechPosition(TechType tech);
-
-    public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType);
-
-    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions);
-
-    public boolean canUseTechPosition(TechType tech, Position target);
-
-    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility);
-
-    public boolean canPlaceCOP();
-
-    public boolean canPlaceCOP(boolean checkCommandibility);
-
-    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType);
-
-    public boolean canPlaceCOP(TilePosition target);
-
-    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility);
+    public boolean canUpgrade(UpgradeType type, boolean checkCanIssueCommandType) {
+        final Player self = game.self();
+
+        if (!getPlayer().equals(self)) {
+            return false;
+        }
+
+        if (!getType().isSuccessorOf(type.whatUpgrades())) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted() ) )
+            return false;
+
+        int nextLvl = self.getUpgradeLevel(type) + 1;
+
+        if (!self.hasUnitTypeRequirement(type.whatUpgrades())){
+            return false;
+        }
+
+        if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))){
+            return false;
+        }
+
+        if (self.isUpgrading(type)){
+            return false;
+        }
+
+        if ( self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type) ){
+            return false;
+        }
+
+        if ( self.minerals() < type.mineralPrice(nextLvl) ){
+            return false;
+        }
+
+        return self.gas() >= type.gasPrice(nextLvl);
+    }
+
+    public boolean canSetRallyPoint() {
+        return canSetRallyPoint(true);
+    }
+
+    public boolean canSetRallyPoint(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canSetRallyPosition(false) || canSetRallyUnit(false);
+    }
+
+    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canSetRallyPoint(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canSetRallyPoint(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit) {
+        return canSetRallyPoint(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit) {
+        return canSetRallyPoint(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canSetRallyPoint(Position target) {
+        return canSetRallyPoint(target, true);
+    }
+
+    public boolean canSetRallyPoint(Unit target) {
+        return canSetRallyPoint(target, true);
+    }
+
+    public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canSetRallyPosition(false);
+    }
+
+    public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (target == null) {
+            return false;
+        }
+        return canSetRallyUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
+    }
+
+    public boolean canSetRallyPosition() {
+        return canSetRallyPosition(true);
+    }
+
+    public boolean canSetRallyPosition(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().canProduce() || !getType().isBuilding() ) {
+            return false;
+        }
+        return !isLifted();
+    }
+
+    public boolean canSetRallyUnit() {
+        return canSetRallyUnit(true);
+    }
+
+    public boolean canSetRallyUnit(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().canProduce() || !getType().isBuilding() ) {
+            return false;
+        }
+        return !isLifted();
+    }
+
+    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canSetRallyUnit(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canSetRallyUnit(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canSetRallyUnit(Unit targetUnit) {
+        return canSetRallyUnit(targetUnit, true);
+    }
+
+    public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canSetRallyUnit( false) ) {
+            return false;
+        }
+
+        return !checkCanTargetUnit || canTargetUnit(targetUnit, false);
+    }
+
+    public boolean canMove() {
+        return canMove(true);
+    }
+
+    public boolean canMove(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        final UnitType ut = getType();
+        if ( !ut.isBuilding()) {
+            if ( !isInterruptible() ) {
+                return false;
+            }
+            if ( !getType().canMove() ) {
+                return false;
+            }
+            if ( isBurrowed() ) {
+                return false;
+            }
+            if ( getOrder() == ConstructingBuilding ) {
+                return false;
+            }
+            if ( ut == Zerg_Larva ) {
+                return false;
+            }
+        }
+        else {
+            if ( !ut.isFlyingBuilding() ) {
+                return false;
+            }
+            if ( !isLifted() ) {
+                return false;
+            }
+        }
+        return isCompleted();
+    }
+
+    public boolean canMoveGrouped(boolean checkCommandibilityGrouped){
+        return canMoveGrouped(checkCommandibilityGrouped, true);
+    }
+
+    public boolean canMoveGrouped() {
+        return canMoveGrouped(true);
+    }
+
+    public boolean canMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+
+        if ( !getType().canMove() ) {
+            return false;
+        }
+        return isCompleted() || isMorphing();
+    }
+
+    public boolean canPatrol() {
+        return canPatrol(true);
+    }
+
+    public boolean canPatrol(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        return canMove(false);
+    }
+
+    public boolean canPatrolGrouped(boolean checkCommandibilityGrouped) {
+        return canPatrolGrouped(checkCommandibilityGrouped, true);
+    }
+
+    public boolean canPatrolGrouped() {
+        return canPatrolGrouped(true);
+    }
+
+    public boolean canPatrolGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+
+        return canMoveGrouped(false, false);
+    }
+
+    public boolean canFollow() {
+        return canFollow(true);
+    }
+
+    public boolean canFollow(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canMove(false);
+    }
+
+    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canFollow(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canFollow(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canFollow(Unit targetUnit) {
+        return canFollow(targetUnit, true);
+    }
+
+    public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canFollow( false) ){
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ){
+            return false;
+        }
+
+        return targetUnit != this;
+    }
+
+    public boolean canGather() {
+        return canGather(true);
+    }
+
+    public boolean canGather(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        final UnitType ut = getType();
+
+        if ( !ut.isBuilding() && !isInterruptible() ){
+            return false;
+        }
+        if ( !ut.isWorker() ){
+            return false;
+        }
+        if ( getPowerUp() != null ){
+            return false;
+        }
+        if ( isHallucination() ){
+            return false;
+        }
+        if ( isBurrowed() ){
+            return false;
+        }
+        if ( !isCompleted() ){
+            return false;
+        }
+        return getOrder() != ConstructingBuilding;
+    }
+
+    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+        return canGather(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canGather(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canGather(Unit targetUnit) {
+        return canGather(targetUnit, true);
+    }
+
+    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canGather( false) ){
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ){
+            return false;
+        }
+
+        final UnitType uType = getType();
+        if ( !uType.isResourceContainer() || uType == Resource_Vespene_Geyser ){
+            return false;
+        }
+
+        if ( !isCompleted() ){
+            return false;
+        }
+
+        if ( !hasPath(getPosition()) ) {
+            return false;
+        }
+
+        return !uType.isRefinery() || getPlayer().equals(game.self());
+
+    }
+
+    public boolean canReturnCargo() {
+        return canReturnCargo(true);
+    }
+
+    public boolean canReturnCargo(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        final UnitType ut = getType();
+
+        if ( !ut.isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        if ( !ut.isWorker() ) {
+            return false;
+        }
+        if ( !isCarryingGas() && !isCarryingMinerals() ) {
+            return false;
+        }
+        if (isBurrowed() ) {
+            return false;
+        }
+        return getOrder() != ConstructingBuilding;
+    }
+    public boolean canHoldPosition() {
+        return canHoldPosition(true);
+    }
+
+    public boolean canHoldPosition(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+
+        if ( !ut.isBuilding() ) {
+            if ( !ut.canMove() ) {
+                return false;
+            }
+            if ( isBurrowed() && ut != Zerg_Lurker ) {
+                return false;
+            }
+            if ( getOrder() == ConstructingBuilding ) {
+                return false;
+            }
+            if ( ut == Zerg_Larva ) {
+                return false;
+            }
+        }
+        else {
+            if ( !ut.isFlyingBuilding() ) {
+                return false;
+            }
+            if ( !isLifted() ) {
+                return false;
+            }
+        }
+
+        return isCompleted();
+    }
+
+    public boolean canStop() {
+        return canStop(true);
+    }
+
+    public boolean canStop(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+
+        if ( !isCompleted() ){
+            return false;
+        }
+        if ( isBurrowed() && ut != Zerg_Lurker ){
+            return false;
+        }
+        return !ut.isBuilding() || isLifted() ||
+                ut == Protoss_Photon_Cannon ||
+                ut == Zerg_Sunken_Colony ||
+                ut == Zerg_Spore_Colony ||
+                ut == Terran_Missile_Turret;
+    }
+
+    public boolean canRepair() {
+        return canRepair(true);
+    }
+
+    public boolean canRepair(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !isInterruptible() ){
+            return false;
+        }
+        if ( getType() != Terran_SCV ){
+            return false;
+        }
+        if ( !isCompleted() ){
+            return false;
+        }
+        if ( isHallucination() ){
+            return false;
+        }
+        return getOrder() != ConstructingBuilding;
+    }
+
+    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRepair(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canRepair(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canRepair(Unit targetUnit) {
+        return canRepair(targetUnit, true);
+    }
+
+    public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canRepair( false) )
+            return false;
+
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) )
+            return false;
+
+        UnitType targType = targetUnit.getType();
+        if ( targType.getRace() != Terran || !targType.isMechanical() ) {
+            return false;
+        }
+        if ( targetUnit.getHitPoints() == targType.maxHitPoints() ) {
+            return false;
+        }
+        if ( !targetUnit.isCompleted() ) {
+            return false;
+        }
+        return targetUnit != this;
+    }
+
+    public boolean canBurrow() {
+        return canBurrow(true);
+    }
+
+    public boolean canBurrow(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canUseTechWithoutTarget(TechType.Burrowing, true, false);
+    }
+
+    public boolean canUnburrow() {
+        return canUnburrow(true);
+    }
+
+    public boolean canUnburrow(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isBurrowable() ) {
+            return false;
+        }
+        return isBurrowed() && getOrder() != Unburrowing;
+    }
+
+    public boolean canCloak() {
+        return canCloak(true);
+    }
+
+    public boolean canCloak(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canUseTechWithoutTarget(getType().cloakingTech(), true, false);
+    }
+    public boolean canDecloak() {
+        return canDecloak(true);
+    }
+
+    public boolean canDecloak(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (getType().cloakingTech() == TechType.None ) {
+            return false;
+        }
+        return getSecondaryOrder() == Cloak;
+    }
+
+    public boolean canSiege() {
+        return canSiege(true);
+    }
+
+    public boolean canSiege(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canUseTechWithoutTarget(TechType.Tank_Siege_Mode, true, false);
+    }
+
+    public boolean canUnsiege() {
+        return canUnsiege(true);
+    }
+
+    public boolean canUnsiege(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !isSieged() ) {
+            return false;
+        }
+        final Order order = getOrder();
+        if ( order == Sieging || order == Unsieging ) {
+            return false;
+        }
+        return !isHallucination();
+    }
+
+    public boolean canLift() {
+        return canLift(true);
+    }
+
+    public boolean canLift(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isFlyingBuilding() ){
+            return false;
+        }
+        if ( isLifted() ){
+            return false;
+        }
+        if ( !isCompleted() ){
+            return false;
+        }
+        return isIdle();
+    }
+
+    public boolean canLand() {
+        return canLand(true);
+    }
+
+    public boolean canLand(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isFlyingBuilding() ) {
+            return false;
+        }
+        return isLifted();
+    }
+
+    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType){
+        return canLand(target, checkCanIssueCommandType, true);
+    }
+
+    public boolean canLand(TilePosition target) {
+        return canLand(target, true);
+    }
+
+    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (checkCanIssueCommandType && !canLand(checkCommandibility) ){
+            return false;
+        }
+
+        return game.canBuildHere(target, getType(), null, true);
+    }
+
+    public boolean canLoad() {
+        return canLoad(true);
+    }
+
+    public boolean canLoad(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+
+        if ( !ut.isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        if ( !isCompleted() ) {
+            return false;
+        }
+        if ( ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0 ) {
+            return false;
+        }
+        if ( isBurrowed() ) {
+            return false;
+        }
+        if (getOrder() == ConstructingBuilding ) {
+            return false;
+        }
+        return ut != Zerg_Larva;
+    }
+
+    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canLoad(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canLoad(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canLoad(Unit targetUnit) {
+        return canLoad(targetUnit, true);
+    }
+
+    public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canLoad( false) ){
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+            return false;
+        }
+
+        final Player self = game.self();
+        //target must also be owned by self
+        if (!targetUnit.getPlayer().equals(self)){
+            return false;
+        }
+        if ( targetUnit.isLoaded() || !targetUnit.isCompleted() ){
+            return false;
+        }
+
+        // verify upgrade for Zerg Overlord
+        if ( targetUnit.getType() == Zerg_Overlord &&self.getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0 ){
+            return false;
+        }
+
+        int thisUnitSpaceProvided = getType().spaceProvided();
+        int targetSpaceProvided = targetUnit.getType().spaceProvided();
+        if ( thisUnitSpaceProvided <= 0 && targetSpaceProvided <= 0 ){
+            return false;
+        }
+
+        final Unit unitToBeLoaded = thisUnitSpaceProvided > 0 ? targetUnit : this ;
+        final UnitType unitToBeLoadedType = unitToBeLoaded.getType();
+        if (!unitToBeLoadedType.canMove() || unitToBeLoadedType.isFlyer() || unitToBeLoadedType.spaceRequired() > 8 ){
+            return false;
+        }
+        if ( !unitToBeLoaded.isCompleted() ){
+            return false;
+        }
+        if ( unitToBeLoaded.isBurrowed() ){
+            return false;
+        }
+
+        final Unit unitThatLoads = thisUnitSpaceProvided > 0 ? this : targetUnit;
+        final UnitType unitThatLoadsType = unitThatLoads.getType();
+        if ( unitThatLoads.isHallucination() ){
+            return false;
+        }
+
+        if (unitThatLoadsType  == Terran_Bunker) {
+            if ( !unitThatLoadsType.isOrganic() || unitThatLoadsType.getRace() != Terran ){
+                return false;
+            }
+            if ( !unitToBeLoaded.hasPath(unitThatLoads.getPosition()) ){
+                return false;
+            }
+        }
+
+        int freeSpace = thisUnitSpaceProvided > 0 ? thisUnitSpaceProvided : targetSpaceProvided;
+        for (Unit u : unitThatLoads.getLoadedUnits()) {
+            final int requiredSpace = u.getType().spaceRequired();
+            if ( requiredSpace > 0 && requiredSpace < 8 ) {
+                freeSpace -= requiredSpace;
+            }
+        }
+        return unitToBeLoadedType.spaceRequired() <= freeSpace;
+    }
+
+    public boolean canUnloadWithOrWithoutTarget() {
+        return canUnloadWithOrWithoutTarget(true);
+    }
+
+    public boolean canUnloadWithOrWithoutTarget(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+        if ( !ut.isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+
+        if ( getLoadedUnits().size() == 0 ) {
+            return false;
+        }
+
+        // Check overlord tech
+        if ( ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
+            return false;
+        }
+
+        return ut.spaceProvided() > 0;
+    }
+
+    public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType) {
+        return canUnloadAtPosition(targDropPos, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUnloadAtPosition(Position targDropPos) {
+        return canUnloadAtPosition(targDropPos, true);
+    }
+
+    public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false) ) {
+            return false;
+        }
+
+        if (getType() != Terran_Bunker ) {
+            if (! new WalkPosition(targDropPos.x / 8, targDropPos.y / 8).isValid(game)) {
+                return false;
+            }
+            else if ( !game.isWalkable(targDropPos.x / 8, targDropPos.y / 8) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean canUnload() {
+        return canUnload(true);
+    }
+
+    public boolean canUnload(boolean checkCommandibility) {
+        return canUnloadAtPosition(getPosition(), true, checkCommandibility);
+    }
+
+    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType){
+        return canUnload(targetUnit, checkCanTargetUnit, checkPosition, checkCanIssueCommandType,true);
+    }
+
+    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition) {
+        return canUnload(targetUnit, checkCanTargetUnit, checkPosition, true);
+    }
+
+    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canUnload(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canUnload(Unit targetUnit) {
+        return canUnload(targetUnit, true);
+    }
+
+    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false) ) {
+            return false;
+        }
+
+        if ( checkPosition && !canUnloadAtPosition(getPosition(), false, false) ) {
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ) {
+            return false;
+        }
+
+        if ( !targetUnit.isLoaded() ) {
+            return false;
+        }
+
+        return equals(targetUnit.getTransport());
+    }
+
+    public boolean canUnloadAll() {
+        return canUnloadAll(true);
+    }
+
+    public boolean canUnloadAll(boolean checkCommandibility) {
+        return canUnloadAtPosition(getPosition(), true, checkCommandibility);
+    }
+
+    public boolean canUnloadAllPosition() {
+        return canUnloadAllPosition(true);
+    }
+
+    public boolean canUnloadAllPosition(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !canUnloadWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        return getType() != Terran_Bunker;
+    }
+
+    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType){
+        return canUnloadAllPosition(targDropPos, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUnloadAllPosition(Position targDropPos) {
+        return canUnloadAllPosition(targDropPos, true);
+    }
+
+    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUnloadAllPosition( false) ) {
+            return false;
+        }
+
+        return canUnloadAtPosition(targDropPos, false, false);
+    }
+
+    public boolean canRightClick() {
+        return canRightClick(true);
+    }
+
+    public boolean canRightClick(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        return canRightClickPosition(false) || canRightClickUnit(false);
+    }
+
+    public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClick(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClick(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClick(Position target, boolean checkCanTargetUnit) {
+        return canRightClick(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClick(Unit target, boolean checkCanTargetUnit) {
+        return canRightClick(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClick(Position target) {
+        return canRightClick(target, true);
+    }
+
+    public boolean canRightClick(Unit target) {
+        return canRightClick(target, true);
+    }
+
+    public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canRightClickPosition(false);
+    }
+
+    public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (target == null) {
+            return false;
+        }
+        return canRightClickUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
+    }
+
+    public boolean canRightClickGrouped(boolean checkCommandibilityGrouped) {
+        return canRightClickGrouped(checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickGrouped() {
+        return canRightClickGrouped(true);
+    }
+
+    public boolean canRightClickGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) )
+            return false;
+
+        return canRightClickPositionGrouped(false, false) || canRightClickUnitGrouped(false, false);
+    }
+
+    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
+        return canRightClickGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
+        return canRightClickGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClickGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClickGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit) {
+        return canRightClickGrouped(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit) {
+        return canRightClickGrouped(target, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClickGrouped(Position target) {
+        return canRightClickGrouped(target, true);
+    }
+
+    public boolean canRightClickGrouped(Unit target) {
+        return canRightClickGrouped(target, true);
+    }
+
+    public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
+            return false;
+        }
+
+        return canRightClickPositionGrouped(false, false);
+    }
+
+    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped , boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
+            return false;
+        }
+        if (target == null) {
+            return false;
+        }
+        return canRightClickUnitGrouped(target, checkCanTargetUnit, checkCanIssueCommandTypeGrouped, false, false);
+    }
+
+    public boolean canRightClickPosition() {
+        return canRightClickPosition(true);
+    }
+
+    public boolean canRightClickPosition(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        return canMove(false) || canSetRallyPosition(false);
+    }
+
+    public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped) {
+        return canRightClickPositionGrouped(checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickPositionGrouped() {
+        return canRightClickPositionGrouped(true);
+    }
+
+    public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+            return false;
+        }
+
+        if ( !isInterruptible() ) {
+            return false;
+        }
+        return canMoveGrouped(false, false);
+    }
+
+    public boolean canRightClickUnit() {
+        return canRightClickUnit(true);
+    }
+
+    public boolean canRightClickUnit(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        return canFollow(false) ||
+                canAttackUnit(false) ||
+                canLoad(false) ||
+                canSetRallyUnit(false);
+    }
+
+    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClickUnit(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canRightClickUnit(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClickUnit(Unit targetUnit) {
+        return canRightClickUnit(targetUnit, true);
+    }
+
+    public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canRightClickUnit( false) ) {
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ) {
+            return false;
+        }
+
+        if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
+                !canAttackUnit(targetUnit, false, true, false) ) {
+            return false;
+        }
+
+        return canFollow(targetUnit, false, true, false) ||
+                canLoad(targetUnit, false, true, false) ||
+                canSetRallyUnit(targetUnit, false, true, false);
+    }
+
+    public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped) {
+        return canRightClickUnitGrouped(checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickUnitGrouped() {
+        return canRightClickUnitGrouped(true);
+    }
+
+    public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ){
+            return false;
+        }
+
+        if ( !isInterruptible() ){
+            return false;
+        }
+        return canFollow(false) ||
+                canAttackUnitGrouped(false, false) ||
+                canLoad(false);
+    }
+
+    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
+        return canRightClickUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
+    }
+
+    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
+        return canRightClickUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
+    }
+
+    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit) {
+        return canRightClickUnitGrouped(targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canRightClickUnitGrouped(Unit targetUnit) {
+        return canRightClickUnitGrouped(targetUnit, true);
+    }
+
+    public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ){
+            return false;
+        }
+        if ( checkCanIssueCommandType && !canRightClickUnitGrouped(false, false) ){
+            return false;
+        }
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+            return false;
+        }
+
+        if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
+                !canAttackUnitGrouped(targetUnit, false, true, false, false) ){
+            return false;
+        }
+
+        return canFollow(targetUnit, false, true, false) ||
+                canLoad(targetUnit, false, true, false);
+    }
+
+    public boolean canHaltConstruction() {
+        return canHaltConstruction(true);
+    }
+
+    public boolean canHaltConstruction(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return getOrder() == ConstructingBuilding;
+    }
+    //------------------------------------------- CAN CANCEL CONSTRUCTION ------------------------------------
+
+    public boolean canCancelConstruction() {
+        return canCancelConstruction(true);
+    }
+
+    public boolean canCancelConstruction(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isBuilding() ){
+            return false;
+        }
+
+        return !isCompleted() && (getType() != Zerg_Nydus_Canal || getNydusExit() == null);
+    }
+
+    public boolean canCancelAddon() {
+        return canCancelAddon(true);
+    }
+
+    public boolean canCancelAddon(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        final Unit addon = getAddon();
+        return addon != null && !addon.isCompleted();
+    }
+
+    public boolean canCancelTrain() {
+        return canCancelTrain(true);
+    }
+
+    public boolean canCancelTrain(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return isTraining();
+    }
+
+    public boolean canCancelTrainSlot() {
+        return canCancelTrainSlot(true);
+    }
+
+    public boolean canCancelTrainSlot(boolean checkCommandibility) {
+        return canCancelTrain(checkCommandibility);
+    }
+
+    public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType) {
+        return canCancelTrainSlot(slot, checkCanIssueCommandType, true);
+    }
+
+    public boolean canCancelTrainSlot(int slot) {
+        return canCancelTrainSlot(slot, true);
+    }
+
+    public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canCancelTrainSlot(false) )
+            return false;
+
+        return isTraining() && slot >= 0 && (getTrainingQueue().size() > slot);
+    }
+
+    public boolean canCancelMorph() {
+        return canCancelMorph(true);
+    }
+
+    public boolean canCancelMorph(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !isMorphing() || (!isCompleted() && getType() == Zerg_Nydus_Canal && getNydusExit() != null) ){
+            return false;
+        }
+        return !isHallucination();
+    }
+
+    public boolean canCancelResearch() {
+        return canCancelResearch(true);
+    }
+
+    public boolean canCancelResearch(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return getOrder() == ResearchTech;
+    }
+
+    public boolean canCancelUpgrade() {
+        return canCancelUpgrade(true);
+    }
+
+    public boolean canCancelUpgrade(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return getOrder() == Upgrade;
+    }
+
+    public boolean canUseTechWithOrWithoutTarget() {
+        return canUseTechWithOrWithoutTarget(true);
+    }
+
+    public boolean canUseTechWithOrWithoutTarget(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isBuilding() && !isInterruptible() ) {
+            return false;
+        }
+        if ( !isCompleted() ) {
+            return false;
+        }
+        return !isHallucination();
+    }
+
+    public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType) {
+        return canUseTechWithOrWithoutTarget(tech, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechWithOrWithoutTarget(TechType tech) {
+        return canUseTechWithOrWithoutTarget(tech, true);
+    }
+
+    public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget( false) ) {
+            return false;
+        }
+
+        final UnitType ut = getType();
+        // researched check
+        if ( !ut.isHero() && !game.self().hasResearched(tech) && ut != Zerg_Lurker ) {
+            return false;
+        }
+
+        // energy check
+        if ( getEnergy() < tech.energyCost() ) {
+            return false;
+        }
+        // unit check
+        if ( tech != TechType.Burrowing && !tech.whatsUses().contains(ut) ) {
+            return false;
+        }
+
+        final Order order = getOrder();
+        switch (tech) {
+            case Spider_Mines: return getSpiderMineCount() > 0;
+            case Tank_Siege_Mode: return !isSieged() && order != Order.Sieging && order != Order.Unsieging;
+            case Cloaking_Field:
+            case Personnel_Cloaking: return getSecondaryOrder() != Cloak;
+            case Burrowing: return ut.isBurrowable() && !isBurrowed() && order != Burrowing && order != Unburrowing;
+            case None: return false;
+            case Nuclear_Strike: return getPlayer().completedUnitCount(Terran_Nuclear_Missile) != 0;
+            case Unknown: return false;
+        }
+
+        return true;
+    }
+
+    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType) {
+        return canUseTech(tech, target, checkCanTargetUnit, checkTargetsType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType) {
+        return canUseTech(tech, target, checkCanTargetUnit, checkTargetsType, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType) {
+        return canUseTech(tech, target, checkCanTargetUnit, checkTargetsType, true);
+    }
+
+    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType) {
+        return canUseTech(tech, target, checkCanTargetUnit, checkTargetsType, true);
+    }
+
+    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit) {
+        return canUseTech(tech, target, checkCanTargetUnit, true);
+    }
+
+    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit) {
+        return canUseTech(tech, target, checkCanTargetUnit, true);
+    }
+
+    public boolean canUseTech(TechType tech, Position target) {
+        return canUseTech(tech, target, true);
+    }
+    public boolean canUseTech(TechType tech, Unit target) {
+        return canUseTech(tech, target, true);
+    }
+
+//    public boolean canUseTech(TechType tech) {
+//        return canUseTech(tech, TechType.None);
+//    }
+
+    public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        return canUseTechPosition(tech, target, checkTargetsType, checkCanIssueCommandType, false);
+    }
+
+    public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+        if (target == null) {
+            return canUseTechWithoutTarget(tech, checkCanIssueCommandType, false);
+        }
+        return canUseTechUnit(tech, target, checkCanTargetUnit, checkTargetsType, checkCanIssueCommandType, false);
+    }
+
+    public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType) {
+        return canUseTechWithoutTarget(tech, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechWithoutTarget(TechType tech) {
+        return canUseTechWithoutTarget(tech, true);
+    }
+
+    public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        if ( !canUseTechWithOrWithoutTarget(tech, false, false) ){
+            return false;
+        }
+        return !tech.targetsUnit() && !tech.targetsPosition() && tech != TechType.None && tech != TechType.Unknown && tech != TechType.Lurker_Aspect;
+    }
+
+    public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType) {
+        return canUseTechUnit(tech, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech) {
+        return canUseTechUnit(tech, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        if ( !canUseTechWithOrWithoutTarget(tech, false, false) ){
+            return false;
+        }
+        return tech.targetsUnit();
+    }
+
+    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType) {
+        return canUseTech(tech, targetUnit, checkCanTargetUnit, checkTargetsUnits, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits) {
+        return canUseTech(tech, targetUnit, checkCanTargetUnit, checkTargetsUnits, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit) {
+        return canUseTech(tech, targetUnit, checkCanTargetUnit, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech, Unit targetUnit) {
+        return canUseTech(tech, targetUnit, true);
+    }
+
+    public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        if ( checkTargetsUnits && !canUseTechUnit(tech, false, false) ){
+            return false;
+        }
+
+        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+            return false;
+        }
+
+        final UnitType targetType = targetUnit.getType();
+
+        switch (tech) {
+            case Archon_Warp:
+                if ( targetType != Protoss_High_Templar ){
+                    return false;
+                }
+                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                    return false;
+                }
+                break;
+
+            case Dark_Archon_Meld:
+                if ( targetType != Protoss_Dark_Templar ){
+                    return false;
+                }
+                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                    return false;
+                }
+                break;
+
+            case Consume:
+                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                    return false;
+                }
+                if ( targetType.getRace() != Zerg || targetType == Zerg_Larva ){
+                    return false;
+                }
+                break;
+
+            case Spawn_Broodlings:
+                if ( ( !targetType.isOrganic() && !targetType.isMechanical() ) ||
+                        targetType.isRobotic() ||
+                        targetType.isFlyer() ){
+                    return false;
+                }
+                break;
+
+            case Lockdown:
+                if ( !targetType.isMechanical() ){
+                    return false;
+                }
+                break;
+
+            case Healing:
+                if ( targetUnit.getHitPoints() == targetType.maxHitPoints() ){
+                    return false;
+                }
+                if ( !targetType.isOrganic() || targetType.isFlyer() ){
+                    return false;
+                }
+                if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer()) ){
+                    return false;
+                }
+                break;
+
+            case Mind_Control:
+                if (getPlayer().equals(targetUnit.getPlayer())){
+                    return false;
+                }
+                if ( targetType == Protoss_Interceptor ||
+                        targetType == Terran_Vulture_Spider_Mine ||
+                        targetType == Zerg_Lurker_Egg ||
+                        targetType == Zerg_Cocoon ||
+                        targetType == Zerg_Larva ||
+                        targetType == Zerg_Egg ){
+                    return false;
+                }
+                break;
+
+            case Feedback:
+                if ( !targetType.isSpellcaster() ){
+                    return false;
+                }
+                break;
+
+            case Infestation:
+                if ( targetType != Terran_Command_Center ||
+                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0 ){
+                    return false;
+                }
+                break;
+        }
+
+        switch (tech) {
+            case Archon_Warp:
+            case Dark_Archon_Meld:
+                if ( !hasPath(targetUnit.getPosition()) ){
+                    return false;
+                }
+                if ( targetUnit.isHallucination() ){
+                    return false;
+                }
+                if ( targetUnit.isMaelstrommed() ){
+                    return false;
+                }
+                // Fall through (don't break).
+            case Parasite:
+            case Irradiate:
+            case Optical_Flare:
+            case Spawn_Broodlings:
+            case Lockdown:
+            case Defensive_Matrix:
+            case Hallucination:
+            case Healing:
+            case Restoration:
+            case Mind_Control:
+            case Consume:
+            case Feedback:
+            case Yamato_Gun:
+                if ( targetUnit.isStasised() ){
+                    return false;
+                }
+                break;
+        }
+
+        switch (tech) {
+            case Yamato_Gun:
+                if ( targetUnit.isInvincible() ){
+                    return false;
+                }
+                break;
+
+            case Parasite:
+            case Irradiate:
+            case Optical_Flare:
+            case Spawn_Broodlings:
+            case Lockdown:
+            case Defensive_Matrix:
+            case Hallucination:
+            case Healing:
+            case Restoration:
+            case Mind_Control:
+                if ( targetUnit.isInvincible() ){
+                    return false;
+                }
+                // Fall through (don't break).
+            case Consume:
+            case Feedback:
+                if ( targetType.isBuilding() ){
+                    return false;
+                }
+                break;
+        }
+
+        return targetUnit != this;
+    }
+
+    public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType) {
+        return canUseTechPosition(tech, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechPosition(TechType tech) {
+        return canUseTechPosition(tech, true);
+    }
+
+    public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        if ( !canUseTechWithOrWithoutTarget( tech, false, false) ){
+            return false;
+        }
+        return tech.targetsPosition();
+    }
+
+    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType) {
+        return canUseTechPosition(tech, target, checkTargetsPositions, checkCanIssueCommandType, true);
+    }
+
+    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions) {
+        return canUseTechPosition(tech, target, checkTargetsPositions, true);
+    }
+
+    public boolean canUseTechPosition(TechType tech, Position target) {
+        return canUseTechPosition(tech, target, true);
+    }
+
+    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility){
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+            return false;
+        }
+
+        if ( checkTargetsPositions && !canUseTechPosition(tech, false, false) ) {
+            return false;
+        }
+
+        return tech != TechType.Spider_Mines || hasPath(target);
+    }
+
+    public boolean canPlaceCOP() {
+        return canPlaceCOP(true);
+    }
+
+    public boolean canPlaceCOP(boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if ( !getType().isFlagBeacon() ) {
+            return false;
+        }
+
+        return unitData.buttonset() != 228 && getOrder() == CTFCOPInit;
+    }
+
+    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType)  {
+        return canPlaceCOP(target, checkCanIssueCommandType, true);
+    }
+
+    public boolean canPlaceCOP(TilePosition target) {
+        return canPlaceCOP(target, true);
+    }
+
+    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if ( checkCommandibility && !canCommand() ) {
+            return false;
+        }
+
+        if (checkCanIssueCommandType && !canPlaceCOP(checkCommandibility) )
+            return false;
+
+        return game.canBuildHere(target, getType(), this, true);
+    }
 
 
     public boolean equals(Object that){

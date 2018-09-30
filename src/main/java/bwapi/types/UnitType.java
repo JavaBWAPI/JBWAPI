@@ -657,4 +657,16 @@ public enum UnitType {
     public Set<UpgradeType> upgradesWhat() {
         return Arrays.stream(upgradesWhat[id]).collect(Collectors.toSet());
     }
+
+    public boolean isSuccessorOf(final UnitType type) {
+        if (this == type) {
+            return true;
+        }
+        switch (type) {
+            case Zerg_Hatchery: return this == Zerg_Lair || this == Zerg_Hive;
+            case Zerg_Lair:  return this == Zerg_Hive;
+            case Zerg_Spire: return this == Zerg_Greater_Spire;
+            default: return false;
+        }
+    }
 }
