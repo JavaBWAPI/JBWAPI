@@ -535,9 +535,7 @@ public class Game {
          // then lands at the new location before building the addon), so we need to do similar checks for the
          // location that the building will be when it builds the addon.
          if ( builder != null && !builder.getType().isAddon() && type.isAddon() ) {
-             if (!canBuildHere(lt.subtract(new TilePosition(4, 1)), builder.getType(), builder, checkExplored)) {
-                 return false;
-             }
+             return canBuildHere(lt.subtract(new TilePosition(4, 1)), builder.getType(), builder, checkExplored);
          }
 
          //if the build site passes all these tests, return true.

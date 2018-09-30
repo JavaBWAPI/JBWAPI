@@ -2511,7 +2511,7 @@ public class Unit {
             return false;
         }
 
-        final UnitType uType = getType();
+        final UnitType uType = targetUnit.getType();
         if ( !uType.isResourceContainer() || uType == Resource_Vespene_Geyser ){
             return false;
         }
