@@ -51,7 +51,7 @@ public class Player {
     }
 
     public boolean isAlly(final Player player) {
-        return getForce().equals(player.getForce());
+        return playerData.isAlly(player.getID());
     }
 
     //TODO FIX in 4.3.0
