@@ -4,6 +4,9 @@ import com.sun.jna.platform.win32.Kernel32;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class Client {
@@ -438,12 +441,18 @@ public class Client {
         public int eventStringCount() { return sharedMemory.getInt(StringOffset); }
         public String eventString(int s) { return parseString(StringOffset + 4 + 256 * s, 256); }
 
+
+        private final CharsetEncoder enc = Charset.forName("ISO-8859-1").newEncoder();
+
         public int addString(String s) {
-            if(s.length() >= 1024)
+            int len = s.length() + 1;
+            if(len >= 1024)
                 throw new StringIndexOutOfBoundsException();
             int at = sharedMemory.getInt(StringOffset + 256004);
+            byte b[] = new byte[len];
+            enc.encode(CharBuffer.wrap(s), ByteBuffer.wrap(b), true);
             sharedMemory.position(StringOffset + 256008 + at * 1024);
-            sharedMemory.put(s.getBytes(StandardCharsets.ISO_8859_1), 0, s.length());
+            sharedMemory.put(b, 0, len);
             sharedMemory.position(0);
             sharedMemory.putInt(StringOffset + 256004, at + 1);
             return at;
