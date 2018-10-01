@@ -33,7 +33,7 @@ abstract class Point {
 
 	public boolean equals(Object o) {
 		if (!(o instanceof Point)) return false;
-		Point point = (Position) o;
+		Point point = (Point) o;
 		return scalar == point.scalar && x == point.x && y == point.y;
 	}
 
