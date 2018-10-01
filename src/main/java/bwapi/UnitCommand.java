@@ -57,32 +57,40 @@ public class UnitCommand {
         return posComs.contains(type) ? new TilePosition(x, y) : new TilePosition(x / 32, y / 32);
     }
 
-    private static Set<UnitCommandType> unitTypeComs = new HashSet<>(
-            Arrays.asList(Build, Build_Addon, Train, Morph)
-    );
     public UnitType getUnitType() {
-        return unitTypeComs.contains(type) ?  UnitType.unitTypes[extra] : UnitType.None;
+        if (type == Build || type == Build_Addon || type == Train || type == Morph) {
+            return UnitType.unitTypes[extra];
+        }
+        return UnitType.None;
     }
 
-    private static Set<UnitCommandType> techComs = new HashSet<>(
-            Arrays.asList(Research, Use_Tech, Use_Tech_Position, Use_Tech_Unit)
-    );
-
     public TechType getTechType() {
-        return techComs.contains(type) ? TechType.techTypes[extra] : TechType.None;
+        if (type == Research || type == Use_Tech || type == Use_Tech_Position || type == Use_Tech_Unit) {
+            return TechType.techTypes[extra];
+        }
+        return TechType.None;
     }
 
     public UpgradeType getUpgradeType() {
         return type == UnitCommandType.Upgrade ? UpgradeType.upgradeTypes[extra] : UpgradeType.None;
     }
 
-    private static Set<UnitCommandType> queuables = new HashSet<>(
-            Arrays.asList(Attack_Move, Attack_Unit, Move, Patrol, Hold_Position, Stop, Follow, Gather, Return_Cargo,
-                    Repair, Load, Unload_All, Unload_All_Position, Right_Click_Position, Right_Click_Unit)
-    );
-
     public boolean isQueued() {
-        return queuables.contains(type) && extra != 0;
+        return (type == Attack_Move ||
+                type == Attack_Unit ||
+                type == Move ||
+                type == Patrol ||
+                type == Hold_Position ||
+                type == Stop ||
+                type == Follow ||
+                type == Gather ||
+                type == Return_Cargo ||
+                type == Load ||
+                type == Unload_All ||
+                type == Unload_All_Position ||
+                type == Right_Click_Position ||
+                type == Right_Click_Unit)
+                && extra != 0;
     }
 
     @Override

@@ -28,6 +28,9 @@ public class Unit {
     private final Position initialPosition;
     private final TilePosition initialTilePosition;
 
+    private final int id;
+    private final int replayID;
+
     // variable
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
@@ -41,10 +44,13 @@ public class Unit {
         initialHitPoints = getHitPoints();
         initialPosition = getPosition();
         initialTilePosition = getTilePosition();
+
+        id = unitData.id();
+        replayID = unitData.replayID();
     }
 
     public int getID() {
-        return unitData.id();
+        return id;
     }
 
 
@@ -53,7 +59,7 @@ public class Unit {
     }
 
     public int getReplayID() {
-        return unitData.replayID();
+        return replayID;
     }
 
     public Player getPlayer() {
