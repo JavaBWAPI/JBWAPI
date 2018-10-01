@@ -54,8 +54,9 @@ public class Player {
         return getForce().equals(player.getForce());
     }
 
+    //TODO FIX in 4.3.0
     public boolean isEnemy(final Player player) {
-        return !(player.isObserver() || player.isNeutral() || isAlly(player));
+        return !(player.isNeutral() || isAlly(player));
     }
 
     public boolean isNeutral() {

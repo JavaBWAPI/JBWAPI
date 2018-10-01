@@ -931,13 +931,15 @@ public class Game {
                 .collect(Collectors.toSet());
     }
 
+    //TODO FIX in 4.3.0
     public Set<Player> enemies() {
         final Player self = self();
         return getPlayers().stream()
-                .filter(p -> !(p.isObserver() || p.isNeutral() || self.isAlly(p)))
+                .filter(p -> !(p.isNeutral() || self.isAlly(p)))
                 .collect(Collectors.toSet());
     }
 
+    //TODO FIX in 4.3.0
     public Set<Player> observers() {
         return getPlayers().stream()
                 .filter(Player::isObserver)
