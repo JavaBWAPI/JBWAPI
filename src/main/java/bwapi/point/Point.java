@@ -3,7 +3,7 @@ package bwapi.point;
 import bwapi.Game;
 
 abstract class Point {
-    static final int TILE_WALK_FACTOR = 4; // 32 / 4
+    static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;
     public final int y;

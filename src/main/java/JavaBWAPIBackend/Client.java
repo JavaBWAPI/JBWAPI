@@ -441,11 +441,11 @@ public class Client {
         public int addString(String s) {
             if(s.length() >= 1024)
                 throw new StringIndexOutOfBoundsException();
-            int at = sharedMemory.getInt(StringOffset + 256000);
+            int at = sharedMemory.getInt(StringOffset + 256004);
             sharedMemory.position(StringOffset + 256008 + at * 1024);
             sharedMemory.put(s.getBytes(StandardCharsets.ISO_8859_1), 0, s.length());
             sharedMemory.position(0);
-            sharedMemory.putInt(StringOffset + 256000, at + 1);
+            sharedMemory.putInt(StringOffset + 256004, at + 1);
             return at;
         }
 
