@@ -55,9 +55,11 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitHide(game.getUnit(event.v1()));
                 break;
             case 12: //UnitCreate
+                game.unitShow(event.v1());
                 eventListener.onUnitCreate(game.getUnit(event.v1()));
                 break;
             case 13: //UnitDestroy
+                game.unitHide(event.v1());
                 eventListener.onUnitDestroy(game.getUnit(event.v1()));
                 break;
             case 14: //UnitMorph

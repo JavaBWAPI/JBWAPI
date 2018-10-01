@@ -26,6 +26,7 @@ public class Unit {
     private final int initialResources;
     private final int initialHitPoints;
     private final Position initialPosition;
+    private final TilePosition initialTilePosition;
 
     // variable
     private int lastCommandFrame = 0;
@@ -39,6 +40,7 @@ public class Unit {
         initialResources = getResources();
         initialHitPoints = getHitPoints();
         initialPosition = getPosition();
+        initialTilePosition = getTilePosition();
     }
 
     public int getID() {
@@ -67,7 +69,10 @@ public class Unit {
     }
 
     public TilePosition getTilePosition() {
-        return getPosition().toTilePosition();
+        final Position p = getPosition();
+        final UnitType ut = getType();
+        return new Position(Math.abs(p.x - ut.tileWidth()  * 32 / 2), Math.abs(p.y - ut.tileHeight() * 32 / 2))
+                .toTilePosition();
     }
 
     public double getAngle() {
@@ -233,7 +238,7 @@ public class Unit {
     }
 
     public TilePosition getInitialTilePosition() {
-        return initialPosition.toTilePosition();
+        return initialTilePosition;
     }
 
     public int getInitialHitPoints() {
