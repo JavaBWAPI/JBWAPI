@@ -13,12 +13,34 @@ public class Region {
     private final Game game;
 
     private final Set<Region> neighbours = new HashSet<>();
+
     private Region closestAccessibleRegion;
     private Region closestInaccessibleRegion;
+
+    private final int id;
+    private final int regionGroupID;
+    private final Position center;
+    private final boolean higherGround;
+    private final int defensePriority;
+    private final boolean accessible;
+    private final int boundsLeft;
+    private final int boundsTop;
+    private final int boundsRight;
+    private final int boundsBottom;
 
     Region(final RegionData regionData, final Game game) {
         this.regionData = regionData;
         this.game = game;
+        this.id = regionData.id();
+        this.regionGroupID = regionData.islandID();
+        this.center = new Position(regionData.centerX(), regionData.centerY());
+        this.higherGround = regionData.isHigherGround();
+        this.defensePriority = regionData.priority();
+        this.accessible = regionData.isAccessible();
+        this.boundsLeft = regionData.leftMost();
+        this.boundsTop = regionData.topMost();
+        this.boundsRight = regionData.rightMost();
+        this.boundsBottom = regionData.bottomMost();
     }
 
     void updateNeighbours() {
@@ -43,27 +65,27 @@ public class Region {
     }
 
     public int getID() {
-        return regionData.id();
+        return id;
     }
 
     public int getRegionGroupID() {
-        return regionData.islandID();
+        return regionGroupID;
     }
 
     public Position getCenter() {
-        return new Position(regionData.centerX(), regionData.centerY());
+        return center;
     }
 
     public boolean isHigherGround() {
-        return regionData.isHigherGround();
+        return higherGround;
     }
 
     public int getDefensePriority() {
-        return regionData.priority();
+        return defensePriority;
     }
 
     public boolean isAccessible() {
-        return regionData.isAccessible();
+        return accessible;
     }
 
     public Set<Region> getNeighbors() {
@@ -71,19 +93,19 @@ public class Region {
     }
 
     public int getBoundsLeft() {
-        return regionData.leftMost();
+        return boundsLeft;
     }
 
     public int getBoundsTop() {
-        return regionData.topMost();
+        return boundsTop;
     }
 
     public int getBoundsRight() {
-        return regionData.rightMost();
+        return boundsRight;
     }
 
     public int getBoundsBottom() {
-        return regionData.bottomMost();
+        return boundsBottom;
     }
 
     public Region getClosestAccessibleRegion() {

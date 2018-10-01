@@ -18,18 +18,33 @@ import static bwapi.values.TextColor.*;
 public class Player {
     private final PlayerData playerData;
     private final Game game;
+    private final int id;
+    private final String name;
+    private final Race race;
+    private final PlayerType playerType;
+    private final Force force;
+    private final boolean neutral;
+    private final TilePosition startLocation;
 
     Player(final PlayerData playerData, final Game game) {
         this.playerData = playerData;
         this.game = game;
+
+        this.id = playerData.id();
+        this.name = playerData.name();
+        this.race = Race.races[playerData.race()];
+        this.playerType = PlayerType.playerTypes[playerData.type()];
+        this.force = game.getForce(playerData.force());
+        this.neutral = equals(game.neutral());
+        this.startLocation = new TilePosition(playerData.startLocationX(), playerData.startLocationY());
     }
 
     public int getID() {
-        return playerData.id();
+        return id;
     }
 
     public String getName() {
-        return playerData.name();
+        return name;
     }
 
     public Set<Unit> getUnits() {
@@ -39,15 +54,15 @@ public class Player {
     }
 
     public Race getRace() {
-        return Race.races[playerData.race()];
+        return race;
     }
 
     public PlayerType getType() {
-        return PlayerType.playerTypes[playerData.type()];
+        return playerType;
     }
 
     public Force getForce() {
-        return game.getForce(playerData.force());
+        return force;
     }
 
     public boolean isAlly(final Player player) {
@@ -60,11 +75,11 @@ public class Player {
     }
 
     public boolean isNeutral() {
-        return equals(game.neutral());
+        return neutral;
     }
 
     public TilePosition getStartLocation() {
-        return new TilePosition(playerData.startLocationX(), playerData.startLocationY());
+        return startLocation;
     }
 
     public boolean isVictorious() {

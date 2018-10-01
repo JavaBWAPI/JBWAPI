@@ -33,6 +33,27 @@ public class Game {
     private final Map<Integer, Unit> units = new HashMap<>();
     private final Set<Integer> visibleUnits = new HashSet<>();
 
+    //CACHED
+    private int randomSeed;
+    private int revision;
+    private boolean  debug;
+    private Player self;
+    private Player enemy;
+    private Player neutral;
+    private boolean replay;
+    private boolean multiplayer;
+    private boolean battleNet;
+    private List<TilePosition> startLocations;
+    private int mapWidth;
+    private int mapHeight;
+    private String mapFileName;
+    private String mapPathName;
+    private String mapName;
+    private String mapHash;
+
+    private boolean[][] buildable;
+    private boolean[][] walkable;
+
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
 
@@ -91,6 +112,38 @@ public class Game {
             }
             if (unit.getPlayer().equals(neutral())) {
                 staticNeutralUnits.add(unit);
+            }
+        }
+
+        randomSeed = gameData.randomSeed();
+        revision = gameData.getRevision();
+        debug = gameData.isDebug();
+        self = players.get(gameData.self());
+        enemy = players.get(gameData.enemy());
+        neutral = players.get(gameData.neutral());
+        replay = gameData.isReplay();
+        multiplayer = gameData.isMultiplayer();
+        battleNet = gameData.isBattleNet();
+        startLocations = IntStream.range(0, gameData.startLocationCount())
+                .mapToObj(i -> new TilePosition(gameData.startLocationX(i), gameData.startLocationY(i)))
+                .collect(Collectors.toList());
+        mapWidth = gameData.mapWidth();
+        mapHeight = gameData.mapHeight();
+        mapFileName = gameData.mapFileName();
+        mapPathName = gameData.mapPathName();
+        mapName = gameData.mapName();
+        mapHash = gameData.mapHash();
+
+        buildable = new boolean[mapWidth][mapHeight];
+        for (int i=0; i < mapWidth; i++) {
+            for (int j=0; j < mapHeight; j++) {
+                buildable[i][j] = gameData.buildable(i, j);
+            }
+        }
+        walkable = new boolean[mapWidth*4][mapHeight*4];
+        for (int i = 0; i < mapWidth * 4; i++) {
+            for (int j=0; j < mapHeight * 4; j++) {
+                walkable[i][j] = gameData.walkable(i, j);
             }
         }
     }
@@ -282,14 +335,11 @@ public class Game {
     }
 
      public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
-        return new HashSet<>();
+        return getUnitsInRadius(new Position(x, y), radius, filter);
      }
 
      public Set<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
-         return getAllUnits().stream().filter( u -> {
-             final Position p = u.getPosition();
-             return center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u);
-         }).collect(Collectors.toSet());
+         return getAllUnits().stream().filter( u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u)).collect(Collectors.toSet());
      }
 
      public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
@@ -303,27 +353,27 @@ public class Game {
      }
 
      public int mapWidth() {
-        return gameData.mapWidth();
+        return mapWidth;
      }
 
      public int mapHeight() {
-        return gameData.mapHeight();
+        return mapHeight;
      }
 
      public String mapFileName() {
-        return gameData.mapFileName();
+        return mapFileName;
      }
 
      public String mapPathName() {
-        return gameData.mapPathName();
+        return mapPathName;
      }
 
      public String mapName() {
-        return gameData.mapName();
+        return mapName;
      }
 
      public String mapHash() {
-        return gameData.mapHash();
+        return mapHash;
      }
 
      public boolean isWalkable(final int walkX, final int walkY) {
@@ -334,7 +384,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return gameData.walkable(position.x, position.y);
+        return walkable[position.x][position.y];
      }
 
      public int getGroundHeight(final int tileX, final int tileY) {
@@ -364,7 +414,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return gameData.buildable(position.x, position.y) && ( includeBuildings ? !gameData.occupied(position.x,  position.y) : true );
+        return buildable[position.x][position.y] && ( includeBuildings ? !gameData.occupied(position.x,  position.y) : true );
      }
 
      public boolean isVisible(final int tileX, final int tileY) {
@@ -839,9 +889,7 @@ public class Game {
      }
 
      public List<TilePosition> getStartLocations() {
-         return IntStream.range(0, gameData.startLocationCount())
-                 .mapToObj(i -> new TilePosition(gameData.startLocationX(i), gameData.startLocationY(i)))
-                 .collect(Collectors.toList());
+         return new ArrayList<>(startLocations);
      }
 
 
@@ -862,11 +910,11 @@ public class Game {
      }
 
      public boolean isMultiplayer() {
-         return gameData.isMultiplayer();
+         return multiplayer;
      }
 
      public boolean isBattleNet() {
-         return gameData.isBattleNet();
+         return battleNet;
      }
 
      public boolean isPaused() {
@@ -874,7 +922,7 @@ public class Game {
      }
 
      public boolean isReplay() {
-         return gameData.isReplay();
+         return replay;
      }
 
      public void pauseGame() {
@@ -911,16 +959,16 @@ public class Game {
      }
 
     public Player self() {
-        return players.get(gameData.self());
+        return self;
     }
 
 
     public Player enemy() {
-        return players.get(gameData.enemy());
+        return enemy;
     }
 
     public Player neutral() {
-        return players.get(gameData.neutral());
+        return neutral;
     }
 
 
@@ -1279,11 +1327,11 @@ public class Game {
     }
 
     public int getRevision() {
-        return gameData.getRevision();
+        return revision;
     }
 
     public boolean isDebug() {
-        return gameData.isDebug();
+        return debug;
     }
 
     public boolean isLatComEnabled() {
@@ -1429,6 +1477,6 @@ public class Game {
 
     //Since 4.2.0
     public int getRandomSeed() {
-        return gameData.randomSeed();
+        return randomSeed;
     }
 }

@@ -6,20 +6,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Force {
-    private final ForceData forceData;
     private final Game game;
 
+    private final int id;
+    private final String name;
+
     Force(final ForceData forceData, final Game game) {
-        this.forceData = forceData;
         this.game = game;
+        this.id = forceData.id();
+        this.name = forceData.name();
     }
 
     public int getID() {
-        return forceData.id();
+        return id;
     }
 
     public String getName() {
-        return forceData.name();
+        return name;
     }
 
     public Set<Player> getPlayers() {
