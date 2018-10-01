@@ -368,6 +368,7 @@ class BuildingPlacer {
         }
         void reset() {
             data = new byte[MAX_RANGE][MAX_RANGE];
+            save = new byte[MAX_RANGE][MAX_RANGE];
         }
         // Checks if the given x/y value is valid for the Placement position
         static boolean isValidPos(final int x, final int y) {

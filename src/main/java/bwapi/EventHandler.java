@@ -41,6 +41,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onNukeDetect(new Position(event.v1(), event.v2()));
                 break;
             case 8: //UnitDiscover
+                game.unitShow(event.v1());
                 eventListener.onUnitDiscover(game.getUnit(event.v1()));
                 break;
             case 9: //UnitEvade
@@ -72,6 +73,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onSaveGame(data.eventString(event.v1()));
                 break;
             case 17: //UnitComplete
+                game.unitShow(event.v1());
                 eventListener.onUnitComplete(game.getUnit((event.v1())));
                 break;
         }
