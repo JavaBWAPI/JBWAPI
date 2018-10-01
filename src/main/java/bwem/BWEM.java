@@ -37,8 +37,8 @@ public final class BWEM {
   public void initialize() {
     if (!(this.map instanceof MapInitializer)) {
       throw new IllegalStateException("BWEM was not instantiated properly.");
-    } else {
-      ((MapInitializer) this.map).initialize();
     }
+    ((MapInitializer) this.map).initialize();
+    this.map.assignStartingLocationsToSuitableBases();
   }
 }
