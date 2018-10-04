@@ -18,7 +18,7 @@ class EventHandler implements Client.EventHandler {
     public void operation(Client.GameData.Event event) {
         switch (event.type()) {
             case 0: //MatchStart
-                game.reset();
+                game.init();
                 eventListener.onStart();
                 break;
             case 1: //MatchEnd

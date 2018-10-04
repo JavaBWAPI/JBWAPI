@@ -20,23 +20,27 @@ public class Game {
     private final GameData gameData;
 
     // CONSTANT
-    private final Map<Integer, Player> players = new HashMap<>();
-    private final Map<Integer, Region> regions = new HashMap<>();
-    private final Map<Integer, Force> forces = new HashMap<>();
-    private final Map<Integer, Bullet> bullets = new HashMap<>();
+    private Player[] players;
+    private Region[] regions;
+    private Force[] forces;
+    private Bullet[] bullets;
+
+    private Set<Force> forceSet;
+    private Set<Player> playerSet;
+    private Set<Region> regionSet;
 
     private final Set<Unit> staticMinerals = new HashSet<>();
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
 
     // CHANGING
-    private final Map<Integer, Unit> units = new HashMap<>();
+    private Unit[] units;
     private final Set<Integer> visibleUnits = new HashSet<>();
 
     //CACHED
     private int randomSeed;
     private int revision;
-    private boolean  debug;
+    private boolean debug;
     private Player self;
     private Player enemy;
     private Player neutral;
@@ -53,6 +57,12 @@ public class Game {
 
     private boolean[][] buildable;
     private boolean[][] walkable;
+    private int[][] groundHeight;
+
+    private short[][] mapTileRegionID;
+    private short[] mapSplitTilesMiniTileMask;
+    private short[] mapSplitTilesRegion1;
+    private short[] mapSplitTilesRegion2;
 
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
@@ -63,46 +73,52 @@ public class Game {
 
     /*
     Call this method in EventHander::OnMatchStart
-     */
-    void reset() {
-        clear();
-        init();
-    }
-
-    private void clear() {
-        players.clear();
-        regions.clear();
-        forces.clear();
+    */
+    void init() {
         staticMinerals.clear();
         staticGeysers.clear();
         staticNeutralUnits.clear();
-        units.clear();
         visibleUnits.clear();
-        bullets.clear();
-    }
 
-    private void init() {
-        for (int id=0; id < gameData.getForceCount(); id++) {
-            forces.put(id, new Force(gameData.getForce(id), this));
-        }
-        for (int id=0; id < gameData.getPlayerCount(); id++) {
-            players.put(id, new Player(gameData.getPlayer(id), this));
+        final int forceCount = gameData.getForceCount();
+        forces = new Force[forceCount];
+        for (int id=0; id < forceCount; id++) {
+            forces[id] = new Force(gameData.getForce(id), this);
         }
 
-        for (int id=0; id < gameData.bulletCount(); id++) {
-            bullets.put(id, new Bullet(gameData.getBullet(id), this));
+        forceSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(forces)));
+
+        final int playerCount = gameData.getPlayerCount();
+        players = new Player[playerCount];
+        for (int id=0; id < playerCount; id++) {
+            players[id] = new Player(gameData.getPlayer(id), this);
         }
 
-        for (int id=0; id < gameData.regionCount(); id++) {
-            regions.put(id, new Region(gameData.getRegion(id), this));
+        playerSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(players)));
+
+        final int bulletCount = gameData.bulletCount();
+        bullets = new Bullet[bulletCount];
+        for (int id=0; id < bulletCount; id++) {
+            bullets[id] = new Bullet(gameData.getBullet(id), this);
         }
 
-        regions.values().forEach(Region::updateNeighbours);
+        final int regionCount = gameData.regionCount();
+        regions = new Region[regionCount];
+        for (int id=0; id < regionCount; id++) {
+            regions[id] = new Region(gameData.getRegion(id), this);
+        }
 
+        for (final Region region : regions) {
+            region.updateNeighbours();
+        }
+
+        regionSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(regions)));
+
+        units = new Unit[1000];
         for (int id=0; id < gameData.getInitialUnitCount(); id++) {
             final Unit unit = new Unit(gameData.getUnit(id), this);
 
-            units.put(id, unit);
+            units[id] = unit;
 
             if (unit.getType().isMineralField()) {
                 staticMinerals.add(unit);
@@ -118,9 +134,9 @@ public class Game {
         randomSeed = gameData.randomSeed();
         revision = gameData.getRevision();
         debug = gameData.isDebug();
-        self = players.get(gameData.self());
-        enemy = players.get(gameData.enemy());
-        neutral = players.get(gameData.neutral());
+        self = players[gameData.self()];
+        enemy = players[gameData.enemy()];
+        neutral = players[gameData.neutral()];
         replay = gameData.isReplay();
         multiplayer = gameData.isMultiplayer();
         battleNet = gameData.isBattleNet();
@@ -135,9 +151,13 @@ public class Game {
         mapHash = gameData.mapHash();
 
         buildable = new boolean[mapWidth][mapHeight];
-        for (int i=0; i < mapWidth; i++) {
-            for (int j=0; j < mapHeight; j++) {
-                buildable[i][j] = gameData.buildable(i, j);
+        groundHeight = new int[mapWidth][mapHeight];
+        mapTileRegionID = new short[mapWidth][mapHeight];
+        for (int x=0; x < mapWidth; x++) {
+            for (int y=0; y < mapHeight; y++) {
+                buildable[x][y] = gameData.buildable(x, y);
+                groundHeight[x][y] = gameData.groundHeight(x, y);
+                mapTileRegionID[x][y] = gameData.mapTileRegionID(x, y);
             }
         }
         walkable = new boolean[mapWidth*4][mapHeight*4];
@@ -146,11 +166,26 @@ public class Game {
                 walkable[i][j] = gameData.walkable(i, j);
             }
         }
+
+        mapSplitTilesMiniTileMask = new short[5000];
+        mapSplitTilesRegion1 = new short[5000];
+        mapSplitTilesRegion2 = new short[5000];
+        for (int i=0; i < 5000; i++) {
+            mapSplitTilesMiniTileMask[i] = gameData.mapSplitTilesMiniTileMask(i);
+            mapSplitTilesRegion1[i] = gameData.mapSplitTilesRegion1(i);
+            mapSplitTilesRegion2[i] = gameData.mapSplitTilesRegion2(i);
+        }
     }
 
     void unitShow(final int id) {
-        if (!units.containsKey(id)) {
-            units.put(id, new Unit(gameData.getUnit(id), this));
+        if (id > units.length) {
+            //rescale unit array if needed
+            final Unit[] largerUnitsArray = new Unit[2*units.length];
+            System.arraycopy(units, 0, largerUnitsArray, 0, units.length);
+            units = largerUnitsArray;
+        }
+        if (units[id] == null) {
+            units[id] = new Unit(gameData.getUnit(id), this);
         }
         visibleUnits.add(id);
     }
@@ -171,21 +206,28 @@ public class Game {
         gameData.addShape(new Client.Shape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
     }
 
+
     public Set<Force> getForces() {
-        return new HashSet<>(forces.values());
+        return forceSet;
     }
 
     public Set<Player> getPlayers() {
-        return new HashSet<>(players.values());
+        return playerSet;
     }
 
 
     public Set<Unit> getAllUnits() {
         if (getFrameCount() == 0) {
-            return new HashSet<>(units.values());
+            final HashSet<Unit> us = new HashSet<>();
+            for (final Unit u : units) {
+                if (u != null) {
+                    us.add(u);
+                }
+            }
+            return us;
         }
         return visibleUnits.stream()
-                .map(units::get)
+                .map(i -> units[i])
                 .collect(Collectors.toSet());
     }
 
@@ -220,9 +262,13 @@ public class Game {
     }
 
     public Set<Bullet> getBullets() {
-        return bullets.values().stream()
-                .filter(Bullet::exists)
-                .collect(Collectors.toSet());
+        final Set<Bullet> bs = new HashSet<>();
+        for (final Bullet bullet : bullets) {
+            if (bullet.exists()) {
+                bs.add(bullet);
+            }
+        }
+        return bs;
     }
 
     public Set<Position> getNukeDots() {
@@ -233,19 +279,22 @@ public class Game {
 
 
     public Force getForce(final int forceID) {
-        return forces.get(forceID);
+        return forces[forceID];
     }
 
     public Player getPlayer(final int playerID) {
-        return players.get(playerID);
+        return players[playerID];
     }
 
     public Unit getUnit(final int unitID) {
-        return units.get(unitID);
+        if (unitID < 0) {
+            return null;
+        }
+        return units[unitID];
     }
 
     public Region getRegion(final int regionID) {
-        return regions.get(regionID);
+        return regions[regionID];
     }
 
     public GameType getGameType() {
@@ -395,7 +444,7 @@ public class Game {
          if (!position.isValid(this)) {
              return -1;
          }
-         return gameData.groundHeight(position.x, position.y);
+         return groundHeight[position.x][position.y];
      }
 
      public boolean isBuildable(final int tileX, final int tileY) {
@@ -954,7 +1003,7 @@ public class Game {
 
      public Set<Unit> getSelectedUnits() {
          return IntStream.range(0, gameData.selectedUnitCount())
-                 .mapToObj(i -> units.get(gameData.selectedUnit(i)))
+                 .mapToObj(i -> units[gameData.selectedUnit(i)])
                  .collect(Collectors.toSet());
      }
 
@@ -1396,15 +1445,34 @@ public class Game {
     }
 
     public Set<Region> getAllRegions() {
-        return new HashSet<>(regions.values());
+        return regionSet;
     }
 
     public Region getRegionAt(final int x, final int y) {
-        return regions.get((int)gameData.mapTileRegionID(x, y));
+        return getRegionAt(new Position(x, y));
     }
 
     public Region getRegionAt(final Position position) {
-        return getRegionAt(position.x, position.y);
+        if ( !position.isValid(this)) {
+            return null;
+        }
+        final short idx = mapTileRegionID[position.x/32][position.y/32];
+        if ( (idx & 0x2000) != 0) {
+            final int minitileShift = ((position.x&0x1F)/8) + ((position.y&0x1F)/8) * 4;
+            final int index = idx & 0x1FFF;
+
+            if (index >= 5000) {
+                return null;
+            }
+
+            if (((mapSplitTilesMiniTileMask[index] >> minitileShift) & 1) != 0) {
+                return getRegion(mapSplitTilesRegion2[index]);
+            }
+            else {
+                return getRegion(mapSplitTilesRegion1[index]);
+            }
+        }
+        return getRegion(idx);
     }
 
 
@@ -1415,8 +1483,6 @@ public class Game {
     public TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition) {
         return getBuildLocation(type, desiredPosition, 64);
     }
-
-
 
     public TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep) {
         return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
