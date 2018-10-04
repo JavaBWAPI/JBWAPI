@@ -979,6 +979,14 @@ public class Unit {
         return issueCommand(UnitCommand.gather(this, target, shiftQueueCommand));
     }
 
+    public boolean returnCargo() {
+        return issueCommand(UnitCommand.returnCargo(this));
+    }
+
+    public boolean returnCargo(final boolean shiftQueueCommand) {
+        return issueCommand(UnitCommand.returnCargo(this, shiftQueueCommand));
+    }
+
     public boolean repair(final Unit target){
         return issueCommand(UnitCommand.repair(this, target));
     }
