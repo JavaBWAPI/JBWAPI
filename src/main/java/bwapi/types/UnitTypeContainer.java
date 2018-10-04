@@ -66,7 +66,7 @@ class UnitTypeContainer {
     };
 
     // DEFAULTS
-    static int defaultMaxHP[]={
+    static final int defaultMaxHP[]={
             40, 45, 80, 125, 0, 150, 0, 60, 120, 200, 160, 150, 500, 20, 100, 40, 250, 300, 0, 300, 200, 500, 800, 400, 0, 400, 0, 1000,
             850, 700, 150, 0, 50, 0, 60, 25, 200, 35, 80, 400, 30, 40, 200, 120, 150, 120, 80, 25, 800, 300, 60, 400, 250, 160, 120, 300,
             400, 1000, 200, 200, 100, 80, 250, 25, 20, 100, 100, 40, 10, 80, 150, 200, 300, 40, 40, 60, 100, 240, 240, 80, 400, 200, 800,
@@ -79,7 +79,7 @@ class UnitTypeContainer {
             800, 800, 800, 800, 0, 0, 0, 0, 0, 0
     };
 
-    static int defaultMaxSP[] = {
+    static final int defaultMaxSP[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 40, 0, 200, 20, 60, 80, 40, 350, 60, 100, 150, 150, 40, 80, 400, 800, 240,
             240, 300, 400, 400, 500, 80, 20, 10, 500, 300, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -88,40 +88,40 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int Building                = 0x00000001;
-    static int Addon                   = 0x00000002;
-    static int Flyer                   = 0x00000004;
-    static int Worker                  = 0x00000008;
-    static int Subunit                 = 0x00000010;
-    static int FlyingBuilding          = 0x00000020;
-    static int Hero                    = 0x00000040;
-    static int RegeneratesHP           = 0x00000080;
-    static int AnimatedIdle            = 0x00000100;
-    static int Cloakable               = 0x00000200;
-    static int TwoUnitsIn1Egg          = 0x00000400;
-    static int NeutralAccessories      = 0x00000800;
-    static int ResourceDepot           = 0x00001000;
-    static int ResourceContainer       = 0x00002000;
-    static int RoboticUnit             = 0x00004000;
-    static int Detector                = 0x00008000;
-    static int OrganicUnit             = 0x00010000;
-    static int CreepBuilding           = 0x00020000;
-    static int Unused                  = 0x00040000;
-    static int RequiresPsi             = 0x00080000;
-    static int Burrowable              = 0x00100000;
-    static int Spellcaster             = 0x00200000;
-    static int PermanentCloak          = 0x00400000;
-    static int NPCOrAccessories        = 0x00800000;
-    static int MorphFromOtherUnit      = 0x01000000;
-    static int LargeUnit               = 0x02000000;
-    static int HugeUnit                = 0x04000000;
-    static int AutoAttackAndMove       = 0x08000000;
-    static int Attack                  = 0x10000000; /* < Can attack */
-    static int Invincible              = 0x20000000;
-    static int Mechanical              = 0x40000000;
-    static int ProducesUnits           = 0x80000000; /* < It can produce units directly (making buildings doesn't count) */
+    static final int Building                = 0x00000001;
+    static final int Addon                   = 0x00000002;
+    static final int Flyer                   = 0x00000004;
+    static final int Worker                  = 0x00000008;
+    static final int Subunit                 = 0x00000010;
+    static final int FlyingBuilding          = 0x00000020;
+    static final int Hero                    = 0x00000040;
+    static final int RegeneratesHP           = 0x00000080;
+    static final int AnimatedIdle            = 0x00000100;
+    static final int Cloakable               = 0x00000200;
+    static final int TwoUnitsIn1Egg          = 0x00000400;
+    static final int NeutralAccessories      = 0x00000800;
+    static final int ResourceDepot           = 0x00001000;
+    static final int ResourceContainer       = 0x00002000;
+    static final int RoboticUnit             = 0x00004000;
+    static final int Detector                = 0x00008000;
+    static final int OrganicUnit             = 0x00010000;
+    static final int CreepBuilding           = 0x00020000;
+    static final int Unused                  = 0x00040000;
+    static final int RequiresPsi             = 0x00080000;
+    static final int Burrowable              = 0x00100000;
+    static final int Spellcaster             = 0x00200000;
+    static final int PermanentCloak          = 0x00400000;
+    static final int NPCOrAccessories        = 0x00800000;
+    static final int MorphFromOtherUnit      = 0x01000000;
+    static final int LargeUnit               = 0x02000000;
+    static final int HugeUnit                = 0x04000000;
+    static final int AutoAttackAndMove       = 0x08000000;
+    static final int Attack                  = 0x10000000; /* < Can attack */
+    static final int Invincible              = 0x20000000;
+    static final int Mechanical              = 0x40000000;
+    static final int ProducesUnits           = 0x80000000; /* < It can produce units directly (making buildings doesn't count) */
 
-    static int unitFlags[]= {
+    static final int unitFlags[]= {
             OrganicUnit | AutoAttackAndMove | Attack,
             Cloakable | OrganicUnit | Spellcaster | AutoAttackAndMove | Attack,
             AutoAttackAndMove | Attack | Mechanical,
@@ -353,7 +353,7 @@ class UnitTypeContainer {
             0,0,0,0,0,0
     };
 
-    static int defaultArmorAmount[] = {
+    static final int defaultArmorAmount[] = {
             0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 3, 1, 3, 0, 0, 0, 3, 3, 0, 3, 3, 4, 4, 3, 0, 3, 0, 4, 4, 4, 1, 0, 1, 0, 1, 10, 10, 0,
             0, 1, 0, 0, 0, 0, 2, 0, 1, 0, 4, 3, 0, 2, 3, 2, 3, 3, 4, 4, 2, 0, 1, 1, 2, 1, 0, 1, 1, 0, 0, 1, 0, 1, 4, 0, 0, 0, 3,
             2, 3, 2, 3, 3, 4, 0, 0, 0, 3, 2, 3, 0, 0, 1, 1, 0, 0, 0, 0, 10, 0, 2, 3, 0, 4, 1, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -362,7 +362,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int defaultOreCost[] = {
+    static final int defaultOreCost[] = {
             50, 25, 75, 100, 1, 150, 1, 50, 150, 100, 100, 100, 400, 1, 200, 0, 50, 200, 1, 150, 50, 400, 50, 300, 1, 300, 1, 800,
             800, 800, 150, 1, 50, 0, 50, 1, 1, 50, 75, 200, 1, 50, 100, 100, 50, 100, 50, 25, 400, 200, 100, 200, 50, 150, 100, 200,
             100, 200, 250, 1, 150, 125, 150, 0, 50, 100, 125, 50, 0, 200, 275, 100, 350, 25, 150, 100, 0, 200, 300, 100, 600, 400,
@@ -373,7 +373,7 @@ class UnitTypeContainer {
             50, 100, 250, 50, 100, 200, 1000, 250, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
 
-    static int defaultGasCost[] = {
+    static final int defaultGasCost[] = {
             0, 75, 0, 50, 1, 100, 1, 0, 100, 225, 50, 100, 300, 0, 200, 0, 150, 100, 1, 0, 0, 200, 600, 200, 1, 200, 1, 600, 600, 600, 100,
             1, 25, 0, 25, 1, 1, 0, 25, 200, 1, 0, 0, 100, 100, 100, 150, 75, 400, 300, 50, 300, 200, 50, 0, 200, 200, 0, 125, 1, 100, 100,
             50, 0, 0, 0, 50, 150, 0, 0, 125, 350, 250, 0, 150, 300, 0, 0, 100, 300, 300, 200, 600, 100, 75, 0, 1000, 300, 300, 1, 1, 100,
@@ -383,7 +383,7 @@ class UnitTypeContainer {
             0, 50, 100, 50, 500, 200, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
 
-    static int defaultTimeCost[] = {
+    static final int defaultTimeCost[] = {
             360, 750, 450, 600, 1, 750, 1, 300, 900, 1200, 720, 750, 2000, 1, 1500, 1, 1500, 1200, 1, 900, 1, 1800, 2400, 1500, 1, 1500, 1,
             4800, 2400, 4800, 750, 1, 360, 1, 450, 1, 1, 420, 420, 900, 1, 300, 600, 600, 600, 750, 750, 450, 1800, 1500, 600, 1500, 1500,
             780, 840, 1200, 1200, 1200, 750, 1, 600, 750, 600, 300, 300, 600, 750, 750, 300, 900, 1200, 2400, 2100, 300, 750, 1500, 600,
@@ -395,7 +395,7 @@ class UnitTypeContainer {
             1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitSupplyProvided[] = {
+    static final int unitSupplyProvided[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -404,7 +404,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitSupplyRequired[] = {
+    static final int unitSupplyRequired[] = {
             2, 2, 4, 4, 0, 4, 0, 2, 4, 4, 0, 4, 12, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 2, 0, 0, 1, 2, 8, 0, 2,
             0, 4, 4, 4, 4, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6, 0, 4, 4, 4, 8, 2, 4, 4, 4, 8, 4, 6, 8, 12, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -413,7 +413,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitSpaceRequired[] = {
+    static final int unitSpaceRequired[] = {
             1, 1, 2, 2, 255, 4, 255, 1, 255, 255, 1, 255, 255, 255, 255, 1, 1, 2, 255, 2, 1, 255, 255, 4, 255, 255, 255, 255, 255,
             255, 255, 255, 1, 255, 1, 255, 255, 1, 2, 4, 1, 1, 255, 255, 255, 255, 2, 255, 4, 255, 1, 1, 2, 2, 1, 255, 255, 255, 255,
             255, 255, 2, 255, 4, 1, 2, 4, 2, 4, 255, 255, 255, 255, 255, 2, 2, 4, 2, 4, 2, 255, 4, 255, 4, 255, 255, 255, 2, 255, 255,
@@ -425,7 +425,7 @@ class UnitTypeContainer {
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitSpaceProvided[] = {
+    static final int unitSpaceProvided[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -434,7 +434,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitBuildScore[] = {
+    static final int unitBuildScore[] = {
             50, 175, 75, 200, 0, 350, 0, 50, 400, 625, 0, 300, 1200, 0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 125,
             0, 0, 25, 125, 650, 0, 50, 100, 300, 550, 400, 225, 100, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 400, 0, 350, 325, 550, 650, 50, 100, 250,
             350, 700, 200, 650, 1025, 950, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 400, 225, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250,
@@ -444,7 +444,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitDestroyScore[] = {
+    static final int unitDestroyScore[] = {
             100, 350, 150, 400, 0, 700, 0, 100, 800, 1250, 400, 600, 2400, 25, 0, 10, 700, 800, 0, 300, 200, 1600, 2500, 1400, 0, 1400, 0, 4800,
             4800, 4800, 700, 0, 200, 0, 250, 10, 25, 50, 350, 1300, 25, 100, 200, 600, 1100, 800, 450, 200, 2600, 1600, 400, 4000, 900, 500, 100,
             1200, 2200, 400, 800, 1100, 700, 650, 1100, 1300, 100, 200, 500, 700, 1400, 400, 1300, 2050, 1900, 60, 400, 800, 2800, 400, 1000, 1400,
@@ -453,18 +453,18 @@ class UnitTypeContainer {
             450, 1350, 525, 120, 825, 750, 225, 120, 195, 10, 240, 10000, 10000, 75, 5000, 2500, 2500, 10, 1200, 900, 150, 150, 10, 525, 225, 0,
             300, 600, 300, 750, 300, 900, 5000, 1050, 1350, 375, 150, 2500, 5000, 5000, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 2000,
             3600, 0, 0, 0, 0, 0, 0, 0, 0, 0, 600, 4000, 0, 100, 10, 10, 10, 10, 10, 100, 100, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0
+            0, 0, 0, 0, 0, 0, 0, 0
     };
 
     static class UnitDimensions {
-        static int tileWidth  = 0;
-        static int tileHeight = 1;
-        static int left       = 2;
-        static int up         = 3;
-        static int right      = 4;
-        static int down       = 5;
+        static final int tileWidth  = 0;
+        static final int tileHeight = 1;
+        static final int left       = 2;
+        static final int up         = 3;
+        static final int right      = 4;
+        static final int down       = 5;
     }
-    static int unitDimensions[][] = {
+    static final int unitDimensions[][] = {
             {1,1,8,9,8,10}, {1,1,7,10,7,11}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,11,11,11,11}, {1,1,19,15,18,14},
             {2,2,32,33,32,16}, {1,1,11,7,11,14}, {2,2,24,16,24,20}, {2,2,37,29,37,29}, {1,1,7,7,7,7}, {1,1,7,14,7,14}, {1,1,8,9,8,10}, {1,1,7,10,7,11}, {1,1,16,16,15,15},
             {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,8,9,8,10}, {1,1,19,15,18,14}, {2,2,32,33,32,16}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,1,1,1,1},
@@ -754,7 +754,7 @@ class UnitTypeContainer {
             {}// Unknown,
     };
 
-    static int seekRangeTiles[] = {
+    static final int seekRangeTiles[] = {
             0, 0, 0, 5, 0, 8, 8, 1, 0, 0, 3, 0, 0, 3, 0, 0, 0, 5, 0, 0, 0, 0, 0, 8, 0, 0, 12, 0, 0, 0, 0, 12, 3, 0, 9, 0, 0, 3, 0, 3, 3, 0,
             0, 3, 0, 8, 0, 3, 3, 8, 3, 3, 0, 0, 3, 3, 0, 0, 0, 0, 9, 3, 7, 7, 0, 3, 0, 3, 3, 0, 0, 0, 8, 0, 3, 3, 3, 3, 0, 3, 0, 8, 8, 8, 0,
             3, 0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -763,7 +763,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int sightRangeTiles[] = {
+    static final int sightRangeTiles[] = {
             7, 9, 8, 8, 8, 10, 10, 7, 7, 10, 7, 8, 11, 3, 3, 7, 11, 8, 8, 8, 7, 7, 10, 10, 10, 10, 10, 8, 11, 11, 10, 10, 7, 10, 9, 4, 4, 5, 6,
             7, 5, 7, 9, 7, 11, 10, 10, 5, 7, 10, 5, 9, 10, 8, 5, 7, 11, 11, 8, 4, 9, 7, 10, 10, 8, 7, 8, 7, 8, 8, 8, 9, 11, 6, 7, 7, 8, 7, 8,
             7, 10, 10, 9, 10, 9, 5, 9, 7, 10, 7, 7, 8, 7, 7, 7, 7, 7, 4, 9, 10, 11, 10, 11, 8, 11, 8, 10, 10, 8, 8, 8, 8, 8, 8, 10, 8, 10, 8,
@@ -817,7 +817,7 @@ class UnitTypeContainer {
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Unknown
     };
 
-    static int groundWeaponHits[] = {
+    static final int groundWeaponHits[] = {
             1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
             1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 2, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 1,
             1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -826,7 +826,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int airWeaponHits[] = {
+    static final int airWeaponHits[] = {
             1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
             1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
             1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
@@ -867,7 +867,7 @@ class UnitTypeContainer {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
 
-    static int unitAcceleration[] = {
+    static final int unitAcceleration[] = {
             1, 1, 100, 1, 0, 1, 0, 67, 67, 50, 1, 17, 27, 1, 33, 1, 1, 1, 0, 100, 1, 67, 50, 1, 0, 1, 0, 27, 27, 27, 1, 0, 1, 0, 1, 1, 0, 1,
             1, 1, 1, 67, 27, 67, 27, 67, 1, 107, 1, 67, 1, 1, 1, 1, 1, 67, 27, 27, 65, 0, 67, 27, 48, 160, 67, 1, 1, 27, 160, 17, 48, 33, 27,
             427, 27, 27, 160, 1, 1, 27, 48, 1, 27, 1, 27, 1, 33, 27, 48, 1, 1, 0, 0, 1, 16, 1, 1, 0, 67, 1, 1, 0, 27, 1, 1, 0, 33, 0, 0, 0,
@@ -876,7 +876,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitHaltDistance[] = {
+    static final int unitHaltDistance[] = {
             1, 1, 14569, 1, 0, 1, 0, 12227, 21745, 5120, 1, 37756, 7585, 1, 1103213, 1, 1, 1, 0, 14569, 1, 21745, 5120, 1, 0, 1, 0,
             7585, 7585, 7585, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 12227, 840, 21745, 7585, 21745, 1, 13616, 1, 21745, 1, 1, 1, 1, 1, 21745,
             7585, 840, 21901, 0, 17067, 13474, 17067, 5120, 12227, 1, 1, 13474, 5120, 37756, 17067, 24824, 13474, 13640, 13474, 13474,
@@ -887,7 +887,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-    static int unitTurnRadius[] = {
+    static final int unitTurnRadius[] = {
             40, 40, 40, 17, 0, 13, 0, 40, 40, 40, 40, 20, 20, 127, 127, 40, 40, 17, 0, 40, 40, 40, 40, 13, 0, 40, 0, 20, 20, 20, 40, 0, 40,
             0, 40, 20, 0, 27, 27, 40, 27, 40, 20, 40, 20, 40, 27, 40, 40, 40, 40, 40, 27, 27, 27, 40, 20, 20, 30, 0, 30, 40, 30, 40, 40, 40,
             40, 40, 40, 20, 30, 40, 20, 40, 40, 40, 40, 40, 40, 40, 30, 20, 20, 20, 20, 27, 40, 40, 30, 27, 27, 0, 0, 27, 14, 27, 27, 0, 30,
