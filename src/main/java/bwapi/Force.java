@@ -29,8 +29,10 @@ public class Force {
                 .collect(Collectors.toSet());
     }
 
-    public boolean equals(Object that) {
-        if (!(that instanceof Force)) return false;
+    public boolean equals(final Object that) {
+        if (!(that instanceof Force)) {
+            return false;
+        }
         return getID() == ((Force) that).getID();
     }
 

@@ -31,9 +31,9 @@ public enum GameType {
     }
 
 
-    private int id;
+    public final int id;
 
-    GameType(int id) {
+    GameType(final int id) {
         this.id = id;
     }
 }

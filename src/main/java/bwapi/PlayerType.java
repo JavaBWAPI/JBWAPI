@@ -23,9 +23,9 @@ public enum PlayerType {
         Arrays.stream(PlayerType.values()).forEach(v -> playerTypes[v.id] = v);
     }
 
-    private int id;
+    public final int id;
 
-    PlayerType(int id) {
+    PlayerType(final int id) {
         this.id = id;
     }
 

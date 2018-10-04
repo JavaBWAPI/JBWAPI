@@ -39,9 +39,9 @@ public enum TextColor {
      * Format text with a textcolor to display on broodwar
      */
     public static String formatText(final String text, final TextColor format) {
-        byte[] data = text.getBytes();
-        int len = text.length();
-        byte[] formatted = new byte[len + 1];
+        final byte[] data = text.getBytes();
+        final int len = text.length();
+        final byte[] formatted = new byte[len + 1];
         formatted[0] = format.value;
         System.arraycopy(data, 0, formatted, 1, len);
         return new String(formatted);
@@ -50,7 +50,7 @@ public enum TextColor {
     //SINCE 4.2
     //C hecks if the given character is a color-changing control code.
     boolean isColor() {
-        int c = this.value;
+        final int c = this.value;
         return (2 <= c && c <= 8) || (14 <= c && c <= 17) || (21 <= c && c <= 31);
     }
 }

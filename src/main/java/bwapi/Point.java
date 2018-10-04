@@ -5,9 +5,9 @@ class Point {
 
     public final int x;
     public final int y;
-    private int scalar;
+    private final int scalar;
 
-    Point(int x, int y, int type) {
+    Point(final int x, final int y, final int type) {
         this.x = x;
         this.y = y;
         this.scalar = type;
@@ -29,9 +29,11 @@ class Point {
         return "[" + x + ", " + y + "]";
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof Point)) return false;
-        Point point = (Point) o;
+    public boolean equals(final Object o) {
+        if (!(o instanceof Point)) {
+            return false;
+        }
+        final Point point = (Point) o;
         return scalar == point.scalar && x == point.x && y == point.y;
     }
 

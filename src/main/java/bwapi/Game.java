@@ -39,7 +39,7 @@ public class Game {
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
     private final Set<Integer> visibleUnits = new HashSet<>();
-    private Client.GameData gameData;
+    private final Client.GameData gameData;
     // CONSTANT
     private Player[] players;
     private Region[] regions;
@@ -83,13 +83,13 @@ public class Game {
         this.gameData = gameData;
     }
 
-    private static boolean hasPower(int x, int y, final UnitType unitType, final Set<Unit> pylons) {
+    private static boolean hasPower(final int x, final int y, final UnitType unitType, final Set<Unit> pylons) {
         if (unitType.id >= 0 && unitType.id < UnitType.None.id && (!unitType.requiresPsi() || !unitType.isBuilding())) {
             return true;
         }
 
         // Loop through all pylons for the current player
-        for (Unit i : pylons) {
+        for (final Unit i : pylons) {
             if (!i.exists() || !i.isCompleted()) {
                 continue;
             }
@@ -315,7 +315,7 @@ public class Game {
 
     public Set<Position> getNukeDots() {
         return IntStream.range(0, gameData.nukeDotCount())
-                .mapToObj(id -> new Position(gameData.getNukeDotX(id), gameData.getNukeDotY((id))))
+                .mapToObj(id -> new Position(gameData.getNukeDotX(id), gameData.getNukeDotY(id)))
                 .collect(Collectors.toSet());
     }
 
@@ -612,7 +612,7 @@ public class Game {
 
     public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
         // lt = left top, rb = right bottom
-        final TilePosition lt = (builder != null && type.isAddon()) ?
+        final TilePosition lt = builder != null && type.isAddon() ?
                 position.add(new TilePosition(4, 1)) : // addon build offset
                 position;
         final TilePosition rb = lt.add(type.tileSize());
@@ -658,21 +658,22 @@ public class Game {
         if (type != Special_Start_Location) {
             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
             final Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
-                    (u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
+                    u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
                             && u.getLeft() <= targPos.x + type.dimensionRight()
                             && u.getTop() <= targPos.y + type.dimensionDown()
                             && u.getRight() <= targPos.x + type.dimensionLeft()
-                            && u.getBottom() <= targPos.y + type.dimensionUp()));
+                            && u.getBottom() <= targPos.y + type.dimensionUp());
 
-            for (Unit u : unitsInRect) {
+            for (final Unit u : unitsInRect) {
                 // Addons can be placed over units that can move, pushing them out of the way
-                if (!(type.isAddon() && u.getType().canMove()))
+                if (!(type.isAddon() && u.getType().canMove())) {
                     return false;
+                }
             }
 
             // Creep Check
             // Note: Zerg structures that don't require creep can still be placed on creep
-            boolean needsCreep = type.requiresCreep();
+            final boolean needsCreep = type.requiresCreep();
             if (type.getRace() != Zerg || needsCreep) {
                 for (int x = lt.x; x < rb.x; ++x) {
                     for (int y = lt.y; y < rb.y; ++y) {
@@ -731,7 +732,7 @@ public class Game {
     }
 
     public boolean canMake(final UnitType type, final Unit builder) {
-        Player pSelf = self();
+        final Player pSelf = self();
         // Error checking
         if (pSelf == null) {
             return false;
@@ -765,7 +766,7 @@ public class Game {
                 if (builder.getLarva().size() == 0) {
                     return false;
                 }
-            } else if (builderType != requiredType) {
+            } else if (!builderType.equals(requiredType)) {
                 return false;
             }
 
@@ -812,17 +813,18 @@ public class Game {
         }
 
         // Check if player has enough supplies
-        Race typeRace = type.getRace();
+        final Race typeRace = type.getRace();
         final int supplyRequired = type.supplyRequired() * (type.isTwoUnitsInOneEgg() ? 2 : 1);
         if (supplyRequired > 0 && pSelf.supplyTotal(typeRace) < pSelf.supplyUsed(typeRace) + supplyRequired - (requiredType.getRace() == typeRace ? requiredType.supplyRequired() : 0)) {
             return false;
         }
 
         UnitType addon = UnitType.None;
-        Map<UnitType, Integer> reqUnits = type.requiredUnits();
+        final Map<UnitType, Integer> reqUnits = type.requiredUnits();
         for (final UnitType ut : type.requiredUnits().keySet()) {
-            if (ut.isAddon())
+            if (ut.isAddon()) {
                 addon = ut;
+            }
 
             if (!pSelf.hasUnitTypeRequirement(ut, reqUnits.get(ut))) {
                 return false;
@@ -921,11 +923,12 @@ public class Game {
                 return false;
             }
         }
-        int nextLvl = self.getUpgradeLevel(type) + 1;
 
         if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
             return false;
         }
+
+        final int nextLvl = self.getUpgradeLevel(type) + 1;
 
         if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
             return false;
@@ -1462,12 +1465,12 @@ public class Game {
         }
         final short idx = mapTileRegionID[position.x / 32][position.y / 32];
         if ((idx & 0x2000) != 0) {
-            final int minitileShift = ((position.x & 0x1F) / 8) + ((position.y & 0x1F) / 8) * 4;
             final int index = idx & 0x1FFF;
 
             if (index >= REGION_DATA_SIZE) {
                 return null;
             }
+            final int minitileShift = ((position.x & 0x1F) / 8) + ((position.y & 0x1F) / 8) * 4;
 
             if (((mapSplitTilesMiniTileMask[index] >> minitileShift) & 1) != 0) {
                 return getRegion(mapSplitTilesRegion2[index]);
@@ -1493,8 +1496,9 @@ public class Game {
     private int getDamageFromImpl(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer) {
         // Retrieve appropriate weapon
         final WeaponType wpn = toType.isFlyer() ? fromType.airWeapon() : fromType.groundWeapon();
-        if (wpn == WeaponType.None || wpn == WeaponType.Unknown)
+        if (wpn == WeaponType.None || wpn == WeaponType.Unknown) {
             return 0;
+        }
 
         // Get initial weapon damage
         int dmg = fromPlayer != null ? fromPlayer.damage(wpn) : wpn.damageAmount() * wpn.damageFactor();
@@ -1512,7 +1516,7 @@ public class Game {
         return getDamageFrom(fromType, toType, fromPlayer, null);
     }
 
-    public int getDamageFrom(final UnitType fromType, UnitType toType) {
+    public int getDamageFrom(final UnitType fromType, final UnitType toType) {
         return getDamageFrom(fromType, toType, null);
     }
 

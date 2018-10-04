@@ -27,9 +27,9 @@ public enum ExplosionType {
     Air_Splash(23),
     Unknown(24);
 
-    private int id;
+    public final int id;
 
-    ExplosionType(int value) {
+    ExplosionType(final int id) {
         this.id = id;
     }
 }

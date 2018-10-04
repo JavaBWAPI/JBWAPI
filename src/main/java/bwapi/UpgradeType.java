@@ -202,7 +202,8 @@ public enum UpgradeType {
     }
 
     public final int id;
-    UpgradeType(int id) {
+
+    UpgradeType(final int id) {
         this.id = id;
     }
 
@@ -214,7 +215,7 @@ public enum UpgradeType {
         return mineralPrice(1);
     }
 
-    public int mineralPrice(int level) {
+    public int mineralPrice(final int level) {
         return defaultOreCostBase[id] + Math.max(0, level - 1) * mineralPriceFactor();
     }
 
@@ -226,7 +227,7 @@ public enum UpgradeType {
         return mineralPrice();
     }
 
-    public int gasPrice(int level) {
+    public int gasPrice(final int level) {
         return mineralPrice(level);
     }
 
@@ -238,7 +239,7 @@ public enum UpgradeType {
         return upgradeTime(1);
     }
 
-    public int upgradeTime(int level) {
+    public int upgradeTime(final int level) {
         return defaultTimeCostBase[id] + Math.max(0, level - 1) * upgradeTimeFactor();
     }
 
@@ -262,7 +263,7 @@ public enum UpgradeType {
         return whatsRequired(1);
     }
 
-    public UnitType whatsRequired(int level) {
-        return (level >= 1 && level <= 3) ? requirements[level - 1][id] : UnitType.None;
+    public UnitType whatsRequired(final int level) {
+        return level >= 1 && level <= 3 ? requirements[level - 1][id] : UnitType.None;
     }
 }

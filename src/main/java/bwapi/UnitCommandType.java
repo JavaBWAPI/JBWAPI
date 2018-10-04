@@ -50,7 +50,7 @@ public enum UnitCommandType {
 
     public final int id;
 
-    UnitCommandType(int id) {
+    UnitCommandType(final int id) {
         this.id = id;
     }
 }

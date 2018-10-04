@@ -250,7 +250,7 @@ public enum UnitType {
 
     public final int id;
 
-    UnitType(int id) {
+    UnitType(final int id) {
         this.id = id;
     }
 
@@ -268,7 +268,7 @@ public enum UnitType {
 
     public Entry<UnitType, Integer> whatBuilds() {
         // Retrieve the type
-        UnitType type = UnitTypeContainer.whatBuilds[id];
+        final UnitType type = UnitTypeContainer.whatBuilds[id];
         int count = 1;
         // Set count to 0 if there is no whatBuilds and 2 if it's an archon
         if (type == UnitType.None) {
@@ -285,7 +285,7 @@ public enum UnitType {
     }
 
     public TechType requiredTech() {
-        return (this == Zerg_Lurker || this == Zerg_Lurker_Egg) ? Lurker_Aspect : TechType.None;
+        return this == Zerg_Lurker || this == Zerg_Lurker_Egg ? Lurker_Aspect : TechType.None;
     }
 
     public TechType cloakingTech() {
@@ -326,7 +326,7 @@ public enum UnitType {
     }
 
     public int maxEnergy() {
-        return isSpellcaster() ? (isHero() ? 250 : 200) : 0;
+        return isSpellcaster() ? isHero() ? 250 : 200 : 0;
     }
 
     public int armor() {

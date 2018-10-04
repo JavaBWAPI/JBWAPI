@@ -65,8 +65,10 @@ public class Bullet {
         return bulletData.isVisible(player.getID());
     }
 
-    public boolean equals(Object that) {
-        if (!(that instanceof Bullet)) return false;
+    public boolean equals(final Object that) {
+        if (!(that instanceof Bullet)) {
+            return false;
+        }
         return getID() == ((Bullet) that).getID();
     }
 

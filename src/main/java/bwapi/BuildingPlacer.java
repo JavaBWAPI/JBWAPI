@@ -1,7 +1,7 @@
 package bwapi;
 
 class BuildingPlacer {
-    private static int MAX_RANGE = 64;
+    private static final int MAX_RANGE = 64;
     private static TilePosition gDirections[] = {
             new TilePosition(1, 1),
             new TilePosition(0, 1),
@@ -12,22 +12,22 @@ class BuildingPlacer {
             new TilePosition(0, -1),
             new TilePosition(-1, -1)
     };
-    private static buildTemplate buildTemplates[] = // [13 + 1]
+    private static BuildTemplate buildTemplates[] = // [13 + 1]
             {
-                    new buildTemplate(32, 0, 0, 1),
-                    new buildTemplate(0, 32, 1, 0),
-                    new buildTemplate(31, 0, 0, 1),
-                    new buildTemplate(0, 31, 1, 0),
-                    new buildTemplate(33, 0, 0, 1),
-                    new buildTemplate(0, 33, 1, 0),
-                    new buildTemplate(30, 0, 0, 1),
-                    new buildTemplate(29, 0, 0, 1),
-                    new buildTemplate(0, 30, 1, 0),
-                    new buildTemplate(28, 0, 0, 1),
-                    new buildTemplate(0, 29, 1, 0),
-                    new buildTemplate(27, 0, 0, 1),
-                    new buildTemplate(0, 28, 1, 0),
-                    new buildTemplate(-1, 0, 0, 0) // last
+                    new BuildTemplate(32, 0, 0, 1),
+                    new BuildTemplate(0, 32, 1, 0),
+                    new BuildTemplate(31, 0, 0, 1),
+                    new BuildTemplate(0, 31, 1, 0),
+                    new BuildTemplate(33, 0, 0, 1),
+                    new BuildTemplate(0, 33, 1, 0),
+                    new BuildTemplate(30, 0, 0, 1),
+                    new BuildTemplate(29, 0, 0, 1),
+                    new BuildTemplate(0, 30, 1, 0),
+                    new BuildTemplate(28, 0, 0, 1),
+                    new BuildTemplate(0, 29, 1, 0),
+                    new BuildTemplate(27, 0, 0, 1),
+                    new BuildTemplate(0, 28, 1, 0),
+                    new BuildTemplate(-1, 0, 0, 0) // last
             };
 
     static TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition1, final int maxRange, final boolean creep, final Game game) {
@@ -44,7 +44,7 @@ class BuildingPlacer {
         switch (type) {
             case Protoss_Pylon:
                 final Unit pSpecialUnitTarget = game.getClosestUnitInRadius(
-                        desiredPosition.toPosition(), 999999, (u -> u.getPlayer().equals(game.self()) && !u.isPowered()));
+                        desiredPosition.toPosition(), 999999, u -> u.getPlayer().equals(game.self()) && !u.isPowered());
                 if (pSpecialUnitTarget != null) {
                     desiredPosition = pSpecialUnitTarget.getPosition().toTilePosition();
                     trimPlacement = false;
@@ -63,16 +63,16 @@ class BuildingPlacer {
                 break;
         }
 
-        PlacementReserve reserve = new PlacementReserve(maxRange);
+        final PlacementReserve reserve = new PlacementReserve(maxRange);
         ReservePlacement(reserve, type, desiredPosition, game);
 
-        if (trimPlacement)
+        if (trimPlacement) {
             reserveTemplateSpacing(reserve);
-
-        TilePosition centerPosition = desiredPosition.subtract((new TilePosition(MAX_RANGE, MAX_RANGE).divide(2)));
-        if (pTargRegion != null)
+        }
+        final TilePosition centerPosition = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
+        if (pTargRegion != null) {
             desiredPosition = pTargRegion.getCenter().toTilePosition();
-
+        }
         // Find the best position
         int bestDistance;
         int fallbackDistance;
@@ -82,7 +82,7 @@ class BuildingPlacer {
         bestDistance = fallbackDistance = 999999;
         bestPosition = fallbackPosition = TilePosition.None;
         for (int passCount = 0; passCount < (pTargRegion != null ? 2 : 1); ++passCount) {
-            for (int y = 0; y < MAX_RANGE; ++y)
+            for (int y = 0; y < MAX_RANGE; ++y) {
                 for (int x = 0; x < MAX_RANGE; ++x) {
                     // Ignore if space is reserved
                     if (reserve.getValue(x, y) == 0) {
@@ -101,19 +101,22 @@ class BuildingPlacer {
                         }
                     }
                 }
-            // Break pass if position is found
-            if (bestPosition != TilePosition.None)
-                break;
+                // Break pass if position is found
+                if (bestPosition != TilePosition.None) {
+                    break;
+                }
 
-            // Break if an alternative position was found
-            if (fallbackPosition != TilePosition.None) {
-                bestPosition = fallbackPosition;
-                break;
+                // Break if an alternative position was found
+                if (fallbackPosition != TilePosition.None) {
+                    bestPosition = fallbackPosition;
+                    break;
+                }
+
+                // If we were really targetting a region, and couldn't find a position above
+                if (pTargRegion != null) { // Then fallback to the default build position
+                    desiredPosition = centerPosition;
+                }
             }
-
-            // If we were really targetting a region, and couldn't find a position above
-            if (pTargRegion != null) // Then fallback to the default build position
-                desiredPosition = centerPosition;
         }
 
         return bestPosition;
@@ -129,7 +132,7 @@ class BuildingPlacer {
         // @TODO: Assign 0 to all locations that have a ground distance > maxRange
 
         // exclude positions off the map
-        final TilePosition start = desiredPosition.subtract((new TilePosition(MAX_RANGE, MAX_RANGE).divide(2)));
+        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
         reserve.iterate((pr, x, y) -> {
             if (!(start.add(new TilePosition(x, y)).isValid(game))) {
                 pr.setValue(x, y, (byte) 0);
@@ -155,24 +158,23 @@ class BuildingPlacer {
                 //reservePylonPlacement();
                 break;
             case Terran_Bunker:  // @TODO
-                //if ( !GetBunkerPlacement() )
-            {
+                //if ( !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
-            }
+                //}
             break;
             case Terran_Missile_Turret:  // @TODO
             case Protoss_Photon_Cannon:
                 //reserveTurretPlacement();
                 break;
             case Zerg_Creep_Colony:  // @TODO
-                //if ( creep || !GetBunkerPlacement() )
-            {
+                //if ( creep || !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
-            }
+                // }
             break;
             default:
-                if (!type.isResourceDepot())
+                if (!type.isResourceDepot()) {
                     ReserveDefault(reserve, type, desiredPosition, game);
+                }
                 break;
         }
     }
@@ -208,7 +210,7 @@ class BuildingPlacer {
 
         // Exclude locations with a different ground height, but restore a backup in case there are no more build locations
         reserve.backup();
-        int targetHeight = game.getGroundHeight(desiredPosition);
+        final int targetHeight = game.getGroundHeight(desiredPosition);
         reserve.iterate((pr, x, y) -> {
             if (game.getGroundHeight(start.add(new TilePosition(x, y))) != targetHeight) {
                 pr.setValue(x, y, (byte) 0);
@@ -229,7 +231,7 @@ class BuildingPlacer {
         game.self().getUnits().stream()
                 .filter(u -> {
                     final UnitType ut = u.getType();
-                    return u.exists() && (u.isCompleted() || (ut.producesLarva() && u.isMorphing())) && ut.isBuilding() && (ut.isResourceDepot() || ut.isRefinery());
+                    return u.exists() && (u.isCompleted() || ut.producesLarva() && u.isMorphing()) && ut.isBuilding() && (ut.isResourceDepot() || ut.isRefinery());
                 })
                 .forEach(u -> ReserveStructure(reserve, u, 2, type, desiredPosition));
 
@@ -251,7 +253,7 @@ class BuildingPlacer {
         game.self().getUnits().stream()
                 .filter(u -> u.exists() && u.getType().canBuildAddon())
                 .forEach(u -> {
-                    final TilePosition addonPos = (u.getTilePosition().add(new TilePosition(4, 1))).subtract(start);
+                    final TilePosition addonPos = u.getTilePosition().add(new TilePosition(4, 1)).subtract(start);
                     reserve.setRange(addonPos, addonPos.add(new TilePosition(2, 2)), (byte) 0);
                 });
 
@@ -261,7 +263,7 @@ class BuildingPlacer {
 
     private static void ReserveDefault(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final Game game) {
         reserve.backup();
-        PlacementReserve original = reserve;
+        final PlacementReserve original = reserve;
 
         // Reserve some space around some specific units
         for (final Unit it : game.self().getUnits()) {
@@ -297,9 +299,10 @@ class BuildingPlacer {
                 for (int y = 0; y < 64; ++y) {
                     for (int x = 0; x < 64; ++x) {
                         for (int dir = 0; dir < 8; ++dir) {
-                            TilePosition p = new TilePosition(x, y).add(gDirections[dir]);
-                            if (!PlacementReserve.isValidPos(p) || original.getValue(p) == 0)
+                            final TilePosition p = new TilePosition(x, y).add(gDirections[dir]);
+                            if (!PlacementReserve.isValidPos(p) || original.getValue(p) == 0) {
                                 reserve.setValue(p, (byte) 0);
+                            }
                         }
 
                     }
@@ -313,7 +316,7 @@ class BuildingPlacer {
         reserve.backup();
 
         for (int j = 0; buildTemplates[j].startX != -1; ++j) {
-            final buildTemplate t = buildTemplates[j];
+            final BuildTemplate t = buildTemplates[j];
             int x = t.startX;
             int y = t.startY;
             for (int i = 0; i < 64; ++i) {
@@ -331,9 +334,9 @@ class BuildingPlacer {
     }
 
     private static void ReserveStructureWithPadding(final PlacementReserve reserve, final TilePosition currentPosition, final TilePosition sizeExtra, final int padding, final UnitType type, final TilePosition desiredPosition) {
-        final TilePosition paddingSize = sizeExtra.add((new TilePosition(padding, padding).multiply(2)));
+        final TilePosition paddingSize = sizeExtra.add(new TilePosition(padding, padding).multiply(2));
 
-        final TilePosition topLeft = currentPosition.subtract(type.tileSize()).subtract((paddingSize.divide(2))).subtract(new TilePosition(1, 1));
+        final TilePosition topLeft = currentPosition.subtract(type.tileSize()).subtract(paddingSize.divide(2)).subtract(new TilePosition(1, 1));
         final TilePosition topLeftRelative = topLeft.subtract(desiredPosition).add(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
         final TilePosition maxSize = topLeftRelative.add(type.tileSize()).add(paddingSize).add(new TilePosition(1, 1));
 
@@ -344,13 +347,13 @@ class BuildingPlacer {
         void operation(PlacementReserve placementReserve, int x, int y);
     }
 
-    private static class buildTemplate {
-        int startX;
-        int startY;
-        int stepX;
-        int stepY;
+    private static class BuildTemplate {
+        final int startX;
+        final int startY;
+        final int stepX;
+        final int stepY;
 
-        buildTemplate(int startX, int startY, int stepX, int stepY) {
+        BuildTemplate(final int startX, final int startY, final int stepX, final int stepY) {
             this.startX = startX;
             this.startY = startY;
             this.stepX = stepX;
@@ -363,7 +366,7 @@ class BuildingPlacer {
         byte data[][];
         byte save[][];
 
-        PlacementReserve(int maxRange) {
+        PlacementReserve(final int maxRange) {
             maxSearch = Math.min(Math.max(0, maxRange), MAX_RANGE);
             reset();
             backup();
@@ -402,14 +405,15 @@ class BuildingPlacer {
             }
         }
 
-        void setRange(TilePosition lt, TilePosition rb, byte value) {
+        void setRange(final TilePosition lt, final TilePosition rb, final byte value) {
             setRange(lt.x, lt.y, rb.x, rb.y, value);
         }
 
         // Gets the value from the placement reserve array, 0 if position is invalid
         byte getValue(final int x, final int y) {
-            if (isValidPos(x, y))
+            if (isValidPos(x, y)) {
                 return data[y][x];
+            }
             return 0;
         }
 
@@ -417,24 +421,26 @@ class BuildingPlacer {
             return getValue(p.x, p.y);
         }
 
-        void iterate(PlacementReserveExec proc) {
+        void iterate(final PlacementReserveExec proc) {
             // Get min/max distances
-            int min = MAX_RANGE / 2 - maxSearch / 2;
-            int max = min + maxSearch;
-            for (int y = min; y < max; ++y)
+            final int min = MAX_RANGE / 2 - maxSearch / 2;
+            final int max = min + maxSearch;
+            for (int y = min; y < max; ++y) {
                 for (int x = min; x < max; ++x) {
                     proc.operation(this, x, y);
                 }
+            }
         }
 
         boolean hasValidSpace() {
             // Get min/max distances
-            int min = MAX_RANGE / 2 - maxSearch / 2;
-            int max = min + maxSearch;
+            final int min = MAX_RANGE / 2 - maxSearch / 2;
+            final int max = min + maxSearch;
             for (int y = min; y < max; ++y) {
                 for (int x = min; x < max; ++x) {
-                    if (getValue(x, y) == 1)
+                    if (getValue(x, y) == 1) {
                         return true;
+                    }
                 }
             }
             return false;

@@ -23,7 +23,7 @@ public enum CommandType {
 
     public final int value;
 
-    CommandType(int value) {
+    CommandType(final int value) {
         this.value = value;
     }
 }

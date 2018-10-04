@@ -25,48 +25,50 @@ class Client {
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
     private ByteBuffer sharedMemory;
     private LittleEndianPipe pipe;
-    private GameData data = new GameData();
+    private final GameData data = new GameData();
 
-    public Client() throws Throwable {
-        ByteBuffer gameList = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, gameTableSize).getByteBuffer(0, GAME_SIZE * 8);
+    public Client() throws Exception {
+        final ByteBuffer gameList = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, gameTableSize).getByteBuffer(0, GAME_SIZE * 8);
         gameList.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < 8; ++i) {
-            int procID = gameList.getInt(GAME_SIZE * i);
-            boolean connected = gameList.get(GAME_SIZE * i + 4) != 0;
+            final int procID = gameList.getInt(GAME_SIZE * i);
+            final boolean connected = gameList.get(GAME_SIZE * i + 4) != 0;
 
             if (procID != 0 && !connected) {
                 try {
                     this.connect(procID);
                     return;
-                } catch (Throwable ignored) {
+                } catch (Exception ignored) {
                 }
             }
         }
-        throw new Throwable("All servers busy!");
+        throw new Exception("All servers busy!");
     }
 
     public GameData data() {
         return data;
     }
 
-    private void connect(int procID) throws Throwable {
+    private void connect(final int procID) throws Exception {
         pipe = new LittleEndianPipe("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
         sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE, 0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
         sharedMemory.order(ByteOrder.LITTLE_ENDIAN);
         int code = 1;
-        while (code != 2)
+        while (code != 2) {
             code = pipe.readInt();
+        }
         System.out.println("Connected to BWAPI@" + procID + " with version " + data.getClientVersion() + ": " + data.getRevision());
     }
 
-    public void update(EventHandler handler) throws Throwable {
+    public void update(final EventHandler handler) throws Exception {
         int code = 1;
         pipe.writeInt(code);
-        while (code != 2)
+        while (code != 2) {
             code = pipe.readInt();
-
-        for (int i = 0; i < data.eventCount(); ++i)
+        }
+        for (int i = 0; i < data.eventCount(); ++i) {
             handler.operation(data.event(i));
+        }
     }
 
     interface MappingKernel extends Kernel32 {
@@ -88,7 +90,7 @@ class Client {
         final int y;
         final int extra;
 
-        public UnitCommand(int type, int unit, int target, int x, int y, int extra) {
+        public UnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
             this.type = type;
             this.unit = unit;
             this.target = target;
@@ -104,7 +106,7 @@ class Client {
         final int value1;
         final int value2;
 
-        public Command(int type, int value1, int value2) {
+        public Command(final int type, final int value1, final int value2) {
             this.type = type;
             this.value1 = value1;
             this.value2 = value2;
@@ -124,7 +126,7 @@ class Client {
         final int color;
         final byte isSolid;
 
-        public Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, boolean isSolid) {
+        public Shape(final int type, final int coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
             this.type = type;
             this.coordType = coordType;
             this.x1 = x1;
@@ -141,7 +143,7 @@ class Client {
     class LittleEndianPipe {
         RandomAccessFile pipe;
 
-        LittleEndianPipe(String name, String mode) throws FileNotFoundException {
+        LittleEndianPipe(final String name, final String mode) throws FileNotFoundException {
             pipe = new RandomAccessFile(name, mode);
         }
 
@@ -149,7 +151,7 @@ class Client {
             return pipe.readByte();
         }
 
-        final void writeByte(int b) throws IOException {
+        final void writeByte(final int b) throws IOException {
             pipe.writeByte(b);
         }
 
@@ -161,7 +163,7 @@ class Client {
             return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
         }
 
-        final void writeInt(int i) throws IOException {
+        final void writeInt(final int i) throws IOException {
             writeByte(i >> 24);
             writeByte((i >> 16) & 0xff);
             writeByte((i >> 8) & 0xff);
@@ -190,23 +192,24 @@ class Client {
         private static final int SIZE = 0x1f7ccd8;
         private final CharsetEncoder enc = Charset.forName("ISO-8859-1").newEncoder();
 
-        private String parseString(int offset, int maxLen) {
-            byte[] buf = new byte[maxLen];
+        private String parseString(final int offset, final int maxLen) {
+            final byte[] buf = new byte[maxLen];
             sharedMemory.position(offset);
             sharedMemory.get(buf, 0, maxLen);
             sharedMemory.position(0);
             int len = 0;
-            for (; len < buf.length && buf[len] != 0; ++len) {
+            while (len < buf.length && buf[len] != 0) {
+                ++len;
             }
             return new String(buf, 0, len, StandardCharsets.ISO_8859_1);
         }
 
-        private double parseDouble(int offset) {
-            byte[] buf = new byte[8];
+        private double parseDouble(final int offset) {
+            final byte[] buf = new byte[8];
             sharedMemory.position(offset);
             sharedMemory.get(buf, 0, 8);
             sharedMemory.position(0);
-            ByteBuffer bb = ByteBuffer.wrap(buf);
+            final ByteBuffer bb = ByteBuffer.wrap(buf);
             bb.order(ByteOrder.LITTLE_ENDIAN);
             return bb.getDouble();
         }
@@ -239,7 +242,7 @@ class Client {
             return sharedMemory.getInt(ForceOffset);
         }
 
-        public ForceData getForce(int id) {
+        public ForceData getForce(final int id) {
             return new ForceData(id);
         }
 
@@ -247,7 +250,7 @@ class Client {
             return sharedMemory.getInt(PlayerOffset);
         }
 
-        public PlayerData getPlayer(int id) {
+        public PlayerData getPlayer(final int id) {
             return new PlayerData(id);
         }
 
@@ -255,7 +258,7 @@ class Client {
             return sharedMemory.getInt(UnitOffset);
         }
 
-        public UnitData getUnit(int id) {
+        public UnitData getUnit(final int id) {
             return new UnitData(id);
         }
 
@@ -263,7 +266,7 @@ class Client {
             return 100;
         }
 
-        public BulletData getBullet(int index) {
+        public BulletData getBullet(final int index) {
             return new BulletData(index);
         }
 
@@ -271,11 +274,11 @@ class Client {
             return sharedMemory.getInt(NukeOffset);
         }
 
-        public int getNukeDotX(int id) {
+        public int getNukeDotX(final int id) {
             return sharedMemory.getInt(NukeOffset + id * 8 + 4);
         }
 
-        public int getNukeDotY(int id) {
+        public int getNukeDotY(final int id) {
             return sharedMemory.getInt(NukeOffset + id * 8 + 8);
         }
 
@@ -347,11 +350,11 @@ class Client {
             return sharedMemory.getInt(GameOffset + 64);
         }
 
-        public boolean mouseState(int button) {
+        public boolean mouseState(final int button) {
             return sharedMemory.get(GameOffset + 68 + button) != 0;
         }
 
-        public boolean keyState(int key) {
+        public boolean keyState(final int key) {
             return sharedMemory.get(GameOffset + 71 + key) != 0;
         }
 
@@ -363,11 +366,11 @@ class Client {
             return sharedMemory.getInt(GameOffset + 332);
         }
 
-        public boolean getFlag(int f) {
+        public boolean getFlag(final int f) {
             return sharedMemory.get(GameOffset + 336 + f) != 0;
         }
 
-        public void setFlag(int f, boolean value) {
+        public void setFlag(final int f, final boolean value) {
             sharedMemory.put(GameOffset + 336 + f, (byte) (value ? 1 : 0));
         }
 
@@ -395,47 +398,47 @@ class Client {
             return parseString(GameOffset + 903, 41);
         }
 
-        public int groundHeight(int x, int y) {
+        public int groundHeight(final int x, final int y) {
             return sharedMemory.getInt(GameOffset + 944 + x * 1024 + y * 4);
         }
 
-        public boolean walkable(int x, int y) {
+        public boolean walkable(final int x, final int y) {
             return sharedMemory.get(GameOffset + 263088 + x * 1024 + y) != 0;
         }
 
-        public boolean buildable(int x, int y) {
+        public boolean buildable(final int x, final int y) {
             return sharedMemory.get(GameOffset + 1311664 + x * 256 + y) != 0;
         }
 
-        public boolean visible(int x, int y) {
+        public boolean visible(final int x, final int y) {
             return sharedMemory.get(GameOffset + 1377200 + x * 256 + y) != 0;
         }
 
-        public boolean explored(int x, int y) {
+        public boolean explored(final int x, final int y) {
             return sharedMemory.get(GameOffset + 1442736 + x * 256 + y) != 0;
         }
 
-        public boolean hasCreep(int x, int y) {
+        public boolean hasCreep(final int x, final int y) {
             return sharedMemory.get(GameOffset + 1508272 + x * 256 + y) != 0;
         }
 
-        public boolean occupied(int x, int y) {
+        public boolean occupied(final int x, final int y) {
             return sharedMemory.get(GameOffset + 1573808 + x * 256 + y) != 0;
         }
 
-        public short mapTileRegionID(int x, int y) {
+        public short mapTileRegionID(final int x, final int y) {
             return sharedMemory.getShort(GameOffset + 1639344 + x * 512 + y * 2);
         }
 
-        public short mapSplitTilesMiniTileMask(int idx) {
+        public short mapSplitTilesMiniTileMask(final int idx) {
             return sharedMemory.getShort(GameOffset + 1770416 + idx * 2);
         }
 
-        public short mapSplitTilesRegion1(int idx) {
+        public short mapSplitTilesRegion1(final int idx) {
             return sharedMemory.getShort(GameOffset + 1780416 + idx * 2);
         }
 
-        public short mapSplitTilesRegion2(int idx) {
+        public short mapSplitTilesRegion2(final int idx) {
             return sharedMemory.getShort(GameOffset + 1790416 + idx * 2);
         }
 
@@ -443,7 +446,7 @@ class Client {
             return sharedMemory.getInt(RegionOffset);
         }
 
-        public RegionData getRegion(int index) {
+        public RegionData getRegion(final int index) {
             return new RegionData(index);
         }
 
@@ -451,11 +454,11 @@ class Client {
             return sharedMemory.get(StartOffset);
         }
 
-        public int startLocationX(int location) {
+        public int startLocationX(final int location) {
             return sharedMemory.get(StartOffset + location * 8 + 4);
         }
 
-        public int startLocationY(int location) {
+        public int startLocationY(final int location) {
             return sharedMemory.get(StartOffset + location * 8 + 8);
         }
 
@@ -483,7 +486,7 @@ class Client {
             return sharedMemory.getInt(SelectionOffset);
         }
 
-        public int selectedUnit(int idx) {
+        public int selectedUnit(final int idx) {
             return sharedMemory.getInt(SelectionOffset + 4 + 4 * idx);
         }
 
@@ -503,7 +506,7 @@ class Client {
             return sharedMemory.getInt(EventOffset);
         }
 
-        private Event event(int idx) {
+        private Event event(final int idx) {
             return new Event(idx);
         }
 
@@ -511,16 +514,17 @@ class Client {
             return sharedMemory.getInt(StringOffset);
         }
 
-        public String eventString(int s) {
+        public String eventString(final int s) {
             return parseString(StringOffset + 4 + 256 * s, 256);
         }
 
-        public int addString(String s) {
-            int len = s.length() + 1;
-            if (len >= 1024)
+        public int addString(final String s) {
+            final int len = s.length() + 1;
+            if (len >= 1024) {
                 throw new StringIndexOutOfBoundsException();
-            int at = sharedMemory.getInt(StringOffset + 256004);
-            byte b[] = new byte[len];
+            }
+            final int at = sharedMemory.getInt(StringOffset + 256004);
+            final byte b[] = new byte[len];
             enc.encode(CharBuffer.wrap(s), ByteBuffer.wrap(b), true);
             sharedMemory.position(StringOffset + 256008 + at * 1024);
             sharedMemory.put(b, 0, len);
@@ -529,8 +533,8 @@ class Client {
             return at;
         }
 
-        public void addShape(Shape shape) {
-            int at = sharedMemory.getInt(ShapeOffset);
+        public void addShape(final Shape shape) {
+            final int at = sharedMemory.getInt(ShapeOffset);
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 4, shape.type);
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 8, shape.coordType);
             sharedMemory.putInt(ShapeOffset + at * Shape.SIZE + 12, shape.x1);
@@ -544,16 +548,16 @@ class Client {
             sharedMemory.putInt(ShapeOffset, at + 1);
         }
 
-        public void addCommand(Command command) {
-            int at = sharedMemory.getInt(CommandOffset);
+        public void addCommand(final Command command) {
+            final int at = sharedMemory.getInt(CommandOffset);
             sharedMemory.putInt(CommandOffset + at * Command.SIZE + 4, command.type);
             sharedMemory.putInt(CommandOffset + at * Command.SIZE + 8, command.value1);
             sharedMemory.putInt(CommandOffset + at * Command.SIZE + 12, command.value2);
             sharedMemory.putInt(CommandOffset, at + 1);
         }
 
-        public void addUnitCommand(UnitCommand command) {
-            int at = sharedMemory.getInt(UnitCommandOffset);
+        public void addUnitCommand(final UnitCommand command) {
+            final int at = sharedMemory.getInt(UnitCommandOffset);
             sharedMemory.putInt(UnitCommandOffset + at * UnitCommand.SIZE + 4, command.type);
             sharedMemory.putInt(UnitCommandOffset + at * UnitCommand.SIZE + 8, command.unit);
             sharedMemory.putInt(UnitCommandOffset + at * UnitCommand.SIZE + 12, command.target);
@@ -565,9 +569,9 @@ class Client {
 
         public class ForceData {
             static final int SIZE = 32;
-            private int id = 0;
+            private final int id;
 
-            public ForceData(int id) {
+            public ForceData(final int id) {
                 this.id = id;
             }
 
@@ -582,9 +586,9 @@ class Client {
 
         public class PlayerData {
             static final int SIZE = 5788;
-            private int id;
+            private final int id;
 
-            public PlayerData(int id) {
+            public PlayerData(final int id) {
                 this.id = id;
             }
 
@@ -608,11 +612,11 @@ class Client {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 36);
             }
 
-            public boolean isAlly(int otherPlayer) {
+            public boolean isAlly(final int otherPlayer) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 40 + otherPlayer) != 0;
             }
 
-            public boolean isEnemy(int otherPlayer) {
+            public boolean isEnemy(final int otherPlayer) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 52 + otherPlayer) != 0;
             }
 
@@ -676,47 +680,47 @@ class Client {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 108);
             }
 
-            public int supplyTotal(int race) {
+            public int supplyTotal(final int race) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 112 + race * 4);
             }
 
-            public int supplyUsed(int race) {
+            public int supplyUsed(final int race) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 124 + race * 4);
             }
 
-            public int allUnitCount(int unitType) {
+            public int allUnitCount(final int unitType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 136 + unitType * 4);
             }
 
-            public int visibleUnitCount(int unitType) {
+            public int visibleUnitCount(final int unitType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 1072 + unitType * 4);
             }
 
-            public int completedUnitCount(int unitType) {
+            public int completedUnitCount(final int unitType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 2008 + unitType * 4);
             }
 
-            public int deadUnitCount(int unitType) {
+            public int deadUnitCount(final int unitType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 2944 + unitType * 4);
             }
 
-            public int killedUnitCount(int unitType) {
+            public int killedUnitCount(final int unitType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 3880 + unitType * 4);
             }
 
-            public int upgradeLevel(int upgradeType) {
+            public int upgradeLevel(final int upgradeType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 4816 + upgradeType * 4);
             }
 
-            public boolean hasResearched(int techType) {
+            public boolean hasResearched(final int techType) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 5068 + techType) != 0;
             }
 
-            public boolean isResearching(int techType) {
+            public boolean isResearching(final int techType) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 5115 + techType) != 0;
             }
 
-            public boolean isUpgrading(int upgradeType) {
+            public boolean isUpgrading(final int upgradeType) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 5162 + upgradeType) != 0;
             }
 
@@ -744,24 +748,24 @@ class Client {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 5248);
             }
 
-            public int maxUpgradeLevel(int upgradeType) {
+            public int maxUpgradeLevel(final int upgradeType) {
                 return sharedMemory.getInt(PlayerOffset + 4 + PlayerData.SIZE * id + 5252 + upgradeType * 4);
             }
 
-            public boolean isResearchAvailable(int techType) {
+            public boolean isResearchAvailable(final int techType) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 5504 + techType) != 0;
             }
 
-            public boolean isUnitAvailable(int unitType) {
+            public boolean isUnitAvailable(final int unitType) {
                 return sharedMemory.get(PlayerOffset + 4 + PlayerData.SIZE * id + 5551 + unitType) != 0;
             }
         }
 
         public class UnitData {
             static final int SIZE = 336;
-            private int id;
+            private final int id;
 
-            UnitData(int id) {
+            UnitData(final int id) {
                 this.id = id;
             }
 
@@ -909,7 +913,7 @@ class Client {
                 return sharedMemory.getInt(UnitOffset + 8 + UnitData.SIZE * id + 152);
             }
 
-            public int trainingQueue(int pos) {
+            public int trainingQueue(final int pos) {
                 return sharedMemory.getInt(UnitOffset + 8 + UnitData.SIZE * id + 156 + pos * 4);
             }
 
@@ -1133,7 +1137,7 @@ class Client {
                 return sharedMemory.get(UnitOffset + 8 + UnitData.SIZE * id + 308) != 0;
             }
 
-            public boolean isVisible(int player) {
+            public boolean isVisible(final int player) {
                 return sharedMemory.get(UnitOffset + 8 + UnitData.SIZE * id + 309 + player) != 0;
             }
 
@@ -1156,9 +1160,9 @@ class Client {
 
         public class BulletData {
             static final int SIZE = 80;
-            private int index;
+            private final int index;
 
-            BulletData(int index) {
+            BulletData(final int index) {
                 this.index = index;
             }
 
@@ -1218,16 +1222,16 @@ class Client {
                 return sharedMemory.get(BulletOffset + index * BulletData.SIZE + 64) != 0;
             }
 
-            public boolean isVisible(int player) {
+            public boolean isVisible(final int player) {
                 return sharedMemory.get(BulletOffset + index * BulletData.SIZE + 65 + player) != 0;
             }
         }
 
         public class RegionData {
             private static final int SIZE = 1068;
-            int index = 0;
+            int index;
 
-            RegionData(int index) {
+            RegionData(final int index) {
                 this.index = index;
             }
 
@@ -1271,7 +1275,7 @@ class Client {
                 return sharedMemory.getInt(RegionOffset + 4 + index * RegionData.SIZE + 36);
             }
 
-            public int neighbor(int n) {
+            public int neighbor(final int n) {
                 return sharedMemory.getInt(RegionOffset + 4 + index * RegionData.SIZE + 40 + n * 4);
             }
 
@@ -1286,9 +1290,9 @@ class Client {
 
         public class Event {
             private static final int SIZE = 12;
-            int idx;
+            final int idx;
 
-            private Event(int idx) {
+            private Event(final int idx) {
                 this.idx = idx;
             }
 

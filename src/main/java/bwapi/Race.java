@@ -49,7 +49,7 @@ public enum Race {
 
     public final int id;
 
-    Race(int id) {
+    Race(final int id) {
         this.id = id;
     }
 

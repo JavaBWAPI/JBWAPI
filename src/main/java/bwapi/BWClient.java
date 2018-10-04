@@ -3,7 +3,7 @@ package bwapi;
 import java.util.Objects;
 
 public class BWClient {
-    private BWListener eventListener;
+    private final BWListener eventListener;
 
     private Client client;
     private EventHandler handler;
@@ -22,11 +22,11 @@ public class BWClient {
         while (client == null) {
             try {
                 client = new Client();
-            } catch (Throwable t) {
+            } catch (final Exception t) {
                 System.err.println("Game table mapping not found.");
                 try {
                     Thread.sleep(1000);
-                } catch (Throwable ignored) {
+                } catch (final Exception ignored) {
                 }
             }
         }
@@ -40,7 +40,7 @@ public class BWClient {
             while (client.data().isInGame()) {
                 client.update(handler);
             }
-        } catch (Throwable exception) {
+        } catch (final Exception exception) {
             exception.printStackTrace();
         }
     }

@@ -1451,11 +1451,11 @@ class UnitTypeContainer {
     static List<Map<UnitType, Integer>> reqUnitsMap = reqUnitsInit();
 
     private static List<Map<UnitType, Integer>> reqUnitsInit() {
-        List<Map<UnitType, Integer>> req = new ArrayList<>(UnitType.values().length);
+        final List<Map<UnitType, Integer>> req = new ArrayList<>(UnitType.values().length);
         // Add the whatBuilds types to the required units map
-        for (UnitType i : UnitType.values()) {
+        for (final UnitType i : UnitType.values()) {
             req.add(new HashMap<>());
-            Map.Entry<UnitType, Integer> wb = i.whatBuilds();
+            final Map.Entry<UnitType, Integer> wb = i.whatBuilds();
             if (wb.getKey() != UnitType.None) {
                 req.get(i.id).put(wb.getKey(), wb.getValue());
             }

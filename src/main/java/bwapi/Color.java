@@ -16,7 +16,9 @@ public class Color {
     public final static Color Cyan = new Color(128);
     public final static Color Black = new Color(0);
     public final static Color Grey = new Color(74);
-    private static RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
+
+    private static final RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
+
     private static final RGBQUAD defaultPalette[] = {
             new RGBQUAD(0, 0, 0), RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
@@ -51,7 +53,8 @@ public class Color {
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, new RGBQUAD(255, 255, 255)
     };
-    private static boolean rgbInitialized = false;
+
+    private static boolean rgbInitialized;
     private static byte closestColor[][][] = new byte[64][64][64];
     public final int id;
 
@@ -63,20 +66,20 @@ public class Color {
         this.id = id;
     }
 
-    private static int getBestIdFor(int red, int green, int blue) {
+    private static int getBestIdFor(final int red, final int green, final int blue) {
 
         int min_dist = 3 * 256 * 256;
         int best_id = 0;
         for (int id = 0; id < 255; ++id) {
-            RGBQUAD p = defaultPalette[id];
+            final RGBQUAD p = defaultPalette[id];
             if (p.rgbReserved != 0) {
                 continue;
             }
-            int r = red - p.rgbRed;
-            int g = green - p.rgbGreen;
-            int b = blue - p.rgbBlue;
+            final int r = red - p.rgbRed;
+            final int g = green - p.rgbGreen;
+            final int b = blue - p.rgbBlue;
 
-            int distance = r * r + g * g + b * b;
+            final int distance = r * r + g * g + b * b;
             if (distance < min_dist) {
                 min_dist = distance;
                 best_id = id;
@@ -88,7 +91,7 @@ public class Color {
         return best_id;
     }
 
-    private static int getRGBIndex(int red, int green, int blue) {
+    private static int getRGBIndex(final int red, final int green, final int blue) {
         if (!rgbInitialized) {
             rgbInitialized = true;
             for (int r = 0; r < 64; ++r) {
@@ -115,7 +118,7 @@ public class Color {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (!(o instanceof Color)) {
             return false;
         }
@@ -129,10 +132,10 @@ public class Color {
 
     /// BROODWAR COLOR IMPLEMENTATION
     private static class RGBQUAD {
-        byte rgbRed;
-        byte rgbGreen;
-        byte rgbBlue;
-        byte rgbReserved;
+        final byte rgbRed;
+        final byte rgbGreen;
+        final byte rgbBlue;
+        final byte rgbReserved;
 
         RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue) {
             this(rgbRed, rgbGreen, rgbBlue, 0);

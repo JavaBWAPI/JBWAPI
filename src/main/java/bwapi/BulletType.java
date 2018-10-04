@@ -56,7 +56,7 @@ public enum BulletType {
 
     private int id;
 
-    BulletType(int id) {
+    BulletType(final int id) {
         this.id = id;
     }
 }

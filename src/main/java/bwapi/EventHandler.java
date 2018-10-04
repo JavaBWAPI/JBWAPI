@@ -3,8 +3,8 @@ package bwapi;
 
 class EventHandler implements Client.EventHandler {
     private final BWListener eventListener;
-    private Game game;
-    private Client.GameData data;
+    private final Game game;
+    private final Client.GameData data;
     private int frames;
 
     public EventHandler(final BWListener eventListener, final Client.GameData data) {
@@ -13,7 +13,7 @@ class EventHandler implements Client.EventHandler {
         this.data = data;
     }
 
-    public void operation(Client.GameData.Event event) {
+    public void operation(final Client.GameData.Event event) {
         final Unit u;
         switch (event.type()) {
             case 0: //MatchStart

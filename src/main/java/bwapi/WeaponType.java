@@ -400,7 +400,7 @@ public enum WeaponType {
     };
     private int id;
 
-    WeaponType(int id) {
+    WeaponType(final int id) {
         this.id = id;
     }
 

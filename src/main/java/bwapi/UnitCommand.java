@@ -326,7 +326,9 @@ public class UnitCommand {
 
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof UnitCommand)) return false;
+        if (!(o instanceof UnitCommand)) {
+            return false;
+        }
 
         final UnitCommand that = (UnitCommand) o;
 

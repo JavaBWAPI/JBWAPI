@@ -11,7 +11,7 @@ public enum UnitSizeType {
 
     public final int id;
 
-    UnitSizeType(int id) {
+    UnitSizeType(final int id) {
         this.id = id;
     }
 }

@@ -35,7 +35,7 @@ public class Unit {
     private int lastPositionUpdate = -1;
     private int lastTypeUpdate = -1;
     private int lastPlayerUpdate = -1;
-    private int lastCommandFrame = 0;
+    private int lastCommandFrame;
     private UnitCommand lastCommand;
 
 
@@ -158,10 +158,10 @@ public class Unit {
         /////// Compute distance
 
         // retrieve left/top/right/bottom values for calculations
-        int left = target.x - 1;
-        int top = target.y - 1;
-        int right = target.x + 1;
-        int bottom = target.y + 1;
+        final int left = target.x - 1;
+        final int top = target.y - 1;
+        final int right = target.x + 1;
+        final int bottom = target.y + 1;
 
         // compute x distance
         int xDist = getLeft() - right;
@@ -199,10 +199,10 @@ public class Unit {
         /////// Compute distance
 
         // retrieve left/top/right/bottom values for calculations
-        int left = target.getLeft() - 1;
-        int top = target.getTop() - 1;
-        int right = target.getRight() + 1;
-        int bottom = target.getBottom() + 1;
+        final int left = target.getLeft() - 1;
+        final int top = target.getTop() - 1;
+        final int right = target.getRight() + 1;
+        final int bottom = target.getBottom() + 1;
 
         // compute x distance
         int xDist = getLeft() - right;
@@ -488,7 +488,7 @@ public class Unit {
                 getTop() - radius,
                 getRight() + radius,
                 getBottom() + radius,
-                (u -> getDistance(u) <= radius));
+                u -> getDistance(u) <= radius);
     }
 
     public Set<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
@@ -497,14 +497,14 @@ public class Unit {
             return new HashSet<>();
         }
 
-        int max = getPlayer().weaponMaxRange(weapon);
+        final int max = getPlayer().weaponMaxRange(weapon);
 
         return game.getUnitsInRectangle(
                 getLeft() - max,
                 getTop() - max,
                 getRight() + max,
                 getBottom() + max,
-                (u -> {
+                u -> {
                     // Unit check and unit status
                     if (u == this || u.isInvincible()) {
                         return false;
@@ -526,7 +526,7 @@ public class Unit {
                             (!weapon.targetsNonBuilding() || ut.isBuilding()) &&
                             (!weapon.targetsNonRobotic() || ut.isRobotic()) &&
                             (!weapon.targetsOrgOrMech() || (!ut.isOrganic() && !ut.isMechanical()));
-                }));
+                });
     }
 
     public boolean hasNuke() {
@@ -698,12 +698,12 @@ public class Unit {
         }
 
         // Retrieve the min and max weapon ranges
-        int minRange = wpn.minRange();
-        int maxRange = getPlayer().weaponMaxRange(wpn);
+        final int minRange = wpn.minRange();
+        final int maxRange = getPlayer().weaponMaxRange(wpn);
 
         // Check if the distance to the unit is within the weapon range
-        int distance = getDistance(target);
-        return (minRange != 0 ? minRange < distance : true) && distance <= maxRange;
+        final int distance = getDistance(target);
+        return (minRange == 0 || minRange < distance) && distance <= maxRange;
     }
 
     public boolean isIrradiated() {
@@ -1385,7 +1385,7 @@ public class Unit {
             if (!getType().producesLarva()) {
                 return false;
             } else {
-                for (Unit larva : getLarva()) {
+                for (final Unit larva : getLarva()) {
                     if (larva.canCommand()) {
                         return true;
                     }
@@ -1800,10 +1800,7 @@ public class Unit {
             return false;
         }
 
-        if ((getType() != Terran_Medic && !canAttackUnit(false)) || !canMove(false))
-            return false;
-
-        return true;
+        return (getType() == Terran_Medic || canAttackUnit(false)) && canMove(false);
     }
 
     public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped) {
@@ -1849,8 +1846,9 @@ public class Unit {
                 if (getScarabCount() <= 0) {
                     return false;
                 }
-            } else
+            } else {
                 return false;
+            }
         }
         if (ut == Zerg_Lurker) {
             if (!isBurrowed()) {
@@ -1895,7 +1893,7 @@ public class Unit {
 
         final UnitType type = getType();
         final boolean targetInAir = targetUnit.isFlying();
-        WeaponType weapon = targetInAir ? type.airWeapon() : type.groundWeapon();
+        final WeaponType weapon = targetInAir ? type.airWeapon() : type.groundWeapon();
 
         if (weapon == WeaponType.None) {
             switch (type) {
@@ -1913,11 +1911,13 @@ public class Unit {
             }
         }
 
-        if (!type.canMove() && !isInWeaponRange(targetUnit))
+        if (!type.canMove() && !isInWeaponRange(targetUnit)) {
             return false;
+        }
 
-        if (type == Zerg_Lurker && !isInWeaponRange(targetUnit))
+        if (type == Zerg_Lurker && !isInWeaponRange(targetUnit)) {
             return false;
+        }
 
         return !equals(targetUnit);
     }
@@ -2143,7 +2143,7 @@ public class Unit {
             if (!isConstructing() && isCompleted()) {
                 return true;
             }
-            for (Unit larva : getLarva()) {
+            for (final Unit larva : getLarva()) {
                 if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
                     return true;
                 }
@@ -2187,7 +2187,7 @@ public class Unit {
         if (getType().producesLarva()) {
             if (uType.whatBuilds().getKey() == Zerg_Larva) {
                 boolean foundCommandableLarva = false;
-                for (Unit larva : getLarva()) {
+                for (final Unit larva : getLarva()) {
                     if (larva.canTrain(true)) {
                         foundCommandableLarva = true;
                         thisUnit = larva;
@@ -2226,7 +2226,7 @@ public class Unit {
             if (!isConstructing() && isCompleted() && (!ut.isBuilding() || isIdle())) {
                 return true;
             }
-            for (Unit larva : getLarva()) {
+            for (final Unit larva : getLarva()) {
                 if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
                     return true;
                 }
@@ -2264,14 +2264,15 @@ public class Unit {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canMorph(false))
+        if (checkCanIssueCommandType && !canMorph(false)) {
             return false;
+        }
 
         Unit thisUnit = this;
         if (getType().producesLarva()) {
             if (uType.whatBuilds().getKey() == Zerg_Larva) {
                 boolean foundCommandableLarva = false;
-                for (Unit larva : getLarva()) {
+                for (final Unit larva : getLarva()) {
                     if (larva.canMorph(true)) {
                         foundCommandableLarva = true;
                         thisUnit = larva;
@@ -2372,14 +2373,15 @@ public class Unit {
             return false;
         }
 
-        if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted()))
+        if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted())) {
             return false;
-
-        int nextLvl = self.getUpgradeLevel(type) + 1;
+        }
 
         if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
             return false;
         }
+
+        final int nextLvl = self.getUpgradeLevel(type) + 1;
 
         if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
             return false;
@@ -2782,11 +2784,12 @@ public class Unit {
             return false;
         }
 
-        final UnitType ut = getType();
-
         if (!isCompleted()) {
             return false;
         }
+
+        final UnitType ut = getType();
+
         if (isBurrowed() && ut != Zerg_Lurker) {
             return false;
         }
@@ -2838,13 +2841,15 @@ public class Unit {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canRepair(false))
+        if (checkCanIssueCommandType && !canRepair(false)) {
             return false;
+        }
 
-        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false))
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
+        }
 
-        UnitType targType = targetUnit.getType();
+        final UnitType targType = targetUnit.getType();
         if (targType.getRace() != Terran || !targType.isMechanical()) {
             return false;
         }
@@ -3066,8 +3071,8 @@ public class Unit {
             return false;
         }
 
-        int thisUnitSpaceProvided = getType().spaceProvided();
-        int targetSpaceProvided = targetUnit.getType().spaceProvided();
+        final int thisUnitSpaceProvided = getType().spaceProvided();
+        final int targetSpaceProvided = targetUnit.getType().spaceProvided();
         if (thisUnitSpaceProvided <= 0 && targetSpaceProvided <= 0) {
             return false;
         }
@@ -3083,12 +3088,12 @@ public class Unit {
         if (unitToBeLoaded.isBurrowed()) {
             return false;
         }
-
         final Unit unitThatLoads = thisUnitSpaceProvided > 0 ? this : targetUnit;
-        final UnitType unitThatLoadsType = unitThatLoads.getType();
+
         if (unitThatLoads.isHallucination()) {
             return false;
         }
+        final UnitType unitThatLoadsType = unitThatLoads.getType();
 
         if (unitThatLoadsType == Terran_Bunker) {
             if (!unitThatLoadsType.isOrganic() || unitThatLoadsType.getRace() != Terran) {
@@ -3100,7 +3105,7 @@ public class Unit {
         }
 
         int freeSpace = thisUnitSpaceProvided > 0 ? thisUnitSpaceProvided : targetSpaceProvided;
-        for (Unit u : unitThatLoads.getLoadedUnits()) {
+        for (final Unit u : unitThatLoads.getLoadedUnits()) {
             final int requiredSpace = u.getType().spaceRequired();
             if (requiredSpace > 0 && requiredSpace < 8) {
                 freeSpace -= requiredSpace;
@@ -3322,8 +3327,9 @@ public class Unit {
             return false;
         }
 
-        if (checkCommandibilityGrouped && !canCommandGrouped(false))
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
+        }
 
         return canRightClickPositionGrouped(false, false) || canRightClickUnitGrouped(false, false);
     }
@@ -3615,10 +3621,11 @@ public class Unit {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canCancelTrainSlot(false))
+        if (checkCanIssueCommandType && !canCancelTrainSlot(false)) {
             return false;
+        }
 
-        return isTraining() && slot >= 0 && (getTrainingQueue().size() > slot);
+        return isTraining() && slot >= 0 && getTrainingQueue().size() > slot;
     }
 
     public boolean canCancelMorph() {
@@ -4093,14 +4100,15 @@ public class Unit {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canPlaceCOP(checkCommandibility))
+        if (checkCanIssueCommandType && !canPlaceCOP(checkCommandibility)) {
             return false;
+        }
 
         return game.canBuildHere(target, getType(), this, true);
     }
 
 
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (!(that instanceof Unit)) {
             return false;
         }

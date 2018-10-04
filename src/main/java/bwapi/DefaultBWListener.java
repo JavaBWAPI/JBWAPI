@@ -5,54 +5,54 @@ public class DefaultBWListener implements BWListener {
     public void onStart() {
     }
 
-    public void onEnd(boolean b) {
+    public void onEnd(final boolean b) {
     }
 
     public void onFrame() {
     }
 
-    public void onSendText(String s) {
+    public void onSendText(final String s) {
     }
 
-    public void onReceiveText(Player player, String s) {
+    public void onReceiveText(final Player player, final String s) {
     }
 
-    public void onPlayerLeft(Player player) {
+    public void onPlayerLeft(final Player player) {
     }
 
-    public void onNukeDetect(Position position) {
+    public void onNukeDetect(final Position position) {
     }
 
-    public void onUnitDiscover(Unit unit) {
+    public void onUnitDiscover(final Unit unit) {
     }
 
-    public void onUnitEvade(Unit unit) {
+    public void onUnitEvade(final Unit unit) {
     }
 
-    public void onUnitShow(Unit unit) {
+    public void onUnitShow(final Unit unit) {
     }
 
-    public void onUnitHide(Unit unit) {
+    public void onUnitHide(final Unit unit) {
     }
 
-    public void onUnitCreate(Unit unit) {
+    public void onUnitCreate(final Unit unit) {
     }
 
-    public void onUnitDestroy(Unit unit) {
+    public void onUnitDestroy(final Unit unit) {
     }
 
-    public void onUnitMorph(Unit unit) {
+    public void onUnitMorph(final Unit unit) {
     }
 
-    public void onUnitRenegade(Unit unit) {
+    public void onUnitRenegade(final Unit unit) {
     }
 
-    public void onSaveGame(String s) {
+    public void onSaveGame(final String s) {
     }
 
-    public void onUnitComplete(Unit unit) {
+    public void onUnitComplete(final Unit unit) {
     }
 
-    public void onPlayerDropped(Player player) {
+    public void onPlayerDropped(final Player player) {
     }
 }

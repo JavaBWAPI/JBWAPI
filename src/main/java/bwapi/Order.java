@@ -202,9 +202,9 @@ public enum Order {
     }
 
 
-    private int id;
+    public final int id;
 
-    Order(int id) {
+    Order(final int id) {
         this.id = id;
     }
 }

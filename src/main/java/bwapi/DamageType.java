@@ -11,7 +11,7 @@ public enum DamageType {
 
     public final int id;
 
-    DamageType(int id) {
+    DamageType(final int id) {
         this.id = id;
     }
 }

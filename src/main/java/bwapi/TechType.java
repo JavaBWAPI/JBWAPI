@@ -182,7 +182,7 @@ public enum TechType {
 
     public final int id;
 
-    TechType(int id) {
+    TechType(final int id) {
         this.id = id;
     }
 

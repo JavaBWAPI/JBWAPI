@@ -44,7 +44,7 @@ public class Region {
         for (int i = 0; i < regionData.neighborCount(); i++) {
             final Region region = game.getRegion(regionData.neighbor(i));
             neighbours.add(region);
-            int d = getDistance(region);
+            final int d = getDistance(region);
             if (region.isAccessible()) {
                 if (d < accessibleBestDist) {
                     closestAccessibleRegion = region;
@@ -115,10 +115,10 @@ public class Region {
 
     public Set<Unit> getUnits() {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),
-                (u -> equals(u.getRegion())));
+                u -> equals(u.getRegion()));
     }
 
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (!(that instanceof Region)) {
             return false;
         }
