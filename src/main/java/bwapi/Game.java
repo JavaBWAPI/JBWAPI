@@ -17,7 +17,7 @@ import static bwapi.types.Race.Zerg;
 import static bwapi.types.UnitType.*;
 
 public class Game {
-    private final GameData gameData;
+    private GameData gameData;
 
     // CONSTANT
     private Player[] players;
@@ -50,6 +50,8 @@ public class Game {
     private List<TilePosition> startLocations;
     private int mapWidth;
     private int mapHeight;
+    private int mapPixelWidth;
+    private int mapPixelHeight;
     private String mapFileName;
     private String mapPathName;
     private String mapName;
@@ -175,6 +177,9 @@ public class Game {
             mapSplitTilesRegion1[i] = gameData.mapSplitTilesRegion1(i);
             mapSplitTilesRegion2[i] = gameData.mapSplitTilesRegion2(i);
         }
+
+        mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
+        mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
     }
 
     void unitShow(final int id) {
@@ -192,6 +197,10 @@ public class Game {
 
     void unitHide(final int id) {
         visibleUnits.remove(id);
+    }
+
+    void updateUnitPositions(final int frame) {
+        getAllUnits().forEach(u -> u.updatePosition(frame));
     }
 
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
@@ -407,6 +416,14 @@ public class Game {
 
      public int mapHeight() {
         return mapHeight;
+     }
+
+     public int mapPixelWidth() {
+        return mapPixelWidth;
+     }
+
+     public int mapPixelHeight() {
+        return mapPixelHeight;
      }
 
      public String mapFileName() {

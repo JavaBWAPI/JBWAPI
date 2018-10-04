@@ -42,8 +42,8 @@ abstract class Point {
 	 */
 	public boolean isValid(final Game game) {
 		return x >= 0 && y >= 0 &&
-				scalar * x < game.mapWidth() * TilePosition.SIZE_IN_PIXELS &&
-				scalar * y < game.mapHeight() * TilePosition.SIZE_IN_PIXELS;
+				scalar * x < game.mapPixelWidth() &&
+				scalar * y < game.mapPixelHeight();
 	}
 
 	public int hashCode() {

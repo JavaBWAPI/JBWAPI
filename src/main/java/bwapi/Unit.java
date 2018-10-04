@@ -34,6 +34,10 @@ public class Unit {
     // variable
     private Player player;
     private UnitType unitType;
+    private Position position;
+    private int lastPositionUpdate = -1;
+    private int lastTypeUpdate = -1;
+    private int lastPlayerUpdate = -1;
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
 
@@ -41,8 +45,9 @@ public class Unit {
         this.unitData = unitData;
         this.game = game;
 
-        updateType();
-        updatePlayer();
+        updateType(0);
+        updatePlayer(0);
+        updatePosition(0);
 
         initialType = getType();
         initialResources = getResources();
@@ -76,7 +81,7 @@ public class Unit {
     }
 
     public Position getPosition() {
-        return new Position(unitData.positionX(), unitData.positionY());
+        return position;
     }
 
     public TilePosition getTilePosition() {
@@ -3933,11 +3938,25 @@ public class Unit {
         return getID();
     }
 
-    void updateType() {
+    void updateType(final int frame) {
+        if (frame > lastTypeUpdate) {
+            lastTypeUpdate = frame;
+            position = new Position(unitData.positionX(), unitData.positionY());
+        }
         unitType = UnitType.unitTypes[unitData.type()];
     }
 
-    void updatePlayer() {
-        player = game.getPlayer(unitData.player());
+    void updatePlayer(final int frame) {
+        if (frame > lastPlayerUpdate) {
+            lastPlayerUpdate = frame;
+            player = game.getPlayer(unitData.player());
+        }
+    }
+
+    void updatePosition(final int frame) {
+        if (frame > lastPositionUpdate) {
+            lastPositionUpdate = frame;
+            position = new Position(unitData.positionX(), unitData.positionY());
+        }
     }
 }
