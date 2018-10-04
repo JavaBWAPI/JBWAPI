@@ -156,6 +156,6 @@ public class Color {
                 }
             }
         }
-        return closestColor[(byte)red >> 2][(byte)green >> 2][(byte)blue >> 2];
+        return closestColor[(byte)(red >> 2)][(byte)(green >> 2)][(byte)(blue >> 2)];
     }
 }
