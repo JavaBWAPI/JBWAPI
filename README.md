@@ -18,4 +18,8 @@ Have a similar (java) interface to BWMirror to make porting bwmirror bots easy w
  - fast (citation needed)
 
 ### compilation
+`mvnw.cmd package`
+
+or if you already have maven installed
+
 `mvn package`
