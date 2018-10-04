@@ -3,8 +3,7 @@ package game;
 import bwapi.BWClient;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
-import bwapi.point.Position;
-import bwapi.values.Color;
+import bwapi.Color;
 
 class DrawTest extends DefaultBWListener {
     final BWClient bwClient;

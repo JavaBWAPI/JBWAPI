@@ -1,7 +1,5 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client.GameData.ForceData;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,7 +9,7 @@ public class Force {
     private final int id;
     private final String name;
 
-    Force(final ForceData forceData, final Game game) {
+    Force(final Client.GameData.ForceData forceData, final Game game) {
         this.game = game;
         this.id = forceData.id();
         this.name = forceData.name();

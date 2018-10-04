@@ -12,9 +12,9 @@
 
 package bwem.util;
 
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.CheckMode;
 import bwem.map.MapImpl;
 import org.apache.commons.lang3.tuple.ImmutablePair;

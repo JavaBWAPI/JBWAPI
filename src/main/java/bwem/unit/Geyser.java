@@ -13,7 +13,7 @@
 package bwem.unit;
 
 import bwapi.Unit;
-import bwapi.types.UnitType;
+import bwapi.UnitType;
 import bwem.map.Map;
 
 /**

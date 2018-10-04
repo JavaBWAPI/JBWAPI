@@ -1,8 +1,4 @@
 import bwapi.*;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.types.Race;
-import bwapi.types.UnitType;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

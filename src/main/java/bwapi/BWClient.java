@@ -1,9 +1,6 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client;
 import java.util.Objects;
-
-
 
 public class BWClient {
     private BWListener eventListener;

@@ -1,7 +1,5 @@
 package bwapi;
 
-import bwapi.point.Position;
-
 public class DefaultBWListener implements BWListener {
 
     public void onStart() {}

@@ -12,7 +12,7 @@
 
 package bwem.area;
 
-import bwapi.point.WalkPosition;
+import bwapi.WalkPosition;
 import bwem.area.typedef.AreaId;
 import bwem.tile.MiniTile;
 import bwem.tile.MiniTileImpl;

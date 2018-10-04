@@ -14,9 +14,9 @@ package bwem.area;
 
 import static bwem.area.typedef.AreaId.UNINITIALIZED;
 
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
-import bwapi.types.UnitType;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
+import bwapi.UnitType;
 import bwem.Base;
 import bwem.BaseImpl;
 import bwem.CheckMode;

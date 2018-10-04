@@ -16,7 +16,7 @@ import bwem.area.typedef.AreaId;
 import bwem.map.TerrainData;
 import bwem.typedef.Altitude;
 import bwem.unit.Neutral;
-import bwapi.point.TilePosition;
+import bwapi.TilePosition;
 
 /**
  * Corresponds to BWAPI/Starcraft's concept of tile (32x32 pixels).<br>

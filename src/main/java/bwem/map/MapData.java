@@ -12,9 +12,9 @@
 
 package bwem.map;
 
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 
 import java.util.List;
 

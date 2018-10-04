@@ -4,6 +4,7 @@ Copyright notice for the Java port source files:
 ````
 // Original work Copyright (c) 2015, 2017, Igor Dimitrijevic
 // Modified work Copyright (c) 2017-2018 OpenBW Team
+// Modified work Copyright (c) 2018 Jasper
 
 //////////////////////////////////////////////////////////////////////////
 //

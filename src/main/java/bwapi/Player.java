@@ -1,22 +1,15 @@
 package bwapi;
 
-import bwapi.point.TilePosition;
-import bwapi.types.*;
-import bwapi.values.Color;
-
-import JavaBWAPIBackend.Client.GameData.PlayerData;
-import bwapi.values.TextColor;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static bwapi.types.UnitType.*;
-import static bwapi.types.UpgradeType.*;
-import static bwapi.types.WeaponType.*;
-import static bwapi.values.TextColor.*;
+import static bwapi.UnitType.*;
+import static bwapi.UpgradeType.*;
+import static bwapi.WeaponType.*;
+import static bwapi.TextColor.*;
 
 public class Player {
-    private final PlayerData playerData;
+    private final Client.GameData.PlayerData playerData;
     private final Game game;
     private final int id;
     private final String name;
@@ -26,7 +19,7 @@ public class Player {
     private final boolean neutral;
     private final TilePosition startLocation;
 
-    Player(final PlayerData playerData, final Game game) {
+    Player(final Client.GameData.PlayerData playerData, final Game game) {
         this.playerData = playerData;
         this.game = game;
 

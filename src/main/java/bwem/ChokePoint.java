@@ -12,7 +12,7 @@
 
 package bwem;
 
-import bwapi.point.WalkPosition;
+import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.typedef.CPPath;
 import bwem.unit.Neutral;

@@ -1,14 +1,7 @@
 package bwapi;
 
 
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.types.TechType;
-import bwapi.types.UnitCommandType;
-import bwapi.types.UnitType;
-import bwapi.types.UpgradeType;
-
-import static bwapi.types.UnitCommandType.*;
+import static bwapi.UnitCommandType.*;
 
 import java.util.*;
 

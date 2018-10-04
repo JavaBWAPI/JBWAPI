@@ -14,8 +14,8 @@ package bwem.map;
 
 import bwapi.Player;
 import bwapi.Unit;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.area.TempAreaInfo;
 import bwem.area.typedef.AreaId;
 import bwem.tile.MiniTile;

@@ -13,8 +13,8 @@
 package bwem.unit;
 
 import bwapi.Unit;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
+import bwapi.Position;
+import bwapi.TilePosition;
 import bwem.area.Area;
 import java.util.List;
 

@@ -13,9 +13,9 @@
 package bwem.unit;
 
 import bwapi.Unit;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.map.Map;
 import bwem.map.MapImpl;

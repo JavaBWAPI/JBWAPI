@@ -1,14 +1,10 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client.GameData.BulletData;
-import bwapi.point.Position;
-import bwapi.types.BulletType;
-
 public class Bullet {
-    private final BulletData bulletData;
+    private final Client.GameData.BulletData bulletData;
     private final Game game;
 
-    Bullet(final BulletData bulletData, final Game game) {
+    Bullet(final Client.GameData.BulletData bulletData, final Game game) {
         this.bulletData = bulletData;
         this.game = game;
     }

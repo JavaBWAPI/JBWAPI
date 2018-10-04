@@ -1,9 +1,6 @@
 package bwapi;
 
 
-import JavaBWAPIBackend.Client;
-import bwapi.point.Position;
-
 class EventHandler implements Client.EventHandler {
     private final BWListener eventListener;
     private Game game;

@@ -1,10 +1,5 @@
 package bwapi;
 
-import bwapi.point.TilePosition;
-import bwapi.types.UnitType;
-
-import java.util.Set;
-
 class BuildingPlacer {
     private static int MAX_RANGE = 64;
 

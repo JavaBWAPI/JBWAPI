@@ -12,9 +12,9 @@
 
 package bwem;
 
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.area.AreaInitializer;
 import bwem.area.AreaInitializerImpl;

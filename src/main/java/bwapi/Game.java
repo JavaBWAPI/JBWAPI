@@ -1,23 +1,15 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client;
-import JavaBWAPIBackend.Client.GameData;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
-import bwapi.types.*;
-import bwapi.values.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static bwapi.types.CommandType.*;
-import static bwapi.types.Race.Zerg;
-import static bwapi.types.UnitType.*;
+import static bwapi.CommandType.*;
+import static bwapi.Race.Zerg;
+import static bwapi.UnitType.*;
 
 public class Game {
-    private GameData gameData;
+    private Client.GameData gameData;
 
     // CONSTANT
     private Player[] players;
@@ -69,7 +61,7 @@ public class Game {
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
 
-    public Game(final GameData gameData) {
+    public Game(final Client.GameData gameData) {
         this.gameData = gameData;
     }
 

@@ -1,15 +1,11 @@
 package bwapi;
 
-import bwapi.point.Position;
-
-import JavaBWAPIBackend.Client.GameData.RegionData;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 public class Region {
-    private final RegionData regionData;
+    private final Client.GameData.RegionData regionData;
     private final Game game;
 
     private final Set<Region> neighbours = new HashSet<>();
@@ -28,7 +24,7 @@ public class Region {
     private final int boundsRight;
     private final int boundsBottom;
 
-    Region(final RegionData regionData, final Game game) {
+    Region(final Client.GameData.RegionData regionData, final Game game) {
         this.regionData = regionData;
         this.game = game;
         this.id = regionData.id();

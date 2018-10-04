@@ -1,10 +1,5 @@
 package bwapi;
 
-import JavaBWAPIBackend.Client.GameData.UnitData;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
-import bwapi.types.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,12 +8,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static bwapi.types.Order.*;
-import static bwapi.types.Race.*;
-import static bwapi.types.UnitType.*;
+import static bwapi.Order.*;
+import static bwapi.Race.*;
+import static bwapi.UnitType.*;
 
 public class Unit {
-    private final UnitData unitData;
+    private final Client.GameData.UnitData unitData;
     private final Game game;
 
     // static
@@ -41,7 +36,7 @@ public class Unit {
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
 
-    Unit(final UnitData unitData, final Game game) {
+    Unit(final Client.GameData.UnitData unitData, final Game game) {
         this.unitData = unitData;
         this.game = game;
 

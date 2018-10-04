@@ -12,8 +12,8 @@
 
 package bwem.area;
 
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.Base;
 import bwem.BaseImpl;
 import bwem.ChokePoint;

@@ -3,9 +3,9 @@ package marinehell;
 import java.util.*;
 
 import bwapi.*;
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
-import bwapi.types.UnitType;
+import bwapi.Position;
+import bwapi.TilePosition;
+import bwapi.UnitType;
 import bwem.BWEM;
 import bwem.Base;
 import bwem.ChokePoint;

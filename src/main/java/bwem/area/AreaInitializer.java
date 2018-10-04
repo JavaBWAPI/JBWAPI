@@ -12,7 +12,7 @@
 
 package bwem.area;
 
-import bwapi.point.TilePosition;
+import bwapi.TilePosition;
 import bwem.ChokePoint;
 import bwem.Markable;
 import bwem.area.typedef.GroupId;

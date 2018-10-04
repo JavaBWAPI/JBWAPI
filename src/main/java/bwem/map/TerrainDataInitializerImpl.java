@@ -13,8 +13,8 @@
 package bwem.map;
 
 import bwapi.Game;
-import bwapi.point.TilePosition;
-import bwapi.point.WalkPosition;
+import bwapi.TilePosition;
+import bwapi.WalkPosition;
 import bwem.CheckMode;
 import bwem.tile.MiniTile;
 import bwem.tile.MiniTileImpl;

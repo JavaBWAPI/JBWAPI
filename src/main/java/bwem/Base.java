@@ -12,8 +12,8 @@
 
 package bwem;
 
-import bwapi.point.Position;
-import bwapi.point.TilePosition;
+import bwapi.Position;
+import bwapi.TilePosition;
 import bwem.area.Area;
 import bwem.map.MapData;
 import bwem.unit.Geyser;
