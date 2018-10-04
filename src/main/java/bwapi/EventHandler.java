@@ -48,6 +48,8 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitEvade(game.getUnit(event.v1()));
                 break;
             case 10: // UnitShow
+                game.getUnit(event.v1()).updateType();
+                game.getUnit(event.v1()).updatePlayer();
                 game.unitShow(event.v1());
                 eventListener.onUnitShow(game.getUnit(event.v1()));
                 break;
@@ -64,10 +66,12 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitDestroy(game.getUnit(event.v1()));
                 break;
             case 14: //UnitMorph
+                game.getUnit(event.v1()).updateType();
                 eventListener.onUnitMorph(game.getUnit(event.v1()));
                 break;
             case 15: //UnitRenegade
-                eventListener.onUnitRenegade(game.getUnit((event.v1())));
+                game.getUnit(event.v1()).updatePlayer();
+                eventListener.onUnitRenegade(game.getUnit(event.v1()));
                 break;
             case 16: //SaveGame
                 eventListener.onSaveGame(data.eventString(event.v1()));

@@ -32,12 +32,17 @@ public class Unit {
     private final int replayID;
 
     // variable
+    private Player player;
+    private UnitType unitType;
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
 
     Unit(final UnitData unitData, final Game game) {
         this.unitData = unitData;
         this.game = game;
+
+        updateType();
+        updatePlayer();
 
         initialType = getType();
         initialResources = getResources();
@@ -63,11 +68,11 @@ public class Unit {
     }
 
     public Player getPlayer() {
-        return game.getPlayer(unitData.player());
+        return player;
     }
 
     public UnitType getType() {
-        return UnitType.unitTypes[unitData.type()];
+        return unitType;
     }
 
     public Position getPosition() {
@@ -3928,4 +3933,11 @@ public class Unit {
         return getID();
     }
 
+    void updateType() {
+        unitType = UnitType.unitTypes[unitData.type()];
+    }
+
+    void updatePlayer() {
+        player = game.getPlayer(unitData.player());
+    }
 }
