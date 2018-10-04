@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 
 class LittleEndianPipe {
     RandomAccessFile pipe;
+
     LittleEndianPipe(String name, String mode) throws FileNotFoundException {
         pipe = new RandomAccessFile(name, mode);
     }

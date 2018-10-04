@@ -242,7 +242,8 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    public static UnitType[] unitTypes = new UnitType[233+1];
+    public static UnitType[] unitTypes = new UnitType[233 + 1];
+
     static {
         Arrays.stream(UnitType.values()).forEach(v -> unitTypes[v.id] = v);
     }
@@ -251,6 +252,14 @@ public enum UnitType {
 
     UnitType(int id) {
         this.id = id;
+    }
+
+    public static int maxUnitWidth() {
+        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::width)).get().width();
+    }
+
+    public static int maxUnitHeight() {
+        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::height)).get().height();
     }
 
     public Race getRace() {
@@ -262,17 +271,15 @@ public enum UnitType {
         UnitType type = UnitTypeContainer.whatBuilds[id];
         int count = 1;
         // Set count to 0 if there is no whatBuilds and 2 if it's an archon
-        if ( type == UnitType.None ) {
+        if (type == UnitType.None) {
             count = 0;
-        }
-        else if (this == UnitType.Protoss_Archon || this == UnitType.Protoss_Dark_Archon ) {
+        } else if (this == UnitType.Protoss_Archon || this == UnitType.Protoss_Dark_Archon) {
             count = 2;
         }
         // Return the desired pair
         return new AbstractMap.SimpleEntry<>(type, count);
     }
 
-    
     public Map<UnitType, Integer> requiredUnits() {
         return UnitTypeContainer.reqUnitsMap.get(id);
     }
@@ -510,7 +517,7 @@ public enum UnitType {
     }
 
     public boolean isRefinery() {
-        switch (this )  {
+        switch (this) {
             case Terran_Refinery:
             case Zerg_Extractor:
             case Protoss_Assimilator:
@@ -568,7 +575,7 @@ public enum UnitType {
     }
 
     public boolean isPowerup() {
-        return  this == Powerup_Uraj_Crystal ||
+        return this == Powerup_Uraj_Crystal ||
                 this == Powerup_Khalis_Crystal ||
                 (this.id >= Powerup_Flag.id && this.id < None.id);
     }
@@ -600,24 +607,24 @@ public enum UnitType {
     public boolean producesCreep() {
         return producesLarva() ||
                 this == Zerg_Creep_Colony ||
-                this ==Zerg_Spore_Colony ||
+                this == Zerg_Spore_Colony ||
                 this == Zerg_Sunken_Colony;
     }
 
     public boolean producesLarva() {
         return this == Zerg_Hatchery ||
-                this == Zerg_Lair     ||
+                this == Zerg_Lair ||
                 this == Zerg_Hive;
     }
 
     public boolean isMineralField() {
-        return this == Resource_Mineral_Field        ||
+        return this == Resource_Mineral_Field ||
                 this == Resource_Mineral_Field_Type_2 ||
                 this == Resource_Mineral_Field_Type_3;
     }
 
     public boolean isCritter() {
-        switch(this) {
+        switch (this) {
             case Critter_Bengalaas:
             case Critter_Kakaru:
             case Critter_Ragnasaur:
@@ -631,22 +638,16 @@ public enum UnitType {
     }
 
     public boolean canBuildAddon() {
-        return this == Terran_Command_Center  ||
-                this == Terran_Factory         ||
-                this == Terran_Starport        ||
+        return this == Terran_Command_Center ||
+                this == Terran_Factory ||
+                this == Terran_Starport ||
                 this == Terran_Science_Facility;
-    }
-
-    public static int maxUnitWidth() {
-        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::width)).get().width();
-    }
-    public static int maxUnitHeight() {
-        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::height)).get().height();
     }
 
     public Set<UnitType> buildsWhat() {
         return Arrays.stream(UnitTypeContainer.buildsWhat[id]).collect(Collectors.toSet());
     }
+
     public Set<TechType> researchesWhat() {
         return Arrays.stream(UnitTypeContainer.researchesWhat[id]).collect(Collectors.toSet());
     }
@@ -660,10 +661,14 @@ public enum UnitType {
             return true;
         }
         switch (type) {
-            case Zerg_Hatchery: return this == Zerg_Lair || this == Zerg_Hive;
-            case Zerg_Lair:  return this == Zerg_Hive;
-            case Zerg_Spire: return this == Zerg_Greater_Spire;
-            default: return false;
+            case Zerg_Hatchery:
+                return this == Zerg_Lair || this == Zerg_Hive;
+            case Zerg_Lair:
+                return this == Zerg_Hive;
+            case Zerg_Spire:
+                return this == Zerg_Greater_Spire;
+            default:
+                return false;
         }
     }
 }

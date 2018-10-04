@@ -19,29 +19,28 @@ public class BWClient {
     }
 
     public void startGame() {
-        while(client == null) {
+        while (client == null) {
             try {
                 client = new Client();
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 System.err.println("Game table mapping not found.");
                 try {
                     Thread.sleep(1000);
+                } catch (Throwable ignored) {
                 }
-                catch (Throwable ignored) { }            }
+            }
         }
 
         handler = new EventHandler(eventListener, client.data());
 
         try {
-            while(!client.data().isInGame()) {
+            while (!client.data().isInGame()) {
                 client.update(handler);
             }
-            while(client.data().isInGame()) {
+            while (client.data().isInGame()) {
                 client.update(handler);
             }
-        }
-        catch (Throwable exception) {
+        } catch (Throwable exception) {
             exception.printStackTrace();
         }
     }

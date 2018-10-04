@@ -8,7 +8,7 @@ public enum Coordinate {
 
     public final int value;
 
-    Coordinate(final int value){
+    Coordinate(final int value) {
         this.value = value;
     }
 }

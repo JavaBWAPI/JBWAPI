@@ -195,7 +195,8 @@ public enum Order {
     None(189),
     Unknown(190);
 
-    public static Order[] orders = new Order[190+1];
+    public static Order[] orders = new Order[190 + 1];
+
     static {
         Arrays.stream(Order.values()).forEach(v -> orders[v.id] = v);
     }
@@ -203,7 +204,7 @@ public enum Order {
 
     private int id;
 
-    Order(int id){
+    Order(int id) {
         this.id = id;
     }
 }

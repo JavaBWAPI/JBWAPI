@@ -117,104 +117,6 @@ public enum WeaponType {
     None(130),
     Unknown(131);
 
-    private int id;
-
-    WeaponType(int id) {
-        this.id = id;
-    }
-
-    public TechType getTech() {
-        return attachedTech[id];
-    }
-
-    public UnitType whatUses() {
-        return whatUses[id];
-    }
-
-    public int damageAmount() {
-        return defaultWpnDamageAmt[id];
-    }
-
-    public int damageBonus() {
-        return defaultWpnDamageBonus[id];
-    }
-
-    public int damageCooldown() {
-        return wpnDamageCooldowns[id];
-    }
-
-    public int damageFactor() {
-        return wpnDamageFactor[id];
-    }
-
-    public UpgradeType upgradeType() {
-        return upgrade[id];
-    }
-
-    public DamageType damageType() {
-        return damageType[id];
-    }
-
-    public ExplosionType explosionType() {
-        return explosionType[id];
-    }
-
-    public int minRange() {
-        return wpnMinRange[id];
-    }
-
-    public int maxRange() {
-        return wpnMaxRange[id];
-    }
-
-    public int innerSplashRadius() {
-        return wpnSplashRangeInner[id];
-    }
-
-    public int medianSplashRadius() {
-        return wpnSplashRangeMid[id];
-    }
-
-    public int outerSplashRadius() {
-        return wpnSplashRangeOuter[id];
-    }
-
-    public boolean targetsAir() {
-        return (wpnFlags[id] & TARG_AIR) != 0;
-    }
-
-    public boolean targetsGround() {
-        return (wpnFlags[id] & TARG_GROUND) != 0;
-    }
-
-    public boolean targetsMechanical() {
-        return (wpnFlags[id] & TARG_MECH) != 0;
-    }
-
-    public boolean targetsOrganic() {
-        return (wpnFlags[id] & TARG_ORGANIC) != 0;
-    }
-
-    public boolean targetsNonBuilding() {
-        return (wpnFlags[id] & TARG_NOBUILD) != 0;
-    }
-
-    public boolean targetsNonRobotic() {
-        return (wpnFlags[id] & TARG_NOROBOT) != 0;
-    }
-
-    public boolean targetsTerrain() {
-        return (wpnFlags[id] & TARG_TERRAIN) != 0;
-    }
-
-    public boolean targetsOrgOrMech() {
-        return (wpnFlags[id] & TARG_ORGMECH) != 0;
-    }
-
-    public boolean targetsOwn() {
-        return (wpnFlags[id] & TARG_OWN) != 0;
-    }
-
     private static int defaultWpnDamageAmt[] = {
             6, 18, 10, 30, 20, 30, 125, 12, 10, 24, 20, 30, 70, 5, 0, 20, 8, 40, 16, 25, 25, 50, 50, 30, 30, 8, 16, 70,
             150, 20, 260, 600, 0, 0, 250, 5, 10, 50, 10, 20, 20, 50, 4, 5, 0, 30, 20, 40, 9, 18, 5, 10, 15, 40, 500, 110,
@@ -228,8 +130,7 @@ public enum WeaponType {
             3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2,
             1, 1, 1, 1, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
     };
-
-    private static int wpnDamageCooldowns[] ={
+    private static int wpnDamageCooldowns[] = {
             15, 15, 22, 22, 30, 22, 22, 22, 22, 22, 22, 37, 37, 15, 15, 22, 30, 22, 30, 30, 30, 30, 30, 22, 22, 22, 22,
             75, 75, 15, 15, 1, 1, 1, 75, 8, 8, 15, 15, 15, 15, 15, 15, 22, 22, 22, 30, 30, 30, 30, 22, 22, 15, 32, 1, 1,
             1, 1, 1, 1, 1, 1, 22, 22, 22, 22, 30, 22, 30, 22, 20, 20, 22, 30, 22, 30, 22, 45, 45, 1, 22, 22, 1, 1, 45, 22,
@@ -260,7 +161,7 @@ public enum WeaponType {
             0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 10, 10, 0, 0, 128, 0, 64, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0,
-             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
     private static int wpnSplashRangeMid[] = {
             0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 20, 25, 25, 0, 0, 192, 0, 64, 0, 0,
@@ -274,17 +175,15 @@ public enum WeaponType {
             0, 0, 0, 0, 0, 0, 0, 60, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 100, 0, 0, 100, 0, 0, 0, 0, 0, 20, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
-    private static int TARG_AIR =     0x01;
-    private static int TARG_GROUND =  0x02;
-    private static int TARG_MECH =    0x04;
+    private static int TARG_AIR = 0x01;
+    private static int TARG_GROUND = 0x02;
+    private static int TARG_MECH = 0x04;
     private static int TARG_ORGANIC = 0x08;
     private static int TARG_NOBUILD = 0x10;
     private static int TARG_NOROBOT = 0x20;
     private static int TARG_TERRAIN = 0x40;
     private static int TARG_ORGMECH = 0x80;
-    private static int TARG_OWN =     0x100;
-
+    private static int TARG_OWN = 0x100;
     private static int wpnFlags[] = {
             TARG_AIR | TARG_GROUND,
             TARG_AIR | TARG_GROUND,
@@ -418,7 +317,6 @@ public enum WeaponType {
             TARG_AIR | TARG_GROUND,
             0, 0
     };
-
     private static UpgradeType upgrade[] = {
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Vehicle_Weapons,
             UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Upgrade_60, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons,
@@ -441,7 +339,6 @@ public enum WeaponType {
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons,
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.None, UpgradeType.Unknown
     };
-
     private static DamageType damageType[] = {
             DamageType.Normal, DamageType.Normal, DamageType.Concussive, DamageType.Concussive, DamageType.Concussive, DamageType.Concussive, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Explosive,
             DamageType.Explosive, DamageType.Normal, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Concussive,
@@ -466,7 +363,6 @@ public enum WeaponType {
             ExplosionType.Feedback, ExplosionType.Optical_Flare, ExplosionType.Maelstrom, ExplosionType.Enemy_Splash, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal,
             ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.None, ExplosionType.Unknown
     };
-    
     private static UnitType whatUses[] = {
             UnitType.Terran_Marine, UnitType.Hero_Jim_Raynor_Marine, UnitType.Terran_Ghost, UnitType.Hero_Sarah_Kerrigan, UnitType.Terran_Vulture, UnitType.Hero_Jim_Raynor_Vulture,
             UnitType.Terran_Vulture_Spider_Mine, UnitType.Terran_Goliath, UnitType.Terran_Goliath, UnitType.Hero_Alan_Schezar, UnitType.Hero_Alan_Schezar, UnitType.Terran_Siege_Tank_Tank_Mode,
@@ -486,13 +382,12 @@ public enum WeaponType {
             UnitType.Hero_Artanis, UnitType.Hero_Artanis, UnitType.Hero_Alexei_Stukov, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.Unknown
     };
-    
     private static TechType attachedTech[] = {
             // Terran
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.Spider_Mines, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.Yamato_Gun, TechType.Nuclear_Strike, TechType.Lockdown, TechType.EMP_Shockwave, TechType.Irradiate,
             // Zerg
-            TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,  TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,
+            TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,
             TechType.None, TechType.Parasite, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Dark_Swarm, TechType.Plague, TechType.Consume,
             // Protoss
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,
@@ -503,4 +398,101 @@ public enum WeaponType {
             TechType.None, TechType.Disruption_Web, TechType.Restoration, TechType.None, TechType.None, TechType.Mind_Control, TechType.Feedback, TechType.Optical_Flare, TechType.Maelstrom, TechType.None, TechType.None, TechType.None, TechType.None,
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None
     };
+    private int id;
+
+    WeaponType(int id) {
+        this.id = id;
+    }
+
+    public TechType getTech() {
+        return attachedTech[id];
+    }
+
+    public UnitType whatUses() {
+        return whatUses[id];
+    }
+
+    public int damageAmount() {
+        return defaultWpnDamageAmt[id];
+    }
+
+    public int damageBonus() {
+        return defaultWpnDamageBonus[id];
+    }
+
+    public int damageCooldown() {
+        return wpnDamageCooldowns[id];
+    }
+
+    public int damageFactor() {
+        return wpnDamageFactor[id];
+    }
+
+    public UpgradeType upgradeType() {
+        return upgrade[id];
+    }
+
+    public DamageType damageType() {
+        return damageType[id];
+    }
+
+    public ExplosionType explosionType() {
+        return explosionType[id];
+    }
+
+    public int minRange() {
+        return wpnMinRange[id];
+    }
+
+    public int maxRange() {
+        return wpnMaxRange[id];
+    }
+
+    public int innerSplashRadius() {
+        return wpnSplashRangeInner[id];
+    }
+
+    public int medianSplashRadius() {
+        return wpnSplashRangeMid[id];
+    }
+
+    public int outerSplashRadius() {
+        return wpnSplashRangeOuter[id];
+    }
+
+    public boolean targetsAir() {
+        return (wpnFlags[id] & TARG_AIR) != 0;
+    }
+
+    public boolean targetsGround() {
+        return (wpnFlags[id] & TARG_GROUND) != 0;
+    }
+
+    public boolean targetsMechanical() {
+        return (wpnFlags[id] & TARG_MECH) != 0;
+    }
+
+    public boolean targetsOrganic() {
+        return (wpnFlags[id] & TARG_ORGANIC) != 0;
+    }
+
+    public boolean targetsNonBuilding() {
+        return (wpnFlags[id] & TARG_NOBUILD) != 0;
+    }
+
+    public boolean targetsNonRobotic() {
+        return (wpnFlags[id] & TARG_NOROBOT) != 0;
+    }
+
+    public boolean targetsTerrain() {
+        return (wpnFlags[id] & TARG_TERRAIN) != 0;
+    }
+
+    public boolean targetsOrgOrMech() {
+        return (wpnFlags[id] & TARG_ORGMECH) != 0;
+    }
+
+    public boolean targetsOwn() {
+        return (wpnFlags[id] & TARG_OWN) != 0;
+    }
 }

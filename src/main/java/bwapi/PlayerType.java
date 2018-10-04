@@ -17,7 +17,8 @@ public enum PlayerType {
     ComputerLeft(11),
     Unknown(12);
 
-    public static PlayerType[] playerTypes = new PlayerType[12+1];
+    public static PlayerType[] playerTypes = new PlayerType[12 + 1];
+
     static {
         Arrays.stream(PlayerType.values()).forEach(v -> playerTypes[v.id] = v);
     }
@@ -29,7 +30,7 @@ public enum PlayerType {
     }
 
     public boolean isLobbyType() {
-        return this == EitherPreferComputer || this == EitherPreferHuman  || isRescueNeutralType();
+        return this == EitherPreferComputer || this == EitherPreferHuman || isRescueNeutralType();
     }
 
     public boolean isGameType() {

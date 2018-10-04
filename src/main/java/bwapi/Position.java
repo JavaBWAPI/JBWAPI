@@ -1,12 +1,31 @@
 package bwapi;
 
 
-public class Position extends Point{
+public class Position extends Point {
 
     public static final int SIZE_IN_PIXELS = 1;
+    public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
+    public static final Position None = new Position(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
+    public static final Position Unknown = new Position(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
+    public static final Position Origin = new Position(0, 0);
 
     public Position(final int x, final int y) {
         super(x, y, SIZE_IN_PIXELS);
+    }
+
+    private static int swap(int a, int b) {
+        return a;
+    }
+
+    private static int getApproxDistance(int x1, int y1, int x2, int y2) {
+        int min = Math.abs(x1 - x2);
+        int max = Math.abs(y1 - y2);
+        if (max < min) max = swap(min, min = max);
+
+        if (min < (max >> 2)) return max;
+
+        int minCalc = (3 * min) >> 3;
+        return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
     }
 
     public int getApproxDistance(final Position position) {
@@ -35,25 +54,5 @@ public class Position extends Point{
 
     public Position multiply(final int multiplier) {
         return new Position(x * multiplier, y * multiplier);
-    }
-
-    public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
-    public static final Position None = new Position(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
-    public static final Position Unknown = new Position(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
-    public static final Position Origin = new Position(0, 0);
-
-    private static int swap(int a, int b) {
-        return a;
-    }
-
-    private static int getApproxDistance(int x1, int y1, int x2, int y2) {
-        int min = Math.abs(x1 - x2);
-        int max = Math.abs(y1 - y2);
-        if ( max < min ) max = swap(min, min=max);
-
-        if ( min < (max >> 2)) return max;
-
-        int minCalc = (3*min) >> 3;
-        return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
     }
 }

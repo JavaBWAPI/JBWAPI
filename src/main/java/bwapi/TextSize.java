@@ -9,7 +9,7 @@ public enum TextSize {
     public final int value;
 
 
-    TextSize(final int value){
+    TextSize(final int value) {
         this.value = value;
     }
 }

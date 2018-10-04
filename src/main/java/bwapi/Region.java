@@ -9,10 +9,6 @@ public class Region {
     private final Game game;
 
     private final Set<Region> neighbours = new HashSet<>();
-
-    private Region closestAccessibleRegion;
-    private Region closestInaccessibleRegion;
-
     private final int id;
     private final int regionGroupID;
     private final Position center;
@@ -23,6 +19,8 @@ public class Region {
     private final int boundsTop;
     private final int boundsRight;
     private final int boundsBottom;
+    private Region closestAccessibleRegion;
+    private Region closestInaccessibleRegion;
 
     Region(final Client.GameData.RegionData regionData, final Game game) {
         this.regionData = regionData;
@@ -43,7 +41,7 @@ public class Region {
         int accessibleBestDist = Integer.MAX_VALUE;
         int inaccessibleBestDist = Integer.MAX_VALUE;
 
-        for (int i=0; i < regionData.neighborCount(); i++) {
+        for (int i = 0; i < regionData.neighborCount(); i++) {
             final Region region = game.getRegion(regionData.neighbor(i));
             neighbours.add(region);
             int d = getDistance(region);
@@ -52,8 +50,7 @@ public class Region {
                     closestAccessibleRegion = region;
                     accessibleBestDist = d;
                 }
-            }
-            else if (d < inaccessibleBestDist) {
+            } else if (d < inaccessibleBestDist) {
                 closestInaccessibleRegion = region;
                 inaccessibleBestDist = d;
             }
@@ -121,14 +118,14 @@ public class Region {
                 (u -> equals(u.getRegion())));
     }
 
-    public boolean equals(Object that){
-        if(!(that instanceof Region)){
+    public boolean equals(Object that) {
+        if (!(that instanceof Region)) {
             return false;
         }
-        return getID() == ((Region)that).getID();
+        return getID() == ((Region) that).getID();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return getID();
     }
 }

@@ -3,10 +3,10 @@ package bwapi;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static bwapi.TextColor.*;
 import static bwapi.UnitType.*;
 import static bwapi.UpgradeType.*;
 import static bwapi.WeaponType.*;
-import static bwapi.TextColor.*;
 
 public class Player {
     private final Client.GameData.PlayerData playerData;
@@ -244,17 +244,17 @@ public class Player {
 
     public int maxEnergy(final UnitType unit) {
         int energy = unit.maxEnergy();
-        if ((unit == Protoss_Arbiter           && getUpgradeLevel(Khaydarin_Core)    > 0) ||
-                (unit == Protoss_Corsair       && getUpgradeLevel(Argus_Jewel)       > 0) ||
-                (unit == Protoss_Dark_Archon   && getUpgradeLevel(Argus_Talisman)    > 0) ||
-                (unit == Protoss_High_Templar  && getUpgradeLevel(Khaydarin_Amulet)  > 0) ||
-                (unit == Terran_Ghost          && getUpgradeLevel(Moebius_Reactor)   > 0) ||
-                (unit == Terran_Battlecruiser  && getUpgradeLevel(Colossus_Reactor)  > 0) ||
-                (unit == Terran_Science_Vessel && getUpgradeLevel(Titan_Reactor)     > 0) ||
-                (unit == Terran_Wraith         && getUpgradeLevel(Apollo_Reactor)    > 0) ||
-                (unit == Terran_Medic          && getUpgradeLevel(Caduceus_Reactor)  > 0) ||
-                (unit == Zerg_Defiler          && getUpgradeLevel(Metasynaptic_Node) > 0) ||
-                (unit == Zerg_Queen            && getUpgradeLevel(Gamete_Meiosis)    > 0) ) {
+        if ((unit == Protoss_Arbiter && getUpgradeLevel(Khaydarin_Core) > 0) ||
+                (unit == Protoss_Corsair && getUpgradeLevel(Argus_Jewel) > 0) ||
+                (unit == Protoss_Dark_Archon && getUpgradeLevel(Argus_Talisman) > 0) ||
+                (unit == Protoss_High_Templar && getUpgradeLevel(Khaydarin_Amulet) > 0) ||
+                (unit == Terran_Ghost && getUpgradeLevel(Moebius_Reactor) > 0) ||
+                (unit == Terran_Battlecruiser && getUpgradeLevel(Colossus_Reactor) > 0) ||
+                (unit == Terran_Science_Vessel && getUpgradeLevel(Titan_Reactor) > 0) ||
+                (unit == Terran_Wraith && getUpgradeLevel(Apollo_Reactor) > 0) ||
+                (unit == Terran_Medic && getUpgradeLevel(Caduceus_Reactor) > 0) ||
+                (unit == Zerg_Defiler && getUpgradeLevel(Metasynaptic_Node) > 0) ||
+                (unit == Zerg_Queen && getUpgradeLevel(Gamete_Meiosis) > 0)) {
             energy += 50;
         }
         return energy;
@@ -262,22 +262,21 @@ public class Player {
 
     public double topSpeed(final UnitType unit) {
         double speed = unit.topSpeed();
-        if ((unit == Terran_Vulture       && getUpgradeLevel(Ion_Thrusters)        > 0) ||
-                (unit == Zerg_Overlord    && getUpgradeLevel(Pneumatized_Carapace) > 0) ||
-                (unit == Zerg_Zergling    && getUpgradeLevel(Metabolic_Boost)      > 0) ||
-                (unit == Zerg_Hydralisk   && getUpgradeLevel(Muscular_Augments)    > 0) ||
-                (unit == Protoss_Zealot   && getUpgradeLevel(Leg_Enhancements)     > 0) ||
-                (unit == Protoss_Shuttle  && getUpgradeLevel(Gravitic_Drive)       > 0) ||
-                (unit == Protoss_Observer && getUpgradeLevel(Gravitic_Boosters)    > 0) ||
-                (unit == Protoss_Scout    && getUpgradeLevel(Gravitic_Thrusters)   > 0) ||
-                (unit == Zerg_Ultralisk   && getUpgradeLevel(Anabolic_Synthesis)   > 0)) {
-            if ( unit == Protoss_Scout ) {
+        if ((unit == Terran_Vulture && getUpgradeLevel(Ion_Thrusters) > 0) ||
+                (unit == Zerg_Overlord && getUpgradeLevel(Pneumatized_Carapace) > 0) ||
+                (unit == Zerg_Zergling && getUpgradeLevel(Metabolic_Boost) > 0) ||
+                (unit == Zerg_Hydralisk && getUpgradeLevel(Muscular_Augments) > 0) ||
+                (unit == Protoss_Zealot && getUpgradeLevel(Leg_Enhancements) > 0) ||
+                (unit == Protoss_Shuttle && getUpgradeLevel(Gravitic_Drive) > 0) ||
+                (unit == Protoss_Observer && getUpgradeLevel(Gravitic_Boosters) > 0) ||
+                (unit == Protoss_Scout && getUpgradeLevel(Gravitic_Thrusters) > 0) ||
+                (unit == Zerg_Ultralisk && getUpgradeLevel(Anabolic_Synthesis) > 0)) {
+            if (unit == Protoss_Scout) {
                 speed += 427 / 256.0;
-            }
-            else {
+            } else {
                 speed = speed * 1.5;
             }
-            if (speed < 853/256.0 ) {
+            if (speed < 853 / 256.0) {
                 speed = 853 / 256.0;
             }
             //acceleration *= 2;
@@ -289,13 +288,11 @@ public class Player {
     public int weaponMaxRange(final WeaponType weapon) {
         int range = weapon.maxRange();
         if ((weapon == Gauss_Rifle && getUpgradeLevel(U_238_Shells) > 0) ||
-                (weapon == Needle_Spines && getUpgradeLevel(Grooved_Spines) > 0) ) {
+                (weapon == Needle_Spines && getUpgradeLevel(Grooved_Spines) > 0)) {
             range += 1 * 32;
-        }
-        else if ( weapon == Phase_Disruptor && getUpgradeLevel(Singularity_Charge) > 0 ) {
+        } else if (weapon == Phase_Disruptor && getUpgradeLevel(Singularity_Charge) > 0) {
             range += 2 * 32;
-        }
-        else if ( weapon == Hellfire_Missile_Pack && getUpgradeLevel(Charon_Boosters) > 0 ) {
+        } else if (weapon == Hellfire_Missile_Pack && getUpgradeLevel(Charon_Boosters) > 0) {
             range += 3 * 32;
         }
         return range;
@@ -303,10 +300,10 @@ public class Player {
 
     public int sightRange(final UnitType unit) {
         int range = unit.sightRange();
-        if ((unit == Terran_Ghost         && getUpgradeLevel(Ocular_Implants) > 0) ||
-                (unit == Zerg_Overlord    && getUpgradeLevel(Antennae)        > 0) ||
-                (unit == Protoss_Observer && getUpgradeLevel(Sensor_Array)    > 0) ||
-                (unit == Protoss_Scout    && getUpgradeLevel(Apial_Sensors)   > 0)) {
+        if ((unit == Terran_Ghost && getUpgradeLevel(Ocular_Implants) > 0) ||
+                (unit == Zerg_Overlord && getUpgradeLevel(Antennae) > 0) ||
+                (unit == Protoss_Observer && getUpgradeLevel(Sensor_Array) > 0) ||
+                (unit == Protoss_Scout && getUpgradeLevel(Apial_Sensors) > 0)) {
             range = 11 * 32;
         }
         return range;
@@ -318,7 +315,7 @@ public class Player {
             // Divide cooldown by 2
             cooldown /= 2;
             // Prevent cooldown from going out of bounds
-            cooldown = Math.min(Math.max(cooldown,5), 250);
+            cooldown = Math.min(Math.max(cooldown, 5), 250);
         }
         return cooldown;
     }
@@ -383,7 +380,7 @@ public class Player {
         if (unit == UnitType.None)
             return true;
 
-        switch(unit) {
+        switch (unit) {
             case Zerg_Hatchery:
                 return completedUnitCount(Zerg_Hatchery) + allUnitCount(Zerg_Lair) + allUnitCount(Zerg_Hive) >= amount;
             case Zerg_Lair:
@@ -395,14 +392,14 @@ public class Player {
         }
     }
 
-    public boolean equals(Object that){
-        if(!(that instanceof Player)){
+    public boolean equals(Object that) {
+        if (!(that instanceof Player)) {
             return false;
         }
-        return getID() == ((Player)that).getID();
+        return getID() == ((Player) that).getID();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return getID();
     }
 }

@@ -29,12 +29,12 @@ public class Force {
                 .collect(Collectors.toSet());
     }
 
-    public boolean equals(Object that){
-        if(!(that instanceof Force)) return false;
-        return getID() == ((Force)that).getID();
+    public boolean equals(Object that) {
+        if (!(that instanceof Force)) return false;
+        return getID() == ((Force) that).getID();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return getID();
     }
 }

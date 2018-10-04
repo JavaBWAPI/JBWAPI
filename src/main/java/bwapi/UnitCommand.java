@@ -1,17 +1,22 @@
 package bwapi;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static bwapi.UnitCommandType.*;
 
-import java.util.*;
-
 public class UnitCommand {
-    Unit unit;
+    private static Set<UnitCommandType> posComs = new HashSet<>(
+            Arrays.asList(Build, Land, Place_COP)
+    );
     final UnitCommandType type;
     final Unit target;
     final int x;
     final int y;
     final int extra;
+    Unit unit;
 
     private UnitCommand(final Unit unit, final UnitCommandType type, final Unit target, final int x, final int y, final int extra) {
         this.unit = unit;
@@ -21,92 +26,6 @@ public class UnitCommand {
         this.y = y;
         this.extra = extra;
     }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public UnitCommandType getType() {
-        return type;
-    }
-
-    public Unit getTarget() {
-        return target;
-    }
-
-    public int getSlot() {
-        return type == Cancel_Train_Slot ? extra : -1;
-    }
-
-    private static Set<UnitCommandType> posComs = new HashSet<>(
-            Arrays.asList(Build, Land, Place_COP)
-    );
-
-    public Position getTargetPosition() {
-        return posComs.contains(type) ? new Position(x * 32, y * 32): new Position(x, y);
-    }
-
-    public TilePosition getTargetTilePosition() {
-        return posComs.contains(type) ? new TilePosition(x, y) : new TilePosition(x / 32, y / 32);
-    }
-
-    public UnitType getUnitType() {
-        if (type == Build || type == Build_Addon || type == Train || type == Morph) {
-            return UnitType.unitTypes[extra];
-        }
-        return UnitType.None;
-    }
-
-    public TechType getTechType() {
-        if (type == Research || type == Use_Tech || type == Use_Tech_Position || type == Use_Tech_Unit) {
-            return TechType.techTypes[extra];
-        }
-        return TechType.None;
-    }
-
-    public UpgradeType getUpgradeType() {
-        return type == UnitCommandType.Upgrade ? UpgradeType.upgradeTypes[extra] : UpgradeType.None;
-    }
-
-    public boolean isQueued() {
-        return (type == Attack_Move ||
-                type == Attack_Unit ||
-                type == Move ||
-                type == Patrol ||
-                type == Hold_Position ||
-                type == Stop ||
-                type == Follow ||
-                type == Gather ||
-                type == Return_Cargo ||
-                type == Load ||
-                type == Unload_All ||
-                type == Unload_All_Position ||
-                type == Right_Click_Position ||
-                type == Right_Click_Unit)
-                && extra != 0;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof UnitCommand)) return false;
-
-        final UnitCommand that = (UnitCommand) o;
-
-        return extra == that.extra && x == that.x && y == that.y && target.equals(that.target) && unit.equals(that.unit)
-                && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = unit.hashCode();
-        result = 31 * result + type.hashCode();
-        result = 31 * result + target.hashCode();
-        result = 31 * result + x;
-        result = 31 * result + y;
-        result = 31 * result + extra;
-        return result;
-    }
-
 
     public static UnitCommand attack(final Unit unit, final Position target) {
 
@@ -343,6 +262,87 @@ public class UnitCommand {
 
     public static UnitCommand placeCOP(final Unit unit, final TilePosition target) {
         return new UnitCommand(unit, Place_COP, null, target.x, target.y, 0);
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public UnitCommandType getType() {
+        return type;
+    }
+
+    public Unit getTarget() {
+        return target;
+    }
+
+    public int getSlot() {
+        return type == Cancel_Train_Slot ? extra : -1;
+    }
+
+    public Position getTargetPosition() {
+        return posComs.contains(type) ? new Position(x * 32, y * 32) : new Position(x, y);
+    }
+
+    public TilePosition getTargetTilePosition() {
+        return posComs.contains(type) ? new TilePosition(x, y) : new TilePosition(x / 32, y / 32);
+    }
+
+    public UnitType getUnitType() {
+        if (type == Build || type == Build_Addon || type == Train || type == Morph) {
+            return UnitType.unitTypes[extra];
+        }
+        return UnitType.None;
+    }
+
+    public TechType getTechType() {
+        if (type == Research || type == Use_Tech || type == Use_Tech_Position || type == Use_Tech_Unit) {
+            return TechType.techTypes[extra];
+        }
+        return TechType.None;
+    }
+
+    public UpgradeType getUpgradeType() {
+        return type == UnitCommandType.Upgrade ? UpgradeType.upgradeTypes[extra] : UpgradeType.None;
+    }
+
+    public boolean isQueued() {
+        return (type == Attack_Move ||
+                type == Attack_Unit ||
+                type == Move ||
+                type == Patrol ||
+                type == Hold_Position ||
+                type == Stop ||
+                type == Follow ||
+                type == Gather ||
+                type == Return_Cargo ||
+                type == Load ||
+                type == Unload_All ||
+                type == Unload_All_Position ||
+                type == Right_Click_Position ||
+                type == Right_Click_Unit)
+                && extra != 0;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof UnitCommand)) return false;
+
+        final UnitCommand that = (UnitCommand) o;
+
+        return extra == that.extra && x == that.x && y == that.y && target.equals(that.target) && unit.equals(that.unit)
+                && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = unit.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + target.hashCode();
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + extra;
+        return result;
     }
 
 }

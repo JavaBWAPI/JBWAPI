@@ -1,15 +1,19 @@
 package bwapi;
 
-public class WalkPosition extends Point{
+public class WalkPosition extends Point {
 
     public static final int SIZE_IN_PIXELS = 8;
+    public static final WalkPosition Invalid = new WalkPosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
+    public static final WalkPosition None = new WalkPosition(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
+    public static final WalkPosition Unknown = new WalkPosition(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
+    public static final WalkPosition Origin = new WalkPosition(0, 0);
 
     public WalkPosition(final int x, final int y) {
         super(x, y, SIZE_IN_PIXELS);
     }
 
     public Position toPosition() {
-        return new Position(x*SIZE_IN_PIXELS, y*SIZE_IN_PIXELS);
+        return new Position(x * SIZE_IN_PIXELS, y * SIZE_IN_PIXELS);
     }
 
     public TilePosition toTilePosition() {
@@ -31,9 +35,4 @@ public class WalkPosition extends Point{
     public WalkPosition multiply(final int multiplier) {
         return new WalkPosition(x * multiplier, y * multiplier);
     }
-
-    public static final WalkPosition Invalid = new WalkPosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
-    public static final WalkPosition None = new WalkPosition(32000 / SIZE_IN_PIXELS, 32032 / SIZE_IN_PIXELS);
-    public static final WalkPosition Unknown = new WalkPosition(32000 / SIZE_IN_PIXELS, 32064 / SIZE_IN_PIXELS);
-    public static final WalkPosition Origin = new WalkPosition(0,0);
 }

@@ -4,85 +4,19 @@ package bwapi;
 import java.util.Objects;
 
 public class Color {
-    public final int id;
-
-    public Color(final int r, final int g, final int b) {
-        id = getRGBIndex(r, g, b);
-    }
-
-    public Color(final int id) {
-        this.id = id;
-    }
-
     public final static Color Red = new Color(111);
-
     public final static Color Blue = new Color(165);
-
     public final static Color Teal = new Color(159);
-
     public final static Color Purple = new Color(164);
-
     public final static Color Orange = new Color(179);
-
     public final static Color Brown = new Color(19);
-
     public final static Color White = new Color(255);
-
     public final static Color Yellow = new Color(135);
-
     public final static Color Green = new Color(117);
-
     public final static Color Cyan = new Color(128);
-
     public final static Color Black = new Color(0);
-
     public final static Color Grey = new Color(74);
-
-    int red() {
-        return id < 256 ? defaultPalette[id].rgbRed : 0;
-    }
-    int green()  {
-        return id < 256 ? defaultPalette[id].rgbGreen : 0;
-    }
-    int blue() {
-        return id < 256 ? defaultPalette[id].rgbBlue : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Color)) {
-            return false;
-        }
-        return id == ((Color) o).id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    /// BROODWAR COLOR IMPLEMENTATION
-    private static class RGBQUAD {
-        byte rgbRed;
-        byte rgbGreen;
-        byte rgbBlue;
-        byte rgbReserved;
-
-        RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue) {
-            this(rgbRed,rgbGreen, rgbBlue, 0);
-        }
-
-        RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue, int rgbReserved) {
-            this.rgbRed = (byte)rgbRed;
-            this.rgbGreen = (byte)rgbGreen;
-            this.rgbBlue = (byte)rgbBlue;
-            this.rgbReserved = (byte)rgbReserved;
-        }
-    }
-
-    private static RGBQUAD RGBRESERVE = new RGBQUAD(0,0,0,0xFF);
-
-    private static boolean rgbInitialized = false;
+    private static RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
     private static final RGBQUAD defaultPalette[] = {
             new RGBQUAD(0, 0, 0), RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
@@ -117,12 +51,23 @@ public class Color {
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, new RGBQUAD(255, 255, 255)
     };
+    private static boolean rgbInitialized = false;
+    private static byte closestColor[][][] = new byte[64][64][64];
+    public final int id;
+
+    public Color(final int r, final int g, final int b) {
+        id = getRGBIndex(r, g, b);
+    }
+
+    public Color(final int id) {
+        this.id = id;
+    }
 
     private static int getBestIdFor(int red, int green, int blue) {
 
-        int min_dist   = 3 * 256 * 256;
-        int best_id    = 0;
-        for( int id = 0; id < 255; ++id )  {
+        int min_dist = 3 * 256 * 256;
+        int best_id = 0;
+        for (int id = 0; id < 255; ++id) {
             RGBQUAD p = defaultPalette[id];
             if (p.rgbReserved != 0) {
                 continue;
@@ -131,8 +76,8 @@ public class Color {
             int g = green - p.rgbGreen;
             int b = blue - p.rgbBlue;
 
-            int distance = r*r + g*g + b*b;
-            if ( distance < min_dist ) {
+            int distance = r * r + g * g + b * b;
+            if (distance < min_dist) {
                 min_dist = distance;
                 best_id = id;
                 if (distance == 0) {
@@ -143,19 +88,61 @@ public class Color {
         return best_id;
     }
 
-    private static byte closestColor[][][] = new byte[64][64][64];
-
     private static int getRGBIndex(int red, int green, int blue) {
-        if ( !rgbInitialized ) {
+        if (!rgbInitialized) {
             rgbInitialized = true;
-            for (int r = 0; r < 64; ++r ) {
-                for (int g = 0; g < 64; ++g ) {
-                    for (int b = 0; b < 64; ++b ) {
+            for (int r = 0; r < 64; ++r) {
+                for (int g = 0; g < 64; ++g) {
+                    for (int b = 0; b < 64; ++b) {
                         closestColor[r][g][b] = (byte) getBestIdFor(r << 2, g << 2, b << 2);
                     }
                 }
             }
         }
-        return closestColor[(byte)(red >> 2)][(byte)(green >> 2)][(byte)(blue >> 2)];
+        return closestColor[(byte) (red >> 2)][(byte) (green >> 2)][(byte) (blue >> 2)];
+    }
+
+    int red() {
+        return id < 256 ? defaultPalette[id].rgbRed : 0;
+    }
+
+    int green() {
+        return id < 256 ? defaultPalette[id].rgbGreen : 0;
+    }
+
+    int blue() {
+        return id < 256 ? defaultPalette[id].rgbBlue : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Color)) {
+            return false;
+        }
+        return id == ((Color) o).id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    /// BROODWAR COLOR IMPLEMENTATION
+    private static class RGBQUAD {
+        byte rgbRed;
+        byte rgbGreen;
+        byte rgbBlue;
+        byte rgbReserved;
+
+        RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue) {
+            this(rgbRed, rgbGreen, rgbBlue, 0);
+        }
+
+        RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue, int rgbReserved) {
+            this.rgbRed = (byte) rgbRed;
+            this.rgbGreen = (byte) rgbGreen;
+            this.rgbBlue = (byte) rgbBlue;
+            this.rgbReserved = (byte) rgbReserved;
+        }
     }
 }

@@ -65,12 +65,12 @@ public class Bullet {
         return bulletData.isVisible(player.getID());
     }
 
-    public boolean equals(Object that){
-        if(!(that instanceof Bullet)) return false;
-        return getID() == ((Bullet)that).getID();
+    public boolean equals(Object that) {
+        if (!(that instanceof Bullet)) return false;
+        return getID() == ((Bullet) that).getID();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return getID();
     }
 

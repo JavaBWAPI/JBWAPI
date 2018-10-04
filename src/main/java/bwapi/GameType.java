@@ -24,7 +24,8 @@ public enum GameType {
     Pro_Gamer_League(32),  // Not valid
     Unknown(33);
 
-    public static GameType[] gameTypes = new GameType[33+1];
+    public static GameType[] gameTypes = new GameType[33 + 1];
+
     static {
         Arrays.stream(GameType.values()).forEach(v -> gameTypes[v.id] = v);
     }

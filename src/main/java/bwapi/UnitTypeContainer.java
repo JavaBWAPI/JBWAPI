@@ -7,65 +7,14 @@ import java.util.Map;
 
 import static bwapi.Race.*;
 import static bwapi.TechType.*;
+import static bwapi.UnitType.*;
 import static bwapi.UpgradeType.*;
 import static bwapi.WeaponType.*;
-import static bwapi.UnitType.*;
 
 
 class UnitTypeContainer {
-    static Race unitRace[] ={
-            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
-            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
-            Terran, Terran, Terran, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
-            Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Terran, Zerg, Protoss, Protoss, Zerg, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
-            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
-            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Race.None, Race.None, Zerg, Zerg, Race.None, Race.None, Race.None, Race.None, Zerg, Protoss, Terran,
-            Terran, Race.None, Terran, Zerg, Zerg, Race.None, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
-            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Race.None, Race.None, Zerg, Zerg, Zerg, Zerg,
-            Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
-            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
-            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
-            Race.None, Race.None, Race.None, Race.None, Protoss, Terran, Zerg, Terran, Protoss, Zerg, Terran, Protoss, Zerg, Terran, Protoss, Terran, Zerg,
-            Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
-            Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
-    };
-
-    static UpgradeType armorUpgrade[]= {
-            Terran_Infantry_Armor, Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
-            Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating,
-            Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating, Upgrade_60, Upgrade_60, Terran_Infantry_Armor,
-            Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor,
-            Terran_Ship_Plating, Terran_Ship_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
-            Terran_Vehicle_Plating, Terran_Ship_Plating, Terran_Ship_Plating, Terran_Ship_Plating, Terran_Vehicle_Plating,
-            Terran_Vehicle_Plating, Terran_Infantry_Armor, Upgrade_60, Terran_Infantry_Armor, Zerg_Carapace, Zerg_Carapace,
-            Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Flyer_Carapace,
-            Zerg_Flyer_Carapace, Zerg_Flyer_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace,
-            Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Flyer_Carapace,
-            Zerg_Flyer_Carapace, Terran_Ship_Plating, Zerg_Carapace, Protoss_Air_Armor, Protoss_Ground_Armor, Zerg_Flyer_Carapace,
-            Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor,
-            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor,
-            Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor,
-            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor,
-            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Zerg_Carapace, Protoss_Air_Armor, Terran_Infantry_Armor,
-            Terran_Infantry_Armor, Upgrade_60, Terran_Ship_Plating, Zerg_Carapace, Zerg_Carapace, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
-            UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.Unknown
-    };
-
     // DEFAULTS
-    static final int defaultMaxHP[]={
+    static final int defaultMaxHP[] = {
             40, 45, 80, 125, 0, 150, 0, 60, 120, 200, 160, 150, 500, 20, 100, 40, 250, 300, 0, 300, 200, 500, 800, 400, 0, 400, 0, 1000,
             850, 700, 150, 0, 50, 0, 60, 25, 200, 35, 80, 400, 30, 40, 200, 120, 150, 120, 80, 25, 800, 300, 60, 400, 250, 160, 120, 300,
             400, 1000, 200, 200, 100, 80, 250, 25, 20, 100, 100, 40, 10, 80, 150, 200, 300, 40, 40, 60, 100, 240, 240, 80, 400, 200, 800,
@@ -77,7 +26,6 @@ class UnitTypeContainer {
             2500, 800, 50, 100000, 100000, 100000, 100000, 100000, 50, 50, 50, 50, 50, 800, 100000, 800, 800, 800, 800, 800, 800, 800, 800,
             800, 800, 800, 800, 0, 0, 0, 0, 0, 0
     };
-
     static final int defaultMaxSP[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 40, 0, 200, 20, 60, 80, 40, 350, 60, 100, 150, 150, 40, 80, 400, 800, 240,
@@ -86,41 +34,39 @@ class UnitTypeContainer {
             450, 300, 250, 500, 1, 100, 450, 500, 500, 550, 600, 0, 500, 500, 450, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
-    static final int Building                = 0x00000001;
-    static final int Addon                   = 0x00000002;
-    static final int Flyer                   = 0x00000004;
-    static final int Worker                  = 0x00000008;
-    static final int Subunit                 = 0x00000010;
-    static final int FlyingBuilding          = 0x00000020;
-    static final int Hero                    = 0x00000040;
-    static final int RegeneratesHP           = 0x00000080;
-    static final int AnimatedIdle            = 0x00000100;
-    static final int Cloakable               = 0x00000200;
-    static final int TwoUnitsIn1Egg          = 0x00000400;
-    static final int NeutralAccessories      = 0x00000800;
-    static final int ResourceDepot           = 0x00001000;
-    static final int ResourceContainer       = 0x00002000;
-    static final int RoboticUnit             = 0x00004000;
-    static final int Detector                = 0x00008000;
-    static final int OrganicUnit             = 0x00010000;
-    static final int CreepBuilding           = 0x00020000;
-    static final int Unused                  = 0x00040000;
-    static final int RequiresPsi             = 0x00080000;
-    static final int Burrowable              = 0x00100000;
-    static final int Spellcaster             = 0x00200000;
-    static final int PermanentCloak          = 0x00400000;
-    static final int NPCOrAccessories        = 0x00800000;
-    static final int MorphFromOtherUnit      = 0x01000000;
-    static final int LargeUnit               = 0x02000000;
-    static final int HugeUnit                = 0x04000000;
-    static final int AutoAttackAndMove       = 0x08000000;
-    static final int Attack                  = 0x10000000; /* < Can attack */
-    static final int Invincible              = 0x20000000;
-    static final int Mechanical              = 0x40000000;
-    static final int ProducesUnits           = 0x80000000; /* < It can produce units directly (making buildings doesn't count) */
-
-    static final int unitFlags[]= {
+    static final int Building = 0x00000001;
+    static final int Addon = 0x00000002;
+    static final int Flyer = 0x00000004;
+    static final int Worker = 0x00000008;
+    static final int Subunit = 0x00000010;
+    static final int FlyingBuilding = 0x00000020;
+    static final int Hero = 0x00000040;
+    static final int RegeneratesHP = 0x00000080;
+    static final int AnimatedIdle = 0x00000100;
+    static final int Cloakable = 0x00000200;
+    static final int TwoUnitsIn1Egg = 0x00000400;
+    static final int NeutralAccessories = 0x00000800;
+    static final int ResourceDepot = 0x00001000;
+    static final int ResourceContainer = 0x00002000;
+    static final int RoboticUnit = 0x00004000;
+    static final int Detector = 0x00008000;
+    static final int OrganicUnit = 0x00010000;
+    static final int CreepBuilding = 0x00020000;
+    static final int Unused = 0x00040000;
+    static final int RequiresPsi = 0x00080000;
+    static final int Burrowable = 0x00100000;
+    static final int Spellcaster = 0x00200000;
+    static final int PermanentCloak = 0x00400000;
+    static final int NPCOrAccessories = 0x00800000;
+    static final int MorphFromOtherUnit = 0x01000000;
+    static final int LargeUnit = 0x02000000;
+    static final int HugeUnit = 0x04000000;
+    static final int AutoAttackAndMove = 0x08000000;
+    static final int Attack = 0x10000000; /* < Can attack */
+    static final int Invincible = 0x20000000;
+    static final int Mechanical = 0x40000000;
+    static final int ProducesUnits = 0x80000000; /* < It can produce units directly (making buildings doesn't count) */
+    static final int unitFlags[] = {
             OrganicUnit | AutoAttackAndMove | Attack,
             Cloakable | OrganicUnit | Spellcaster | AutoAttackAndMove | Attack,
             AutoAttackAndMove | Attack | Mechanical,
@@ -349,9 +295,8 @@ class UnitTypeContainer {
             NeutralAccessories | NPCOrAccessories,
             NeutralAccessories | NPCOrAccessories,
             NeutralAccessories | NPCOrAccessories,
-            0,0,0,0,0,0
+            0, 0, 0, 0, 0, 0
     };
-
     static final int defaultArmorAmount[] = {
             0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 3, 1, 3, 0, 0, 0, 3, 3, 0, 3, 3, 4, 4, 3, 0, 3, 0, 4, 4, 4, 1, 0, 1, 0, 1, 10, 10, 0,
             0, 1, 0, 0, 0, 0, 2, 0, 1, 0, 4, 3, 0, 2, 3, 2, 3, 3, 4, 4, 2, 0, 1, 1, 2, 1, 0, 1, 1, 0, 0, 1, 0, 1, 4, 0, 0, 0, 3,
@@ -360,7 +305,6 @@ class UnitTypeContainer {
             1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
     static final int defaultOreCost[] = {
             50, 25, 75, 100, 1, 150, 1, 50, 150, 100, 100, 100, 400, 1, 200, 0, 50, 200, 1, 150, 50, 400, 50, 300, 1, 300, 1, 800,
             800, 800, 150, 1, 50, 0, 50, 1, 1, 50, 75, 200, 1, 50, 100, 100, 50, 100, 50, 25, 400, 200, 100, 200, 50, 150, 100, 200,
@@ -371,7 +315,6 @@ class UnitTypeContainer {
             150, 150, 150, 300, 200, 150, 100, 250, 250, 1500, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 600, 1000, 250, 50, 100, 250,
             50, 100, 250, 50, 100, 200, 1000, 250, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-
     static final int defaultGasCost[] = {
             0, 75, 0, 50, 1, 100, 1, 0, 100, 225, 50, 100, 300, 0, 200, 0, 150, 100, 1, 0, 0, 200, 600, 200, 1, 200, 1, 600, 600, 600, 100,
             1, 25, 0, 25, 1, 1, 0, 25, 200, 1, 0, 0, 100, 100, 100, 150, 75, 400, 300, 50, 300, 200, 50, 0, 200, 200, 0, 125, 1, 100, 100,
@@ -381,7 +324,6 @@ class UnitTypeContainer {
             0, 100, 0, 200, 0, 150, 0, 200, 150, 100, 0, 0, 0, 500, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 200, 400, 0, 50, 100, 0, 50, 100,
             0, 50, 100, 50, 500, 200, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-
     static final int defaultTimeCost[] = {
             360, 750, 450, 600, 1, 750, 1, 300, 900, 1200, 720, 750, 2000, 1, 1500, 1, 1500, 1200, 1, 900, 1, 1800, 2400, 1500, 1, 1500, 1,
             4800, 2400, 4800, 750, 1, 360, 1, 450, 1, 1, 420, 420, 900, 1, 300, 600, 600, 600, 750, 750, 450, 1800, 1500, 600, 1500, 1500,
@@ -393,7 +335,6 @@ class UnitTypeContainer {
             1, 1, 1, 1, 1, 1, 2400, 4800, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2400, 2400, 2400, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitSupplyProvided[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -402,7 +343,6 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitSupplyRequired[] = {
             2, 2, 4, 4, 0, 4, 0, 2, 4, 4, 0, 4, 12, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 2, 0, 0, 1, 2, 8, 0, 2,
             0, 4, 4, 4, 4, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6, 0, 4, 4, 4, 8, 2, 4, 4, 4, 8, 4, 6, 8, 12, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2,
@@ -411,7 +351,6 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitSpaceRequired[] = {
             1, 1, 2, 2, 255, 4, 255, 1, 255, 255, 1, 255, 255, 255, 255, 1, 1, 2, 255, 2, 1, 255, 255, 4, 255, 255, 255, 255, 255,
             255, 255, 255, 1, 255, 1, 255, 255, 1, 2, 4, 1, 1, 255, 255, 255, 255, 2, 255, 4, 255, 1, 1, 2, 2, 1, 255, 255, 255, 255,
@@ -423,7 +362,6 @@ class UnitTypeContainer {
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitSpaceProvided[] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -432,7 +370,6 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitBuildScore[] = {
             50, 175, 75, 200, 0, 350, 0, 50, 400, 625, 0, 300, 1200, 0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 125,
             0, 0, 25, 125, 650, 0, 50, 100, 300, 550, 400, 225, 100, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 400, 0, 350, 325, 550, 650, 50, 100, 250,
@@ -442,7 +379,6 @@ class UnitTypeContainer {
             300, 0, 350, 450, 125, 50, 0, 0, 0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-
     static final int unitDestroyScore[] = {
             100, 350, 150, 400, 0, 700, 0, 100, 800, 1250, 400, 600, 2400, 25, 0, 10, 700, 800, 0, 300, 200, 1600, 2500, 1400, 0, 1400, 0, 4800,
             4800, 4800, 700, 0, 200, 0, 250, 10, 25, 50, 350, 1300, 25, 100, 200, 600, 1100, 800, 450, 200, 2600, 1600, 400, 4000, 900, 500, 100,
@@ -454,46 +390,144 @@ class UnitTypeContainer {
             3600, 0, 0, 0, 0, 0, 0, 0, 0, 0, 600, 4000, 0, 100, 10, 10, 10, 10, 10, 100, 100, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0
     };
-
-    static class UnitDimensions {
-        static final int tileWidth  = 0;
-        static final int tileHeight = 1;
-        static final int left       = 2;
-        static final int up         = 3;
-        static final int right      = 4;
-        static final int down       = 5;
-    }
     static final int unitDimensions[][] = {
-            {1,1,8,9,8,10}, {1,1,7,10,7,11}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,11,11,11,11}, {1,1,19,15,18,14},
-            {2,2,32,33,32,16}, {1,1,11,7,11,14}, {2,2,24,16,24,20}, {2,2,37,29,37,29}, {1,1,7,7,7,7}, {1,1,7,14,7,14}, {1,1,8,9,8,10}, {1,1,7,10,7,11}, {1,1,16,16,15,15},
-            {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,8,9,8,10}, {1,1,19,15,18,14}, {2,2,32,33,32,16}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,16,16,15,15}, {1,1,1,1,1,1},
-            {2,2,37,29,37,29}, {2,2,37,29,37,29}, {2,2,37,29,37,29}, {1,1,16,16,15,15}, {1,1,1,1,1,1}, {1,1,11,7,11,14}, {1,1,13,13,13,17}, {1,1,8,9,8,10}, {1,1,8,8,7,7},
-            {1,1,16,16,15,15}, {1,1,8,4,7,11}, {1,1,10,10,10,12}, {2,2,19,16,18,15}, {1,1,9,9,9,9}, {1,1,11,11,11,11}, {2,2,25,25,24,24}, {2,2,22,22,21,21}, {2,2,22,22,21,21},
-            {2,2,24,24,23,23}, {1,1,13,12,13,12}, {1,1,12,12,11,11}, {2,2,19,16,18,15}, {2,2,24,24,23,23}, {1,1,8,9,8,10}, {1,1,7,10,7,11}, {1,1,13,12,13,12}, {1,1,10,10,10,12},
-            {1,1,8,4,7,11}, {2,2,22,22,21,21}, {2,2,22,22,21,21}, {2,2,25,25,24,24}, {2,2,24,16,24,20}, {1,1,16,16,15,15}, {1,1,18,16,17,15}, {1,1,12,6,11,19}, {2,2,22,22,21,21},
-            {1,1,16,16,15,15}, {1,1,11,11,11,11}, {1,1,11,5,11,13}, {1,1,15,15,16,16}, {1,1,12,10,11,13}, {1,1,16,16,15,15}, {2,1,20,16,19,15}, {2,1,18,16,17,15}, {2,2,22,22,21,21},
-            {2,2,32,32,31,31}, {1,1,8,8,7,7}, {1,1,12,6,11,19}, {1,1,12,6,11,19}, {1,1,16,16,15,15}, {1,1,11,5,11,13}, {1,1,15,15,16,16}, {1,1,12,10,11,13}, {2,1,18,16,17,15},
-            {1,1,16,16,15,15}, {2,2,32,32,31,31}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,2,2,2,2}, {2,2,22,22,21,21}, {1,1,12,10,11,13}, {2,1,18,16,17,15}, {1,1,16,16,15,15},
-            {1,1,16,16,15,15}, {1,1,15,15,16,16}, {1,1,15,15,16,16}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15},
-            {1,1,18,16,17,15}, {1,1,7,10,7,11}, {1,1,7,10,7,11}, {1,1,13,13,13,17}, {2,2,37,29,37,29}, {1,1,15,15,16,16}, {1,1,7,10,7,11}, {4,3,60,40,59,39}, {4,3,58,41,58,41},
-            {2,2,37,16,31,25}, {2,2,37,16,31,25}, {3,2,38,22,38,26}, {4,2,56,32,56,31}, {4,3,48,40,56,32}, {3,2,40,32,44,24}, {4,3,56,40,56,40}, {4,3,48,40,48,38},
-            {2,2,47,24,28,22}, {4,3,48,38,48,38}, {2,2,47,24,28,22}, {2,2,47,24,28,22}, {3,2,48,32,47,31}, {2,2,39,24,31,24}, {3,3,48,48,47,47}, {4,3,48,32,48,28},
-            {3,2,48,32,47,22}, {2,2,16,32,16,16}, {3,2,32,24,32,16}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {4,3,58,41,58,41},
-            {4,3,49,32,49,32}, {4,3,49,32,49,32}, {4,3,49,32,49,32}, {2,2,32,32,31,31}, {3,2,40,32,40,24}, {4,2,48,32,48,4}, {2,2,28,32,28,24}, {3,2,38,28,32,28},
-            {3,2,44,32,32,20}, {3,2,40,32,32,31}, {2,2,28,32,28,24}, {3,2,36,28,40,18}, {2,2,24,24,23,23}, {2,2,24,24,23,23}, {3,3,48,48,47,47}, {2,2,24,24,23,23},
-            {5,3,80,32,79,40}, {5,3,80,32,79,40}, {4,2,64,32,63,31}, {2,2,32,32,31,31}, {3,2,40,32,32,31}, {3,2,40,32,32,31}, {1,1,16,16,15,15}, {4,3,56,39,56,39},
-            {3,2,36,16,40,20}, {2,2,16,12,16,20}, {4,2,48,32,48,24}, {4,3,64,48,63,47}, {3,2,44,16,44,28}, {4,3,48,32,48,40}, {3,3,48,48,47,47}, {2,2,20,16,20,16},
-            {3,2,24,24,40,24}, {3,2,40,24,40,24}, {3,2,32,24,32,24}, {3,2,36,24,36,20}, {4,3,48,40,48,32}, {4,3,64,48,63,47}, {3,2,40,32,47,24}, {3,2,44,28,44,28},
-            {3,2,32,32,32,20}, {3,2,32,16,32,16}, {4,3,64,48,63,47}, {7,3,112,48,111,47}, {5,4,80,34,79,63}, {2,1,32,16,31,15}, {2,1,32,16,31,15}, {2,1,32,16,31,15},
-            {2,2,32,32,31,31}, {2,2,32,32,31,31}, {2,2,32,32,31,31}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {2,2,32,32,31,31}, {1,1,16,16,15,15}, {1,1,16,16,15,15},
-            {1,1,16,16,15,15}, {4,2,64,32,63,31}, {3,2,48,32,47,31}, {5,3,80,38,69,47}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {3,2,48,32,47,31},
-            {3,2,48,32,47,31}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {3,2,48,32,47,31}, {4,3,56,28,63,43}, {3,2,48,32,47,31}, {5,5,80,80,79,79},
-            {2,2,32,32,31,31}, {8,4,128,64,127,63}, {3,2,25,17,44,20}, {3,2,44,17,25,20}, {3,2,41,17,28,20}, {3,2,28,17,41,20}, {2,2,32,32,31,31}, {1,1,16,16,15,15},
-            {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {4,3,48,32,48,32}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15},
-            {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15}, {1,1,16,16,15,15},
-            {1,1,16,16,15,15}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0}
+            {1, 1, 8, 9, 8, 10}, {1, 1, 7, 10, 7, 11}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 11, 11, 11, 11}, {1, 1, 19, 15, 18, 14},
+            {2, 2, 32, 33, 32, 16}, {1, 1, 11, 7, 11, 14}, {2, 2, 24, 16, 24, 20}, {2, 2, 37, 29, 37, 29}, {1, 1, 7, 7, 7, 7}, {1, 1, 7, 14, 7, 14}, {1, 1, 8, 9, 8, 10}, {1, 1, 7, 10, 7, 11}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 8, 9, 8, 10}, {1, 1, 19, 15, 18, 14}, {2, 2, 32, 33, 32, 16}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1},
+            {2, 2, 37, 29, 37, 29}, {2, 2, 37, 29, 37, 29}, {2, 2, 37, 29, 37, 29}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 11, 7, 11, 14}, {1, 1, 13, 13, 13, 17}, {1, 1, 8, 9, 8, 10}, {1, 1, 8, 8, 7, 7},
+            {1, 1, 16, 16, 15, 15}, {1, 1, 8, 4, 7, 11}, {1, 1, 10, 10, 10, 12}, {2, 2, 19, 16, 18, 15}, {1, 1, 9, 9, 9, 9}, {1, 1, 11, 11, 11, 11}, {2, 2, 25, 25, 24, 24}, {2, 2, 22, 22, 21, 21}, {2, 2, 22, 22, 21, 21},
+            {2, 2, 24, 24, 23, 23}, {1, 1, 13, 12, 13, 12}, {1, 1, 12, 12, 11, 11}, {2, 2, 19, 16, 18, 15}, {2, 2, 24, 24, 23, 23}, {1, 1, 8, 9, 8, 10}, {1, 1, 7, 10, 7, 11}, {1, 1, 13, 12, 13, 12}, {1, 1, 10, 10, 10, 12},
+            {1, 1, 8, 4, 7, 11}, {2, 2, 22, 22, 21, 21}, {2, 2, 22, 22, 21, 21}, {2, 2, 25, 25, 24, 24}, {2, 2, 24, 16, 24, 20}, {1, 1, 16, 16, 15, 15}, {1, 1, 18, 16, 17, 15}, {1, 1, 12, 6, 11, 19}, {2, 2, 22, 22, 21, 21},
+            {1, 1, 16, 16, 15, 15}, {1, 1, 11, 11, 11, 11}, {1, 1, 11, 5, 11, 13}, {1, 1, 15, 15, 16, 16}, {1, 1, 12, 10, 11, 13}, {1, 1, 16, 16, 15, 15}, {2, 1, 20, 16, 19, 15}, {2, 1, 18, 16, 17, 15}, {2, 2, 22, 22, 21, 21},
+            {2, 2, 32, 32, 31, 31}, {1, 1, 8, 8, 7, 7}, {1, 1, 12, 6, 11, 19}, {1, 1, 12, 6, 11, 19}, {1, 1, 16, 16, 15, 15}, {1, 1, 11, 5, 11, 13}, {1, 1, 15, 15, 16, 16}, {1, 1, 12, 10, 11, 13}, {2, 1, 18, 16, 17, 15},
+            {1, 1, 16, 16, 15, 15}, {2, 2, 32, 32, 31, 31}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 2, 2, 2, 2}, {2, 2, 22, 22, 21, 21}, {1, 1, 12, 10, 11, 13}, {2, 1, 18, 16, 17, 15}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 16, 16, 15, 15}, {1, 1, 15, 15, 16, 16}, {1, 1, 15, 15, 16, 16}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 18, 16, 17, 15}, {1, 1, 7, 10, 7, 11}, {1, 1, 7, 10, 7, 11}, {1, 1, 13, 13, 13, 17}, {2, 2, 37, 29, 37, 29}, {1, 1, 15, 15, 16, 16}, {1, 1, 7, 10, 7, 11}, {4, 3, 60, 40, 59, 39}, {4, 3, 58, 41, 58, 41},
+            {2, 2, 37, 16, 31, 25}, {2, 2, 37, 16, 31, 25}, {3, 2, 38, 22, 38, 26}, {4, 2, 56, 32, 56, 31}, {4, 3, 48, 40, 56, 32}, {3, 2, 40, 32, 44, 24}, {4, 3, 56, 40, 56, 40}, {4, 3, 48, 40, 48, 38},
+            {2, 2, 47, 24, 28, 22}, {4, 3, 48, 38, 48, 38}, {2, 2, 47, 24, 28, 22}, {2, 2, 47, 24, 28, 22}, {3, 2, 48, 32, 47, 31}, {2, 2, 39, 24, 31, 24}, {3, 3, 48, 48, 47, 47}, {4, 3, 48, 32, 48, 28},
+            {3, 2, 48, 32, 47, 22}, {2, 2, 16, 32, 16, 16}, {3, 2, 32, 24, 32, 16}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {4, 3, 58, 41, 58, 41},
+            {4, 3, 49, 32, 49, 32}, {4, 3, 49, 32, 49, 32}, {4, 3, 49, 32, 49, 32}, {2, 2, 32, 32, 31, 31}, {3, 2, 40, 32, 40, 24}, {4, 2, 48, 32, 48, 4}, {2, 2, 28, 32, 28, 24}, {3, 2, 38, 28, 32, 28},
+            {3, 2, 44, 32, 32, 20}, {3, 2, 40, 32, 32, 31}, {2, 2, 28, 32, 28, 24}, {3, 2, 36, 28, 40, 18}, {2, 2, 24, 24, 23, 23}, {2, 2, 24, 24, 23, 23}, {3, 3, 48, 48, 47, 47}, {2, 2, 24, 24, 23, 23},
+            {5, 3, 80, 32, 79, 40}, {5, 3, 80, 32, 79, 40}, {4, 2, 64, 32, 63, 31}, {2, 2, 32, 32, 31, 31}, {3, 2, 40, 32, 32, 31}, {3, 2, 40, 32, 32, 31}, {1, 1, 16, 16, 15, 15}, {4, 3, 56, 39, 56, 39},
+            {3, 2, 36, 16, 40, 20}, {2, 2, 16, 12, 16, 20}, {4, 2, 48, 32, 48, 24}, {4, 3, 64, 48, 63, 47}, {3, 2, 44, 16, 44, 28}, {4, 3, 48, 32, 48, 40}, {3, 3, 48, 48, 47, 47}, {2, 2, 20, 16, 20, 16},
+            {3, 2, 24, 24, 40, 24}, {3, 2, 40, 24, 40, 24}, {3, 2, 32, 24, 32, 24}, {3, 2, 36, 24, 36, 20}, {4, 3, 48, 40, 48, 32}, {4, 3, 64, 48, 63, 47}, {3, 2, 40, 32, 47, 24}, {3, 2, 44, 28, 44, 28},
+            {3, 2, 32, 32, 32, 20}, {3, 2, 32, 16, 32, 16}, {4, 3, 64, 48, 63, 47}, {7, 3, 112, 48, 111, 47}, {5, 4, 80, 34, 79, 63}, {2, 1, 32, 16, 31, 15}, {2, 1, 32, 16, 31, 15}, {2, 1, 32, 16, 31, 15},
+            {2, 2, 32, 32, 31, 31}, {2, 2, 32, 32, 31, 31}, {2, 2, 32, 32, 31, 31}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {2, 2, 32, 32, 31, 31}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 16, 16, 15, 15}, {4, 2, 64, 32, 63, 31}, {3, 2, 48, 32, 47, 31}, {5, 3, 80, 38, 69, 47}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31},
+            {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {3, 2, 48, 32, 47, 31}, {4, 3, 56, 28, 63, 43}, {3, 2, 48, 32, 47, 31}, {5, 5, 80, 80, 79, 79},
+            {2, 2, 32, 32, 31, 31}, {8, 4, 128, 64, 127, 63}, {3, 2, 25, 17, 44, 20}, {3, 2, 44, 17, 25, 20}, {3, 2, 41, 17, 28, 20}, {3, 2, 28, 17, 41, 20}, {2, 2, 32, 32, 31, 31}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {4, 3, 48, 32, 48, 32}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15},
+            {1, 1, 16, 16, 15, 15}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}
     };
-
+    static final int seekRangeTiles[] = {
+            0, 0, 0, 5, 0, 8, 8, 1, 0, 0, 3, 0, 0, 3, 0, 0, 0, 5, 0, 0, 0, 0, 0, 8, 0, 0, 12, 0, 0, 0, 0, 12, 3, 0, 9, 0, 0, 3, 0, 3, 3, 0,
+            0, 3, 0, 8, 0, 3, 3, 8, 3, 3, 0, 0, 3, 3, 0, 0, 0, 0, 9, 3, 7, 7, 0, 3, 0, 3, 3, 0, 0, 0, 8, 0, 3, 3, 3, 3, 0, 3, 0, 8, 8, 8, 0,
+            3, 0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 5, 2, 5, 2,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static final int sightRangeTiles[] = {
+            7, 9, 8, 8, 8, 10, 10, 7, 7, 10, 7, 8, 11, 3, 3, 7, 11, 8, 8, 8, 7, 7, 10, 10, 10, 10, 10, 8, 11, 11, 10, 10, 7, 10, 9, 4, 4, 5, 6,
+            7, 5, 7, 9, 7, 11, 10, 10, 5, 7, 10, 5, 9, 10, 8, 5, 7, 11, 11, 8, 4, 9, 7, 10, 10, 8, 7, 8, 7, 8, 8, 8, 9, 11, 6, 7, 7, 8, 7, 8,
+            7, 10, 10, 9, 10, 9, 5, 9, 7, 10, 7, 7, 8, 7, 7, 7, 7, 7, 4, 9, 10, 11, 10, 11, 8, 11, 8, 10, 10, 8, 8, 8, 8, 8, 8, 10, 8, 10, 8,
+            8, 8, 8, 8, 8, 8, 11, 10, 10, 8, 5, 5, 10, 9, 10, 11, 8, 8, 8, 8, 8, 8, 8, 8, 8, 10, 10, 7, 10, 8, 8, 7, 8, 8, 8, 7, 11, 10, 8, 10,
+            7, 10, 10, 10, 11, 10, 10, 10, 10, 10, 8, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 10, 8, 8, 8, 8, 8,
+            8, 8, 8, 8, 8, 10, 8, 6, 7, 1, 1, 1, 1, 6, 6, 3, 6, 3, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0
+    };
+    static final int groundWeaponHits[] = {
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
+            1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 2, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 1,
+            1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static final int airWeaponHits[] = {
+            1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+            1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+            1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static final int unitAcceleration[] = {
+            1, 1, 100, 1, 0, 1, 0, 67, 67, 50, 1, 17, 27, 1, 33, 1, 1, 1, 0, 100, 1, 67, 50, 1, 0, 1, 0, 27, 27, 27, 1, 0, 1, 0, 1, 1, 0, 1,
+            1, 1, 1, 67, 27, 67, 27, 67, 1, 107, 1, 67, 1, 1, 1, 1, 1, 67, 27, 27, 65, 0, 67, 27, 48, 160, 67, 1, 1, 27, 160, 17, 48, 33, 27,
+            427, 27, 27, 160, 1, 1, 27, 48, 1, 27, 1, 27, 1, 33, 27, 48, 1, 1, 0, 0, 1, 16, 1, 1, 0, 67, 1, 1, 0, 27, 1, 1, 0, 33, 0, 0, 0,
+            33, 33, 0, 33, 33, 0, 33, 0, 0, 0, 0, 0, 33, 0, 0, 33, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static final int unitHaltDistance[] = {
+            1, 1, 14569, 1, 0, 1, 0, 12227, 21745, 5120, 1, 37756, 7585, 1, 1103213, 1, 1, 1, 0, 14569, 1, 21745, 5120, 1, 0, 1, 0,
+            7585, 7585, 7585, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 12227, 840, 21745, 7585, 21745, 1, 13616, 1, 21745, 1, 1, 1, 1, 1, 21745,
+            7585, 840, 21901, 0, 17067, 13474, 17067, 5120, 12227, 1, 1, 13474, 5120, 37756, 17067, 24824, 13474, 13640, 13474, 13474,
+            5120, 1, 1, 13474, 17067, 1, 13474, 1, 13474, 1, 24824, 13474, 17067, 1, 1, 0, 0, 1, 51200, 1, 1, 0, 17067, 1, 1, 0, 7585,
+            1, 1, 0, 2763, 0, 0, 0, 2763, 2763, 0, 2763, 2763, 0, 2763, 0, 0, 0, 0, 0, 2763, 0, 0, 2763, 0, 0, 0, 0, 2763, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static final int unitTurnRadius[] = {
+            40, 40, 40, 17, 0, 13, 0, 40, 40, 40, 40, 20, 20, 127, 127, 40, 40, 17, 0, 40, 40, 40, 40, 13, 0, 40, 0, 20, 20, 20, 40, 0, 40,
+            0, 40, 20, 0, 27, 27, 40, 27, 40, 20, 40, 20, 40, 27, 40, 40, 40, 40, 40, 27, 27, 27, 40, 20, 20, 30, 0, 30, 40, 30, 40, 40, 40,
+            40, 40, 40, 20, 30, 40, 20, 40, 40, 40, 40, 40, 40, 40, 30, 20, 20, 20, 20, 27, 40, 40, 30, 27, 27, 0, 0, 27, 14, 27, 27, 0, 30,
+            40, 40, 0, 20, 40, 40, 0, 27, 0, 0, 0, 27, 27, 0, 27, 27, 0, 27, 0, 0, 0, 0, 0, 27, 0, 40, 27, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static Race unitRace[] = {
+            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
+            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
+            Terran, Terran, Terran, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
+            Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Terran, Zerg, Protoss, Protoss, Zerg, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
+            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
+            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Race.None, Race.None, Zerg, Zerg, Race.None, Race.None, Race.None, Race.None, Zerg, Protoss, Terran,
+            Terran, Race.None, Terran, Zerg, Zerg, Race.None, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
+            Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Race.None, Race.None, Zerg, Zerg, Zerg, Zerg,
+            Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
+            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss,
+            Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Protoss, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
+            Race.None, Race.None, Race.None, Race.None, Protoss, Terran, Zerg, Terran, Protoss, Zerg, Terran, Protoss, Zerg, Terran, Protoss, Terran, Zerg,
+            Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
+            Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
+    };
+    static UpgradeType armorUpgrade[] = {
+            Terran_Infantry_Armor, Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
+            Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating,
+            Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating, Upgrade_60, Upgrade_60, Terran_Infantry_Armor,
+            Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor,
+            Terran_Ship_Plating, Terran_Ship_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
+            Terran_Vehicle_Plating, Terran_Ship_Plating, Terran_Ship_Plating, Terran_Ship_Plating, Terran_Vehicle_Plating,
+            Terran_Vehicle_Plating, Terran_Infantry_Armor, Upgrade_60, Terran_Infantry_Armor, Zerg_Carapace, Zerg_Carapace,
+            Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Flyer_Carapace,
+            Zerg_Flyer_Carapace, Zerg_Flyer_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace,
+            Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Carapace, Zerg_Flyer_Carapace, Zerg_Flyer_Carapace,
+            Zerg_Flyer_Carapace, Terran_Ship_Plating, Zerg_Carapace, Protoss_Air_Armor, Protoss_Ground_Armor, Zerg_Flyer_Carapace,
+            Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor,
+            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor, Protoss_Air_Armor,
+            Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor, Protoss_Ground_Armor,
+            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor,
+            Protoss_Ground_Armor, Protoss_Air_Armor, Protoss_Ground_Armor, Protoss_Air_Armor, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Zerg_Carapace, Protoss_Air_Armor, Terran_Infantry_Armor,
+            Terran_Infantry_Armor, Upgrade_60, Terran_Ship_Plating, Zerg_Carapace, Zerg_Carapace, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
+            UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.Unknown
+    };
     static UnitType whatBuilds[] = {
             Terran_Barracks, Terran_Barracks, Terran_Factory, Terran_Factory, UnitType.None, Terran_Factory, UnitType.None, Terran_Command_Center, Terran_Starport,
             Terran_Starport, UnitType.None, Terran_Starport, Terran_Starport, UnitType.None, Terran_Nuclear_Silo, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
@@ -514,7 +548,6 @@ class UnitTypeContainer {
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Unknown
     };
-
     static UnitType buildsWhat[][] = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
@@ -523,7 +556,7 @@ class UnitTypeContainer {
             {},// Terran_Goliath_Turret,
             {},// Terran_Siege_Tank_Tank_Mode,
             {},// Terran_Siege_Tank_Tank_Mode_Turret,
-            {Terran_Academy, Terran_Armory, Terran_Barracks, Terran_Bunker, Terran_Command_Center, Terran_Engineering_Bay, Terran_Factory, Terran_Missile_Turret, Terran_Refinery, Terran_Science_Facility, Terran_Starport, Terran_Supply_Depot },// Terran_SCV,
+            {Terran_Academy, Terran_Armory, Terran_Barracks, Terran_Bunker, Terran_Command_Center, Terran_Engineering_Bay, Terran_Factory, Terran_Missile_Turret, Terran_Refinery, Terran_Science_Facility, Terran_Starport, Terran_Supply_Depot},// Terran_SCV,
             {},// Terran_Wraith,
             {},// Terran_Science_Vessel,
             {},// Hero_Gui_Montag,
@@ -580,7 +613,7 @@ class UnitTypeContainer {
             {Protoss_Dark_Archon},// Protoss_Dark_Templar,
             {},// Zerg_Devourer,
             {},// Protoss_Dark_Archon,
-            { Protoss_Arbiter_Tribunal, Protoss_Assimilator, Protoss_Citadel_of_Adun, Protoss_Cybernetics_Core, Protoss_Fleet_Beacon, Protoss_Forge, Protoss_Gateway, Protoss_Nexus, Protoss_Observatory, Protoss_Photon_Cannon, Protoss_Pylon, Protoss_Robotics_Facility, Protoss_Robotics_Support_Bay, Protoss_Shield_Battery, Protoss_Stargate, Protoss_Templar_Archives},// Protoss_Probe,
+            {Protoss_Arbiter_Tribunal, Protoss_Assimilator, Protoss_Citadel_of_Adun, Protoss_Cybernetics_Core, Protoss_Fleet_Beacon, Protoss_Forge, Protoss_Gateway, Protoss_Nexus, Protoss_Observatory, Protoss_Photon_Cannon, Protoss_Pylon, Protoss_Robotics_Facility, Protoss_Robotics_Support_Bay, Protoss_Shield_Battery, Protoss_Stargate, Protoss_Templar_Archives},// Protoss_Probe,
             {},// Protoss_Zealot,
             {},// Protoss_Dragoon,
             {Protoss_Archon},// Protoss_High_Templar,
@@ -752,25 +785,6 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-
-    static final int seekRangeTiles[] = {
-            0, 0, 0, 5, 0, 8, 8, 1, 0, 0, 3, 0, 0, 3, 0, 0, 0, 5, 0, 0, 0, 0, 0, 8, 0, 0, 12, 0, 0, 0, 0, 12, 3, 0, 9, 0, 0, 3, 0, 3, 3, 0,
-            0, 3, 0, 8, 0, 3, 3, 8, 3, 3, 0, 0, 3, 3, 0, 0, 0, 0, 9, 3, 7, 7, 0, 3, 0, 3, 3, 0, 0, 0, 8, 0, 3, 3, 3, 3, 0, 3, 0, 8, 8, 8, 0,
-            3, 0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 5, 2, 5, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    static final int sightRangeTiles[] = {
-            7, 9, 8, 8, 8, 10, 10, 7, 7, 10, 7, 8, 11, 3, 3, 7, 11, 8, 8, 8, 7, 7, 10, 10, 10, 10, 10, 8, 11, 11, 10, 10, 7, 10, 9, 4, 4, 5, 6,
-            7, 5, 7, 9, 7, 11, 10, 10, 5, 7, 10, 5, 9, 10, 8, 5, 7, 11, 11, 8, 4, 9, 7, 10, 10, 8, 7, 8, 7, 8, 8, 8, 9, 11, 6, 7, 7, 8, 7, 8,
-            7, 10, 10, 9, 10, 9, 5, 9, 7, 10, 7, 7, 8, 7, 7, 7, 7, 7, 4, 9, 10, 11, 10, 11, 8, 11, 8, 10, 10, 8, 8, 8, 8, 8, 8, 10, 8, 10, 8,
-            8, 8, 8, 8, 8, 8, 11, 10, 10, 8, 5, 5, 10, 9, 10, 11, 8, 8, 8, 8, 8, 8, 8, 8, 8, 10, 10, 7, 10, 8, 8, 7, 8, 8, 8, 7, 11, 10, 8, 10,
-            7, 10, 10, 10, 11, 10, 10, 10, 10, 10, 8, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 10, 8, 8, 8, 8, 8,
-            8, 8, 8, 8, 8, 10, 8, 6, 7, 1, 1, 1, 1, 6, 6, 3, 6, 3, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0
-    };
-
     static WeaponType groundWeapon[] = {
             Gauss_Rifle, C_10_Canister_Rifle, Fragmentation_Grenade, Twin_Autocannons, Twin_Autocannons, Arclite_Cannon, Arclite_Cannon,
             Fusion_Cutter, Burst_Lasers, WeaponType.None, Flame_Thrower_Gui_Montag, WeaponType.None, ATS_Laser_Battery, WeaponType.Spider_Mines, WeaponType.None, WeaponType.None,
@@ -795,7 +809,6 @@ class UnitTypeContainer {
             Flame_Thrower_Wall_Trap, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None,
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Unknown
     };
-
     static WeaponType airWeapon[] = {
             Gauss_Rifle, C_10_Canister_Rifle, WeaponType.None, Hellfire_Missile_Pack, Hellfire_Missile_Pack, WeaponType.None, WeaponType.None, WeaponType.None, Gemini_Missiles, WeaponType.None, WeaponType.None, WeaponType.None,
             ATA_Laser_Battery, WeaponType.None, WeaponType.None, WeaponType.None, C_10_Canister_Rifle_Sarah_Kerrigan, Hellfire_Missile_Pack_Alan_Schezar, Hellfire_Missile_Pack_Alan_Schezar, WeaponType.None,
@@ -815,25 +828,6 @@ class UnitTypeContainer {
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None,
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Unknown
     };
-
-    static final int groundWeaponHits[] = {
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
-            1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 2, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 1,
-            1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    static final int airWeaponHits[] = {
-            1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
-            1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
     static UnitSizeType unitSize[] = {
             UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Medium, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Independent,
             UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Medium, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Large,
@@ -852,7 +846,6 @@ class UnitTypeContainer {
             UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent,
             UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.Unknown
     };
-
     static double unitTopSpeeds[] = {
             4.0, 4.0, 6.4, 4.57, 0.0, 4.0, 0.0, 4.92, 6.67, 5.0, 4.0, 5.47, 2.5, 16.0, 33.33, 4.0, 4.0, 4.57, 0.0, 6.4, 4.0, 6.67,
             5.0, 4.0, 0.0, 0.0, 0.0, 2.5, 2.5, 2.5, 0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 0.0, 5.49, 3.66, 5.12, 6.0, 4.92, 0.83, 6.67, 2.5,
@@ -865,88 +858,49 @@ class UnitTypeContainer {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
-
-    static final int unitAcceleration[] = {
-            1, 1, 100, 1, 0, 1, 0, 67, 67, 50, 1, 17, 27, 1, 33, 1, 1, 1, 0, 100, 1, 67, 50, 1, 0, 1, 0, 27, 27, 27, 1, 0, 1, 0, 1, 1, 0, 1,
-            1, 1, 1, 67, 27, 67, 27, 67, 1, 107, 1, 67, 1, 1, 1, 1, 1, 67, 27, 27, 65, 0, 67, 27, 48, 160, 67, 1, 1, 27, 160, 17, 48, 33, 27,
-            427, 27, 27, 160, 1, 1, 27, 48, 1, 27, 1, 27, 1, 33, 27, 48, 1, 1, 0, 0, 1, 16, 1, 1, 0, 67, 1, 1, 0, 27, 1, 1, 0, 33, 0, 0, 0,
-            33, 33, 0, 33, 33, 0, 33, 0, 0, 0, 0, 0, 33, 0, 0, 33, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    static final int unitHaltDistance[] = {
-            1, 1, 14569, 1, 0, 1, 0, 12227, 21745, 5120, 1, 37756, 7585, 1, 1103213, 1, 1, 1, 0, 14569, 1, 21745, 5120, 1, 0, 1, 0,
-            7585, 7585, 7585, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 12227, 840, 21745, 7585, 21745, 1, 13616, 1, 21745, 1, 1, 1, 1, 1, 21745,
-            7585, 840, 21901, 0, 17067, 13474, 17067, 5120, 12227, 1, 1, 13474, 5120, 37756, 17067, 24824, 13474, 13640, 13474, 13474,
-            5120, 1, 1, 13474, 17067, 1, 13474, 1, 13474, 1, 24824, 13474, 17067, 1, 1, 0, 0, 1, 51200, 1, 1, 0, 17067, 1, 1, 0, 7585,
-            1, 1, 0, 2763, 0, 0, 0, 2763, 2763, 0, 2763, 2763, 0, 2763, 0, 0, 0, 0, 0, 2763, 0, 0, 2763, 0, 0, 0, 0, 2763, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    static final int unitTurnRadius[] = {
-            40, 40, 40, 17, 0, 13, 0, 40, 40, 40, 40, 20, 20, 127, 127, 40, 40, 17, 0, 40, 40, 40, 40, 13, 0, 40, 0, 20, 20, 20, 40, 0, 40,
-            0, 40, 20, 0, 27, 27, 40, 27, 40, 20, 40, 20, 40, 27, 40, 40, 40, 40, 40, 27, 27, 27, 40, 20, 20, 30, 0, 30, 40, 30, 40, 40, 40,
-            40, 40, 40, 20, 30, 40, 20, 40, 40, 40, 40, 40, 40, 40, 30, 20, 20, 20, 20, 27, 40, 40, 30, 27, 27, 0, 0, 27, 14, 27, 27, 0, 30,
-            40, 40, 0, 20, 40, 40, 0, 27, 0, 0, 0, 27, 27, 0, 27, 27, 0, 27, 0, 0, 0, 0, 0, 27, 0, 40, 27, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-
-    static UpgradeType infantry_no_wpnUpgrade[]    = { Terran_Infantry_Armor };
-    static UpgradeType infantryUpgrade[]           = { Terran_Infantry_Armor, Terran_Infantry_Weapons };
-    static UpgradeType marineUpgrade[]             = { Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells };
-    static UpgradeType ghostUpgrade[]              = { Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor };
-
-    static UpgradeType mechUpgrade[]               = { Terran_Vehicle_Plating, Terran_Vehicle_Weapons };
-    static UpgradeType vultureUpgrade[]            = { Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters };
-    static UpgradeType goliathUpgrade[]            = { Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters };
-
-    static UpgradeType terran_air_no_wpnUpgrade[]  = { Terran_Ship_Plating };
-    static UpgradeType terran_airUpgrade[]         = { Terran_Ship_Plating, Terran_Ship_Weapons };
-    static UpgradeType science_vesselUpgrade[]     = { Terran_Ship_Plating, Titan_Reactor };
-    static UpgradeType wraithUpgrade[]             = { Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor };
-    static UpgradeType battlecruiserUpgrade[]      = { Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor };
-    static UpgradeType medicUpgrade[]              = { Terran_Infantry_Armor, Caduceus_Reactor };
-
-    static UpgradeType carapaceUpgrade[]           = { Zerg_Carapace };
-    static UpgradeType zerg_meleeUpgrade[]         = { Zerg_Carapace, Zerg_Melee_Attacks };
-    static UpgradeType zerg_rangeUpgrade[]         = { Zerg_Carapace, Zerg_Missile_Attacks };
-    static UpgradeType zerglingUpgrade[]           = { Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands };
-    static UpgradeType hydraliskUpgrade[]          = { Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines };
-    static UpgradeType defilerUpgrade[]            = { Zerg_Carapace, Metasynaptic_Node };
-    static UpgradeType ultraliskUpgrade[]          = { Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis };
-
-    static UpgradeType zerg_air_no_wpnUpgrade[]    = { Zerg_Flyer_Carapace };
-    static UpgradeType zerg_airUpgrade[]           = { Zerg_Flyer_Carapace, Zerg_Flyer_Attacks };
-    static UpgradeType overlordUpgrade[]           = { Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace };
-    static UpgradeType queenUpgrade[]              = { Zerg_Flyer_Carapace, Gamete_Meiosis };
-
-    static UpgradeType shieldsUpgrade[]            = { Protoss_Plasma_Shields };
-    static UpgradeType protoss_ground_no_wpnUpgrade[]  = { Protoss_Plasma_Shields, Protoss_Ground_Armor };
-    static UpgradeType protoss_groundUpgrade[]     = { Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons };
-    static UpgradeType zealotUpgrade[]             = { Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements };
-    static UpgradeType dragoonUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge };
-    static UpgradeType reaverUpgrade[]             = { Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity };
-    static UpgradeType templarUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet };
-
-    static UpgradeType protoss_air_no_wpnUpgrade[] = { Protoss_Plasma_Shields, Protoss_Air_Armor };
-    static UpgradeType protoss_airUpgrade[]        = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons };
-    static UpgradeType shuttleUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive };
-    static UpgradeType observerUpgrade[]           = { Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters };
-    static UpgradeType scoutUpgrade[]              = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters };
-    static UpgradeType carrierUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity };
-    static UpgradeType arbiterUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core };
-    static UpgradeType corsairUpgrade[]            = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel };
-    static UpgradeType dark_archonUpgrade[]        = { Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman };
-
-    static UpgradeType infested_duranUpgrade[]     = { Zerg_Carapace, Terran_Infantry_Weapons };
-    static UpgradeType trapUpgrade[]               = { Terran_Vehicle_Weapons };
-    static UpgradeType flame_trapUpgrade[]         = { Terran_Infantry_Weapons };
-
+    static UpgradeType infantry_no_wpnUpgrade[] = {Terran_Infantry_Armor};
+    static UpgradeType infantryUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons};
+    static UpgradeType marineUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells};
+    static UpgradeType ghostUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor};
+    static UpgradeType mechUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons};
+    static UpgradeType vultureUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters};
+    static UpgradeType goliathUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters};
+    static UpgradeType terran_air_no_wpnUpgrade[] = {Terran_Ship_Plating};
+    static UpgradeType terran_airUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons};
+    static UpgradeType science_vesselUpgrade[] = {Terran_Ship_Plating, Titan_Reactor};
+    static UpgradeType wraithUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor};
+    static UpgradeType battlecruiserUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor};
+    static UpgradeType medicUpgrade[] = {Terran_Infantry_Armor, Caduceus_Reactor};
+    static UpgradeType carapaceUpgrade[] = {Zerg_Carapace};
+    static UpgradeType zerg_meleeUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks};
+    static UpgradeType zerg_rangeUpgrade[] = {Zerg_Carapace, Zerg_Missile_Attacks};
+    static UpgradeType zerglingUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands};
+    static UpgradeType hydraliskUpgrade[] = {Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines};
+    static UpgradeType defilerUpgrade[] = {Zerg_Carapace, Metasynaptic_Node};
+    static UpgradeType ultraliskUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis};
+    static UpgradeType zerg_air_no_wpnUpgrade[] = {Zerg_Flyer_Carapace};
+    static UpgradeType zerg_airUpgrade[] = {Zerg_Flyer_Carapace, Zerg_Flyer_Attacks};
+    static UpgradeType overlordUpgrade[] = {Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace};
+    static UpgradeType queenUpgrade[] = {Zerg_Flyer_Carapace, Gamete_Meiosis};
+    static UpgradeType shieldsUpgrade[] = {Protoss_Plasma_Shields};
+    static UpgradeType protoss_ground_no_wpnUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor};
+    static UpgradeType protoss_groundUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons};
+    static UpgradeType zealotUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements};
+    static UpgradeType dragoonUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge};
+    static UpgradeType reaverUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity};
+    static UpgradeType templarUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet};
+    static UpgradeType protoss_air_no_wpnUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor};
+    static UpgradeType protoss_airUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons};
+    static UpgradeType shuttleUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive};
+    static UpgradeType observerUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters};
+    static UpgradeType scoutUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters};
+    static UpgradeType carrierUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity};
+    static UpgradeType arbiterUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core};
+    static UpgradeType corsairUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel};
+    static UpgradeType dark_archonUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman};
+    static UpgradeType infested_duranUpgrade[] = {Zerg_Carapace, Terran_Infantry_Weapons};
+    static UpgradeType trapUpgrade[] = {Terran_Vehicle_Weapons};
+    static UpgradeType flame_trapUpgrade[] = {Terran_Infantry_Weapons};
     static UpgradeType upgrades[][] = {
             marineUpgrade, ghostUpgrade, vultureUpgrade, goliathUpgrade, goliathUpgrade, mechUpgrade, mechUpgrade, infantry_no_wpnUpgrade,
             wraithUpgrade, science_vesselUpgrade, infantryUpgrade, terran_air_no_wpnUpgrade, battlecruiserUpgrade, {}, {},
@@ -976,7 +930,6 @@ class UnitTypeContainer {
             trapUpgrade, flame_trapUpgrade, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-
     static UpgradeType upgradesWhat[][] = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
@@ -1111,7 +1064,7 @@ class UnitTypeContainer {
             {},// Zerg_Infested_Command_Center,
             {},// Zerg_Hatchery,
             {Ventral_Sacs, Antennae, Pneumatized_Carapace},// Zerg_Lair,
-            { Ventral_Sacs, Antennae, Pneumatized_Carapace },// Zerg_Hive,
+            {Ventral_Sacs, Antennae, Pneumatized_Carapace},// Zerg_Hive,
             {},// Zerg_Nydus_Canal,
             {Muscular_Augments, Grooved_Spines},// Zerg_Hydralisk_Den,
             {Metasynaptic_Node},// Zerg_Defiler_Mound,
@@ -1119,7 +1072,7 @@ class UnitTypeContainer {
             {Gamete_Meiosis},// Zerg_Queens_Nest,
             {Zerg_Melee_Attacks, Zerg_Missile_Attacks, Zerg_Carapace},// Zerg_Evolution_Chamber,
             {Anabolic_Synthesis, Chitinous_Plating},// Zerg_Ultralisk_Cavern,
-            { Zerg_Flyer_Attacks, Zerg_Flyer_Carapace },// Zerg_Spire,
+            {Zerg_Flyer_Attacks, Zerg_Flyer_Carapace},// Zerg_Spire,
             {Metabolic_Boost, Adrenal_Glands},// Zerg_Spawning_Pool,
             {},// Zerg_Creep_Colony,
             {},// Zerg_Spore_Colony,
@@ -1214,29 +1167,27 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-
-    static TechType stimTech[] = { Stim_Packs };
-    static TechType ghost_fullTech[] = { TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike };
-    static TechType vultureTech[] = { TechType.Spider_Mines };
-    static TechType siegeTech[] = { Tank_Siege_Mode };
-    static TechType wraithTech[] = { Cloaking_Field };
-    static TechType vesselTech[] = { TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate };
-    static TechType cruiserTech[] = { TechType.Yamato_Gun };
-    static TechType ghost_heroTech[] = { TechType.Lockdown, Personnel_Cloaking };
-    static TechType medicTech[] = { TechType.Restoration, TechType.Optical_Flare, Healing };
-    static TechType burrowTech[] = { Burrowing };
-    static TechType queenTech[] = { Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite };
-    static TechType defilerTech[] = { Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume };
-    static TechType ikerriganTech[] = { Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume };
-    static TechType corsairTech[] = { TechType.Disruption_Web };
-    static TechType dtTech[] = { Dark_Archon_Meld };
-    static TechType darchonTech[] = { TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom };
-    static TechType templar_fullTech[] = { TechType.Psionic_Storm, Hallucination, Archon_Warp };
-    static TechType arbiterTech[] = { Recall, TechType.Stasis_Field };
-    static TechType templar_heroTech[] = { TechType.Psionic_Storm, Hallucination };
-    static TechType iduranTech[] = { TechType.Lockdown, Personnel_Cloaking, TechType.Consume };
-    static TechType comsatTech[] = { Scanner_Sweep };
-
+    static TechType stimTech[] = {Stim_Packs};
+    static TechType ghost_fullTech[] = {TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike};
+    static TechType vultureTech[] = {TechType.Spider_Mines};
+    static TechType siegeTech[] = {Tank_Siege_Mode};
+    static TechType wraithTech[] = {Cloaking_Field};
+    static TechType vesselTech[] = {TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate};
+    static TechType cruiserTech[] = {TechType.Yamato_Gun};
+    static TechType ghost_heroTech[] = {TechType.Lockdown, Personnel_Cloaking};
+    static TechType medicTech[] = {TechType.Restoration, TechType.Optical_Flare, Healing};
+    static TechType burrowTech[] = {Burrowing};
+    static TechType queenTech[] = {Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite};
+    static TechType defilerTech[] = {Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume};
+    static TechType ikerriganTech[] = {Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume};
+    static TechType corsairTech[] = {TechType.Disruption_Web};
+    static TechType dtTech[] = {Dark_Archon_Meld};
+    static TechType darchonTech[] = {TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom};
+    static TechType templar_fullTech[] = {TechType.Psionic_Storm, Hallucination, Archon_Warp};
+    static TechType arbiterTech[] = {Recall, TechType.Stasis_Field};
+    static TechType templar_heroTech[] = {TechType.Psionic_Storm, Hallucination};
+    static TechType iduranTech[] = {TechType.Lockdown, Personnel_Cloaking, TechType.Consume};
+    static TechType comsatTech[] = {Scanner_Sweep};
     static TechType unitTechs[][] = {
             stimTech, ghost_fullTech, vultureTech, {}, {}, siegeTech, {}, {}, wraithTech, vesselTech,
             stimTech, {}, cruiserTech, {}, {}, {}, ghost_heroTech, {}, {}, vultureTech,
@@ -1260,7 +1211,6 @@ class UnitTypeContainer {
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-
     static TechType researchesWhat[][] = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
@@ -1394,8 +1344,8 @@ class UnitTypeContainer {
             {},// Powerup_Khalis_Crystal,
             {},// Zerg_Infested_Command_Center,
             {Burrowing},// Zerg_Hatchery,
-            { Burrowing },// Zerg_Lair,
-            { Burrowing },// Zerg_Hive,
+            {Burrowing},// Zerg_Lair,
+            {Burrowing},// Zerg_Hive,
             {},// Zerg_Nydus_Canal,
             {Lurker_Aspect},// Zerg_Hydralisk_Den,
             {TechType.Consume, TechType.Plague},// Zerg_Defiler_Mound,
@@ -1498,7 +1448,6 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-
     static List<Map<UnitType, Integer>> reqUnitsMap = reqUnitsInit();
 
     private static List<Map<UnitType, Integer>> reqUnitsInit() {
@@ -1507,7 +1456,7 @@ class UnitTypeContainer {
         for (UnitType i : UnitType.values()) {
             req.add(new HashMap<>());
             Map.Entry<UnitType, Integer> wb = i.whatBuilds();
-            if ( wb.getKey() != UnitType.None ) {
+            if (wb.getKey() != UnitType.None) {
                 req.get(i.id).put(wb.getKey(), wb.getValue());
             }
         }
@@ -1584,5 +1533,14 @@ class UnitTypeContainer {
         req.get(Protoss_Shield_Battery.id).put(Protoss_Gateway, 1);
 
         return req;
+    }
+
+    static class UnitDimensions {
+        static final int tileWidth = 0;
+        static final int tileHeight = 1;
+        static final int left = 2;
+        static final int up = 3;
+        static final int right = 4;
+        static final int down = 5;
     }
 }

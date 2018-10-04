@@ -9,26 +9,43 @@ import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 public class Game {
+    private static final int damageRatio[][] = {
+            // Ind, Sml, Med, Lrg, Non, Unk
+            {0, 0, 0, 0, 0, 0}, // Independent
+            {0, 128, 192, 256, 0, 0}, // Explosive
+            {0, 256, 128, 64, 0, 0}, // Concussive
+            {0, 256, 256, 256, 0, 0}, // Normal
+            {0, 256, 256, 256, 0, 0}, // Ignore_Armor
+            {0, 0, 0, 0, 0, 0}, // None
+            {0, 0, 0, 0, 0, 0}  // Unknown
+    };
+    private static boolean bPsiFieldMask[][] = {
+            {false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false},
+            {false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false},
+            {false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false},
+            {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true},
+            {false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false},
+            {false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false},
+            {false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false}
+    };
+    private final Set<Unit> staticMinerals = new HashSet<>();
+    private final Set<Unit> staticGeysers = new HashSet<>();
+    private final Set<Unit> staticNeutralUnits = new HashSet<>();
+    private final Set<Integer> visibleUnits = new HashSet<>();
     private Client.GameData gameData;
-
     // CONSTANT
     private Player[] players;
     private Region[] regions;
     private Force[] forces;
     private Bullet[] bullets;
-
     private Set<Force> forceSet;
     private Set<Player> playerSet;
     private Set<Region> regionSet;
-
-    private final Set<Unit> staticMinerals = new HashSet<>();
-    private final Set<Unit> staticGeysers = new HashSet<>();
-    private final Set<Unit> staticNeutralUnits = new HashSet<>();
-
     // CHANGING
     private Unit[] units;
-    private final Set<Integer> visibleUnits = new HashSet<>();
-
     //CACHED
     private int randomSeed;
     private int revision;
@@ -48,21 +65,43 @@ public class Game {
     private String mapPathName;
     private String mapName;
     private String mapHash;
-
     private boolean[][] buildable;
     private boolean[][] walkable;
     private int[][] groundHeight;
-
     private short[][] mapTileRegionID;
     private short[] mapSplitTilesMiniTileMask;
     private short[] mapSplitTilesRegion1;
     private short[] mapSplitTilesRegion2;
-
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
 
     public Game(final Client.GameData gameData) {
         this.gameData = gameData;
+    }
+
+    private static boolean hasPower(int x, int y, final UnitType unitType, final Set<Unit> pylons) {
+        if (unitType.id >= 0 && unitType.id < UnitType.None.id && (!unitType.requiresPsi() || !unitType.isBuilding())) {
+            return true;
+        }
+
+        // Loop through all pylons for the current player
+        for (Unit i : pylons) {
+            if (!i.exists() || !i.isCompleted()) {
+                continue;
+            }
+            final Position p = i.getPosition();
+            if (Math.abs(p.x - x) >= 256) {
+                continue;
+            }
+            if (Math.abs(p.y - y) >= 160) {
+                continue;
+            }
+
+            if (bPsiFieldMask[(y - p.y + 160) / 32][(x - p.x + 256) / 32]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*
@@ -76,7 +115,7 @@ public class Game {
 
         final int forceCount = gameData.getForceCount();
         forces = new Force[forceCount];
-        for (int id=0; id < forceCount; id++) {
+        for (int id = 0; id < forceCount; id++) {
             forces[id] = new Force(gameData.getForce(id), this);
         }
 
@@ -84,7 +123,7 @@ public class Game {
 
         final int playerCount = gameData.getPlayerCount();
         players = new Player[playerCount];
-        for (int id=0; id < playerCount; id++) {
+        for (int id = 0; id < playerCount; id++) {
             players[id] = new Player(gameData.getPlayer(id), this);
         }
 
@@ -92,13 +131,13 @@ public class Game {
 
         final int bulletCount = gameData.bulletCount();
         bullets = new Bullet[bulletCount];
-        for (int id=0; id < bulletCount; id++) {
+        for (int id = 0; id < bulletCount; id++) {
             bullets[id] = new Bullet(gameData.getBullet(id), this);
         }
 
         final int regionCount = gameData.regionCount();
         regions = new Region[regionCount];
-        for (int id=0; id < regionCount; id++) {
+        for (int id = 0; id < regionCount; id++) {
             regions[id] = new Region(gameData.getRegion(id), this);
         }
 
@@ -109,7 +148,7 @@ public class Game {
         regionSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(regions)));
 
         units = new Unit[1000];
-        for (int id=0; id < gameData.getInitialUnitCount(); id++) {
+        for (int id = 0; id < gameData.getInitialUnitCount(); id++) {
             final Unit unit = new Unit(gameData.getUnit(id), this);
 
             units[id] = unit;
@@ -147,16 +186,16 @@ public class Game {
         buildable = new boolean[mapWidth][mapHeight];
         groundHeight = new int[mapWidth][mapHeight];
         mapTileRegionID = new short[mapWidth][mapHeight];
-        for (int x=0; x < mapWidth; x++) {
-            for (int y=0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+            for (int y = 0; y < mapHeight; y++) {
                 buildable[x][y] = gameData.buildable(x, y);
                 groundHeight[x][y] = gameData.groundHeight(x, y);
                 mapTileRegionID[x][y] = gameData.mapTileRegionID(x, y);
             }
         }
-        walkable = new boolean[mapWidth*4][mapHeight*4];
+        walkable = new boolean[mapWidth * 4][mapHeight * 4];
         for (int i = 0; i < mapWidth * 4; i++) {
-            for (int j=0; j < mapHeight * 4; j++) {
+            for (int j = 0; j < mapHeight * 4; j++) {
                 walkable[i][j] = gameData.walkable(i, j);
             }
         }
@@ -164,7 +203,7 @@ public class Game {
         mapSplitTilesMiniTileMask = new short[5000];
         mapSplitTilesRegion1 = new short[5000];
         mapSplitTilesRegion2 = new short[5000];
-        for (int i=0; i < 5000; i++) {
+        for (int i = 0; i < 5000; i++) {
             mapSplitTilesMiniTileMask[i] = gameData.mapSplitTilesMiniTileMask(i);
             mapSplitTilesRegion1[i] = gameData.mapSplitTilesRegion1(i);
             mapSplitTilesRegion2[i] = gameData.mapSplitTilesRegion2(i);
@@ -177,7 +216,7 @@ public class Game {
     void unitShow(final int id) {
         if (id > units.length) {
             //rescale unit array if needed
-            final Unit[] largerUnitsArray = new Unit[2*units.length];
+            final Unit[] largerUnitsArray = new Unit[2 * units.length];
             System.arraycopy(units, 0, largerUnitsArray, 0, units.length);
             units = largerUnitsArray;
         }
@@ -207,7 +246,6 @@ public class Game {
         gameData.addShape(new Client.Shape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
     }
 
-
     public Set<Force> getForces() {
         return forceSet;
     }
@@ -215,7 +253,6 @@ public class Game {
     public Set<Player> getPlayers() {
         return playerSet;
     }
-
 
     public Set<Unit> getAllUnits() {
         if (getFrameCount() == 0) {
@@ -234,19 +271,19 @@ public class Game {
 
     public Set<Unit> getMinerals() {
         return getAllUnits().stream()
-                .filter(u ->u.getType().isMineralField())
+                .filter(u -> u.getType().isMineralField())
                 .collect(Collectors.toSet());
     }
 
     public Set<Unit> getGeysers() {
         return getAllUnits().stream()
-                .filter(u ->u.getType() == Resource_Vespene_Geyser)
+                .filter(u -> u.getType() == Resource_Vespene_Geyser)
                 .collect(Collectors.toSet());
     }
 
     public Set<Unit> getNeutralUnits() {
         return getAllUnits().stream()
-                .filter(u ->u.getPlayer().equals(neutral()))
+                .filter(u -> u.getPlayer().equals(neutral()))
                 .collect(Collectors.toSet());
     }
 
@@ -277,7 +314,6 @@ public class Game {
                 .mapToObj(id -> new Position(gameData.getNukeDotX(id), gameData.getNukeDotY((id))))
                 .collect(Collectors.toSet());
     }
-
 
     public Force getForce(final int forceID) {
         return forces[forceID];
@@ -322,704 +358,662 @@ public class Game {
         return gameData.averageFPS();
     }
 
-     public Position getMousePosition() {
+    public Position getMousePosition() {
         return new Position(gameData.mouseX(), gameData.mouseY());
-     }
+    }
 
-     public boolean getMouseState(final MouseButton button) {
+    public boolean getMouseState(final MouseButton button) {
         return gameData.mouseState(button.value);
-     }
+    }
 
-     public boolean getKeyState(final Key key) {
+    public boolean getKeyState(final Key key) {
         return gameData.keyState(key.value);
-     }
+    }
 
-     public Position getScreenPosition() {
+    public Position getScreenPosition() {
         return new Position(gameData.screenX(), gameData.screenY());
-     }
+    }
 
-     public void setScreenPosition(final int x, final int y) {
-        addCommand(SetScreenPosition.value, x, y);
-     }
-
-     public void setScreenPosition(final Position p) {
+    public void setScreenPosition(final Position p) {
         setScreenPosition(p.x, p.y);
-     }
+    }
 
-     public void pingMinimap(final int x, final int y) {
+    public void setScreenPosition(final int x, final int y) {
+        addCommand(SetScreenPosition.value, x, y);
+    }
+
+    public void pingMinimap(final int x, final int y) {
         addCommand(PingMinimap.value, x, y);
-     }
+    }
 
-     public void pingMinimap(final Position p) {
+    public void pingMinimap(final Position p) {
         pingMinimap(p.x, p.y);
-     }
+    }
 
-     public boolean isFlagEnabled(final Flag flag) {
+    public boolean isFlagEnabled(final Flag flag) {
         return gameData.getFlag(flag.value);
-     }
+    }
 
-     public void enableFlag(final Flag flag) {
+    public void enableFlag(final Flag flag) {
         gameData.setFlag(flag.value, true);
-     }
+    }
 
-     public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
+    public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
         return getAllUnits().stream().filter(u -> {
             final TilePosition tp = u.getTilePosition();
             return tp.x == tileX && tp.y == tileY;
         }).collect(Collectors.toSet());
-     }
+    }
 
-     public Set<Unit> getUnitsOnTile(final TilePosition tile) {
-         return getUnitsOnTile(tile.x, tile.y);
-     }
+    public Set<Unit> getUnitsOnTile(final TilePosition tile) {
+        return getUnitsOnTile(tile.x, tile.y);
+    }
 
-     public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-        return getAllUnits().stream().filter( u -> {
+    public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+        return getAllUnits().stream().filter(u -> {
             final Position p = u.getPosition();
             return left <= p.x && top <= p.y && p.x < right && p.y < bottom && filter.operation(u);
         }).collect(Collectors.toSet());
-     }
+    }
 
     public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
     }
 
-     public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
+    public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
         return getUnitsInRadius(new Position(x, y), radius, filter);
-     }
+    }
 
-     public Set<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
-         return getAllUnits().stream().filter( u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u)).collect(Collectors.toSet());
-     }
+    public Set<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
+        return getAllUnits().stream().filter(u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u)).collect(Collectors.toSet());
+    }
 
-     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-         return getUnitsInRectangle(left, top, right, bottom, filter).stream()
-                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
-     }
+    public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+        return getUnitsInRectangle(left, top, right, bottom, filter).stream()
+                .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
+    }
 
-     public Unit getClosestUnitInRadius(final Position center, final int radius, final UnitFilter filter) {
+    public Unit getClosestUnitInRadius(final Position center, final int radius, final UnitFilter filter) {
         return getUnitsInRadius(center, radius, filter).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
-     }
+    }
 
-     public int mapWidth() {
+    public int mapWidth() {
         return mapWidth;
-     }
+    }
 
-     public int mapHeight() {
+    public int mapHeight() {
         return mapHeight;
-     }
+    }
 
-     public int mapPixelWidth() {
+    public int mapPixelWidth() {
         return mapPixelWidth;
-     }
+    }
 
-     public int mapPixelHeight() {
+    public int mapPixelHeight() {
         return mapPixelHeight;
-     }
+    }
 
-     public String mapFileName() {
+    public String mapFileName() {
         return mapFileName;
-     }
+    }
 
-     public String mapPathName() {
+    public String mapPathName() {
         return mapPathName;
-     }
+    }
 
-     public String mapName() {
+    public String mapName() {
         return mapName;
-     }
+    }
 
-     public String mapHash() {
+    public String mapHash() {
         return mapHash;
-     }
+    }
 
-     public boolean isWalkable(final int walkX, final int walkY) {
+    public boolean isWalkable(final int walkX, final int walkY) {
         return isWalkable(new WalkPosition(walkX, walkY));
-     }
+    }
 
-     public boolean isWalkable(final WalkPosition position) {
+    public boolean isWalkable(final WalkPosition position) {
         if (!position.isValid(this)) {
             return false;
         }
         return walkable[position.x][position.y];
-     }
+    }
 
-     public int getGroundHeight(final int tileX, final int tileY) {
-         return getGroundHeight(new TilePosition(tileX, tileY));
-     }
+    public int getGroundHeight(final int tileX, final int tileY) {
+        return getGroundHeight(new TilePosition(tileX, tileY));
+    }
 
-     public int getGroundHeight(final TilePosition position) {
-         if (!position.isValid(this)) {
-             return -1;
-         }
-         return groundHeight[position.x][position.y];
-     }
+    public int getGroundHeight(final TilePosition position) {
+        if (!position.isValid(this)) {
+            return -1;
+        }
+        return groundHeight[position.x][position.y];
+    }
 
-     public boolean isBuildable(final int tileX, final int tileY) {
-         return isBuildable(tileX, tileY, false);
-     }
+    public boolean isBuildable(final int tileX, final int tileY) {
+        return isBuildable(tileX, tileY, false);
+    }
 
-     public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
+    public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
         return isBuildable(new TilePosition(tileX, tileY), includeBuildings);
-     }
+    }
 
-     public boolean isBuildable(final TilePosition position) {
+    public boolean isBuildable(final TilePosition position) {
         return isBuildable(position, false);
-     }
+    }
 
-     public boolean isBuildable(final TilePosition position, final boolean includeBuildings) {
+    public boolean isBuildable(final TilePosition position, final boolean includeBuildings) {
         if (!position.isValid(this)) {
             return false;
         }
-        return buildable[position.x][position.y] && ( includeBuildings ? !gameData.occupied(position.x,  position.y) : true );
-     }
+        return buildable[position.x][position.y] && (includeBuildings ? !gameData.occupied(position.x, position.y) : true);
+    }
 
-     public boolean isVisible(final int tileX, final int tileY) {
-         return isVisible(new TilePosition(tileX, tileY));
-     }
+    public boolean isVisible(final int tileX, final int tileY) {
+        return isVisible(new TilePosition(tileX, tileY));
+    }
 
-     public boolean isVisible(final TilePosition position) {
+    public boolean isVisible(final TilePosition position) {
         if (!position.isValid(this)) {
             return false;
         }
         return gameData.visible(position.x, position.y);
-     }
-
-     public boolean isExplored(final int tileX, final int tileY) {
-         return isExplored(new TilePosition(tileX, tileY));
-     }
-
-     public boolean isExplored(final TilePosition position) {
-         if (!position.isValid(this)) {
-             return false;
-         }
-         return gameData.explored(position.x, position.y);
-     }
-
-     public boolean hasCreep(final int tileX, final int tileY) {
-         return hasCreep(new TilePosition(tileX, tileY));
-     }
-
-     public boolean hasCreep(final TilePosition position) {
-         if (!position.isValid(this)) {
-             return false;
-         }
-        return  gameData.hasCreep(position.x, position.y);
-     }
-
-     private static boolean bPsiFieldMask[][] = {
-        { false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false },
-        { false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-        { false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
-        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
-        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
-        { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true },
-        { false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-        { false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-        { false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false }
-    };
-
-    private static boolean hasPower(int x, int y, final UnitType unitType, final Set<Unit> pylons) {
-        if ( unitType.id >= 0 && unitType.id < UnitType.None.id && (!unitType.requiresPsi() || !unitType.isBuilding()) ) {
-            return true;
-        }
-
-        // Loop through all pylons for the current player
-        for (Unit i : pylons) {
-            if ( !i.exists() || !i.isCompleted() ) {
-                continue;
-            }
-            final Position p = i.getPosition();
-            if (Math.abs(p.x - x) >= 256 ) {
-                continue;
-            }
-            if (Math.abs(p.y - y) >= 160 ) {
-                continue;
-            }
-
-            if ( bPsiFieldMask[(y - p.y + 160) / 32][(x - p.x + 256) / 32] ) {
-                return true;
-            }
-        }
-        return false;
     }
 
-     public boolean hasPowerPrecise(final int x, final int y) {
+    public boolean isExplored(final int tileX, final int tileY) {
+        return isExplored(new TilePosition(tileX, tileY));
+    }
+
+    public boolean isExplored(final TilePosition position) {
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return gameData.explored(position.x, position.y);
+    }
+
+    public boolean hasCreep(final int tileX, final int tileY) {
+        return hasCreep(new TilePosition(tileX, tileY));
+    }
+
+    public boolean hasCreep(final TilePosition position) {
+        if (!position.isValid(this)) {
+            return false;
+        }
+        return gameData.hasCreep(position.x, position.y);
+    }
+
+    public boolean hasPowerPrecise(final int x, final int y) {
         return hasPowerPrecise(new Position(x, y));
-     }
+    }
 
-     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
-         return hasPowerPrecise(new Position(x, y), unitType);
-     }
+    public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
+        return hasPowerPrecise(new Position(x, y), unitType);
+    }
 
-     public boolean hasPowerPrecise(final Position position){
-         return hasPowerPrecise(position, UnitType.None);
-     }
+    public boolean hasPowerPrecise(final Position position) {
+        return hasPowerPrecise(position, UnitType.None);
+    }
 
-     public boolean hasPowerPrecise(final Position position, final UnitType unitType){
+    public boolean hasPowerPrecise(final Position position, final UnitType unitType) {
         if (!position.isValid(this)) {
             return false;
         }
         return hasPower(position.x, position.y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toSet()));
-     }
+    }
 
-     public boolean hasPower(final int tileX, final int tileY){
-         return hasPower(new TilePosition(tileX, tileY));
-     }
+    public boolean hasPower(final int tileX, final int tileY) {
+        return hasPower(new TilePosition(tileX, tileY));
+    }
 
-     public boolean hasPower(final int tileX, final int tileY, final UnitType unitType){
-         return hasPower(new TilePosition(tileX, tileY), unitType);
-     }
+    public boolean hasPower(final int tileX, final int tileY, final UnitType unitType) {
+        return hasPower(new TilePosition(tileX, tileY), unitType);
+    }
 
-     public boolean hasPower(final TilePosition position){
-         return hasPower(position.x, position.y, UnitType.None);
-     }
+    public boolean hasPower(final TilePosition position) {
+        return hasPower(position.x, position.y, UnitType.None);
+    }
 
-     public boolean hasPower(final TilePosition position, final UnitType unitType){
-         if ( unitType.id >= 0 && unitType.id < UnitType.None.id ) {
-             return hasPowerPrecise(position.x * 32 + unitType.tileWidth() * 16, position.y * 32 + unitType.tileHeight() * 16, unitType);
-         }
-         return hasPowerPrecise( position.x*32, position.y*32, UnitType.None);
-     }
+    public boolean hasPower(final TilePosition position, final UnitType unitType) {
+        if (unitType.id >= 0 && unitType.id < UnitType.None.id) {
+            return hasPowerPrecise(position.x * 32 + unitType.tileWidth() * 16, position.y * 32 + unitType.tileHeight() * 16, unitType);
+        }
+        return hasPowerPrecise(position.x * 32, position.y * 32, UnitType.None);
+    }
 
-     public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight){
-         return hasPower(tileX, tileY, tileWidth, tileHeight, UnitType.Unknown);
-     }
+    public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight) {
+        return hasPower(tileX, tileY, tileWidth, tileHeight, UnitType.Unknown);
+    }
 
-     public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return hasPowerPrecise( tileX*32 + tileWidth*16, tileY*32 + tileHeight*16, unitType);
-     }
+    public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
+        return hasPowerPrecise(tileX * 32 + tileWidth * 16, tileY * 32 + tileHeight * 16, unitType);
+    }
 
-     public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight){
-         return hasPower(position.x, position.y, tileWidth, tileHeight);
-     }
+    public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight) {
+        return hasPower(position.x, position.y, tileWidth, tileHeight);
+    }
 
-     public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType){
-         return hasPower(position.x, position.y, tileWidth, tileHeight, unitType);
-     }
+    public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType) {
+        return hasPower(position.x, position.y, tileWidth, tileHeight, unitType);
+    }
 
-     public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
-         return canBuildHere(position, type, builder, false);
-     }
+    public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
+        return canBuildHere(position, type, builder, false);
+    }
 
-     public boolean canBuildHere(final TilePosition position, final UnitType type) {
-         return canBuildHere(position, type, null);
-     }
+    public boolean canBuildHere(final TilePosition position, final UnitType type) {
+        return canBuildHere(position, type, null);
+    }
 
-     public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
-         // lt = left top, rb = right bottom
-         final TilePosition lt = (builder != null && type.isAddon()) ?
-                 position.add(new TilePosition(4, 1)) : // addon build offset
-                 position;
-         final TilePosition rb = lt.add(type.tileSize());
+    public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
+        // lt = left top, rb = right bottom
+        final TilePosition lt = (builder != null && type.isAddon()) ?
+                position.add(new TilePosition(4, 1)) : // addon build offset
+                position;
+        final TilePosition rb = lt.add(type.tileSize());
 
-         // Map limit check
-         if ( !lt.isValid(this) || !(rb.toPosition().subtract(new Position(1,1)).isValid(this))) {
-             return false;
-         }
+        // Map limit check
+        if (!lt.isValid(this) || !(rb.toPosition().subtract(new Position(1, 1)).isValid(this))) {
+            return false;
+        }
 
-         //if the getUnit is a refinery, we just need to check the set of geysers to see if the position
-         //matches one of them (and the type is still vespene geyser)
-         if ( type.isRefinery() ) {
-             for (final Unit g : getGeysers()) {
-                 if (g.getTilePosition().equals(lt)) {
-                     return !g.isVisible() || g.getType() == Resource_Vespene_Geyser;
-                 }
-             }
-             return false;
-         }
+        //if the getUnit is a refinery, we just need to check the set of geysers to see if the position
+        //matches one of them (and the type is still vespene geyser)
+        if (type.isRefinery()) {
+            for (final Unit g : getGeysers()) {
+                if (g.getTilePosition().equals(lt)) {
+                    return !g.isVisible() || g.getType() == Resource_Vespene_Geyser;
+                }
+            }
+            return false;
+        }
 
-         // Tile buildability check
-         for (int x = lt.x; x < rb.x; ++x ){
-             for (int y = lt.y; y < rb.y; ++y ) {
-                 // Check if tile is buildable/unoccupied and explored.
-                 if (!isBuildable(x, y) || (checkExplored && !isExplored(x,y))) {
-                     return false;
-                 }
-             }
-         }
+        // Tile buildability check
+        for (int x = lt.x; x < rb.x; ++x) {
+            for (int y = lt.y; y < rb.y; ++y) {
+                // Check if tile is buildable/unoccupied and explored.
+                if (!isBuildable(x, y) || (checkExplored && !isExplored(x, y))) {
+                    return false;
+                }
+            }
+        }
 
-         // Check if builder is capable of reaching the building site
-         if (builder != null) {
-             if (!builder.getType().isBuilding()) {
-                 if (!builder.hasPath(lt.toPosition().add(type.tileSize().toPosition().divide(2)))) {
-                     return false;
-                 }
-             }
-             else if (!builder.getType().isFlyingBuilding() && type != Zerg_Nydus_Canal && !type.isFlagBeacon()) {
-                 return false;
-             }
-         }
+        // Check if builder is capable of reaching the building site
+        if (builder != null) {
+            if (!builder.getType().isBuilding()) {
+                if (!builder.hasPath(lt.toPosition().add(type.tileSize().toPosition().divide(2)))) {
+                    return false;
+                }
+            } else if (!builder.getType().isFlyingBuilding() && type != Zerg_Nydus_Canal && !type.isFlagBeacon()) {
+                return false;
+            }
+        }
 
-         // Ground getUnit dimension check
-         if (type != Special_Start_Location) {
-             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-             final Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
-                     (u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
-                             && u.getLeft() <= targPos.x + type.dimensionRight()
-                             && u.getTop() <= targPos.y + type.dimensionDown()
-                             && u.getRight() <= targPos.x + type.dimensionLeft()
-                             && u.getBottom() <= targPos.y + type.dimensionUp()));
+        // Ground getUnit dimension check
+        if (type != Special_Start_Location) {
+            final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
+            final Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
+                    (u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
+                            && u.getLeft() <= targPos.x + type.dimensionRight()
+                            && u.getTop() <= targPos.y + type.dimensionDown()
+                            && u.getRight() <= targPos.x + type.dimensionLeft()
+                            && u.getBottom() <= targPos.y + type.dimensionUp()));
 
-             for (Unit u : unitsInRect){
-                 // Addons can be placed over units that can move, pushing them out of the way
-                 if ( !(type.isAddon() && u.getType().canMove()) )
-                     return false;
-             }
+            for (Unit u : unitsInRect) {
+                // Addons can be placed over units that can move, pushing them out of the way
+                if (!(type.isAddon() && u.getType().canMove()))
+                    return false;
+            }
 
-             // Creep Check
-             // Note: Zerg structures that don't require creep can still be placed on creep
-             boolean needsCreep = type.requiresCreep();
-             if (type.getRace() != Zerg || needsCreep) {
-                 for (int x = lt.x; x < rb.x; ++x) {
-                     for (int y = lt.y; y < rb.y; ++y) {
-                         if (needsCreep != hasCreep(x, y)) {
-                             return false;
-                         }
-                     }
-                 }
-             }
+            // Creep Check
+            // Note: Zerg structures that don't require creep can still be placed on creep
+            boolean needsCreep = type.requiresCreep();
+            if (type.getRace() != Zerg || needsCreep) {
+                for (int x = lt.x; x < rb.x; ++x) {
+                    for (int y = lt.y; y < rb.y; ++y) {
+                        if (needsCreep != hasCreep(x, y)) {
+                            return false;
+                        }
+                    }
+                }
+            }
 
-             // Power Check
-             if (type.requiresPsi() && hasPower(lt, type)) {
-                 return false;
-             }
+            // Power Check
+            if (type.requiresPsi() && hasPower(lt, type)) {
+                return false;
+            }
 
-         } //don't ignore units
+        } //don't ignore units
 
-         // Resource Check (CC, Nex, Hatch)
-         if (type.isResourceDepot())  {
-             for (final Unit m : getStaticMinerals()) {
-                 final TilePosition tp = m.getInitialTilePosition();
-                 if ( (isVisible(tp) || isVisible(tp.x + 1, tp.y)) && !m.exists()) {
-                     continue; // tile position is visible, but mineral is not => mineral does not exist
-                 }
-                 if (tp.x > lt.x - 5 &&
-                         tp.y > lt.y - 4 &&
-                         tp.x < lt.x + 7 &&
-                         tp.y < lt.y + 6) {
-                     return false;
-                 }
-             }
-             for (final Unit g : getStaticGeysers()) {
-                 final TilePosition tp = g.getInitialTilePosition();
-                 if (tp.x > lt.x - 7 &&
-                         tp.y > lt.y - 5 &&
-                         tp.x < lt.x + 7 &&
-                         tp.y < lt.y + 6) {
-                     return false;
-                 }
-             }
-         }
+        // Resource Check (CC, Nex, Hatch)
+        if (type.isResourceDepot()) {
+            for (final Unit m : getStaticMinerals()) {
+                final TilePosition tp = m.getInitialTilePosition();
+                if ((isVisible(tp) || isVisible(tp.x + 1, tp.y)) && !m.exists()) {
+                    continue; // tile position is visible, but mineral is not => mineral does not exist
+                }
+                if (tp.x > lt.x - 5 &&
+                        tp.y > lt.y - 4 &&
+                        tp.x < lt.x + 7 &&
+                        tp.y < lt.y + 6) {
+                    return false;
+                }
+            }
+            for (final Unit g : getStaticGeysers()) {
+                final TilePosition tp = g.getInitialTilePosition();
+                if (tp.x > lt.x - 7 &&
+                        tp.y > lt.y - 5 &&
+                        tp.x < lt.x + 7 &&
+                        tp.y < lt.y + 6) {
+                    return false;
+                }
+            }
+        }
 
-         // A building can build an addon at a different location (i.e. automatically lifts (if not already lifted)
-         // then lands at the new location before building the addon), so we need to do similar checks for the
-         // location that the building will be when it builds the addon.
-         if ( builder != null && !builder.getType().isAddon() && type.isAddon() ) {
-             return canBuildHere(lt.subtract(new TilePosition(4, 1)), builder.getType(), builder, checkExplored);
-         }
+        // A building can build an addon at a different location (i.e. automatically lifts (if not already lifted)
+        // then lands at the new location before building the addon), so we need to do similar checks for the
+        // location that the building will be when it builds the addon.
+        if (builder != null && !builder.getType().isAddon() && type.isAddon()) {
+            return canBuildHere(lt.subtract(new TilePosition(4, 1)), builder.getType(), builder, checkExplored);
+        }
 
-         //if the build site passes all these tests, return true.
-         return true;
-     }
+        //if the build site passes all these tests, return true.
+        return true;
+    }
 
-     public boolean canMake(final UnitType type) {
+    public boolean canMake(final UnitType type) {
         return canMake(type, null);
-     }
+    }
 
-     public boolean canMake(final UnitType type, final Unit builder) {
-         Player pSelf = self();
-         // Error checking
-         if (pSelf == null) {
-             return false;
-         }
+    public boolean canMake(final UnitType type, final Unit builder) {
+        Player pSelf = self();
+        // Error checking
+        if (pSelf == null) {
+            return false;
+        }
 
-         // Check if the unit type is available (UMS game)
-         if ( !pSelf.isUnitAvailable(type) ) {
-             return false;
-         }
+        // Check if the unit type is available (UMS game)
+        if (!pSelf.isUnitAvailable(type)) {
+            return false;
+        }
 
-         // Get the required UnitType
-         final UnitType requiredType = type.whatBuilds().getKey();
+        // Get the required UnitType
+        final UnitType requiredType = type.whatBuilds().getKey();
 
-         // do checks if a builder is provided
-         if ( builder != null ) {
-             // Check if the owner of the unit is you
-             if (!pSelf.equals(builder.getPlayer())) {
-                 return false;
-             }
+        // do checks if a builder is provided
+        if (builder != null) {
+            // Check if the owner of the unit is you
+            if (!pSelf.equals(builder.getPlayer())) {
+                return false;
+            }
 
-             final UnitType builderType = builder.getType();
-             if ( type == Zerg_Nydus_Canal && builderType == Zerg_Nydus_Canal ) {
-                 if ( !builder.isCompleted() ) {
-                     return false;
-                 }
-                 return builder.getNydusExit() == null;
-             }
+            final UnitType builderType = builder.getType();
+            if (type == Zerg_Nydus_Canal && builderType == Zerg_Nydus_Canal) {
+                if (!builder.isCompleted()) {
+                    return false;
+                }
+                return builder.getNydusExit() == null;
+            }
 
-             // Check if this unit can actually build the unit type
-             if ( requiredType == Zerg_Larva && builderType.producesLarva() ) {
-                 if ( builder.getLarva().size() == 0 ) {
-                     return false;
-                 }
-             }
-             else if ( builderType != requiredType ) {
-                 return false;
-             }
+            // Check if this unit can actually build the unit type
+            if (requiredType == Zerg_Larva && builderType.producesLarva()) {
+                if (builder.getLarva().size() == 0) {
+                    return false;
+                }
+            } else if (builderType != requiredType) {
+                return false;
+            }
 
-             // Carrier/Reaver space checking
-             int max_amt;
-             switch ( builderType ) {
-                 case Protoss_Carrier:
-                 case Hero_Gantrithor:
+            // Carrier/Reaver space checking
+            int max_amt;
+            switch (builderType) {
+                case Protoss_Carrier:
+                case Hero_Gantrithor:
                     // Get max interceptors
-                     max_amt = 4;
-                     if ( pSelf.getUpgradeLevel(UpgradeType.Carrier_Capacity) > 0 || builderType == Hero_Gantrithor ) {
-                         max_amt += 4;
-                     }
+                    max_amt = 4;
+                    if (pSelf.getUpgradeLevel(UpgradeType.Carrier_Capacity) > 0 || builderType == Hero_Gantrithor) {
+                        max_amt += 4;
+                    }
 
-                     // Check if there is room
-                     if ( builder.getInterceptorCount() + builder.getTrainingQueue().size() >= max_amt ) {
-                         return false;
-                     }
-                     break;
-                 case Protoss_Reaver:
-                 case Hero_Warbringer:
-                 // Get max scarabs
-                 max_amt = 5;
-                     if ( pSelf.getUpgradeLevel(UpgradeType.Reaver_Capacity) > 0 || builderType == Hero_Warbringer ) {
-                         max_amt += 5;
-                     }
+                    // Check if there is room
+                    if (builder.getInterceptorCount() + builder.getTrainingQueue().size() >= max_amt) {
+                        return false;
+                    }
+                    break;
+                case Protoss_Reaver:
+                case Hero_Warbringer:
+                    // Get max scarabs
+                    max_amt = 5;
+                    if (pSelf.getUpgradeLevel(UpgradeType.Reaver_Capacity) > 0 || builderType == Hero_Warbringer) {
+                        max_amt += 5;
+                    }
 
-                     // check if there is room
-                     if (builder.getScarabCount() + builder.getTrainingQueue().size() >= max_amt) {
-                         return false;
-                     }
-                 break;
-             }
-         } // if builder != nullptr
+                    // check if there is room
+                    if (builder.getScarabCount() + builder.getTrainingQueue().size() >= max_amt) {
+                        return false;
+                    }
+                    break;
+            }
+        } // if builder != nullptr
 
-         // Check if player has enough minerals
-         if ( pSelf.minerals() < type.mineralPrice() ) {
-             return false;
-         }
+        // Check if player has enough minerals
+        if (pSelf.minerals() < type.mineralPrice()) {
+            return false;
+        }
 
-         // Check if player has enough gas
-         if ( pSelf.gas() < type.gasPrice() ) {
-             return false;
-         }
+        // Check if player has enough gas
+        if (pSelf.gas() < type.gasPrice()) {
+            return false;
+        }
 
-         // Check if player has enough supplies
-         Race typeRace = type.getRace();
-         final int supplyRequired = type.supplyRequired() * (type.isTwoUnitsInOneEgg() ? 2 : 1);
-         if (supplyRequired > 0 && pSelf.supplyTotal(typeRace) < pSelf.supplyUsed(typeRace) + supplyRequired - (requiredType.getRace() == typeRace ? requiredType.supplyRequired() : 0)) {
-             return false;
-         }
+        // Check if player has enough supplies
+        Race typeRace = type.getRace();
+        final int supplyRequired = type.supplyRequired() * (type.isTwoUnitsInOneEgg() ? 2 : 1);
+        if (supplyRequired > 0 && pSelf.supplyTotal(typeRace) < pSelf.supplyUsed(typeRace) + supplyRequired - (requiredType.getRace() == typeRace ? requiredType.supplyRequired() : 0)) {
+            return false;
+        }
 
-         UnitType addon = UnitType.None;
-         Map<UnitType, Integer> reqUnits = type.requiredUnits();
-         for (final UnitType ut : type.requiredUnits().keySet()) {
-             if (ut.isAddon())
-                 addon = ut;
+        UnitType addon = UnitType.None;
+        Map<UnitType, Integer> reqUnits = type.requiredUnits();
+        for (final UnitType ut : type.requiredUnits().keySet()) {
+            if (ut.isAddon())
+                addon = ut;
 
-             if (!pSelf.hasUnitTypeRequirement(ut, reqUnits.get(ut))) {
-                 return false;
-             }
-         }
+            if (!pSelf.hasUnitTypeRequirement(ut, reqUnits.get(ut))) {
+                return false;
+            }
+        }
 
-         if (type.requiredTech() != TechType.None && !pSelf.hasResearched(type.requiredTech())) {
-             return false;
-         }
+        if (type.requiredTech() != TechType.None && !pSelf.hasResearched(type.requiredTech())) {
+            return false;
+        }
 
-         return builder == null ||
-                 addon == UnitType.None ||
-                 addon.whatBuilds().getKey() != type.whatBuilds().getKey() ||
-                 (builder.getAddon() != null && builder.getAddon().getType() == addon);
-     }
+        return builder == null ||
+                addon == UnitType.None ||
+                addon.whatBuilds().getKey() != type.whatBuilds().getKey() ||
+                (builder.getAddon() != null && builder.getAddon().getType() == addon);
+    }
 
-     public boolean canResearch(final TechType type, final Unit unit) {
-         return canResearch(type, unit, true);
-     }
+    public boolean canResearch(final TechType type, final Unit unit) {
+        return canResearch(type, unit, true);
+    }
 
-     public boolean canResearch(final TechType type) {
+    public boolean canResearch(final TechType type) {
         return canResearch(type, null);
-     }
+    }
 
-     public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
+    public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
         final Player self = self();
-         // Error checking
-         if ( self == null ) {
-             return false;
-         }
+        // Error checking
+        if (self == null) {
+            return false;
+        }
 
-         if ( unit != null ) {
-             if (!unit.getPlayer().equals(self)) {
-                 return false;
-             }
+        if (unit != null) {
+            if (!unit.getPlayer().equals(self)) {
+                return false;
+            }
 
-             if (!unit.getType().isSuccessorOf(type.whatResearches())) {
-                 return false;
-             }
+            if (!unit.getType().isSuccessorOf(type.whatResearches())) {
+                return false;
+            }
 
-             if ( checkCanIssueCommandType && ( unit.isLifted() || !unit.isIdle() || !unit.isCompleted() ) ) {
-                 return false;
-             }
-         }
-         if (self.isResearching(type)) {
-             return false;
-         }
+            if (checkCanIssueCommandType && (unit.isLifted() || !unit.isIdle() || !unit.isCompleted())) {
+                return false;
+            }
+        }
+        if (self.isResearching(type)) {
+            return false;
+        }
 
-         if (self.hasResearched(type)) {
-             return false;
-         }
+        if (self.hasResearched(type)) {
+            return false;
+        }
 
-         if ( !self.isResearchAvailable(type) ) {
-             return false;
-         }
+        if (!self.isResearchAvailable(type)) {
+            return false;
+        }
 
-         if (self.minerals() < type.mineralPrice()) {
-             return false;
-         }
+        if (self.minerals() < type.mineralPrice()) {
+            return false;
+        }
 
-         if (self.gas() < type.gasPrice()) {
-             return false;
-         }
+        if (self.gas() < type.gasPrice()) {
+            return false;
+        }
 
-         if (!self.hasUnitTypeRequirement(type.requiredUnit())) {
-             return false;
-         }
+        if (!self.hasUnitTypeRequirement(type.requiredUnit())) {
+            return false;
+        }
 
-         return true;
-     }
+        return true;
+    }
 
-     public boolean canUpgrade(final UpgradeType type, final Unit unit) {
-         return canUpgrade(type, unit, true);
-     }
+    public boolean canUpgrade(final UpgradeType type, final Unit unit) {
+        return canUpgrade(type, unit, true);
+    }
 
-     public boolean canUpgrade(final UpgradeType type) {
-         return canUpgrade(type, null);
-     }
+    public boolean canUpgrade(final UpgradeType type) {
+        return canUpgrade(type, null);
+    }
 
-     public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
-         final Player self = self();
-         if ( self == null) {
-             return false;
-         }
+    public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
+        final Player self = self();
+        if (self == null) {
+            return false;
+        }
 
-         if ( unit != null ) {
-             if (!unit.getPlayer().equals(self)) {
-                 return false;
-             }
+        if (unit != null) {
+            if (!unit.getPlayer().equals(self)) {
+                return false;
+            }
 
-             if (!unit.getType().isSuccessorOf(type.whatUpgrades())) {
-                 return false;
-             }
+            if (!unit.getType().isSuccessorOf(type.whatUpgrades())) {
+                return false;
+            }
 
-             if ( checkCanIssueCommandType && ( unit.isLifted() || !unit.isIdle() || !unit.isCompleted())) {
-                 return false;
-             }
-         }
-         int nextLvl = self.getUpgradeLevel(type) + 1;
+            if (checkCanIssueCommandType && (unit.isLifted() || !unit.isIdle() || !unit.isCompleted())) {
+                return false;
+            }
+        }
+        int nextLvl = self.getUpgradeLevel(type) + 1;
 
-         if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
-             return false;
-         }
+        if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
+            return false;
+        }
 
-         if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
-             return false;
-         }
+        if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
+            return false;
+        }
 
-         if (self.isUpgrading(type)) {
-             return false;
-         }
+        if (self.isUpgrading(type)) {
+            return false;
+        }
 
-         if ( self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type)) {
-             return false;
-         }
+        if (self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type)) {
+            return false;
+        }
 
-         if ( self.minerals() < type.mineralPrice(nextLvl)) {
-             return false;
-         }
+        if (self.minerals() < type.mineralPrice(nextLvl)) {
+            return false;
+        }
 
-         return self.gas() >= type.gasPrice(nextLvl);
-     }
+        return self.gas() >= type.gasPrice(nextLvl);
+    }
 
-     public List<TilePosition> getStartLocations() {
-         return new ArrayList<>(startLocations);
-     }
+    public List<TilePosition> getStartLocations() {
+        return new ArrayList<>(startLocations);
+    }
 
-
-     public void printf(final String cstr_format) {
+    public void printf(final String cstr_format) {
         addCommand(Printf.value, gameData.addString(cstr_format), 0);
-     }
+    }
 
-     public void sendText(final String cstr_format) {
+    public void sendText(final String cstr_format) {
         addCommand(SendText.value, gameData.addString(cstr_format), 0);
-     }
+    }
 
-     public void sendTextEx(final boolean toAllies, final String cstr_format) {
+    public void sendTextEx(final boolean toAllies, final String cstr_format) {
         addCommand(SendText.value, gameData.addString(cstr_format), toAllies ? 1 : 0);
-     }
+    }
 
-     public boolean isInGame() {
-         return gameData.isInGame();
-     }
+    public boolean isInGame() {
+        return gameData.isInGame();
+    }
 
-     public boolean isMultiplayer() {
-         return multiplayer;
-     }
+    public boolean isMultiplayer() {
+        return multiplayer;
+    }
 
-     public boolean isBattleNet() {
-         return battleNet;
-     }
+    public boolean isBattleNet() {
+        return battleNet;
+    }
 
-     public boolean isPaused() {
-         return gameData.isPaused();
-     }
+    public boolean isPaused() {
+        return gameData.isPaused();
+    }
 
-     public boolean isReplay() {
-         return replay;
-     }
+    public boolean isReplay() {
+        return replay;
+    }
 
-     public void pauseGame() {
+    public void pauseGame() {
         addCommand(PauseGame.value, 0, 0);
-     }
+    }
 
-     public void resumeGame() {
+    public void resumeGame() {
         addCommand(ResumeGame.value, 0, 0);
-     }
+    }
 
-     public void leaveGame() {
+    public void leaveGame() {
         addCommand(LeaveGame.value, 0, 0);
-     }
+    }
 
-     public void restartGame() {
+    public void restartGame() {
         addCommand(RestartGame.value, 0, 0);
-     }
+    }
 
-     public void setLocalSpeed(final int speed) {
+    public void setLocalSpeed(final int speed) {
         addCommand(SetLocalSpeed.value, speed, 0);
-     }
+    }
 
-     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
-         return ! units.stream()
-                 .map(u -> u.issueCommand(command))
-                 .collect(Collectors.toList())
-                 .contains(false);
-     }
+    public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
+        return !units.stream()
+                .map(u -> u.issueCommand(command))
+                .collect(Collectors.toList())
+                .contains(false);
+    }
 
-     public Set<Unit> getSelectedUnits() {
-         return IntStream.range(0, gameData.selectedUnitCount())
-                 .mapToObj(i -> units[gameData.selectedUnit(i)])
-                 .collect(Collectors.toSet());
-     }
+    public Set<Unit> getSelectedUnits() {
+        return IntStream.range(0, gameData.selectedUnitCount())
+                .mapToObj(i -> units[gameData.selectedUnit(i)])
+                .collect(Collectors.toSet());
+    }
 
     public Player self() {
         return self;
     }
-
 
     public Player enemy() {
         return enemy;
@@ -1028,7 +1022,6 @@ public class Game {
     public Player neutral() {
         return neutral;
     }
-
 
     public Set<Player> allies() {
         final Player self = self();
@@ -1052,12 +1045,10 @@ public class Game {
                 .collect(Collectors.toSet());
     }
 
-
     public void drawText(final Coordinate ctype, final int x, final int y, final String cstr_format) {
         final int stringId = gameData.addString(cstr_format);
-        addShape(Shape.Text.value, ctype.value, x, y, 0,0, stringId, textSize.value,0,false);
+        addShape(Shape.Text.value, ctype.value, x, y, 0, 0, stringId, textSize.value, 0, false);
     }
-
 
     public void drawTextMap(final int x, final int y, final String cstr_format) {
         drawText(Coordinate.Map, x, y, cstr_format);
@@ -1071,7 +1062,7 @@ public class Game {
         drawText(Coordinate.Mouse, x, y, cstr_format);
     }
 
-    public void drawTextMouse(final Position p, final String cstr_format){
+    public void drawTextMouse(final Position p, final String cstr_format) {
         drawTextMouse(p.x, p.y, cstr_format);
 
     }
@@ -1084,13 +1075,12 @@ public class Game {
         drawTextScreen(p.x, p.y, cstr_format);
     }
 
-
     public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color) {
         drawBox(ctype, left, top, right, bottom, color, false);
     }
 
     public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
-        addShape(Shape.Box.value, ctype.value, left, top, right, bottom, 0,0, color.id, isSolid);
+        addShape(Shape.Box.value, ctype.value, left, top, right, bottom, 0, 0, color.id, isSolid);
     }
 
     public void drawBoxMap(int left, int top, int right, int bottom, Color color) {
@@ -1153,48 +1143,48 @@ public class Game {
         drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color);
     }
 
-    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+    public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
-    public void drawTriangleMap(Position a, Position b, Position c, Color color){
+    public void drawTriangleMap(Position a, Position b, Position c, Color color) {
         drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
-    public void drawTriangleMap(Position a, Position b, Position c, Color color, boolean isSolid){
+    public void drawTriangleMap(Position a, Position b, Position c, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
     }
 
-    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color){
+    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
         drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color);
     }
 
-    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+    public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
-    public void drawTriangleMouse(Position a, Position b, Position c, Color color){
+    public void drawTriangleMouse(Position a, Position b, Position c, Color color) {
         drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
-    public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid){
+    public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
 
     }
 
-    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color){
+    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
         drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color);
     }
 
-    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid){
+    public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
-    public void drawTriangleScreen(Position a, Position b, Position c, Color color){
+    public void drawTriangleScreen(Position a, Position b, Position c, Color color) {
         drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
-    public void drawTriangleScreen(Position a, Position b, Position c, Color color, boolean isSolid){
+    public void drawTriangleScreen(Position a, Position b, Position c, Color color, boolean isSolid) {
         drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
     }
 
@@ -1203,59 +1193,59 @@ public class Game {
     }
 
     public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color, boolean isSolid) {
-        addShape(Shape.Circle.value, ctype.value, x ,y,0,0, radius,0, color.id, isSolid);
+        addShape(Shape.Circle.value, ctype.value, x, y, 0, 0, radius, 0, color.id, isSolid);
     }
 
     public void drawCircleMap(int x, int y, int radius, Color color) {
         drawCircle(Coordinate.Map, x, y, radius, color);
     }
 
-    public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid){
+    public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(Coordinate.Map, x, y, radius, color, isSolid);
     }
 
-    public void drawCircleMap(Position p, int radius, Color color){
+    public void drawCircleMap(Position p, int radius, Color color) {
         drawCircle(Coordinate.Map, p.x, p.y, radius, color);
     }
 
-    public void drawCircleMap(Position p, int radius, Color color, boolean isSolid){
+    public void drawCircleMap(Position p, int radius, Color color, boolean isSolid) {
         drawCircle(Coordinate.Map, p.x, p.y, radius, color, isSolid);
     }
 
-    public void drawCircleMouse(int x, int y, int radius, Color color){
+    public void drawCircleMouse(int x, int y, int radius, Color color) {
         drawCircle(Coordinate.Mouse, x, y, radius, color);
     }
 
-    public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid){
+    public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(Coordinate.Mouse, x, y, radius, color, isSolid);
     }
 
-    public void drawCircleMouse(Position p, int radius, Color color){
+    public void drawCircleMouse(Position p, int radius, Color color) {
         drawCircle(Coordinate.Mouse, p.x, p.y, radius, color);
     }
 
-    public void drawCircleMouse(Position p, int radius, Color color, boolean isSolid){
-        drawCircle(Coordinate.Mouse,p. x, p.y, radius, color, isSolid);
+    public void drawCircleMouse(Position p, int radius, Color color, boolean isSolid) {
+        drawCircle(Coordinate.Mouse, p.x, p.y, radius, color, isSolid);
     }
 
-    public void drawCircleScreen(int x, int y, int radius, Color color){
+    public void drawCircleScreen(int x, int y, int radius, Color color) {
         drawCircle(Coordinate.Screen, x, y, radius, color);
     }
 
-    public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid){
+    public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(Coordinate.Screen, x, y, radius, color, isSolid);
     }
 
-    public void drawCircleScreen(Position p, int radius, Color color){
+    public void drawCircleScreen(Position p, int radius, Color color) {
         drawCircle(Coordinate.Screen, p.x, p.y, radius, color);
     }
 
-    public void drawCircleScreen(Position p, int radius, Color color, boolean isSolid){
+    public void drawCircleScreen(Position p, int radius, Color color, boolean isSolid) {
         drawCircle(Coordinate.Screen, p.x, p.y, radius, color, isSolid);
     }
 
     public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color) {
-        drawEllipse(ctype,x, y, xrad, yrad, color, false);
+        drawEllipse(ctype, x, y, xrad, yrad, color, false);
     }
 
     public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
@@ -1412,17 +1402,6 @@ public class Game {
         addCommand(SetFrameSkip.value, frameSkip, 0);
     }
 
-    public boolean hasPath(final Position source, final Position destination) {
-        if (source.isValid(this) && destination.isValid(this)) {
-            final Region rgnA = getRegionAt(source);
-            final Region rgnB = getRegionAt(destination);
-            if (rgnA != null && rgnB != null && rgnA.getRegionGroupID() == rgnB.getRegionGroupID()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // If you need these please implement (see addCommand and make a PR to the github repo)
     // public boolean setAlliance(Player player, boolean allied);
     // public boolean setAlliance(Player player);
@@ -1434,12 +1413,24 @@ public class Game {
     // public boolean setRevealAll();
     // public boolean setRevealAll(boolean reveal);
 
-     public void setTextSize() {
-         textSize = TextSize.Default;
-     }
-     public void setTextSize(final TextSize size) {
+    public boolean hasPath(final Position source, final Position destination) {
+        if (source.isValid(this) && destination.isValid(this)) {
+            final Region rgnA = getRegionAt(source);
+            final Region rgnB = getRegionAt(destination);
+            if (rgnA != null && rgnB != null && rgnA.getRegionGroupID() == rgnB.getRegionGroupID()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setTextSize() {
+        textSize = TextSize.Default;
+    }
+
+    public void setTextSize(final TextSize size) {
         textSize = size;
-     }
+    }
 
     public int elapsedTime() {
         return gameData.elapsedTime();
@@ -1462,12 +1453,12 @@ public class Game {
     }
 
     public Region getRegionAt(final Position position) {
-        if ( !position.isValid(this)) {
+        if (!position.isValid(this)) {
             return null;
         }
-        final short idx = mapTileRegionID[position.x/32][position.y/32];
-        if ( (idx & 0x2000) != 0) {
-            final int minitileShift = ((position.x&0x1F)/8) + ((position.y&0x1F)/8) * 4;
+        final short idx = mapTileRegionID[position.x / 32][position.y / 32];
+        if ((idx & 0x2000) != 0) {
+            final int minitileShift = ((position.x & 0x1F) / 8) + ((position.y & 0x1F) / 8) * 4;
             final int index = idx & 0x1FFF;
 
             if (index >= 5000) {
@@ -1476,14 +1467,12 @@ public class Game {
 
             if (((mapSplitTilesMiniTileMask[index] >> minitileShift) & 1) != 0) {
                 return getRegion(mapSplitTilesRegion2[index]);
-            }
-            else {
+            } else {
                 return getRegion(mapSplitTilesRegion1[index]);
             }
         }
         return getRegion(idx);
     }
-
 
     public TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition, final int maxRange) {
         return getBuildLocation(type, desiredPosition, maxRange, false);
@@ -1497,28 +1486,17 @@ public class Game {
         return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
     }
 
-    private static final int damageRatio[][] = {
-            // Ind, Sml, Med, Lrg, Non, Unk
-            {  0,   0,   0,   0,   0,   0 }, // Independent
-            {  0, 128, 192, 256,   0,   0 }, // Explosive
-            {  0, 256, 128,  64,   0,   0 }, // Concussive
-            {  0, 256, 256, 256,   0,   0 }, // Normal
-            {  0, 256, 256, 256,   0,   0 }, // Ignore_Armor
-            {  0,   0,   0,   0,   0,   0 }, // None
-            {  0,   0,   0,   0,   0,   0 }  // Unknown
-    };
-
     private int getDamageFromImpl(UnitType fromType, UnitType toType, Player fromPlayer, Player toPlayer) {
         // Retrieve appropriate weapon
         final WeaponType wpn = toType.isFlyer() ? fromType.airWeapon() : fromType.groundWeapon();
-        if ( wpn == WeaponType.None || wpn == WeaponType.Unknown )
+        if (wpn == WeaponType.None || wpn == WeaponType.Unknown)
             return 0;
 
         // Get initial weapon damage
         int dmg = fromPlayer != null ? fromPlayer.damage(wpn) : wpn.damageAmount() * wpn.damageFactor();
 
         // If we need to calculate using armor
-        if ( wpn.damageType() != DamageType.Ignore_Armor && toPlayer != null ) {
+        if (wpn.damageType() != DamageType.Ignore_Armor && toPlayer != null) {
             dmg -= Math.min(dmg, toPlayer.armor(toType));
         }
 
@@ -1538,7 +1516,7 @@ public class Game {
         return getDamageFromImpl(fromType, toType, fromPlayer, toPlayer == null ? self() : toPlayer);
     }
 
-    public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer){
+    public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer) {
         return getDamageTo(toType, fromType, toPlayer, null);
     }
 

@@ -9,23 +9,25 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static bwapi.Order.*;
-import static bwapi.Race.*;
+import static bwapi.Race.Terran;
+import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 public class Unit {
+    private static Set<Order> gatheringGasOrders = new HashSet<>(Arrays.asList(
+            Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision));
+    private static Set<Order> gatheringMineralOrders = new HashSet<>(Arrays.asList(
+            Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision));
     private final Client.GameData.UnitData unitData;
     private final Game game;
-
     // static
     private final UnitType initialType;
     private final int initialResources;
     private final int initialHitPoints;
     private final Position initialPosition;
     private final TilePosition initialTilePosition;
-
     private final int id;
     private final int replayID;
-
     // variable
     private Player player;
     private UnitType unitType;
@@ -35,6 +37,7 @@ public class Unit {
     private int lastPlayerUpdate = -1;
     private int lastCommandFrame = 0;
     private UnitCommand lastCommand;
+
 
     Unit(final Client.GameData.UnitData unitData, final Game game) {
         this.unitData = unitData;
@@ -54,10 +57,19 @@ public class Unit {
         replayID = unitData.replayID();
     }
 
+    private static boolean reallyGatheringGas(final Unit targ, final Player player) {
+        return targ != null && targ.exists() && targ.isCompleted() && targ.getPlayer() == player &&
+                targ.getType() != Resource_Vespene_Geyser && (targ.getType().isRefinery() || targ.getType().isResourceDepot());
+    }
+
+    private static boolean reallyGatheringMinerals(final Unit targ, final Player player) {
+        return targ != null && targ.exists() && (targ.getType().isMineralField() ||
+                (targ.isCompleted() && targ.getPlayer() == player && targ.getType().isResourceDepot()));
+    }
+
     public int getID() {
         return id;
     }
-
 
     public boolean exists() {
         return unitData.exists();
@@ -82,7 +94,7 @@ public class Unit {
     public TilePosition getTilePosition() {
         final Position p = getPosition();
         final UnitType ut = getType();
-        return new Position(Math.abs(p.x - ut.tileWidth()  * 32 / 2), Math.abs(p.y - ut.tileHeight() * 32 / 2))
+        return new Position(Math.abs(p.x - ut.tileWidth() * 32 / 2), Math.abs(p.y - ut.tileHeight() * 32 / 2))
                 .toTilePosition();
     }
 
@@ -195,7 +207,7 @@ public class Unit {
         // compute x distance
         int xDist = getLeft() - right;
         if (xDist < 0) {
-            xDist = left -getRight();
+            xDist = left - getRight();
             if (xDist < 0) {
                 xDist = 0;
             }
@@ -481,7 +493,7 @@ public class Unit {
 
     public Set<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
         // Return if this unit does not exist
-        if ( !exists() ) {
+        if (!exists()) {
             return new HashSet<>();
         }
 
@@ -494,13 +506,13 @@ public class Unit {
                 getBottom() + max,
                 (u -> {
                     // Unit check and unit status
-                    if ( u == this || u.isInvincible() ) {
+                    if (u == this || u.isInvincible()) {
                         return false;
                     }
 
                     // Weapon distance check
                     final int dist = getDistance(u);
-                    if ( (weapon.minRange() != 0 && dist < weapon.minRange()) || dist > max ) {
+                    if ((weapon.minRange() != 0 && dist < weapon.minRange()) || dist > max) {
                         return false;
                     }
 
@@ -540,7 +552,7 @@ public class Unit {
         if (isCompleted()) {
             return false;
         }
-        if (getType().getRace() != Terran ) {
+        if (getType().getRace() != Terran) {
             return true;
         }
         return getBuildUnit() != null;
@@ -610,14 +622,6 @@ public class Unit {
         return getOrder() == Order.Follow;
     }
 
-    private static Set<Order> gatheringGasOrders = new HashSet<>(Arrays.asList(
-            Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision));
-
-    private static boolean reallyGatheringGas(final Unit targ, final Player player) {
-        return targ != null && targ.exists() && targ.isCompleted() && targ.getPlayer() == player &&
-                targ.getType() != Resource_Vespene_Geyser && (targ.getType().isRefinery() || targ.getType().isResourceDepot());
-    }
-
     public boolean isGatheringGas() {
         if (!unitData.isGathering()) {
             return false;
@@ -636,14 +640,6 @@ public class Unit {
         //if BWOrder is MoveToGas, Harvest1, or Harvest2 we need to do some additional checks to make sure the unit is really gathering
         return reallyGatheringGas(getTarget(), getPlayer()) || reallyGatheringGas(getOrderTarget(), getPlayer());
     }
-
-    private static boolean reallyGatheringMinerals(final Unit targ, final Player player) {
-        return targ != null && targ.exists() && (targ.getType().isMineralField() ||
-                (targ.isCompleted() && targ.getPlayer() == player && targ.getType().isResourceDepot()));
-    }
-
-    private static Set<Order> gatheringMineralOrders = new HashSet<>(Arrays.asList(
-            Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision));
 
     public boolean isGatheringMinerals() {
         if (!unitData.isGathering()) {
@@ -686,7 +682,7 @@ public class Unit {
 
     public boolean isInWeaponRange(final Unit target) {
         // Preliminary checks
-        if ( !exists() || target == null || !target.exists() || this == target) {
+        if (!exists() || target == null || !target.exists() || this == target) {
             return false;
         }
 
@@ -737,7 +733,9 @@ public class Unit {
 
     public boolean isMoving() {
         return unitData.isMoving();
-    };
+    }
+
+    ;
 
     public boolean isParasited() {
         return unitData.isParasited();
@@ -765,7 +763,7 @@ public class Unit {
 
     public boolean isSieged() {
         final UnitType t = getType();
-        return  t == Terran_Siege_Tank_Siege_Mode || t == Hero_Edmund_Duke_Siege_Mode;
+        return t == Terran_Siege_Tank_Siege_Mode || t == Hero_Edmund_Duke_Siege_Mode;
     }
 
     public boolean isStartingAttack() {
@@ -841,17 +839,17 @@ public class Unit {
 
 
     public boolean issueCommand(final UnitCommand command) {
-        if ( !canIssueCommand(command) ) {
+        if (!canIssueCommand(command)) {
             return false;
         }
         command.unit = this;
 
         // If using train or morph on a hatchery, automatically switch selection to larva
         // (assuming canIssueCommand ensures that there is a larva)
-        if ( (command.type == UnitCommandType.Train || command.type == UnitCommandType.Morph) &&
+        if ((command.type == UnitCommandType.Train || command.type == UnitCommandType.Morph) &&
                 getType().producesLarva() && command.getUnitType().whatBuilds().getKey() == UnitType.Zerg_Larva) {
             for (final Unit larva : getLarva()) {
-                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() )  {
+                if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
                     command.unit = larva;
                     break;
                 }
@@ -888,89 +886,90 @@ public class Unit {
     }
 
     public boolean attack(final Unit target, final boolean shiftQueueCommand) {
-        return issueCommand(UnitCommand.attack(this, target,shiftQueueCommand));
+        return issueCommand(UnitCommand.attack(this, target, shiftQueueCommand));
     }
 
-    public boolean build(final UnitType type){
+    public boolean build(final UnitType type) {
         return issueCommand(UnitCommand.train(this, type));
     }
 
-    public boolean build(final UnitType type, final TilePosition target){
+    public boolean build(final UnitType type, final TilePosition target) {
         return issueCommand(UnitCommand.build(this, target, type));
     }
 
-    public boolean buildAddon(final UnitType type){
+    public boolean buildAddon(final UnitType type) {
         return issueCommand(UnitCommand.buildAddon(this, type));
     }
 
-    public boolean train(final UnitType type){
+    public boolean train(final UnitType type) {
         return issueCommand(UnitCommand.train(this, type));
     }
 
-    public boolean morph(final UnitType type){
+    public boolean morph(final UnitType type) {
         return issueCommand(UnitCommand.morph(this, type));
     }
 
-    public boolean research(final TechType tech){
+    public boolean research(final TechType tech) {
         return issueCommand(UnitCommand.research(this, tech));
     }
 
-    public boolean upgrade(final UpgradeType upgrade){
+    public boolean upgrade(final UpgradeType upgrade) {
         return issueCommand(UnitCommand.upgrade(this, upgrade));
     }
 
-    public boolean setRallyPoint(final Position target){
+    public boolean setRallyPoint(final Position target) {
         return issueCommand(UnitCommand.setRallyPoint(this, target));
     }
 
-    public boolean setRallyPoint(final Unit target){
+    public boolean setRallyPoint(final Unit target) {
         return issueCommand(UnitCommand.setRallyPoint(this, target));
     }
 
-    public boolean move(final Position target){
+    public boolean move(final Position target) {
         return issueCommand(UnitCommand.move(this, target));
     }
 
-    public boolean move(final Position target, final boolean shiftQueueCommand){
+    public boolean move(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.move(this, target, shiftQueueCommand));
     }
 
-    public boolean patrol(final Position target){
+    public boolean patrol(final Position target) {
         return issueCommand(UnitCommand.patrol(this, target));
     }
 
-    public boolean patrol(final Position target, final boolean shiftQueueCommand){
+    public boolean patrol(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.patrol(this, target, shiftQueueCommand));
     }
 
-    public boolean holdPosition(){
+    public boolean holdPosition() {
         return issueCommand(UnitCommand.holdPosition(this));
     }
 
-    public boolean holdPosition(final boolean shiftQueueCommand){
+    public boolean holdPosition(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.holdPosition(this, shiftQueueCommand));
     }
 
-    public boolean stop(){
+    public boolean stop() {
         return issueCommand(UnitCommand.stop(this));
     }
 
-    public boolean stop(final boolean shiftQueueCommand){
+    public boolean stop(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.stop(this, shiftQueueCommand));
     }
 
-    public boolean follow(final Unit target){
+    public boolean follow(final Unit target) {
         return issueCommand(UnitCommand.follow(this, target));
     }
-    public boolean follow(final Unit target, final boolean shiftQueueCommand){
+
+    public boolean follow(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.follow(this, target, shiftQueueCommand));
     }
 
-    public boolean gather(final Unit target){
+    public boolean gather(final Unit target) {
         return issueCommand(UnitCommand.gather(this, target));
     }
 
-    public boolean gather(final Unit target, final boolean shiftQueueCommand){
+    public boolean gather(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.gather(this, target, shiftQueueCommand));
     }
 
@@ -982,127 +981,127 @@ public class Unit {
         return issueCommand(UnitCommand.returnCargo(this, shiftQueueCommand));
     }
 
-    public boolean repair(final Unit target){
+    public boolean repair(final Unit target) {
         return issueCommand(UnitCommand.repair(this, target));
     }
 
-    public boolean repair(final Unit target, final boolean shiftQueueCommand){
+    public boolean repair(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.repair(this, target, shiftQueueCommand));
     }
 
-    public boolean burrow(){
+    public boolean burrow() {
         return issueCommand(UnitCommand.burrow(this));
     }
 
-    public boolean unburrow(){
+    public boolean unburrow() {
         return issueCommand(UnitCommand.unburrow(this));
     }
 
-    public boolean cloak(){
+    public boolean cloak() {
         return issueCommand(UnitCommand.cloak(this));
     }
 
-    public boolean decloak(){
+    public boolean decloak() {
         return issueCommand(UnitCommand.decloak(this));
     }
 
-    public boolean siege(){
+    public boolean siege() {
         return issueCommand(UnitCommand.siege(this));
     }
 
-    public boolean unsiege(){
+    public boolean unsiege() {
         return issueCommand(UnitCommand.unsiege(this));
     }
 
-    public boolean lift(){
+    public boolean lift() {
         return issueCommand(UnitCommand.lift(this));
     }
 
-    public boolean land(final TilePosition target){
+    public boolean land(final TilePosition target) {
         return issueCommand(UnitCommand.land(this, target));
     }
 
-    public boolean load(final Unit target){
+    public boolean load(final Unit target) {
         return issueCommand(UnitCommand.load(this, target));
     }
 
-    public boolean load(final Unit target, final boolean shiftQueueCommand){
+    public boolean load(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.load(this, target, shiftQueueCommand));
     }
 
-    public boolean unload(final Unit target){
+    public boolean unload(final Unit target) {
         return issueCommand(UnitCommand.unload(this, target));
     }
 
-    public boolean unloadAll(){
+    public boolean unloadAll() {
         return issueCommand(UnitCommand.unloadAll(this));
     }
 
-    public boolean unloadAll(final boolean shiftQueueCommand){
+    public boolean unloadAll(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.unloadAll(this, shiftQueueCommand));
     }
 
-    public boolean unloadAll(final Position target){
+    public boolean unloadAll(final Position target) {
         return issueCommand(UnitCommand.unloadAll(this, target));
     }
 
-    public boolean unloadAll(final Position target, final boolean shiftQueueCommand){
+    public boolean unloadAll(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.unloadAll(this, target, shiftQueueCommand));
     }
 
-    public boolean rightClick(final Position target){
+    public boolean rightClick(final Position target) {
         return issueCommand(UnitCommand.rightClick(this, target));
     }
 
-    public boolean rightClick(final Unit target){
+    public boolean rightClick(final Unit target) {
         return issueCommand(UnitCommand.rightClick(this, target));
     }
 
-    public boolean rightClick(final Position target, final boolean shiftQueueCommand){
+    public boolean rightClick(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.rightClick(this, target, shiftQueueCommand));
     }
 
-    public boolean rightClick(final Unit target, final boolean shiftQueueCommand){
+    public boolean rightClick(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.rightClick(this, target, shiftQueueCommand));
     }
 
-    public boolean haltConstruction(){
+    public boolean haltConstruction() {
         return issueCommand(UnitCommand.haltConstruction(this));
     }
 
-    public boolean cancelConstruction(){
+    public boolean cancelConstruction() {
         return issueCommand(UnitCommand.cancelConstruction(this));
     }
 
-    public boolean cancelAddon(){
+    public boolean cancelAddon() {
         return issueCommand(UnitCommand.cancelAddon(this));
     }
 
-    public boolean cancelTrain(){
+    public boolean cancelTrain() {
         return issueCommand(UnitCommand.cancelTrain(this));
     }
 
-    public boolean cancelTrain(final int slot){
+    public boolean cancelTrain(final int slot) {
         return issueCommand(UnitCommand.cancelTrain(this, slot));
     }
 
-    public boolean cancelMorph(){
+    public boolean cancelMorph() {
         return issueCommand(UnitCommand.cancelMorph(this));
     }
 
-    public boolean cancelResearch(){
+    public boolean cancelResearch() {
         return issueCommand(UnitCommand.cancelResearch(this));
     }
 
-    public boolean cancelUpgrade(){
+    public boolean cancelUpgrade() {
         return issueCommand(UnitCommand.cancelUpgrade(this));
     }
 
-    public boolean useTech(final TechType tech){
+    public boolean useTech(final TechType tech) {
         return issueCommand(UnitCommand.useTech(this, tech));
     }
 
-    public boolean useTech(final TechType tech, final Position target){
+    public boolean useTech(final TechType tech, final Position target) {
         return issueCommand(UnitCommand.useTech(this, tech, target));
     }
 
@@ -1144,79 +1143,123 @@ public class Unit {
         }
 
         final UnitCommandType ct = command.type;
-        if ( checkCanIssueCommandType && !canIssueCommandType(ct, false)) {
+        if (checkCanIssueCommandType && !canIssueCommandType(ct, false)) {
             return false;
         }
 
-        switch (ct)  {
-            case Attack_Move: return true;
-            case Attack_Unit: return canAttackUnit(command.target, checkCanTargetUnit, false, false);
-            case Build: return canBuild(command.getUnitType(), new TilePosition(command.x, command.y), checkCanBuildUnitType, false, false);
-            case Build_Addon: return canBuildAddon( command.getUnitType(), false, false);
-            case Train: return canTrain( command.getUnitType(), false, false);
-            case Morph: return canMorph( command.getUnitType(), false, false);
-            case Research: return game.canResearch(command.getTechType(), this,  false);
-            case Upgrade: return game.canUpgrade(command.getUpgradeType(),  this,false);
-            case Set_Rally_Position: return true;
-            case Set_Rally_Unit: return canSetRallyUnit(command.target, checkCanTargetUnit, false, false);
-            case Move: return true;
-            case Patrol: return true;
-            case Hold_Position:  return true;
-            case Stop: return true;
-            case Follow: return canFollow(command.target, checkCanTargetUnit, false, false);
-            case Gather: return canGather(command.target, checkCanTargetUnit, false, false);
-            case Return_Cargo: return true;
-            case Repair:  return canRepair(command.target, checkCanTargetUnit, false, false);
-            case Burrow: return true;
-            case Unburrow: return true;
-            case Cloak: return true;
-            case Decloak: return true;
-            case Siege: return true;
-            case Unsiege: return true;
-            case Lift: return true;
-            case Land: return canLand(new TilePosition(command.x, command.y), false, false);
-            case Load: return canLoad(command.target, checkCanTargetUnit, false, false);
-            case Unload:  return canUnload( command.target, checkCanTargetUnit, false, false, false);
-            case Unload_All: return true;
-            case Unload_All_Position:  return canUnloadAllPosition( command.getTargetPosition(), false, false);
-            case Right_Click_Position:  return true;
-            case Right_Click_Unit:  return canRightClickUnit( command.target, checkCanTargetUnit, false, false);
-            case Halt_Construction: return true;
-            case Cancel_Construction: return true;
-            case Cancel_Addon: return true;
-            case Cancel_Train:  return true;
-            case Cancel_Train_Slot: return canCancelTrainSlot( command.extra, false, false);
-            case Cancel_Morph: return true;
-            case Cancel_Research: return true;
-            case Cancel_Upgrade: return true;
-            case Use_Tech: return canUseTechWithoutTarget( TechType.techTypes[command.extra], false, false);
-            case Use_Tech_Unit: return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
-            case Use_Tech_Position: return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
-            case Place_COP: return canPlaceCOP(new TilePosition(command.x, command.y), false, false);
+        switch (ct) {
+            case Attack_Move:
+                return true;
+            case Attack_Unit:
+                return canAttackUnit(command.target, checkCanTargetUnit, false, false);
+            case Build:
+                return canBuild(command.getUnitType(), new TilePosition(command.x, command.y), checkCanBuildUnitType, false, false);
+            case Build_Addon:
+                return canBuildAddon(command.getUnitType(), false, false);
+            case Train:
+                return canTrain(command.getUnitType(), false, false);
+            case Morph:
+                return canMorph(command.getUnitType(), false, false);
+            case Research:
+                return game.canResearch(command.getTechType(), this, false);
+            case Upgrade:
+                return game.canUpgrade(command.getUpgradeType(), this, false);
+            case Set_Rally_Position:
+                return true;
+            case Set_Rally_Unit:
+                return canSetRallyUnit(command.target, checkCanTargetUnit, false, false);
+            case Move:
+                return true;
+            case Patrol:
+                return true;
+            case Hold_Position:
+                return true;
+            case Stop:
+                return true;
+            case Follow:
+                return canFollow(command.target, checkCanTargetUnit, false, false);
+            case Gather:
+                return canGather(command.target, checkCanTargetUnit, false, false);
+            case Return_Cargo:
+                return true;
+            case Repair:
+                return canRepair(command.target, checkCanTargetUnit, false, false);
+            case Burrow:
+                return true;
+            case Unburrow:
+                return true;
+            case Cloak:
+                return true;
+            case Decloak:
+                return true;
+            case Siege:
+                return true;
+            case Unsiege:
+                return true;
+            case Lift:
+                return true;
+            case Land:
+                return canLand(new TilePosition(command.x, command.y), false, false);
+            case Load:
+                return canLoad(command.target, checkCanTargetUnit, false, false);
+            case Unload:
+                return canUnload(command.target, checkCanTargetUnit, false, false, false);
+            case Unload_All:
+                return true;
+            case Unload_All_Position:
+                return canUnloadAllPosition(command.getTargetPosition(), false, false);
+            case Right_Click_Position:
+                return true;
+            case Right_Click_Unit:
+                return canRightClickUnit(command.target, checkCanTargetUnit, false, false);
+            case Halt_Construction:
+                return true;
+            case Cancel_Construction:
+                return true;
+            case Cancel_Addon:
+                return true;
+            case Cancel_Train:
+                return true;
+            case Cancel_Train_Slot:
+                return canCancelTrainSlot(command.extra, false, false);
+            case Cancel_Morph:
+                return true;
+            case Cancel_Research:
+                return true;
+            case Cancel_Upgrade:
+                return true;
+            case Use_Tech:
+                return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
+            case Use_Tech_Unit:
+                return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+            case Use_Tech_Position:
+                return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+            case Place_COP:
+                return canPlaceCOP(new TilePosition(command.x, command.y), false, false);
         }
         return true;
     }
 
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
         return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
     }
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, checkCanIssueCommandType, true);
 
     }
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit) {
         return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, checkCanTargetUnit, true);
 
     }
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits) {
         return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, checkCanUseTechUnitOnUnits, true);
     }
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions) {
         return canIssueCommandGrouped(command, checkCanUseTechPositionOnPositions, true);
     }
 
@@ -1224,65 +1267,109 @@ public class Unit {
         return canIssueCommandGrouped(command, true);
     }
 
-    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility){
+    public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
         final UnitCommandType ct = command.type;
-        if ( checkCanIssueCommandType && !canIssueCommandTypeGrouped(ct, false, false) ) {
+        if (checkCanIssueCommandType && !canIssueCommandTypeGrouped(ct, false, false)) {
             return false;
         }
 
-        switch (ct)  {
-            case Attack_Move: return true;
-            case Attack_Unit:  return canAttackUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
-            case Build: return false;
-            case Build_Addon:  return false;
-            case Train: return canTrain(command.getUnitType(), false, false);
-            case Morph:  return canMorph(command.getUnitType(), false, false);
-            case Research: return false;
-            case Upgrade: return false;
-            case Set_Rally_Position: return false;
-            case Set_Rally_Unit: return false;
-            case Move: return true;
-            case Patrol: return true;
-            case Hold_Position: return true;
-            case Stop: return true;
-            case Follow: return canFollow(command.target, checkCanTargetUnit, false, false);
-            case Gather: return canGather(command.target, checkCanTargetUnit, false, false);
-            case Return_Cargo: return true;
-            case Repair: return canRepair(command.target, checkCanTargetUnit, false, false);
-            case Burrow: return true;
-            case Unburrow: return true;
-            case Cloak: return true;
-            case Decloak: return true;
-            case Siege: return true;
-            case Unsiege: return true;
-            case Lift: return false;
-            case Land: return false;
-            case Load: return canLoad(command.target, checkCanTargetUnit, false, false);
-            case Unload: return false;
-            case Unload_All: return false;
-            case Unload_All_Position: return canUnloadAllPosition(command.getTargetPosition(), false, false);
-            case Right_Click_Position: return true;
-            case Right_Click_Unit: return canRightClickUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
-            case Halt_Construction: return true;
-            case Cancel_Construction: return false;
-            case Cancel_Addon: return false;
-            case Cancel_Train: return false;
-            case Cancel_Train_Slot: return false;
-            case Cancel_Morph: return true;
-            case Cancel_Research: return false;
-            case Cancel_Upgrade: return false;
-            case Use_Tech: return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
-            case Use_Tech_Unit: return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
-            case Use_Tech_Position: return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
-            case Place_COP: return false;
+        switch (ct) {
+            case Attack_Move:
+                return true;
+            case Attack_Unit:
+                return canAttackUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
+            case Build:
+                return false;
+            case Build_Addon:
+                return false;
+            case Train:
+                return canTrain(command.getUnitType(), false, false);
+            case Morph:
+                return canMorph(command.getUnitType(), false, false);
+            case Research:
+                return false;
+            case Upgrade:
+                return false;
+            case Set_Rally_Position:
+                return false;
+            case Set_Rally_Unit:
+                return false;
+            case Move:
+                return true;
+            case Patrol:
+                return true;
+            case Hold_Position:
+                return true;
+            case Stop:
+                return true;
+            case Follow:
+                return canFollow(command.target, checkCanTargetUnit, false, false);
+            case Gather:
+                return canGather(command.target, checkCanTargetUnit, false, false);
+            case Return_Cargo:
+                return true;
+            case Repair:
+                return canRepair(command.target, checkCanTargetUnit, false, false);
+            case Burrow:
+                return true;
+            case Unburrow:
+                return true;
+            case Cloak:
+                return true;
+            case Decloak:
+                return true;
+            case Siege:
+                return true;
+            case Unsiege:
+                return true;
+            case Lift:
+                return false;
+            case Land:
+                return false;
+            case Load:
+                return canLoad(command.target, checkCanTargetUnit, false, false);
+            case Unload:
+                return false;
+            case Unload_All:
+                return false;
+            case Unload_All_Position:
+                return canUnloadAllPosition(command.getTargetPosition(), false, false);
+            case Right_Click_Position:
+                return true;
+            case Right_Click_Unit:
+                return canRightClickUnitGrouped(command.target, checkCanTargetUnit, false, false, false);
+            case Halt_Construction:
+                return true;
+            case Cancel_Construction:
+                return false;
+            case Cancel_Addon:
+                return false;
+            case Cancel_Train:
+                return false;
+            case Cancel_Train_Slot:
+                return false;
+            case Cancel_Morph:
+                return true;
+            case Cancel_Research:
+                return false;
+            case Cancel_Upgrade:
+                return false;
+            case Use_Tech:
+                return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
+            case Use_Tech_Unit:
+                return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+            case Use_Tech_Position:
+                return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+            case Place_COP:
+                return false;
         }
         return true;
     }
@@ -1294,14 +1381,13 @@ public class Unit {
         }
 
         // Global can be ordered check
-        if ( isLockedDown() || isMaelstrommed() || isStasised() ||
-                !isPowered() || getOrder() == Order.ZergBirth || isLoaded() ) {
-            if ( !getType().producesLarva() ) {
+        if (isLockedDown() || isMaelstrommed() || isStasised() ||
+                !isPowered() || getOrder() == Order.ZergBirth || isLoaded()) {
+            if (!getType().producesLarva()) {
                 return false;
-            }
-            else {
-                for (Unit larva : getLarva())  {
-                    if (larva.canCommand() ) {
+            } else {
+                for (Unit larva : getLarva()) {
+                    if (larva.canCommand()) {
                         return true;
                     }
                 }
@@ -1310,26 +1396,26 @@ public class Unit {
         }
 
         final UnitType uType = getType();
-        if ( uType == Protoss_Interceptor ||
+        if (uType == Protoss_Interceptor ||
                 uType == Terran_Vulture_Spider_Mine ||
                 uType == Spell_Scanner_Sweep ||
-                uType == Special_Map_Revealer ) {
+                uType == Special_Map_Revealer) {
             return false;
         }
 
         if (isCompleted() &&
-                ( uType == Protoss_Pylon ||
+                (uType == Protoss_Pylon ||
                         uType == Terran_Supply_Depot ||
                         uType.isResourceContainer() ||
                         uType == Protoss_Shield_Battery ||
                         uType == Terran_Nuclear_Missile ||
                         uType.isPowerup() ||
-                        ( uType.isSpecialBuilding() && !uType.isFlagBeacon()))) {
+                        (uType.isSpecialBuilding() && !uType.isFlagBeacon()))) {
             return false;
         }
         return isCompleted() || uType.isBuilding() || isMorphing();
     }
-    
+
     public boolean canCommandGrouped() {
         return canCommandGrouped(true);
     }
@@ -1351,50 +1437,92 @@ public class Unit {
             return false;
         }
         switch (ct) {
-            case Attack_Move: return canAttackMove(false);
-            case Attack_Unit: return canAttackUnit(false);
-            case Build: return canBuild(false);
-            case Build_Addon: return canBuildAddon(false);
-            case Train: return canTrain(false);
-            case Morph: return canMorph(false);
-            case Research: return canResearch(false);
-            case Upgrade: return canUpgrade(false);
-            case Set_Rally_Position: return canSetRallyPosition(false);
-            case Set_Rally_Unit: return canSetRallyUnit(false);
-            case Move: return canMove(false);
-            case Patrol: return canPatrol(false);
-            case Hold_Position: return canHoldPosition(false);
-            case Stop: return canStop(false);
-            case Follow: return canFollow(false);
-            case Gather: return canGather(false);
-            case Return_Cargo: return canReturnCargo(false);
-            case Repair: return canRepair(false);
-            case Burrow: return canBurrow(false);
-            case Unburrow: return canUnburrow(false);
-            case Cloak: return canCloak(false);
-            case Decloak: return canDecloak(false);
-            case Siege: return canSiege(false);
-            case Unsiege: return canUnsiege(false);
-            case Lift: return canLift(false);
-            case Land: return canLand(false);
-            case Load: return canLoad(false);
-            case Unload: return canUnload(false);
-            case Unload_All: return canUnloadAll(false);
-            case Unload_All_Position: return canUnloadAllPosition(false);
-            case Right_Click_Position: return canRightClickPosition(false);
-            case Right_Click_Unit: return canRightClickUnit(false);
-            case Halt_Construction: return canHaltConstruction(false);
-            case Cancel_Construction: return canCancelConstruction(false);
-            case Cancel_Addon: return canCancelAddon(false);
-            case Cancel_Train: return canCancelTrain(false);
-            case Cancel_Train_Slot: return canCancelTrainSlot(false);
-            case Cancel_Morph: return canCancelMorph(false);
-            case Cancel_Research: return canCancelResearch(false);
-            case Cancel_Upgrade: return canCancelUpgrade(false);
+            case Attack_Move:
+                return canAttackMove(false);
+            case Attack_Unit:
+                return canAttackUnit(false);
+            case Build:
+                return canBuild(false);
+            case Build_Addon:
+                return canBuildAddon(false);
+            case Train:
+                return canTrain(false);
+            case Morph:
+                return canMorph(false);
+            case Research:
+                return canResearch(false);
+            case Upgrade:
+                return canUpgrade(false);
+            case Set_Rally_Position:
+                return canSetRallyPosition(false);
+            case Set_Rally_Unit:
+                return canSetRallyUnit(false);
+            case Move:
+                return canMove(false);
+            case Patrol:
+                return canPatrol(false);
+            case Hold_Position:
+                return canHoldPosition(false);
+            case Stop:
+                return canStop(false);
+            case Follow:
+                return canFollow(false);
+            case Gather:
+                return canGather(false);
+            case Return_Cargo:
+                return canReturnCargo(false);
+            case Repair:
+                return canRepair(false);
+            case Burrow:
+                return canBurrow(false);
+            case Unburrow:
+                return canUnburrow(false);
+            case Cloak:
+                return canCloak(false);
+            case Decloak:
+                return canDecloak(false);
+            case Siege:
+                return canSiege(false);
+            case Unsiege:
+                return canUnsiege(false);
+            case Lift:
+                return canLift(false);
+            case Land:
+                return canLand(false);
+            case Load:
+                return canLoad(false);
+            case Unload:
+                return canUnload(false);
+            case Unload_All:
+                return canUnloadAll(false);
+            case Unload_All_Position:
+                return canUnloadAllPosition(false);
+            case Right_Click_Position:
+                return canRightClickPosition(false);
+            case Right_Click_Unit:
+                return canRightClickUnit(false);
+            case Halt_Construction:
+                return canHaltConstruction(false);
+            case Cancel_Construction:
+                return canCancelConstruction(false);
+            case Cancel_Addon:
+                return canCancelAddon(false);
+            case Cancel_Train:
+                return canCancelTrain(false);
+            case Cancel_Train_Slot:
+                return canCancelTrainSlot(false);
+            case Cancel_Morph:
+                return canCancelMorph(false);
+            case Cancel_Research:
+                return canCancelResearch(false);
+            case Cancel_Upgrade:
+                return canCancelUpgrade(false);
             case Use_Tech:
             case Use_Tech_Unit:
-            case Use_Tech_Position: return canUseTechWithOrWithoutTarget(false);
-            case Place_COP: return canPlaceCOP(false);
+            case Use_Tech_Position:
+                return canUseTechWithOrWithoutTarget(false);
+            case Place_COP:
+                return canPlaceCOP(false);
         }
 
         return true;
@@ -1418,61 +1546,103 @@ public class Unit {
         }
 
         switch (ct) {
-            case Attack_Move: return canAttackMoveGrouped(false, false);
-            case Attack_Unit: return canAttackUnitGrouped(false, false);
-            case Build: return false;
-            case Build_Addon: return false;
-            case Train: return canTrain(false);
-            case Morph: return canMorph(false);
-            case Research: return false;
-            case Upgrade: return false;
-            case Set_Rally_Position: return false;
-            case Set_Rally_Unit: return false;
-            case Move: return canMoveGrouped(false, false);
-            case Patrol: return canPatrolGrouped(false, false);
-            case Hold_Position: return canHoldPosition(false);
-            case Stop: return canStop(false);
-            case Follow: return canFollow(false);
-            case Gather: return canGather(false);
-            case Return_Cargo: return canReturnCargo(false);
-            case Repair: return canRepair(false);
-            case Burrow: return canBurrow(false);
-            case Unburrow: return canUnburrow(false);
-            case Cloak: return canCloak(false);
-            case Decloak: return canDecloak(false);
-            case Siege: return canSiege(false);
-            case Unsiege: return canUnsiege(false);
-            case Lift: return false;
-            case Land: return false;
-            case Load: return canLoad(false);
-            case Unload: return false;
-            case Unload_All: return false;
-            case Unload_All_Position: return canUnloadAllPosition(false);
-            case Right_Click_Position: return canRightClickPositionGrouped(false, false);
-            case Right_Click_Unit: return canRightClickUnitGrouped(false, false);
-            case Halt_Construction: return canHaltConstruction(false);
-            case Cancel_Construction: return false;
-            case Cancel_Addon: return false;
-            case Cancel_Train: return false;
-            case Cancel_Train_Slot: return false;
-            case Cancel_Morph: return canCancelMorph(false);
-            case Cancel_Research: return false;
-            case Cancel_Upgrade: return false;
+            case Attack_Move:
+                return canAttackMoveGrouped(false, false);
+            case Attack_Unit:
+                return canAttackUnitGrouped(false, false);
+            case Build:
+                return false;
+            case Build_Addon:
+                return false;
+            case Train:
+                return canTrain(false);
+            case Morph:
+                return canMorph(false);
+            case Research:
+                return false;
+            case Upgrade:
+                return false;
+            case Set_Rally_Position:
+                return false;
+            case Set_Rally_Unit:
+                return false;
+            case Move:
+                return canMoveGrouped(false, false);
+            case Patrol:
+                return canPatrolGrouped(false, false);
+            case Hold_Position:
+                return canHoldPosition(false);
+            case Stop:
+                return canStop(false);
+            case Follow:
+                return canFollow(false);
+            case Gather:
+                return canGather(false);
+            case Return_Cargo:
+                return canReturnCargo(false);
+            case Repair:
+                return canRepair(false);
+            case Burrow:
+                return canBurrow(false);
+            case Unburrow:
+                return canUnburrow(false);
+            case Cloak:
+                return canCloak(false);
+            case Decloak:
+                return canDecloak(false);
+            case Siege:
+                return canSiege(false);
+            case Unsiege:
+                return canUnsiege(false);
+            case Lift:
+                return false;
+            case Land:
+                return false;
+            case Load:
+                return canLoad(false);
+            case Unload:
+                return false;
+            case Unload_All:
+                return false;
+            case Unload_All_Position:
+                return canUnloadAllPosition(false);
+            case Right_Click_Position:
+                return canRightClickPositionGrouped(false, false);
+            case Right_Click_Unit:
+                return canRightClickUnitGrouped(false, false);
+            case Halt_Construction:
+                return canHaltConstruction(false);
+            case Cancel_Construction:
+                return false;
+            case Cancel_Addon:
+                return false;
+            case Cancel_Train:
+                return false;
+            case Cancel_Train_Slot:
+                return false;
+            case Cancel_Morph:
+                return canCancelMorph(false);
+            case Cancel_Research:
+                return false;
+            case Cancel_Upgrade:
+                return false;
             case Use_Tech:
             case Use_Tech_Unit:
-            case Use_Tech_Position: return canUseTechWithOrWithoutTarget(false);
-            case Place_COP: return false;
+            case Use_Tech_Position:
+                return canUseTechWithOrWithoutTarget(false);
+            case Place_COP:
+                return false;
         }
         return true;
     }
 
     public boolean canTargetUnit(Unit targetUnit) {
-        if ( targetUnit == null || !targetUnit.exists() ) {
+        if (targetUnit == null || !targetUnit.exists()) {
             return false;
         }
         final UnitType targetType = targetUnit.getType();
         if (!targetUnit.isCompleted() && !targetType.isBuilding() && !targetUnit.isMorphing() &&
-                targetType != Protoss_Archon && targetType != Protoss_Dark_Archon ) {
+                targetType != Protoss_Archon && targetType != Protoss_Dark_Archon) {
             return false;
         }
         return targetType != Spell_Scanner_Sweep &&
@@ -1537,7 +1707,7 @@ public class Unit {
             return false;
         }
 
-        if ( target == null ) {
+        if (target == null) {
             return false;
         }
         return canAttackUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
@@ -1557,30 +1727,30 @@ public class Unit {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
         return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
     }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
         return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
     }
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
         return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
     }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
-    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canAttackGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
-    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit){
+    public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit) {
         return canAttackGrouped(target, checkCanTargetUnit, true);
     }
 
@@ -1601,7 +1771,7 @@ public class Unit {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
         return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
@@ -1616,7 +1786,7 @@ public class Unit {
             return false;
         }
 
-        if ( target == null ) {
+        if (target == null) {
             return false;
         }
         return canAttackUnitGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, false, false);
@@ -1631,7 +1801,7 @@ public class Unit {
             return false;
         }
 
-        if ( (getType() != Terran_Medic && !canAttackUnit( false) ) || !canMove(false) )
+        if ((getType() != Terran_Medic && !canAttackUnit(false)) || !canMove(false))
             return false;
 
         return true;
@@ -1650,7 +1820,7 @@ public class Unit {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false)) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
         final UnitType ut = getType();
@@ -1667,43 +1837,40 @@ public class Unit {
         }
 
         final UnitType ut = getType();
-        if ( !ut.isBuilding() && !isInterruptible() ) {
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
 
         }
-        if ( ut.groundWeapon() == WeaponType.None && ut.airWeapon() == WeaponType.None ) {
-            if ( ut == Protoss_Carrier || ut == Hero_Gantrithor ) {
-                if ( getInterceptorCount() <= 0 ) {
+        if (ut.groundWeapon() == WeaponType.None && ut.airWeapon() == WeaponType.None) {
+            if (ut == Protoss_Carrier || ut == Hero_Gantrithor) {
+                if (getInterceptorCount() <= 0) {
                     return false;
                 }
-            }
-            else if ( ut == Protoss_Reaver || ut == Hero_Warbringer ) {
-                if ( getScarabCount() <= 0 ) {
+            } else if (ut == Protoss_Reaver || ut == Hero_Warbringer) {
+                if (getScarabCount() <= 0) {
                     return false;
                 }
-            }
-            else
+            } else
                 return false;
         }
-        if (ut == Zerg_Lurker ) {
-            if ( !isBurrowed() ) {
+        if (ut == Zerg_Lurker) {
+            if (!isBurrowed()) {
                 return false;
             }
-        }
-        else if (isBurrowed() ) {
+        } else if (isBurrowed()) {
             return false;
         }
-        if ( !isCompleted() ) {
+        if (!isCompleted()) {
             return false;
         }
         return getOrder() != Order.ConstructingBuilding;
     }
 
-    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canAttackUnit(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
-    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit){
+    public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit) {
         return canAttackUnit(targetUnit, checkCanTargetUnit, true);
     }
 
@@ -1716,14 +1883,14 @@ public class Unit {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canAttackUnit( false) ) {
+        if (checkCanIssueCommandType && !canAttackUnit(false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ) {
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
-        if ( targetUnit.isInvincible() ) {
+        if (targetUnit.isInvincible()) {
             return false;
         }
 
@@ -1747,10 +1914,10 @@ public class Unit {
             }
         }
 
-        if ( !type.canMove() && !isInWeaponRange(targetUnit) )
+        if (!type.canMove() && !isInWeaponRange(targetUnit))
             return false;
 
-        if ( type == Zerg_Lurker && !isInWeaponRange(targetUnit) )
+        if (type == Zerg_Lurker && !isInWeaponRange(targetUnit))
             return false;
 
         return !equals(targetUnit);
@@ -1765,43 +1932,42 @@ public class Unit {
     }
 
     public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
-        if ( !isInterruptible() ) {
+        if (!isInterruptible()) {
             return false;
         }
         final UnitType ut = getType();
-        if ( !ut.canMove() &&  ut != Terran_Siege_Tank_Siege_Mode ) {
+        if (!ut.canMove() && ut != Terran_Siege_Tank_Siege_Mode) {
             return false;
         }
-        if ( !isCompleted() ) {
-             return false;
+        if (!isCompleted()) {
+            return false;
         }
-        if ( getType() == Zerg_Lurker ) {
-            if ( !isBurrowed() ) {
+        if (getType() == Zerg_Lurker) {
+            if (!isBurrowed()) {
                 return false;
             }
-        }
-        else if ( isBurrowed() ) {
+        } else if (isBurrowed()) {
             return false;
         }
         return getOrder() != ConstructingBuilding;
     }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped){
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
         return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, checkCommandibilityGrouped, true);
     }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
-    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit){
+    public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit) {
         return canAttackUnitGrouped(targetUnit, checkCanTargetUnit, true);
     }
 
@@ -1810,34 +1976,34 @@ public class Unit {
     }
 
     public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
-        if ( checkCanIssueCommandTypeGrouped && !canAttackUnitGrouped(false, false) ) {
+        if (checkCanIssueCommandTypeGrouped && !canAttackUnitGrouped(false, false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ) {
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
-        if ( isInvincible() ) {
+        if (isInvincible()) {
             return false;
         }
 
         final UnitType ut = getType();
-        if ( ut == Zerg_Lurker && !isInWeaponRange(targetUnit) ) {
+        if (ut == Zerg_Lurker && !isInWeaponRange(targetUnit)) {
             return false;
         }
 
-        if ( ut == Zerg_Queen &&
-                ( targetUnit.getType() != Terran_Command_Center ||
-                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0 ) ) {
+        if (ut == Zerg_Queen &&
+                (targetUnit.getType() != Terran_Command_Center ||
+                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0)) {
             return false;
         }
 
@@ -1849,17 +2015,17 @@ public class Unit {
     }
 
     public boolean canBuild(boolean checkCommandibility) {
-        if ( checkCommandibility  && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
-        if ( !ut.isBuilding() && !isInterruptible() ) {
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
         }
-        if ( isConstructing() ||
-                !isCompleted()   ||
-                        (ut.isBuilding() && !isIdle()) ) {
+        if (isConstructing() ||
+                !isCompleted() ||
+                (ut.isBuilding() && !isIdle())) {
             return false;
         }
         return !isHallucination();
@@ -1874,18 +2040,18 @@ public class Unit {
     }
 
     public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canBuild(false) ) {
+        if (checkCanIssueCommandType && !canBuild(false)) {
             return false;
         }
-        if ( !game.canMake(uType, this) ) {
+        if (!game.canMake(uType, this)) {
             return false;
         }
 
-        if ( !uType.isBuilding() ) {
+        if (!uType.isBuilding()) {
             return false;
         }
         return getAddon() == null;
@@ -1904,19 +2070,19 @@ public class Unit {
     }
 
     public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility  && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canBuild(false) ){
+        if (checkCanIssueCommandType && !canBuild(false)) {
             return false;
         }
 
-        if ( checkTargetUnitType && !canBuild(uType, false, false) ){
+        if (checkTargetUnitType && !canBuild(uType, false, false)) {
             return false;
         }
 
-        if ( !tilePos.isValid(game)){
+        if (!tilePos.isValid(game)) {
             return false;
         }
 
@@ -1928,14 +2094,14 @@ public class Unit {
     }
 
     public boolean canBuildAddon(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if (isConstructing() || !isCompleted() || isLifted() || (getType().isBuilding() && !isIdle()) ) {
+        if (isConstructing() || !isCompleted() || isLifted() || (getType().isBuilding() && !isIdle())) {
             return false;
         }
-        if ( getAddon() != null ) {
+        if (getAddon() != null) {
             return false;
         }
         return getType().canBuildAddon();
@@ -1950,16 +2116,16 @@ public class Unit {
     }
 
     public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
-        if ( checkCanIssueCommandType && !canBuildAddon(uType, false) ) {
+        if (checkCanIssueCommandType && !canBuildAddon(uType, false)) {
             return false;
         }
-        if ( !game.canMake(uType, this) ) {
+        if (!game.canMake(uType, this)) {
             return false;
         }
-        if ( !uType.isAddon() ) {
+        if (!uType.isAddon()) {
             return false;
         }
         return game.canBuildHere(getTilePosition(), uType, this);
@@ -1970,32 +2136,32 @@ public class Unit {
     }
 
     public boolean canTrain(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         final UnitType ut = getType();
-        if ( ut.producesLarva() ) {
-            if ( !isConstructing() && isCompleted() ) {
+        if (ut.producesLarva()) {
+            if (!isConstructing() && isCompleted()) {
                 return true;
             }
             for (Unit larva : getLarva()) {
-                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() ) {
+                if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
                     return true;
                 }
             }
             return false;
         }
 
-        if ( isConstructing() || !isCompleted() || isLifted() ) {
+        if (isConstructing() || !isCompleted() || isLifted()) {
             return false;
         }
-        if ( !ut.canProduce() &&
+        if (!ut.canProduce() &&
                 ut != Terran_Nuclear_Silo &&
                 ut != Zerg_Hydralisk &&
                 ut != Zerg_Mutalisk &&
                 ut != Zerg_Creep_Colony &&
                 ut != Zerg_Spire &&
-                ut != Zerg_Larva ) {
+                ut != Zerg_Larva) {
             return false;
         }
         return !isHallucination();
@@ -2010,39 +2176,38 @@ public class Unit {
     }
 
     public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canTrain(false) ){
+        if (checkCanIssueCommandType && !canTrain(false)) {
             return false;
         }
 
         Unit thisUnit = this;
-        if (getType().producesLarva() ) {
-            if ( uType.whatBuilds().getKey() == Zerg_Larva ) {
+        if (getType().producesLarva()) {
+            if (uType.whatBuilds().getKey() == Zerg_Larva) {
                 boolean foundCommandableLarva = false;
                 for (Unit larva : getLarva()) {
-                    if ( larva.canTrain(true) ) {
+                    if (larva.canTrain(true)) {
                         foundCommandableLarva = true;
                         thisUnit = larva;
                         break;
                     }
                 }
-                if (!foundCommandableLarva){
+                if (!foundCommandableLarva) {
                     return false;
                 }
-            }
-            else if (isConstructing() || !isCompleted() ){
+            } else if (isConstructing() || !isCompleted()) {
                 return false;
             }
         }
 
-        if ( !game.canMake(uType, thisUnit) ){
+        if (!game.canMake(uType, thisUnit)) {
             return false;
         }
 
-        if ( uType.isAddon() || ( uType.isBuilding() && !thisUnit.getType().isBuilding() ) ){
+        if (uType.isAddon() || (uType.isBuilding() && !thisUnit.getType().isBuilding())) {
             return false;
         }
         return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
@@ -2053,41 +2218,41 @@ public class Unit {
     }
 
     public boolean canMorph(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
-        if (ut.producesLarva() ) {
-            if ( !isConstructing() && isCompleted() && ( !ut.isBuilding() || isIdle() ) ) {
+        if (ut.producesLarva()) {
+            if (!isConstructing() && isCompleted() && (!ut.isBuilding() || isIdle())) {
                 return true;
             }
             for (Unit larva : getLarva()) {
-                if ( !larva.isConstructing() && larva.isCompleted() && larva.canCommand() ) {
+                if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
                     return true;
                 }
             }
             return false;
         }
 
-        if ( isConstructing() || !isCompleted()   || (ut.isBuilding() && !isIdle()) ) {
+        if (isConstructing() || !isCompleted() || (ut.isBuilding() && !isIdle())) {
             return false;
         }
 
-        if ( ut != Zerg_Hydralisk &&
+        if (ut != Zerg_Hydralisk &&
                 ut != Zerg_Mutalisk &&
                 ut != Zerg_Creep_Colony &&
                 ut != Zerg_Spire &&
                 ut != Zerg_Hatchery &&
                 ut != Zerg_Lair &&
                 ut != Zerg_Hive &&
-                ut != Zerg_Larva ) {
+                ut != Zerg_Larva) {
             return false;
         }
         return !isHallucination();
     }
 
-    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType){
+    public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType) {
         return canMorph(uType, checkCanIssueCommandType, true);
     }
 
@@ -2096,19 +2261,19 @@ public class Unit {
     }
 
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canMorph( false) )
+        if (checkCanIssueCommandType && !canMorph(false))
             return false;
 
         Unit thisUnit = this;
-        if ( getType().producesLarva()) {
-            if ( uType.whatBuilds().getKey() == Zerg_Larva ) {
+        if (getType().producesLarva()) {
+            if (uType.whatBuilds().getKey() == Zerg_Larva) {
                 boolean foundCommandableLarva = false;
                 for (Unit larva : getLarva()) {
-                    if ( larva.canMorph(true) ) {
+                    if (larva.canMorph(true)) {
                         foundCommandableLarva = true;
                         thisUnit = larva;
                         break;
@@ -2117,13 +2282,12 @@ public class Unit {
                 if (!foundCommandableLarva) {
                     return false;
                 }
-            }
-            else if ( isConstructing() || !isCompleted() || (getType().isBuilding() && !isIdle()) ) {
+            } else if (isConstructing() || !isCompleted() || (getType().isBuilding() && !isIdle())) {
                 return false;
             }
         }
 
-        if ( !game.canMake(uType, thisUnit) ) {
+        if (!game.canMake(uType, thisUnit)) {
             return false;
         }
         return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
@@ -2134,7 +2298,7 @@ public class Unit {
     }
 
     public boolean canResearch(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2155,7 +2319,7 @@ public class Unit {
             return false;
         }
 
-        if ( checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted() ) ) {
+        if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted())) {
             return false;
         }
 
@@ -2167,7 +2331,7 @@ public class Unit {
             return false;
         }
 
-        if ( !self.isResearchAvailable(type) ) {
+        if (!self.isResearchAvailable(type)) {
             return false;
         }
 
@@ -2187,7 +2351,7 @@ public class Unit {
     }
 
     public boolean canUpgrade(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2209,28 +2373,28 @@ public class Unit {
             return false;
         }
 
-        if ( checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted() ) )
+        if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted()))
             return false;
 
         int nextLvl = self.getUpgradeLevel(type) + 1;
 
-        if (!self.hasUnitTypeRequirement(type.whatUpgrades())){
+        if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
             return false;
         }
 
-        if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))){
+        if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
             return false;
         }
 
-        if (self.isUpgrading(type)){
+        if (self.isUpgrading(type)) {
             return false;
         }
 
-        if ( self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type) ){
+        if (self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type)) {
             return false;
         }
 
-        if ( self.minerals() < type.mineralPrice(nextLvl) ){
+        if (self.minerals() < type.mineralPrice(nextLvl)) {
             return false;
         }
 
@@ -2242,7 +2406,7 @@ public class Unit {
     }
 
     public boolean canSetRallyPoint(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2274,7 +2438,7 @@ public class Unit {
     }
 
     public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2282,7 +2446,7 @@ public class Unit {
     }
 
     public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2297,11 +2461,11 @@ public class Unit {
     }
 
     public boolean canSetRallyPosition(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().canProduce() || !getType().isBuilding() ) {
+        if (!getType().canProduce() || !getType().isBuilding()) {
             return false;
         }
         return !isLifted();
@@ -2312,11 +2476,11 @@ public class Unit {
     }
 
     public boolean canSetRallyUnit(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().canProduce() || !getType().isBuilding() ) {
+        if (!getType().canProduce() || !getType().isBuilding()) {
             return false;
         }
         return !isLifted();
@@ -2335,11 +2499,11 @@ public class Unit {
     }
 
     public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canSetRallyUnit( false) ) {
+        if (checkCanIssueCommandType && !canSetRallyUnit(false)) {
             return false;
         }
 
@@ -2351,39 +2515,38 @@ public class Unit {
     }
 
     public boolean canMove(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         final UnitType ut = getType();
-        if ( !ut.isBuilding()) {
-            if ( !isInterruptible() ) {
+        if (!ut.isBuilding()) {
+            if (!isInterruptible()) {
                 return false;
             }
-            if ( !getType().canMove() ) {
+            if (!getType().canMove()) {
                 return false;
             }
-            if ( isBurrowed() ) {
+            if (isBurrowed()) {
                 return false;
             }
-            if ( getOrder() == ConstructingBuilding ) {
+            if (getOrder() == ConstructingBuilding) {
                 return false;
             }
-            if ( ut == Zerg_Larva ) {
+            if (ut == Zerg_Larva) {
                 return false;
             }
-        }
-        else {
-            if ( !ut.isFlyingBuilding() ) {
+        } else {
+            if (!ut.isFlyingBuilding()) {
                 return false;
             }
-            if ( !isLifted() ) {
+            if (!isLifted()) {
                 return false;
             }
         }
         return isCompleted();
     }
 
-    public boolean canMoveGrouped(boolean checkCommandibilityGrouped){
+    public boolean canMoveGrouped(boolean checkCommandibilityGrouped) {
         return canMoveGrouped(checkCommandibilityGrouped, true);
     }
 
@@ -2392,15 +2555,15 @@ public class Unit {
     }
 
     public boolean canMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
-        if ( !getType().canMove() ) {
+        if (!getType().canMove()) {
             return false;
         }
         return isCompleted() || isMorphing();
@@ -2411,7 +2574,7 @@ public class Unit {
     }
 
     public boolean canPatrol(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         return canMove(false);
@@ -2426,11 +2589,11 @@ public class Unit {
     }
 
     public boolean canPatrolGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
@@ -2442,7 +2605,7 @@ public class Unit {
     }
 
     public boolean canFollow(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2462,15 +2625,15 @@ public class Unit {
     }
 
     public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canFollow( false) ){
+        if (checkCanIssueCommandType && !canFollow(false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ){
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
@@ -2482,33 +2645,33 @@ public class Unit {
     }
 
     public boolean canGather(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         final UnitType ut = getType();
 
-        if ( !ut.isBuilding() && !isInterruptible() ){
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
         }
-        if ( !ut.isWorker() ){
+        if (!ut.isWorker()) {
             return false;
         }
-        if ( getPowerUp() != null ){
+        if (getPowerUp() != null) {
             return false;
         }
-        if ( isHallucination() ){
+        if (isHallucination()) {
             return false;
         }
-        if ( isBurrowed() ){
+        if (isBurrowed()) {
             return false;
         }
-        if ( !isCompleted() ){
+        if (!isCompleted()) {
             return false;
         }
         return getOrder() != ConstructingBuilding;
     }
 
-    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType){
+    public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
         return canGather(targetUnit, checkCanTargetUnit, checkCanIssueCommandType, true);
     }
 
@@ -2521,28 +2684,28 @@ public class Unit {
     }
 
     public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canGather( false) ){
+        if (checkCanIssueCommandType && !canGather(false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ){
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
         final UnitType uType = targetUnit.getType();
-        if ( !uType.isResourceContainer() || uType == Resource_Vespene_Geyser ){
+        if (!uType.isResourceContainer() || uType == Resource_Vespene_Geyser) {
             return false;
         }
 
-        if ( !isCompleted() ){
+        if (!isCompleted()) {
             return false;
         }
 
-        if ( !hasPath(getPosition()) ) {
+        if (!hasPath(getPosition())) {
             return false;
         }
 
@@ -2555,55 +2718,55 @@ public class Unit {
     }
 
     public boolean canReturnCargo(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         final UnitType ut = getType();
 
-        if ( !ut.isBuilding() && !isInterruptible() ) {
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
         }
-        if ( !ut.isWorker() ) {
+        if (!ut.isWorker()) {
             return false;
         }
-        if ( !isCarryingGas() && !isCarryingMinerals() ) {
+        if (!isCarryingGas() && !isCarryingMinerals()) {
             return false;
         }
-        if (isBurrowed() ) {
+        if (isBurrowed()) {
             return false;
         }
         return getOrder() != ConstructingBuilding;
     }
+
     public boolean canHoldPosition() {
         return canHoldPosition(true);
     }
 
     public boolean canHoldPosition(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
 
-        if ( !ut.isBuilding() ) {
-            if ( !ut.canMove() ) {
+        if (!ut.isBuilding()) {
+            if (!ut.canMove()) {
                 return false;
             }
-            if ( isBurrowed() && ut != Zerg_Lurker ) {
+            if (isBurrowed() && ut != Zerg_Lurker) {
                 return false;
             }
-            if ( getOrder() == ConstructingBuilding ) {
+            if (getOrder() == ConstructingBuilding) {
                 return false;
             }
-            if ( ut == Zerg_Larva ) {
+            if (ut == Zerg_Larva) {
                 return false;
             }
-        }
-        else {
-            if ( !ut.isFlyingBuilding() ) {
+        } else {
+            if (!ut.isFlyingBuilding()) {
                 return false;
             }
-            if ( !isLifted() ) {
+            if (!isLifted()) {
                 return false;
             }
         }
@@ -2616,16 +2779,16 @@ public class Unit {
     }
 
     public boolean canStop(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
 
-        if ( !isCompleted() ){
+        if (!isCompleted()) {
             return false;
         }
-        if ( isBurrowed() && ut != Zerg_Lurker ){
+        if (isBurrowed() && ut != Zerg_Lurker) {
             return false;
         }
         return !ut.isBuilding() || isLifted() ||
@@ -2640,20 +2803,20 @@ public class Unit {
     }
 
     public boolean canRepair(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !isInterruptible() ){
+        if (!isInterruptible()) {
             return false;
         }
-        if ( getType() != Terran_SCV ){
+        if (getType() != Terran_SCV) {
             return false;
         }
-        if ( !isCompleted() ){
+        if (!isCompleted()) {
             return false;
         }
-        if ( isHallucination() ){
+        if (isHallucination()) {
             return false;
         }
         return getOrder() != ConstructingBuilding;
@@ -2672,24 +2835,24 @@ public class Unit {
     }
 
     public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canRepair( false) )
+        if (checkCanIssueCommandType && !canRepair(false))
             return false;
 
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) )
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false))
             return false;
 
         UnitType targType = targetUnit.getType();
-        if ( targType.getRace() != Terran || !targType.isMechanical() ) {
+        if (targType.getRace() != Terran || !targType.isMechanical()) {
             return false;
         }
-        if ( targetUnit.getHitPoints() == targType.maxHitPoints() ) {
+        if (targetUnit.getHitPoints() == targType.maxHitPoints()) {
             return false;
         }
-        if ( !targetUnit.isCompleted() ) {
+        if (!targetUnit.isCompleted()) {
             return false;
         }
         return targetUnit != this;
@@ -2700,7 +2863,7 @@ public class Unit {
     }
 
     public boolean canBurrow(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2712,11 +2875,11 @@ public class Unit {
     }
 
     public boolean canUnburrow(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isBurrowable() ) {
+        if (!getType().isBurrowable()) {
             return false;
         }
         return isBurrowed() && getOrder() != Unburrowing;
@@ -2727,22 +2890,23 @@ public class Unit {
     }
 
     public boolean canCloak(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         return canUseTechWithoutTarget(getType().cloakingTech(), true, false);
     }
+
     public boolean canDecloak() {
         return canDecloak(true);
     }
 
     public boolean canDecloak(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if (getType().cloakingTech() == TechType.None ) {
+        if (getType().cloakingTech() == TechType.None) {
             return false;
         }
         return getSecondaryOrder() == Cloak;
@@ -2753,7 +2917,7 @@ public class Unit {
     }
 
     public boolean canSiege(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -2765,15 +2929,15 @@ public class Unit {
     }
 
     public boolean canUnsiege(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !isSieged() ) {
+        if (!isSieged()) {
             return false;
         }
         final Order order = getOrder();
-        if ( order == Sieging || order == Unsieging ) {
+        if (order == Sieging || order == Unsieging) {
             return false;
         }
         return !isHallucination();
@@ -2784,17 +2948,17 @@ public class Unit {
     }
 
     public boolean canLift(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isFlyingBuilding() ){
+        if (!getType().isFlyingBuilding()) {
             return false;
         }
-        if ( isLifted() ){
+        if (isLifted()) {
             return false;
         }
-        if ( !isCompleted() ){
+        if (!isCompleted()) {
             return false;
         }
         return isIdle();
@@ -2805,17 +2969,17 @@ public class Unit {
     }
 
     public boolean canLand(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isFlyingBuilding() ) {
+        if (!getType().isFlyingBuilding()) {
             return false;
         }
         return isLifted();
     }
 
-    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType){
+    public boolean canLand(TilePosition target, boolean checkCanIssueCommandType) {
         return canLand(target, checkCanIssueCommandType, true);
     }
 
@@ -2824,11 +2988,11 @@ public class Unit {
     }
 
     public boolean canLand(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canLand(checkCommandibility) ){
+        if (checkCanIssueCommandType && !canLand(checkCommandibility)) {
             return false;
         }
 
@@ -2840,25 +3004,25 @@ public class Unit {
     }
 
     public boolean canLoad(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
 
-        if ( !ut.isBuilding() && !isInterruptible() ) {
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
         }
-        if ( !isCompleted() ) {
+        if (!isCompleted()) {
             return false;
         }
-        if ( ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0 ) {
+        if (ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
             return false;
         }
-        if ( isBurrowed() ) {
+        if (isBurrowed()) {
             return false;
         }
-        if (getOrder() == ConstructingBuilding ) {
+        if (getOrder() == ConstructingBuilding) {
             return false;
         }
         return ut != Zerg_Larva;
@@ -2877,61 +3041,61 @@ public class Unit {
     }
 
     public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canLoad( false) ){
+        if (checkCanIssueCommandType && !canLoad(false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
         final Player self = game.self();
         //target must also be owned by self
-        if (!targetUnit.getPlayer().equals(self)){
+        if (!targetUnit.getPlayer().equals(self)) {
             return false;
         }
-        if ( targetUnit.isLoaded() || !targetUnit.isCompleted() ){
+        if (targetUnit.isLoaded() || !targetUnit.isCompleted()) {
             return false;
         }
 
         // verify upgrade for Zerg Overlord
-        if ( targetUnit.getType() == Zerg_Overlord &&self.getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0 ){
+        if (targetUnit.getType() == Zerg_Overlord && self.getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
             return false;
         }
 
         int thisUnitSpaceProvided = getType().spaceProvided();
         int targetSpaceProvided = targetUnit.getType().spaceProvided();
-        if ( thisUnitSpaceProvided <= 0 && targetSpaceProvided <= 0 ){
+        if (thisUnitSpaceProvided <= 0 && targetSpaceProvided <= 0) {
             return false;
         }
 
-        final Unit unitToBeLoaded = thisUnitSpaceProvided > 0 ? targetUnit : this ;
+        final Unit unitToBeLoaded = thisUnitSpaceProvided > 0 ? targetUnit : this;
         final UnitType unitToBeLoadedType = unitToBeLoaded.getType();
-        if (!unitToBeLoadedType.canMove() || unitToBeLoadedType.isFlyer() || unitToBeLoadedType.spaceRequired() > 8 ){
+        if (!unitToBeLoadedType.canMove() || unitToBeLoadedType.isFlyer() || unitToBeLoadedType.spaceRequired() > 8) {
             return false;
         }
-        if ( !unitToBeLoaded.isCompleted() ){
+        if (!unitToBeLoaded.isCompleted()) {
             return false;
         }
-        if ( unitToBeLoaded.isBurrowed() ){
+        if (unitToBeLoaded.isBurrowed()) {
             return false;
         }
 
         final Unit unitThatLoads = thisUnitSpaceProvided > 0 ? this : targetUnit;
         final UnitType unitThatLoadsType = unitThatLoads.getType();
-        if ( unitThatLoads.isHallucination() ){
+        if (unitThatLoads.isHallucination()) {
             return false;
         }
 
-        if (unitThatLoadsType  == Terran_Bunker) {
-            if ( !unitThatLoadsType.isOrganic() || unitThatLoadsType.getRace() != Terran ){
+        if (unitThatLoadsType == Terran_Bunker) {
+            if (!unitThatLoadsType.isOrganic() || unitThatLoadsType.getRace() != Terran) {
                 return false;
             }
-            if ( !unitToBeLoaded.hasPath(unitThatLoads.getPosition()) ){
+            if (!unitToBeLoaded.hasPath(unitThatLoads.getPosition())) {
                 return false;
             }
         }
@@ -2939,7 +3103,7 @@ public class Unit {
         int freeSpace = thisUnitSpaceProvided > 0 ? thisUnitSpaceProvided : targetSpaceProvided;
         for (Unit u : unitThatLoads.getLoadedUnits()) {
             final int requiredSpace = u.getType().spaceRequired();
-            if ( requiredSpace > 0 && requiredSpace < 8 ) {
+            if (requiredSpace > 0 && requiredSpace < 8) {
                 freeSpace -= requiredSpace;
             }
         }
@@ -2951,21 +3115,21 @@ public class Unit {
     }
 
     public boolean canUnloadWithOrWithoutTarget(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
-        if ( !ut.isBuilding() && !isInterruptible() ) {
+        if (!ut.isBuilding() && !isInterruptible()) {
             return false;
         }
 
-        if ( getLoadedUnits().size() == 0 ) {
+        if (getLoadedUnits().size() == 0) {
             return false;
         }
 
         // Check overlord tech
-        if ( ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
+        if (ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
             return false;
         }
 
@@ -2981,19 +3145,18 @@ public class Unit {
     }
 
     public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false) ) {
+        if (checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if (getType() != Terran_Bunker ) {
-            if (! new WalkPosition(targDropPos.x / 8, targDropPos.y / 8).isValid(game)) {
+        if (getType() != Terran_Bunker) {
+            if (!new WalkPosition(targDropPos.x / 8, targDropPos.y / 8).isValid(game)) {
                 return false;
-            }
-            else if ( !game.isWalkable(targDropPos.x / 8, targDropPos.y / 8) ) {
+            } else if (!game.isWalkable(targDropPos.x / 8, targDropPos.y / 8)) {
                 return false;
             }
         }
@@ -3009,8 +3172,8 @@ public class Unit {
         return canUnloadAtPosition(getPosition(), true, checkCommandibility);
     }
 
-    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType){
-        return canUnload(targetUnit, checkCanTargetUnit, checkPosition, checkCanIssueCommandType,true);
+    public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType) {
+        return canUnload(targetUnit, checkCanTargetUnit, checkPosition, checkCanIssueCommandType, true);
     }
 
     public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition) {
@@ -3026,23 +3189,23 @@ public class Unit {
     }
 
     public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false) ) {
+        if (checkCanIssueCommandType && !canUnloadWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( checkPosition && !canUnloadAtPosition(getPosition(), false, false) ) {
+        if (checkPosition && !canUnloadAtPosition(getPosition(), false, false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ) {
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
-        if ( !targetUnit.isLoaded() ) {
+        if (!targetUnit.isLoaded()) {
             return false;
         }
 
@@ -3062,18 +3225,18 @@ public class Unit {
     }
 
     public boolean canUnloadAllPosition(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !canUnloadWithOrWithoutTarget(false) ){
+        if (!canUnloadWithOrWithoutTarget(false)) {
             return false;
         }
 
         return getType() != Terran_Bunker;
     }
 
-    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType){
+    public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType) {
         return canUnloadAllPosition(targDropPos, checkCanIssueCommandType, true);
     }
 
@@ -3082,11 +3245,11 @@ public class Unit {
     }
 
     public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUnloadAllPosition( false) ) {
+        if (checkCanIssueCommandType && !canUnloadAllPosition(false)) {
             return false;
         }
 
@@ -3098,7 +3261,7 @@ public class Unit {
     }
 
     public boolean canRightClick(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         return canRightClickPosition(false) || canRightClickUnit(false);
@@ -3129,7 +3292,7 @@ public class Unit {
     }
 
     public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3137,7 +3300,7 @@ public class Unit {
     }
 
     public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3156,11 +3319,11 @@ public class Unit {
     }
 
     public boolean canRightClickGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) )
+        if (checkCommandibilityGrouped && !canCommandGrouped(false))
             return false;
 
         return canRightClickPositionGrouped(false, false) || canRightClickUnitGrouped(false, false);
@@ -3199,7 +3362,7 @@ public class Unit {
     }
 
     public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3210,8 +3373,8 @@ public class Unit {
         return canRightClickPositionGrouped(false, false);
     }
 
-    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped , boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+    public boolean canRightClickGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3229,11 +3392,11 @@ public class Unit {
     }
 
     public boolean canRightClickPosition(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isBuilding() && !isInterruptible() ) {
+        if (!getType().isBuilding() && !isInterruptible()) {
             return false;
         }
         return canMove(false) || canSetRallyPosition(false);
@@ -3248,14 +3411,14 @@ public class Unit {
     }
 
     public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ) {
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
-        if ( !isInterruptible() ) {
+        if (!isInterruptible()) {
             return false;
         }
         return canMoveGrouped(false, false);
@@ -3266,11 +3429,11 @@ public class Unit {
     }
 
     public boolean canRightClickUnit(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isBuilding() && !isInterruptible() ) {
+        if (!getType().isBuilding() && !isInterruptible()) {
             return false;
         }
         return canFollow(false) ||
@@ -3292,20 +3455,20 @@ public class Unit {
     }
 
     public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canRightClickUnit( false) ) {
+        if (checkCanIssueCommandType && !canRightClickUnit(false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit( targetUnit, false) ) {
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
-        if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
-                !canAttackUnit(targetUnit, false, true, false) ) {
+        if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
+                !canAttackUnit(targetUnit, false, true, false)) {
             return false;
         }
 
@@ -3323,15 +3486,15 @@ public class Unit {
     }
 
     public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ){
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
 
-        if ( !isInterruptible() ){
+        if (!isInterruptible()) {
             return false;
         }
         return canFollow(false) ||
@@ -3356,22 +3519,22 @@ public class Unit {
     }
 
     public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCommandibilityGrouped && !canCommandGrouped(false) ){
+        if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
-        if ( checkCanIssueCommandType && !canRightClickUnitGrouped(false, false) ){
+        if (checkCanIssueCommandType && !canRightClickUnitGrouped(false, false)) {
             return false;
         }
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
-        if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
-                !canAttackUnitGrouped(targetUnit, false, true, false, false) ){
+        if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer()) &&
+                !canAttackUnitGrouped(targetUnit, false, true, false, false)) {
             return false;
         }
 
@@ -3384,7 +3547,7 @@ public class Unit {
     }
 
     public boolean canHaltConstruction(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3397,11 +3560,11 @@ public class Unit {
     }
 
     public boolean canCancelConstruction(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isBuilding() ){
+        if (!getType().isBuilding()) {
             return false;
         }
 
@@ -3413,7 +3576,7 @@ public class Unit {
     }
 
     public boolean canCancelAddon(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         final Unit addon = getAddon();
@@ -3425,7 +3588,7 @@ public class Unit {
     }
 
     public boolean canCancelTrain(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3449,11 +3612,11 @@ public class Unit {
     }
 
     public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canCancelTrainSlot(false) )
+        if (checkCanIssueCommandType && !canCancelTrainSlot(false))
             return false;
 
         return isTraining() && slot >= 0 && (getTrainingQueue().size() > slot);
@@ -3464,11 +3627,11 @@ public class Unit {
     }
 
     public boolean canCancelMorph(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !isMorphing() || (!isCompleted() && getType() == Zerg_Nydus_Canal && getNydusExit() != null) ){
+        if (!isMorphing() || (!isCompleted() && getType() == Zerg_Nydus_Canal && getNydusExit() != null)) {
             return false;
         }
         return !isHallucination();
@@ -3479,7 +3642,7 @@ public class Unit {
     }
 
     public boolean canCancelResearch(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3491,7 +3654,7 @@ public class Unit {
     }
 
     public boolean canCancelUpgrade(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3503,14 +3666,14 @@ public class Unit {
     }
 
     public boolean canUseTechWithOrWithoutTarget(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isBuilding() && !isInterruptible() ) {
+        if (!getType().isBuilding() && !isInterruptible()) {
             return false;
         }
-        if ( !isCompleted() ) {
+        if (!isCompleted()) {
             return false;
         }
         return !isHallucination();
@@ -3525,39 +3688,46 @@ public class Unit {
     }
 
     public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget( false) ) {
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
         final UnitType ut = getType();
         // researched check
-        if ( !ut.isHero() && !game.self().hasResearched(tech) && ut != Zerg_Lurker ) {
+        if (!ut.isHero() && !game.self().hasResearched(tech) && ut != Zerg_Lurker) {
             return false;
         }
 
         // energy check
-        if ( getEnergy() < tech.energyCost() ) {
+        if (getEnergy() < tech.energyCost()) {
             return false;
         }
         // unit check
-        if ( tech != TechType.Burrowing && !tech.whatsUses().contains(ut) ) {
+        if (tech != TechType.Burrowing && !tech.whatsUses().contains(ut)) {
             return false;
         }
 
         final Order order = getOrder();
         switch (tech) {
-            case Spider_Mines: return getSpiderMineCount() > 0;
-            case Tank_Siege_Mode: return !isSieged() && order != Order.Sieging && order != Order.Unsieging;
+            case Spider_Mines:
+                return getSpiderMineCount() > 0;
+            case Tank_Siege_Mode:
+                return !isSieged() && order != Order.Sieging && order != Order.Unsieging;
             case Cloaking_Field:
-            case Personnel_Cloaking: return getSecondaryOrder() != Cloak;
-            case Burrowing: return ut.isBurrowable() && !isBurrowed() && order != Burrowing && order != Unburrowing;
-            case None: return false;
-            case Nuclear_Strike: return getPlayer().completedUnitCount(Terran_Nuclear_Missile) != 0;
-            case Unknown: return false;
+            case Personnel_Cloaking:
+                return getSecondaryOrder() != Cloak;
+            case Burrowing:
+                return ut.isBurrowable() && !isBurrowed() && order != Burrowing && order != Unburrowing;
+            case None:
+                return false;
+            case Nuclear_Strike:
+                return getPlayer().completedUnitCount(Terran_Nuclear_Missile) != 0;
+            case Unknown:
+                return false;
         }
 
         return true;
@@ -3590,6 +3760,7 @@ public class Unit {
     public boolean canUseTech(TechType tech, Position target) {
         return canUseTech(tech, target, true);
     }
+
     public boolean canUseTech(TechType tech, Unit target) {
         return canUseTech(tech, target, true);
     }
@@ -3599,7 +3770,7 @@ public class Unit {
 //    }
 
     public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
@@ -3607,7 +3778,7 @@ public class Unit {
     }
 
     public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
         if (target == null) {
@@ -3625,15 +3796,15 @@ public class Unit {
     }
 
     public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( !canUseTechWithOrWithoutTarget(tech, false, false) ){
+        if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
         return !tech.targetsUnit() && !tech.targetsPosition() && tech != TechType.None && tech != TechType.Unknown && tech != TechType.Lurker_Aspect;
@@ -3648,15 +3819,15 @@ public class Unit {
     }
 
     public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( !canUseTechWithOrWithoutTarget(tech, false, false) ){
+        if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
         return tech.targetsUnit();
@@ -3679,19 +3850,19 @@ public class Unit {
     }
 
     public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( checkTargetsUnits && !canUseTechUnit(tech, false, false) ){
+        if (checkTargetsUnits && !canUseTechUnit(tech, false, false)) {
             return false;
         }
 
-        if ( checkCanTargetUnit && !canTargetUnit(targetUnit, false) ){
+        if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
@@ -3699,81 +3870,81 @@ public class Unit {
 
         switch (tech) {
             case Archon_Warp:
-                if ( targetType != Protoss_High_Templar ){
+                if (targetType != Protoss_High_Templar) {
                     return false;
                 }
-                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                if (!getPlayer().equals(targetUnit.getPlayer())) {
                     return false;
                 }
                 break;
 
             case Dark_Archon_Meld:
-                if ( targetType != Protoss_Dark_Templar ){
+                if (targetType != Protoss_Dark_Templar) {
                     return false;
                 }
-                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                if (!getPlayer().equals(targetUnit.getPlayer())) {
                     return false;
                 }
                 break;
 
             case Consume:
-                if ( !getPlayer().equals(targetUnit.getPlayer())){
+                if (!getPlayer().equals(targetUnit.getPlayer())) {
                     return false;
                 }
-                if ( targetType.getRace() != Zerg || targetType == Zerg_Larva ){
+                if (targetType.getRace() != Zerg || targetType == Zerg_Larva) {
                     return false;
                 }
                 break;
 
             case Spawn_Broodlings:
-                if ( ( !targetType.isOrganic() && !targetType.isMechanical() ) ||
+                if ((!targetType.isOrganic() && !targetType.isMechanical()) ||
                         targetType.isRobotic() ||
-                        targetType.isFlyer() ){
+                        targetType.isFlyer()) {
                     return false;
                 }
                 break;
 
             case Lockdown:
-                if ( !targetType.isMechanical() ){
+                if (!targetType.isMechanical()) {
                     return false;
                 }
                 break;
 
             case Healing:
-                if ( targetUnit.getHitPoints() == targetType.maxHitPoints() ){
+                if (targetUnit.getHitPoints() == targetType.maxHitPoints()) {
                     return false;
                 }
-                if ( !targetType.isOrganic() || targetType.isFlyer() ){
+                if (!targetType.isOrganic() || targetType.isFlyer()) {
                     return false;
                 }
-                if ( !targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer()) ){
+                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer())) {
                     return false;
                 }
                 break;
 
             case Mind_Control:
-                if (getPlayer().equals(targetUnit.getPlayer())){
+                if (getPlayer().equals(targetUnit.getPlayer())) {
                     return false;
                 }
-                if ( targetType == Protoss_Interceptor ||
+                if (targetType == Protoss_Interceptor ||
                         targetType == Terran_Vulture_Spider_Mine ||
                         targetType == Zerg_Lurker_Egg ||
                         targetType == Zerg_Cocoon ||
                         targetType == Zerg_Larva ||
-                        targetType == Zerg_Egg ){
+                        targetType == Zerg_Egg) {
                     return false;
                 }
                 break;
 
             case Feedback:
-                if ( !targetType.isSpellcaster() ){
+                if (!targetType.isSpellcaster()) {
                     return false;
                 }
                 break;
 
             case Infestation:
-                if ( targetType != Terran_Command_Center ||
-                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0 ){
+                if (targetType != Terran_Command_Center ||
+                        targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0) {
                     return false;
                 }
                 break;
@@ -3782,13 +3953,13 @@ public class Unit {
         switch (tech) {
             case Archon_Warp:
             case Dark_Archon_Meld:
-                if ( !hasPath(targetUnit.getPosition()) ){
+                if (!hasPath(targetUnit.getPosition())) {
                     return false;
                 }
-                if ( targetUnit.isHallucination() ){
+                if (targetUnit.isHallucination()) {
                     return false;
                 }
-                if ( targetUnit.isMaelstrommed() ){
+                if (targetUnit.isMaelstrommed()) {
                     return false;
                 }
                 // Fall through (don't break).
@@ -3805,7 +3976,7 @@ public class Unit {
             case Consume:
             case Feedback:
             case Yamato_Gun:
-                if ( targetUnit.isStasised() ){
+                if (targetUnit.isStasised()) {
                     return false;
                 }
                 break;
@@ -3813,7 +3984,7 @@ public class Unit {
 
         switch (tech) {
             case Yamato_Gun:
-                if ( targetUnit.isInvincible() ){
+                if (targetUnit.isInvincible()) {
                     return false;
                 }
                 break;
@@ -3828,13 +3999,13 @@ public class Unit {
             case Healing:
             case Restoration:
             case Mind_Control:
-                if ( targetUnit.isInvincible() ){
+                if (targetUnit.isInvincible()) {
                     return false;
                 }
                 // Fall through (don't break).
             case Consume:
             case Feedback:
-                if ( targetType.isBuilding() ){
+                if (targetType.isBuilding()) {
                     return false;
                 }
                 break;
@@ -3852,15 +4023,15 @@ public class Unit {
     }
 
     public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( !canUseTechWithOrWithoutTarget( tech, false, false) ){
+        if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
         return tech.targetsPosition();
@@ -3878,16 +4049,16 @@ public class Unit {
         return canUseTechPosition(tech, target, true);
     }
 
-    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility){
-        if ( checkCommandibility && !canCommand() ) {
+    public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false) ){
+        if (checkCanIssueCommandType && !canUseTechWithOrWithoutTarget(false)) {
             return false;
         }
 
-        if ( checkTargetsPositions && !canUseTechPosition(tech, false, false) ) {
+        if (checkTargetsPositions && !canUseTechPosition(tech, false, false)) {
             return false;
         }
 
@@ -3899,18 +4070,18 @@ public class Unit {
     }
 
     public boolean canPlaceCOP(boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if ( !getType().isFlagBeacon() ) {
+        if (!getType().isFlagBeacon()) {
             return false;
         }
 
         return unitData.buttonset() != 228 && getOrder() == CTFCOPInit;
     }
 
-    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType)  {
+    public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType) {
         return canPlaceCOP(target, checkCanIssueCommandType, true);
     }
 
@@ -3919,25 +4090,25 @@ public class Unit {
     }
 
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if ( checkCommandibility && !canCommand() ) {
+        if (checkCommandibility && !canCommand()) {
             return false;
         }
 
-        if (checkCanIssueCommandType && !canPlaceCOP(checkCommandibility) )
+        if (checkCanIssueCommandType && !canPlaceCOP(checkCommandibility))
             return false;
 
         return game.canBuildHere(target, getType(), this, true);
     }
 
 
-    public boolean equals(Object that){
-        if(!(that instanceof Unit)){
+    public boolean equals(Object that) {
+        if (!(that instanceof Unit)) {
             return false;
         }
-        return getID() == ((Unit)that).getID();
+        return getID() == ((Unit) that).getID();
     }
 
-    public int hashCode(){
+    public int hashCode() {
         return getID();
     }
 
