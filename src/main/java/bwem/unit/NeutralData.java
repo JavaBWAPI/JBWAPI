@@ -17,20 +17,20 @@ import bwapi.Unit;
 import java.util.List;
 
 public interface NeutralData {
-  List<Mineral> getMinerals();
+    List<Mineral> getMinerals();
 
-  /**
-   * If a Mineral wrappers the given BWAPI unit, returns a pointer to it. Otherwise, returns null.
-   */
-  Mineral getMineral(Unit u);
+    /**
+     * If a Mineral wrappers the given BWAPI unit, returns a pointer to it. Otherwise, returns null.
+     */
+    Mineral getMineral(Unit u);
 
-  // Returns a reference to the geysers (Cf. Geyser).
-  List<Geyser> getGeysers();
+    // Returns a reference to the geysers (Cf. Geyser).
+    List<Geyser> getGeysers();
 
-  // If a Geyser wrappers the given BWAPI unit, returns a pointer to it.
-  // Otherwise, returns nullptr.
-  Geyser getGeyser(Unit g);
+    // If a Geyser wrappers the given BWAPI unit, returns a pointer to it.
+    // Otherwise, returns nullptr.
+    Geyser getGeyser(Unit g);
 
-  // Returns a reference to the StaticBuildings (Cf. StaticBuilding).
-  List<StaticBuilding> getStaticBuildings();
+    // Returns a reference to the StaticBuildings (Cf. StaticBuilding).
+    List<StaticBuilding> getStaticBuildings();
 }

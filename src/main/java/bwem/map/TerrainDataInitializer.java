@@ -20,17 +20,17 @@ import bwem.tile.MiniTile;
 import bwem.tile.Tile;
 
 public interface TerrainDataInitializer {
-  Tile getTile_(TilePosition tilePosition, CheckMode checkMode);
+    Tile getTile_(TilePosition tilePosition, CheckMode checkMode);
 
-  Tile getTile_(TilePosition tilePosition);
+    Tile getTile_(TilePosition tilePosition);
 
-  MiniTile getMiniTile_(WalkPosition walkPosition, CheckMode checkMode);
+    MiniTile getMiniTile_(WalkPosition walkPosition, CheckMode checkMode);
 
-  MiniTile getMiniTile_(WalkPosition walkPosition);
+    MiniTile getMiniTile_(WalkPosition walkPosition);
 
-  void markUnwalkableMiniTiles(final Game game);
+    void markUnwalkableMiniTiles(final Game game);
 
-  void markBuildableTilesAndGroundHeight(final Game game);
+    void markBuildableTilesAndGroundHeight(final Game game);
 
-  void decideSeasOrLakes(int lakeMaxMiniTiles, int lakeMaxWidthInMiniTiles);
+    void decideSeasOrLakes(int lakeMaxMiniTiles, int lakeMaxWidthInMiniTiles);
 }

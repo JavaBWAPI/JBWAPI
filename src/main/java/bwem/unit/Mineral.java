@@ -20,40 +20,40 @@ import bwem.map.Map;
  * getType().isMineralField().
  */
 public final class Mineral extends Resource {
-  public Mineral(final Unit unit, final Map map) {
-    super(unit, map);
+    public Mineral(final Unit unit, final Map map) {
+        super(unit, map);
 
-    //        bwem_assert(Type().isMineralField());
-    if (!unit.getType().isMineralField()) {
-      throw new IllegalArgumentException(
-          "Unit is not a MineralPatch: " + unit.getClass().getName());
+        //        bwem_assert(Type().isMineralField());
+        if (!unit.getType().isMineralField()) {
+            throw new IllegalArgumentException(
+                    "Unit is not a MineralPatch: " + unit.getClass().getName());
+        }
     }
-  }
 
-  @Override
-  public int getInitialAmount() {
-    return super.getUnit().getInitialResources();
-  }
-
-  @Override
-  public int getAmount() {
-    return super.getUnit().getResources();
-  }
-
-  @Override
-  public boolean equals(final Object object) {
-    if (this == object) {
-      return true;
-    } else if (!(object instanceof Mineral)) {
-      return false;
-    } else {
-      final Mineral that = (Mineral) object;
-      return (this.getUnit().getID() == that.getUnit().getID());
+    @Override
+    public int getInitialAmount() {
+        return super.getUnit().getInitialResources();
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return getUnit().hashCode();
-  }
+    @Override
+    public int getAmount() {
+        return super.getUnit().getResources();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Mineral)) {
+            return false;
+        } else {
+            final Mineral that = (Mineral) object;
+            return (this.getUnit().getID() == that.getUnit().getID());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getUnit().hashCode();
+    }
 }

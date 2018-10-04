@@ -19,38 +19,38 @@ import bwem.util.IWrappedInteger;
  * area.h:54:typedef int16_t id;
  */
 public final class AreaId implements IWrappedInteger<AreaId>, Comparable<AreaId> {
-  public static final AreaId UNINITIALIZED = new AreaId(-1);
-  public static final AreaId ZERO = new AreaId(0);
-  private final int val;
+    public static final AreaId UNINITIALIZED = new AreaId(-1);
+    public static final AreaId ZERO = new AreaId(0);
+    private final int val;
 
-  public AreaId(final int val) {
-    this.val = val;
-  }
-
-  @Override
-  public int intValue() {
-    return this.val;
-  }
-
-  @Override
-  public int compareTo(final AreaId that) {
-    return Integer.compare(this.val, that.val);
-  }
-
-  @Override
-  public boolean equals(final Object object) {
-    if (this == object) {
-      return true;
-    } else if (!(object instanceof AreaId)) {
-      return false;
-    } else {
-      final AreaId that = (AreaId) object;
-      return (this.val == that.val);
+    public AreaId(final int val) {
+        this.val = val;
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return this.val;
-  }
+    @Override
+    public int intValue() {
+        return this.val;
+    }
+
+    @Override
+    public int compareTo(final AreaId that) {
+        return Integer.compare(this.val, that.val);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof AreaId)) {
+            return false;
+        } else {
+            final AreaId that = (AreaId) object;
+            return (this.val == that.val);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.val;
+    }
 }

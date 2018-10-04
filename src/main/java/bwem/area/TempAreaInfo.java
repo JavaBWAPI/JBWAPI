@@ -24,12 +24,15 @@ import bwem.typedef.Altitude;
 //   - a default-constructed TempAreaInfo instance is never Valid (used as a dummy value to simplify
 // the algorithm).
 //   - any other instance becomes invalid when absorbed (see Merge)
-/** Helper class for void Map::ComputeAreas() */
+
+/**
+ * Helper class for void Map::ComputeAreas()
+ */
 public class TempAreaInfo {
-    private boolean isValid;
     private final AreaId id;
     private final WalkPosition walkPositionWithHighestAltitude;
     private final Altitude highestAltitude;
+    private boolean isValid;
     private int size;
 
     public TempAreaInfo() {

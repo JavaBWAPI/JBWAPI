@@ -17,17 +17,17 @@ package bwem;
  * this code. See "src/test/util/OldMarkable.java" for what NOT to do.
  */
 public final class StaticMarkable {
-  private int currentMark;
+    private int currentMark;
 
-  public StaticMarkable() {
-    this.currentMark = 0;
-  }
+    public StaticMarkable() {
+        this.currentMark = 0;
+    }
 
-  public int getCurrentMark() {
-    return this.currentMark;
-  }
+    public int getCurrentMark() {
+        return this.currentMark;
+    }
 
-  public void unmarkAll() {
-    ++this.currentMark;
-  }
+    public void unmarkAll() {
+        ++this.currentMark;
+    }
 }

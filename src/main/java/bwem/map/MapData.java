@@ -19,42 +19,50 @@ import bwapi.WalkPosition;
 import java.util.List;
 
 public interface MapData {
-  /** Returns the size of the map in tiles. */
-  TilePosition getTileSize();
+    /**
+     * Returns the size of the map in tiles.
+     */
+    TilePosition getTileSize();
 
-  /** Returns the size of the map in walktiles. */
-  WalkPosition getWalkSize();
+    /**
+     * Returns the size of the map in walktiles.
+     */
+    WalkPosition getWalkSize();
 
-  /** Returns the size of the map in pixels. */
-  Position getPixelSize();
+    /**
+     * Returns the size of the map in pixels.
+     */
+    Position getPixelSize();
 
-  /** Returns the center of the map in pixels. */
-  Position getCenter();
+    /**
+     * Returns the center of the map in pixels.
+     */
+    Position getCenter();
 
-  /**
-   * Returns the internal container of the starting Locations.<br>
-   * Note: these correspond to BWAPI::getStartLocations().
-   */
-  List<TilePosition> getStartingLocations();
+    /**
+     * Returns the internal container of the starting Locations.<br>
+     * Note: these correspond to BWAPI::getStartLocations().
+     */
+    List<TilePosition> getStartingLocations();
 
-  /**
-   * Tests whether the specified position is inside the map.
-   *
-   * @param tilePosition the specified position
-   */
-  boolean isValid(TilePosition tilePosition);
+    /**
+     * Tests whether the specified position is inside the map.
+     *
+     * @param tilePosition the specified position
+     */
+    boolean isValid(TilePosition tilePosition);
 
-  /**
-   * Tests whether the specified position is inside the map.
-   *
-   * @param walkPosition the specified position
-   */
-  boolean isValid(WalkPosition walkPosition);
+    /**
+     * Tests whether the specified position is inside the map.
+     *
+     * @param walkPosition the specified position
+     */
+    boolean isValid(WalkPosition walkPosition);
 
-  /**
-   * Tests whether the specified position is inside the map.
-   *
-   * @param position the specified position
-   */
-  boolean isValid(Position position);
+    /**
+     * Tests whether the specified position is inside the map.
+     *
+     * @param position the specified position
+     */
+    boolean isValid(Position position);
 }

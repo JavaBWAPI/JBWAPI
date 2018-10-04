@@ -12,10 +12,11 @@
 
 package bwem.unit;
 
-import bwapi.Unit;
 import bwapi.Position;
 import bwapi.TilePosition;
+import bwapi.Unit;
 import bwem.area.Area;
+
 import java.util.List;
 
 /**
@@ -24,45 +25,57 @@ import java.util.List;
  * Stacked Neutrals are supported, provided they share the same type at the same location.
  */
 public interface Neutral {
-  /** Returns the BWAPI::Unit this Neutral is wrapping around. */
-  Unit getUnit();
+    /**
+     * Returns the BWAPI::Unit this Neutral is wrapping around.
+     */
+    Unit getUnit();
 
-  /** Returns the center of this Neutral, in pixels (same as unit()->getInitialPosition()). */
-  Position getCenter();
+    /**
+     * Returns the center of this Neutral, in pixels (same as unit()->getInitialPosition()).
+     */
+    Position getCenter();
 
-  /**
-   * Returns the top left Tile position of this Neutral (same as unit()->getInitialTilePosition()).
-   */
-  TilePosition getTopLeft();
+    /**
+     * Returns the top left Tile position of this Neutral (same as unit()->getInitialTilePosition()).
+     */
+    TilePosition getTopLeft();
 
-  /** Returns the bottom right Tile position of this Neutral */
-  TilePosition getBottomRight();
+    /**
+     * Returns the bottom right Tile position of this Neutral
+     */
+    TilePosition getBottomRight();
 
-  /** Returns the size of this Neutral, in Tiles (same as Type()->tileSize()) */
-  TilePosition getSize();
+    /**
+     * Returns the size of this Neutral, in Tiles (same as Type()->tileSize())
+     */
+    TilePosition getSize();
 
-  /**
-   * Tells whether this Neutral is blocking some ChokePoint.<br>
-   * - This applies to minerals and StaticBuildings only.<br>
-   * - For each blocking Neutral, a pseudo ChokePoint (which is blocked()) is created on top of it,
-   * with the exception of stacked blocking Neutrals for which only one pseudo ChokePoint is
-   * created.<br>
-   * - Cf. definition of pseudo getChokePoints in class ChokePoint comment.<br>
-   * - Cf. ChokePoint::blockingNeutral and ChokePoint::blocked.
-   */
-  boolean isBlocking();
+    /**
+     * Tells whether this Neutral is blocking some ChokePoint.<br>
+     * - This applies to minerals and StaticBuildings only.<br>
+     * - For each blocking Neutral, a pseudo ChokePoint (which is blocked()) is created on top of it,
+     * with the exception of stacked blocking Neutrals for which only one pseudo ChokePoint is
+     * created.<br>
+     * - Cf. definition of pseudo getChokePoints in class ChokePoint comment.<br>
+     * - Cf. ChokePoint::blockingNeutral and ChokePoint::blocked.
+     */
+    boolean isBlocking();
 
-  /** If blocking() == true, returns the set of areas blocked by this Neutral. */
-  List<Area> getBlockedAreas();
+    /**
+     * If blocking() == true, returns the set of areas blocked by this Neutral.
+     */
+    List<Area> getBlockedAreas();
 
-  /**
-   * Returns the next Neutral stacked over this Neutral, if ever.<br>
-   * - To iterate through the whole stack, one can use the following:<br>
-   * <code>for (const Neutral * n = Map::GetTile(topLeft()).GetNeutral() ; n ; n = n->nextStacked())
-   * </code>
-   */
-  Neutral getNextStacked();
+    /**
+     * Returns the next Neutral stacked over this Neutral, if ever.<br>
+     * - To iterate through the whole stack, one can use the following:<br>
+     * <code>for (const Neutral * n = Map::GetTile(topLeft()).GetNeutral() ; n ; n = n->nextStacked())
+     * </code>
+     */
+    Neutral getNextStacked();
 
-  /** Returns the last Neutral stacked over this Neutral, if ever. */
-  Neutral getLastStacked();
+    /**
+     * Returns the last Neutral stacked over this Neutral, if ever.
+     */
+    Neutral getLastStacked();
 }

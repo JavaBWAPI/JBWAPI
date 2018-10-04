@@ -20,17 +20,17 @@ import bwem.tile.Tile;
 import bwem.tile.TileData;
 
 public interface TerrainData {
-  MapData getMapData();
+    MapData getMapData();
 
-  TileData getTileData();
+    TileData getTileData();
 
-  Tile getTile(TilePosition tilePosition, CheckMode checkMode);
+    Tile getTile(TilePosition tilePosition, CheckMode checkMode);
 
-  Tile getTile(TilePosition tilePosition);
+    Tile getTile(TilePosition tilePosition);
 
-  MiniTile getMiniTile(WalkPosition walkPosition, CheckMode checkMode);
+    MiniTile getMiniTile(WalkPosition walkPosition, CheckMode checkMode);
 
-  MiniTile getMiniTile(WalkPosition walkPosition);
+    MiniTile getMiniTile(WalkPosition walkPosition);
 
-  boolean isSeaWithNonSeaNeighbors(WalkPosition walkPosition);
+    boolean isSeaWithNonSeaNeighbors(WalkPosition walkPosition);
 }

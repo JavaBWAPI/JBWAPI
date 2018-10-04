@@ -21,29 +21,29 @@ import bwem.map.Map;
  * Special_Pit_Door.
  */
 public class StaticBuilding extends NeutralImpl {
-  public StaticBuilding(final Unit unit, final Map map) {
-    super(unit, map);
+    public StaticBuilding(final Unit unit, final Map map) {
+        super(unit, map);
 
-    // TODO
-    //        bwem_assert(Type().isSpecialBuilding() ||
-    //                    (Type() == Special_Pit_Door) ||
-    //                    Type() == Special_Right_Pit_Door);
-  }
-
-  @Override
-  public boolean equals(final Object object) {
-    if (this == object) {
-      return true;
-    } else if (!(object instanceof StaticBuilding)) {
-      return false;
-    } else {
-      final StaticBuilding that = (StaticBuilding) object;
-      return (this.getUnit().getID() == that.getUnit().getID());
+        // TODO
+        //        bwem_assert(Type().isSpecialBuilding() ||
+        //                    (Type() == Special_Pit_Door) ||
+        //                    Type() == Special_Right_Pit_Door);
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return getUnit().hashCode();
-  }
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof StaticBuilding)) {
+            return false;
+        } else {
+            final StaticBuilding that = (StaticBuilding) object;
+            return (this.getUnit().getID() == that.getUnit().getID());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getUnit().hashCode();
+    }
 }

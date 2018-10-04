@@ -21,39 +21,39 @@ import bwem.map.Map;
  * Resource_Vespene_Geyser.
  */
 public final class Geyser extends Resource {
-  public Geyser(final Unit unit, final Map map) {
-    super(unit, map);
+    public Geyser(final Unit unit, final Map map) {
+        super(unit, map);
 
-    if (!unit.getType().equals(UnitType.Resource_Vespene_Geyser)) {
-      throw new IllegalArgumentException(
-          "Unit is not a VespeneGeyser: " + unit.getClass().getName());
+        if (!unit.getType().equals(UnitType.Resource_Vespene_Geyser)) {
+            throw new IllegalArgumentException(
+                    "Unit is not a VespeneGeyser: " + unit.getClass().getName());
+        }
     }
-  }
 
-  @Override
-  public int getInitialAmount() {
-    return super.getUnit().getInitialResources();
-  }
-
-  @Override
-  public int getAmount() {
-    return super.getUnit().getResources();
-  }
-
-  @Override
-  public boolean equals(final Object object) {
-    if (this == object) {
-      return true;
-    } else if (!(object instanceof Geyser)) {
-      return false;
-    } else {
-      final Geyser that = (Geyser) object;
-      return (this.getUnit().getID() == that.getUnit().getID());
+    @Override
+    public int getInitialAmount() {
+        return super.getUnit().getInitialResources();
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return getUnit().hashCode();
-  }
+    @Override
+    public int getAmount() {
+        return super.getUnit().getResources();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Geyser)) {
+            return false;
+        } else {
+            final Geyser that = (Geyser) object;
+            return (this.getUnit().getID() == that.getUnit().getID());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getUnit().hashCode();
+    }
 }

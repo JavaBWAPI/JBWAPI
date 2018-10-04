@@ -18,27 +18,28 @@ import bwem.map.MapInitializer;
 import bwem.map.MapInitializerImpl;
 
 public final class BWEM {
-  private final Map map;
+    private final Map map;
 
-  public BWEM(final Game game) {
-    this.map = new MapInitializerImpl(game);
-  }
-
-  /** Returns the root internal data container. */
-  public Map getMap() {
-    return this.map;
-  }
-
-
-  /**
-   * Initializes and pre-computes all of the internal data.
-   *
-   */
-  public void initialize() {
-    if (!(this.map instanceof MapInitializer)) {
-      throw new IllegalStateException("BWEM was not instantiated properly.");
+    public BWEM(final Game game) {
+        this.map = new MapInitializerImpl(game);
     }
-    ((MapInitializer) this.map).initialize();
-    this.map.assignStartingLocationsToSuitableBases();
-  }
+
+    /**
+     * Returns the root internal data container.
+     */
+    public Map getMap() {
+        return this.map;
+    }
+
+
+    /**
+     * Initializes and pre-computes all of the internal data.
+     */
+    public void initialize() {
+        if (!(this.map instanceof MapInitializer)) {
+            throw new IllegalStateException("BWEM was not instantiated properly.");
+        }
+        ((MapInitializer) this.map).initialize();
+        this.map.assignStartingLocationsToSuitableBases();
+    }
 }
