@@ -1,6 +1,6 @@
 package bwapi;
 
-abstract class Point {
+class Point {
     static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;

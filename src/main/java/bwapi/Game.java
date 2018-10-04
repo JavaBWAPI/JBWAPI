@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static bwapi.CommandType.*;
+import static bwapi.Point.TILE_WALK_FACTOR;
 import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
@@ -19,7 +20,7 @@ public class Game {
             {0, 0, 0, 0, 0, 0}, // None
             {0, 0, 0, 0, 0, 0}  // Unknown
     };
-    private static boolean bPsiFieldMask[][] = {
+    private static final boolean bPsiFieldMask[][] = {
             {false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false},
             {false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false},
             {false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false},
@@ -31,6 +32,9 @@ public class Game {
             {false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false},
             {false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false}
     };
+
+    private static final int REGION_DATA_SIZE = 5000;
+
     private final Set<Unit> staticMinerals = new HashSet<>();
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
@@ -193,17 +197,17 @@ public class Game {
                 mapTileRegionID[x][y] = gameData.mapTileRegionID(x, y);
             }
         }
-        walkable = new boolean[mapWidth * 4][mapHeight * 4];
-        for (int i = 0; i < mapWidth * 4; i++) {
-            for (int j = 0; j < mapHeight * 4; j++) {
+        walkable = new boolean[mapWidth * TILE_WALK_FACTOR][mapHeight * TILE_WALK_FACTOR];
+        for (int i = 0; i < mapWidth * TILE_WALK_FACTOR; i++) {
+            for (int j = 0; j < mapHeight * TILE_WALK_FACTOR; j++) {
                 walkable[i][j] = gameData.walkable(i, j);
             }
         }
 
-        mapSplitTilesMiniTileMask = new short[5000];
-        mapSplitTilesRegion1 = new short[5000];
-        mapSplitTilesRegion2 = new short[5000];
-        for (int i = 0; i < 5000; i++) {
+        mapSplitTilesMiniTileMask = new short[REGION_DATA_SIZE];
+        mapSplitTilesRegion1 = new short[REGION_DATA_SIZE];
+        mapSplitTilesRegion2 = new short[REGION_DATA_SIZE];
+        for (int i = 0; i < REGION_DATA_SIZE; i++) {
             mapSplitTilesMiniTileMask[i] = gameData.mapSplitTilesMiniTileMask(i);
             mapSplitTilesRegion1[i] = gameData.mapSplitTilesRegion1(i);
             mapSplitTilesRegion2[i] = gameData.mapSplitTilesRegion2(i);
@@ -1461,7 +1465,7 @@ public class Game {
             final int minitileShift = ((position.x & 0x1F) / 8) + ((position.y & 0x1F) / 8) * 4;
             final int index = idx & 0x1FFF;
 
-            if (index >= 5000) {
+            if (index >= REGION_DATA_SIZE) {
                 return null;
             }
 

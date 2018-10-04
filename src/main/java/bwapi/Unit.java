@@ -688,7 +688,6 @@ public class Unit {
 
         // Store the types as locals
         final UnitType thisType = getType();
-        final UnitType targType = target.getType();
 
         // Obtain the weapon type
         final WeaponType wpn = target.isFlying() ? thisType.airWeapon() : thisType.groundWeapon();
@@ -3124,7 +3123,7 @@ public class Unit {
             return false;
         }
 
-        if (getLoadedUnits().size() == 0) {
+        if (getLoadedUnits().isEmpty()) {
             return false;
         }
 

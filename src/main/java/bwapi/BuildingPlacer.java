@@ -30,11 +30,13 @@ class BuildingPlacer {
                     new buildTemplate(-1, 0, 0, 0) // last
             };
 
-    static TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep, final Game game) {
+    static TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition1, final int maxRange, final boolean creep, final Game game) {
         // Make sure the type is compatible
         if (!type.isBuilding()) {
             return TilePosition.Invalid;
         }
+
+        TilePosition desiredPosition = desiredPosition1;
 
         // Do type-specific checks
         boolean trimPlacement = true;
@@ -62,7 +64,7 @@ class BuildingPlacer {
         }
 
         PlacementReserve reserve = new PlacementReserve(maxRange);
-        ReservePlacement(reserve, type, desiredPosition, creep, game);
+        ReservePlacement(reserve, type, desiredPosition, game);
 
         if (trimPlacement)
             reserveTemplateSpacing(reserve);
@@ -72,8 +74,10 @@ class BuildingPlacer {
             desiredPosition = pTargRegion.getCenter().toTilePosition();
 
         // Find the best position
-        int bestDistance, fallbackDistance;
-        TilePosition bestPosition, fallbackPosition;
+        int bestDistance;
+        int fallbackDistance;
+        TilePosition bestPosition;
+        TilePosition fallbackPosition;
 
         bestDistance = fallbackDistance = 999999;
         bestPosition = fallbackPosition = TilePosition.None;
@@ -115,7 +119,7 @@ class BuildingPlacer {
         return bestPosition;
     }
 
-    private static void ReservePlacement(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final boolean creep, final Game game) {
+    private static void ReservePlacement(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final Game game) {
         // Reset the array
         reserve.reset();
 
@@ -271,13 +275,13 @@ class BuildingPlacer {
                 case Protoss_Robotics_Facility:
                 case Protoss_Gateway:
                 case Protoss_Photon_Cannon:
-                default:
-                    ReserveStructure(reserve, it, 2, type, desiredPosition);
-                    break;
                 case Terran_Barracks:
                 case Terran_Bunker:
                 case Zerg_Creep_Colony:
                     ReserveStructure(reserve, it, 1, type, desiredPosition);
+                    break;
+                default:
+                    ReserveStructure(reserve, it, 2, type, desiredPosition);
                     break;
             }
         }
@@ -310,7 +314,8 @@ class BuildingPlacer {
 
         for (int j = 0; buildTemplates[j].startX != -1; ++j) {
             final buildTemplate t = buildTemplates[j];
-            int x = t.startX, y = t.startY;
+            int x = t.startX;
+            int y = t.startY;
             for (int i = 0; i < 64; ++i) {
                 reserve.setValue(x, y, (byte) 0);
                 x += t.stepX;
@@ -340,7 +345,10 @@ class BuildingPlacer {
     }
 
     private static class buildTemplate {
-        int startX, startY, stepX, stepY;
+        int startX;
+        int startY;
+        int stepX;
+        int stepY;
 
         buildTemplate(int startX, int startY, int stepX, int stepY) {
             this.startX = startX;

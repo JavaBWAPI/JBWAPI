@@ -33,7 +33,6 @@ class Client {
         for (int i = 0; i < 8; ++i) {
             int procID = gameList.getInt(GAME_SIZE * i);
             boolean connected = gameList.get(GAME_SIZE * i + 4) != 0;
-            int lastKeepAliveTime = gameList.getInt(GAME_SIZE * i + 8);
 
             if (procID != 0 && !connected) {
                 try {
@@ -82,7 +81,12 @@ class Client {
 
     public static class UnitCommand {
         private static final int SIZE = 24;
-        final int type, unit, target, x, y, extra;
+        final int type;
+        final int unit;
+        final int target;
+        final int x;
+        final int y;
+        final int extra;
 
         public UnitCommand(int type, int unit, int target, int x, int y, int extra) {
             this.type = type;
@@ -96,7 +100,9 @@ class Client {
 
     public static class Command {
         private static final int SIZE = 12;
-        final int type, value1, value2;
+        final int type;
+        final int value1;
+        final int value2;
 
         public Command(int type, int value1, int value2) {
             this.type = type;
@@ -107,7 +113,15 @@ class Client {
 
     public static class Shape {
         private static final int SIZE = 40;
-        final int type, coordType, x1, y1, x2, y2, extra1, extra2, color;
+        final int type;
+        final int coordType;
+        final int x1;
+        final int y1;
+        final int x2;
+        final int y2;
+        final int extra1;
+        final int extra2;
+        final int color;
         final byte isSolid;
 
         public Shape(int type, int coordType, int x1, int y1, int x2, int y2, int extra1, int extra2, int color, boolean isSolid) {
@@ -140,7 +154,10 @@ class Client {
         }
 
         final int readInt() throws IOException {
-            int b1 = readByte(), b2 = readByte(), b3 = readByte(), b4 = readByte();
+            final int b1 = readByte();
+            final int b2 = readByte();
+            final int b3 = readByte();
+            final int b4 = readByte();
             return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
         }
 
