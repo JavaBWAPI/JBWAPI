@@ -1,5 +1,5 @@
 package bwapi;
 
-interface UnitFilter {
+public interface UnitFilter {
     boolean operation(Unit unit);
 }
