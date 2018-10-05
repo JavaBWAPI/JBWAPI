@@ -151,10 +151,13 @@ public class Game {
 
         regionSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(regions)));
 
-        units = new Unit[1000];
+        units = new Unit[10000];
         for (int id = 0; id < gameData.getInitialUnitCount(); id++) {
             final Unit unit = new Unit(gameData.getUnit(id), this);
-
+            //skip ghost units
+            if (unit.getInitialType() == UnitType.Terran_Marine && unit.getInitialHitPoints() == 0) {
+                continue;
+            }
             units[id] = unit;
 
             if (unit.getType().isMineralField()) {
@@ -217,16 +220,22 @@ public class Game {
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
     }
 
-    void unitShow(final int id) {
+    void unitCreate(final int id) {
         if (id > units.length) {
             //rescale unit array if needed
             final Unit[] largerUnitsArray = new Unit[2 * units.length];
             System.arraycopy(units, 0, largerUnitsArray, 0, units.length);
             units = largerUnitsArray;
         }
+
         if (units[id] == null) {
-            units[id] = new Unit(gameData.getUnit(id), this);
+            final Unit u = new Unit(gameData.getUnit(id), this);
+            units[id] = u;
         }
+    }
+
+    void unitShow(final int id) {
+        unitCreate(id);
         visibleUnits.add(id);
     }
 

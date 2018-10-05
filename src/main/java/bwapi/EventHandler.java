@@ -46,6 +46,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onSaveGame(data.eventString(event.v1()));
                 break;
             case 8: //UnitDiscover
+                game.unitCreate(event.v1());
                 u = game.getUnit(event.v1());
                 u.updatePosition(frames);
                 u.updateType(frames);
@@ -71,6 +72,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitHide(u);
                 break;
             case 12: //UnitCreate
+                game.unitCreate(event.v1());
                 u = game.getUnit(event.v1());
                 u.updatePosition(frames);
                 u.updateType(frames);
@@ -78,6 +80,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitCreate(u);
                 break;
             case 13: //UnitDestroy
+                game.unitHide(event.v1());
                 u = game.getUnit(event.v1());
                 eventListener.onUnitDestroy(u);
                 break;
@@ -93,6 +96,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitRenegade(u);
                 break;
             case 17: //UnitComplete
+                game.unitCreate(event.v1());
                 u = game.getUnit(event.v1());
                 u.updatePlayer(frames);
                 eventListener.onUnitComplete(u);

@@ -16,19 +16,16 @@ public class Player {
     private final Race race;
     private final PlayerType playerType;
     private final Force force;
-    private final boolean neutral;
     private final TilePosition startLocation;
 
     Player(final Client.GameData.PlayerData playerData, final Game game) {
         this.playerData = playerData;
         this.game = game;
-
         this.id = playerData.id();
         this.name = playerData.name();
         this.race = Race.races[playerData.race()];
         this.playerType = PlayerType.playerTypes[playerData.type()];
         this.force = game.getForce(playerData.force());
-        this.neutral = equals(game.neutral());
         this.startLocation = new TilePosition(playerData.startLocationX(), playerData.startLocationY());
     }
 
@@ -68,7 +65,7 @@ public class Player {
     }
 
     public boolean isNeutral() {
-        return neutral;
+        return  equals(game.neutral());
     }
 
     public TilePosition getStartLocation() {
