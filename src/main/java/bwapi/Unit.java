@@ -91,6 +91,14 @@ public class Unit {
         return position;
     }
 
+    public int getX() {
+        return position.x;
+    }
+
+    public int getY() {
+        return position.y;
+    }
+
     public TilePosition getTilePosition() {
         final Position p = getPosition();
         final UnitType ut = getType();
