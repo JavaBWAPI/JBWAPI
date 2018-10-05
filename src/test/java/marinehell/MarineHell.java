@@ -1,18 +1,16 @@
-package marinehell;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import bwapi.*;
-import bwapi.Position;
-import bwapi.TilePosition;
-import bwapi.UnitType;
-import bwem.BWEM;
-import bwem.Base;
-import bwem.ChokePoint;
+import bwta.BWTA;
+import bwta.BaseLocation;
 
-public class MarineHell extends DefaultBWListener {
+public class TestBot1 extends DefaultBWListener {
 
-    private BWClient mirror = new BWClient(this);
+    private Mirror mirror = new Mirror();
 
     private Game game;
 
@@ -21,27 +19,32 @@ public class MarineHell extends DefaultBWListener {
     private int frameskip = 0;
     private int cyclesForSearching = 0;
     private int maxCyclesForSearching = 0;
+    private int enemies = 0;
     private int searchingScv = 0;
     private int searchingTimeout = 0;
     private boolean dontBuild = false;
     private int timeout = 0;
-    private Unit bunkerBuilder;
-    private Unit searcher;
-
-    private BWEM BWTA;
+    Unit bunkerBuilder;
+    Unit searcher;
 
     private String debugText = "";
 
     private enum Strategy {
         WaitFor50, AttackAtAllCost
-    }
+    };
 
     private Strategy selectedStrategy = Strategy.WaitFor50;
 
     private Set<Position> enemyBuildingMemory = new HashSet<>();
 
-    private void run() {
+    public void run() {
+        mirror.getModule().setEventListener(this);
         mirror.startGame();
+    }
+
+    @Override
+    public void onUnitCreate(Unit unit) {
+
     }
 
     @Override
@@ -49,7 +52,7 @@ public class MarineHell extends DefaultBWListener {
         frameskip = 0;
         cyclesForSearching = 0;
         maxCyclesForSearching = 0;
-        int enemies = 0;
+        enemies = 0;
         searchingScv = 0;
         searchingTimeout = 0;
         dontBuild = false;
@@ -61,8 +64,13 @@ public class MarineHell extends DefaultBWListener {
         self = game.self();
         game.setLocalSpeed(0);
 
-        BWTA = new BWEM(game);
-        BWTA.initialize();
+        // Use BWTA to analyze map
+        // This may take a few minutes if the map is processed first time!
+
+        BWTA.readMap();
+        BWTA.analyze();
+
+        int i = 0;
     }
 
     @Override
@@ -75,7 +83,11 @@ public class MarineHell extends DefaultBWListener {
         game.drawTextScreen(10, 40, "Elapsed time: " + game.elapsedTime() + "; Strategy: " + selectedStrategy);
         game.drawTextScreen(10, 50, debugText);
         game.drawTextScreen(10, 60, "supply: " + self.supplyTotal() + " used: " + self.supplyUsed());
-
+        /*
+         * if (game.elapsedTime() > 2001) { int x = (game.elapsedTime() / 500) %
+         * 2; if (x == 0) { selectedStrategy = Strategy.FindEnemy; } else {
+         * selectedStrategy = Strategy.HugeAttack; } }
+         */
 
         if (maxCyclesForSearching > 300000) {
             dontBuild = true;
@@ -88,21 +100,22 @@ public class MarineHell extends DefaultBWListener {
         }
         cyclesForSearching = 0;
 
+        StringBuilder units = new StringBuilder("My units:\n");
         List<Unit> workers = new ArrayList<>();
         List<Unit> barracks = new ArrayList<>();
         Unit commandCenter = null;
         List<Unit> marines = new ArrayList<>();
-        List<Base> baseLocations = new ArrayList<>();
-        List<Base> allLocations = new ArrayList<>();
+        List<BaseLocation> baseLocations = new ArrayList<>();
+        List<BaseLocation> allLocations = new ArrayList<>();
         Unit bunker = null;
         Position workerAttacked = null;
 
 
-        if (bunkerBuilder != null && !bunkerBuilder.exists()) {
+        if (bunkerBuilder != null && bunkerBuilder.exists() == false) {
             bunkerBuilder = null;
         }
 
-        if (searcher != null && !searcher.exists()) {
+        if (searcher != null && searcher.exists() == false) {
             searcher = null;
         }
 
@@ -124,7 +137,7 @@ public class MarineHell extends DefaultBWListener {
                 commandCenter = myUnit;
             }
 
-            if (myUnit.getType() == UnitType.Terran_Barracks && !myUnit.isBeingConstructed()) {
+            if (myUnit.getType() == UnitType.Terran_Barracks && myUnit.isBeingConstructed() == false) {
                 barracks.add(myUnit);
             }
 
@@ -132,7 +145,7 @@ public class MarineHell extends DefaultBWListener {
                 marines.add(myUnit);
             }
 
-            if (myUnit.getType() == UnitType.Terran_Bunker && !myUnit.isBeingConstructed()) {
+            if (myUnit.getType() == UnitType.Terran_Bunker && myUnit.isBeingConstructed() == false) {
                 bunker = myUnit;
             }
 
@@ -148,7 +161,8 @@ public class MarineHell extends DefaultBWListener {
             // patch
             if (myUnit.getType().isWorker() && myUnit.isIdle()) {
                 boolean skip = false;
-                if (bunker == null && myUnit.equals(bunkerBuilder) && !barracks.isEmpty()) {
+                if (bunker == null && bunkerBuilder != null && myUnit.equals(bunkerBuilder)
+                        && barracks.isEmpty() == false) {
                     skip = true;
                 }
 
@@ -166,7 +180,7 @@ public class MarineHell extends DefaultBWListener {
 
                 // if a mineral patch was found, send the worker to gather it
                 if (closestMineral != null) {
-                    if (!skip) {
+                    if (skip == false) {
                         myUnit.gather(closestMineral, false);
                     }
                 }
@@ -186,12 +200,12 @@ public class MarineHell extends DefaultBWListener {
             bunkerBuilder = workers.get(10);
         }
 
-        if (bunker == null && barracks.size() >= 1 && workers.size() > 10 && !dontBuild) {
+        if (bunker == null && barracks.size() >= 1 && workers.size() > 10 && dontBuild == false) {
             game.setLocalSpeed(20);
 
             if (timeout < 200) {
                 game.drawTextMap(bunkerBuilder.getPosition(), "Moving to create bunker " + timeout + "/400");
-                bunkerBuilder.move(getClosestChokePoint(BWTA, bunkerBuilder.getPosition()).getCenter().toPosition());
+                bunkerBuilder.move(BWTA.getNearestChokepoint(bunkerBuilder.getPosition()).getCenter());
                 timeout++;
             } else {
                 game.drawTextMap(bunkerBuilder.getPosition(), "Buiding bunker");
@@ -206,13 +220,13 @@ public class MarineHell extends DefaultBWListener {
             game.drawTextMap(workers.get(10).getPosition(), "He will build bunker");
         }
 
-        if (bunker != null && bunkerBuilder != null && !bunkerBuilder.isRepairing()) {
+        if (bunker != null && bunkerBuilder != null && bunkerBuilder.isRepairing() == false) {
             game.drawTextMap(bunkerBuilder.getPosition(), "Reparing bunker");
             bunkerBuilder.repair(bunker);
         }
 
         if (commandCenter.getTrainingQueue().isEmpty() && workers.size() < 20 && self.minerals() >= 50) {
-            commandCenter.build(UnitType.Terran_SCV);
+            commandCenter.build(UnitType.AllUnits.Terran_SCV);
         }
 
         frameskip++;
@@ -228,7 +242,7 @@ public class MarineHell extends DefaultBWListener {
 
         int i = 1;
         for (Unit worker : workers) {
-            if (worker.isGatheringMinerals() && !dontBuild) {
+            if (worker.isGatheringMinerals() && dontBuild == false) {
                 if (self.minerals() >= 150 * i && barracks.size() < 6) {
                     TilePosition buildTile = getBuildTile(worker, UnitType.Terran_Barracks, self.getStartLocation());
                     if (buildTile != null) {
@@ -254,22 +268,23 @@ public class MarineHell extends DefaultBWListener {
 
         for (Unit barrack : barracks) {
             if (barrack.getTrainingQueue().isEmpty()) {
-                barrack.build(UnitType.Terran_Marine);
+                barrack.build(UnitType.AllUnits.Terran_Marine);
             }
         }
 
-        for (Base b : BWTA.getMap().getBases()) {
+        for (BaseLocation b : BWTA.getBaseLocations()) {
             // If this is a possible start location,
-            if (b.isStartingLocation()) {
+            if (b.isStartLocation()) {
                 baseLocations.add(b);
             }
 
             allLocations.add(b);
         }
 
+        Random random = new Random();
         int k = 0;
         for (Unit marine : marines) {
-            if (!marine.isAttacking() && !marine.isMoving()) {
+            if (marine.isAttacking() == false && marine.isMoving() == false) {
                 if (marines.size() > 50 || selectedStrategy == Strategy.AttackAtAllCost) {
                     if (marines.size() > 40) {
                         selectedStrategy = Strategy.AttackAtAllCost;
@@ -277,7 +292,7 @@ public class MarineHell extends DefaultBWListener {
                         selectedStrategy = Strategy.WaitFor50;
                     }
                     if (enemyBuildingMemory.isEmpty()) {
-                        marine.attack(allLocations.get(k % allLocations.size()).getCenter());
+                        marine.attack(allLocations.get(k % allLocations.size()).getPosition());
                     } else {
                         for (Position p : enemyBuildingMemory) {
                             marine.attack(p);
@@ -286,25 +301,23 @@ public class MarineHell extends DefaultBWListener {
 
                     if (marines.size() > 70) {
                         if (k < allLocations.size()) {
-                            marine.attack(allLocations.get(k).getCenter());
+                            marine.attack(allLocations.get(k).getPosition());
                         }
                     }
                 } else {
                     Position newPos;
 
                     if (bunker != null) {
-                        Iterator<ChokePoint> cpppath = BWTA.getMap().getPath(bunker.getPosition(), game.self().getStartLocation().toPosition()).iterator();
-                        List<TilePosition> path = new ArrayList<>();
-                        while (cpppath.hasNext()) {
-                            path.add(cpppath.next().getCenter().toTilePosition());
-                        }
+                        List<TilePosition> path = BWTA.getShortestPath(bunker.getTilePosition(),
+                                BWTA.getStartLocation(game.self()).getTilePosition());
+
                         if (path.size() > 1) {
                             newPos = path.get(1).toPosition();
                         } else {
-                            newPos = getClosestChokePoint(BWTA, marine.getPosition()).getCenter().toPosition();
+                            newPos = BWTA.getNearestChokepoint(marine.getPosition()).getCenter();
                         }
                     } else {
-                        newPos = getClosestChokePoint(BWTA, marine.getPosition()).getCenter().toPosition();
+                        newPos = BWTA.getNearestChokepoint(marine.getPosition()).getCenter();
                     }
 
                     marine.attack(newPos);
@@ -327,17 +340,20 @@ public class MarineHell extends DefaultBWListener {
 
         if (searcher != null && searcher.isGatheringMinerals() && searchingScv < baseLocations.size()
                 && searchingTimeout % 10 == 0) {
-            searcher.move(baseLocations.get(searchingScv).getCenter());
+            searcher.move(baseLocations.get(searchingScv).getPosition());
             searchingScv++;
         }
-        int workersSize = workers.size();
-        debugText = "Size: " + workersSize + "; isGathering" + workers.get(workersSize > 7 ? 7 : workersSize - 1).isGatheringMinerals() + "; location: "
+
+        debugText = "Size: " + workers.size() + "; isGathering" + workers.get(7).isGatheringMinerals() + "; location: "
                 + baseLocations.size() + "; num: " + searchingScv;
 
         for (Unit u : game.enemy().getUnits()) {
             // if this unit is in fact a building
             if (u.getType().isBuilding()) {
-                enemyBuildingMemory.add(u.getPosition());
+                // check if we have it's position in memory and add it if we
+                // don't
+                if (!enemyBuildingMemory.contains(u.getPosition()))
+                    enemyBuildingMemory.add(u.getPosition());
             }
         }
 
@@ -363,7 +379,7 @@ public class MarineHell extends DefaultBWListener {
 
                 // if there is no more any building, remove that position from
                 // our memory
-                if (!buildingStillThere) {
+                if (buildingStillThere == false) {
                     enemyBuildingMemory.remove(p);
                     break;
                 }
@@ -375,7 +391,7 @@ public class MarineHell extends DefaultBWListener {
     }
 
     public static void main(String[] args) {
-        new MarineHell().run();
+        new TestBot1().run();
     }
 
     // Returns a suitable TilePosition to build a given building type near
@@ -438,19 +454,5 @@ public class MarineHell extends DefaultBWListener {
         if (ret == null)
             game.printf("Unable to find suitable build position for " + buildingType.toString());
         return ret;
-    }
-
-    // Jabbo
-    public static ChokePoint getClosestChokePoint(BWEM BWTA, Position pos) {
-        ChokePoint closestBase = null;
-        double dist = Double.MAX_VALUE;
-        for (ChokePoint base : BWTA.getMap().getChokePoints()) {
-            double cDist = pos.getApproxDistance(base.getCenter().toPosition());
-            if (closestBase == null || cDist < dist) {
-                closestBase = base;
-                dist = cDist;
-            }
-        }
-        return closestBase;
     }
 }
