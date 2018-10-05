@@ -29,17 +29,6 @@ public class BWTA {
         bwem = new BWEM(game);
     }
 
-    private static boolean walkableTile(final int x, final int y) {
-        for (int sx=0; sx < 4; sx++) {
-            for (int sy=0; sy < 4; sy++) {
-                if (!game.isWalkable(x+sx, y+sx)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public static void analyze() {
         bwem.initialize();
 
