@@ -1425,6 +1425,10 @@ public class Game {
         return gameData.getInstanceID();
     }
 
+    public int getAPM() {
+        return getAPM(false);
+    }
+
     public int getAPM(final boolean includeSelects) {
         return includeSelects ? gameData.getBotAPM_selects() : gameData.getBotAPM_noselects();
     }
