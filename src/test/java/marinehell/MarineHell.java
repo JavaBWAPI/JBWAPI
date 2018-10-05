@@ -8,9 +8,9 @@ import bwapi.*;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
-public class TestBot1 extends DefaultBWListener {
+public class MarineHell extends DefaultBWListener {
 
-    private Mirror mirror = new Mirror();
+    private BWClient mirror = new BWClient(this);
 
     private Game game;
 
@@ -38,7 +38,6 @@ public class TestBot1 extends DefaultBWListener {
     private Set<Position> enemyBuildingMemory = new HashSet<>();
 
     public void run() {
-        mirror.getModule().setEventListener(this);
         mirror.startGame();
     }
 
@@ -67,7 +66,7 @@ public class TestBot1 extends DefaultBWListener {
         // Use BWTA to analyze map
         // This may take a few minutes if the map is processed first time!
 
-        BWTA.readMap();
+        BWTA.readMap(game);
         BWTA.analyze();
 
         int i = 0;
@@ -344,7 +343,7 @@ public class TestBot1 extends DefaultBWListener {
             searchingScv++;
         }
 
-        debugText = "Size: " + workers.size() + "; isGathering" + workers.get(7).isGatheringMinerals() + "; location: "
+        debugText = "Size: " + workers.size() + "; isGathering" + workers.get(workers.size() > 7 ? 7 : workers.size() - 1).isGatheringMinerals() + "; location: "
                 + baseLocations.size() + "; num: " + searchingScv;
 
         for (Unit u : game.enemy().getUnits()) {
@@ -391,7 +390,7 @@ public class TestBot1 extends DefaultBWListener {
     }
 
     public static void main(String[] args) {
-        new TestBot1().run();
+        new MarineHell().run();
     }
 
     // Returns a suitable TilePosition to build a given building type near
