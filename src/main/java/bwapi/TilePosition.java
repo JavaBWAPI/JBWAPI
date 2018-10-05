@@ -35,4 +35,8 @@ public class TilePosition extends Point {
     public TilePosition multiply(final int multiplier) {
         return new TilePosition(x * multiplier, y * multiplier);
     }
+
+    public double getDistance(final TilePosition position) {
+        return getDistance(position.x, position.y);
+    }
 }

@@ -35,4 +35,8 @@ public class WalkPosition extends Point {
     public WalkPosition multiply(final int multiplier) {
         return new WalkPosition(x * multiplier, y * multiplier);
     }
+
+    public double getDistance(final WalkPosition position) {
+        return getDistance(position.x, position.y);
+    }
 }

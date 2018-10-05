@@ -57,4 +57,8 @@ public class Position extends Point {
     public Position multiply(final int multiplier) {
         return new Position(x * multiplier, y * multiplier);
     }
+
+    public double getDistance(final Position position) {
+        return getDistance(position.x, position.y);
+    }
 }

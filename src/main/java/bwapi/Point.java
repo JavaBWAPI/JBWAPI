@@ -29,6 +29,12 @@ class Point {
         return "[" + x + ", " + y + "]";
     }
 
+    protected double getDistance(final int x, final int y) {
+        final int dx = x - this.x;
+        final int dy = y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     public boolean equals(final Object o) {
         if (!(o instanceof Point)) {
             return false;
