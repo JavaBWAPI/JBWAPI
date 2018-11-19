@@ -17,6 +17,8 @@ class PlayTestListener extends DefaultBWListener {
         game = bwClient.getGame();
 
         game.setLocalSpeed(20);
+        game.enableFlag(Flag.UserInput);
+        game.enableFlag(Flag.CompleteMapInformation);
     }
 
     public void onFrame() {

@@ -395,10 +395,6 @@ class Client {
             return sharedMemory.get(GameOffset + 336 + f) != 0;
         }
 
-        public void setFlag(final int f, final boolean value) {
-            sharedMemory.put(GameOffset + 336 + f, (byte) (value ? 1 : 0));
-        }
-
         public int mapWidth() {
             return sharedMemory.getInt(GameOffset + 340);
         }
