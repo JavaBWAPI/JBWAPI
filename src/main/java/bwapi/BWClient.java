@@ -3,13 +3,13 @@ package bwapi;
 import java.util.Objects;
 
 public class BWClient {
-    private final BWListener eventListener;
+    private final BWEventListener eventListener;
 
     private Client client;
     private EventHandler handler;
 
 
-    public BWClient(final BWListener eventListener) {
+    public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
         this.eventListener = eventListener;
     }

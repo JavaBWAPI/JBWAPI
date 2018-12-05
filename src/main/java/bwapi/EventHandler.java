@@ -2,12 +2,12 @@ package bwapi;
 
 
 class EventHandler implements Client.EventHandler {
-    private final BWListener eventListener;
+    private final BWEventListener eventListener;
     private final Game game;
     private final Client.GameData data;
     private int frames;
 
-    public EventHandler(final BWListener eventListener, final Client.GameData data) {
+    public EventHandler(final BWEventListener eventListener, final Client.GameData data) {
         this.eventListener = eventListener;
         game = new Game(data);
         this.data = data;

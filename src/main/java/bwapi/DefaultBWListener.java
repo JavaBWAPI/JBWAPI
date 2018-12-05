@@ -1,6 +1,6 @@
 package bwapi;
 
-public class DefaultBWListener implements BWListener {
+public class DefaultBWListener implements BWEventListener {
 
     public void onStart() {
     }

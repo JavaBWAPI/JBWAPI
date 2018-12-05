@@ -1,7 +1,7 @@
 package bwapi;
 
 
-public interface BWListener {
+public interface BWEventListener {
 
     void onStart();
 
