@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 public class BWTA {
     private static BWEM bwem;
-    private static Game game;
     static Map<Area, Region> regionMap;
     static Map<ChokePoint, Chokepoint> chokeMap;
     static Map<Base, BaseLocation> baseMap;
@@ -22,8 +21,7 @@ public class BWTA {
     private static Set<Chokepoint> chokepoints;
     private static Set<BaseLocation> baseLocations;
 
-    public static void readMap(final Game gamePointer) {
-        game = gamePointer;
+    public static void readMap(final Game game) {
         bwem = new BWEM(game);
     }
 

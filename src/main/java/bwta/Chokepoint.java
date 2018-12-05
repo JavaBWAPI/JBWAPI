@@ -1,9 +1,11 @@
 package bwta;
 
 import bwapi.Position;
+import bwapi.WalkPosition;
 import bwem.ChokePoint;
 import bwapi.Pair;
-import bwapi.Pair;
+
+import java.util.List;
 
 
 public class Chokepoint {
@@ -13,15 +15,10 @@ public class Chokepoint {
     private double width;
 
     Chokepoint(final ChokePoint chokePoint) {
-        try {
-            this.chokePoint = chokePoint;
-            this.sides = new Pair<>(chokePoint.getGeometry().get(1).toPosition(), chokePoint.getGeometry().get(2).toPosition());
-            this.center = chokePoint.getGeometry().get(0).toPosition();
-            this.width = sides.getLeft().getDistance(sides.getRight());
-        }
-        catch (Exception e) {
-            System.out.println(width);
-        }
+        this.chokePoint = chokePoint;
+        this.sides = calculateSides(chokePoint.getGeometry());
+        this.center = sides.getFirst().add(sides.getSecond()).divide(2);
+        this.width = sides.getLeft().getDistance(sides.getRight());
     }
 
     public Pair<Region, Region> getRegions() {
@@ -51,5 +48,23 @@ public class Chokepoint {
     @Override
     public int hashCode() {
         return chokePoint.hashCode();
+    }
+
+    private static Pair<Position, Position> calculateSides(final List<WalkPosition> wp) {
+        WalkPosition p1 = wp.get(0);
+        WalkPosition p2 = wp.get(0);
+        double d_max = -1;
+
+        for (int i=0; i < wp.size(); i++) {
+            for (int j=i+1; j < wp.size(); j++) {
+                double d = wp.get(i).getDistance(wp.get(j));
+                if (d > d_max) {
+                    d_max = d;
+                    p1 = wp.get(i);
+                    p2 = wp.get(j);
+                }
+            }
+        }
+        return new Pair<>(p1.toPosition(), p2.toPosition());
     }
 }
