@@ -17,8 +17,8 @@ import bwapi.TilePosition;
 import bwapi.WalkPosition;
 import bwem.CheckMode;
 import bwem.map.MapImpl;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
+import bwapi.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +77,7 @@ public final class BwemExt {
         if (point.getY() < topLeftY) topLeftY = point.getY();
         if (point.getY() > bottomRightY) bottomRightY = point.getY();
 
-        return new ImmutablePair<>(
+        return new Pair<>(
                 new TilePosition(topLeftX, topLeftY), new TilePosition(bottomRightX, bottomRightY));
     }
 
@@ -193,7 +193,7 @@ public final class BwemExt {
                             || ((dx == sizeX - 1) && (dy == sizeY - 1))
                             || ((dx == 0) && (dy == sizeY - 1))
                             || ((dx == sizeX - 1) && (dy == 0)))) {
-                        border.add(new ImmutablePair<>(dx, dy));
+                        border.add(new Pair<>(dx, dy));
                     }
                 }
             }

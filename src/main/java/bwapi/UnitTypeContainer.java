@@ -1455,7 +1455,7 @@ class UnitTypeContainer {
         // Add the whatBuilds types to the required units map
         for (final UnitType i : UnitType.values()) {
             req.add(new HashMap<>());
-            final Map.Entry<UnitType, Integer> wb = i.whatBuilds();
+            final Pair<UnitType, Integer> wb = i.whatBuilds();
             if (wb.getKey() != UnitType.None) {
                 req.get(i.id).put(wb.getKey(), wb.getValue());
             }

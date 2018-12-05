@@ -2,25 +2,30 @@ package bwta;
 
 import bwapi.Position;
 import bwem.ChokePoint;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
+import bwapi.Pair;
 
 
 public class Chokepoint {
-    private final ChokePoint chokePoint;
-    private final Pair<Position, Position> sides;
-    private final Position center;
-    private final double width;
+    private  ChokePoint chokePoint;
+    private  Pair<Position, Position> sides;
+    private Position center;
+    private double width;
 
     Chokepoint(final ChokePoint chokePoint) {
-        this.chokePoint = chokePoint;
-        this.sides = new ImmutablePair<>(chokePoint.getGeometry().get(1).toPosition(), chokePoint.getGeometry().get(2).toPosition());
-        this.center = chokePoint.getGeometry().get(0).toPosition();
-        this.width = sides.getLeft().getDistance(sides.getRight());
+        try {
+            this.chokePoint = chokePoint;
+            this.sides = new Pair<>(chokePoint.getGeometry().get(1).toPosition(), chokePoint.getGeometry().get(2).toPosition());
+            this.center = chokePoint.getGeometry().get(0).toPosition();
+            this.width = sides.getLeft().getDistance(sides.getRight());
+        }
+        catch (Exception e) {
+            System.out.println(width);
+        }
     }
 
     public Pair<Region, Region> getRegions() {
-        return new ImmutablePair<>(BWTA.regionMap.get(chokePoint.getAreas().getLeft()), BWTA.regionMap.get(chokePoint.getAreas().getRight()));
+        return new Pair<>(BWTA.regionMap.get(chokePoint.getAreas().getLeft()), BWTA.regionMap.get(chokePoint.getAreas().getRight()));
     }
 
     public Pair<Position, Position> getSides() {

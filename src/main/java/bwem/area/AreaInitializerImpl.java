@@ -25,8 +25,8 @@ import bwem.tile.Tile;
 import bwem.tile.TileImpl;
 import bwem.unit.*;
 import bwem.util.BwemExt;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
+import bwapi.Pair;
 
 import java.util.*;
 
@@ -207,7 +207,7 @@ public class AreaInitializerImpl extends AreaImpl implements AreaInitializer {
                         Comparator.comparingInt(
                                 Pair::getLeft)); // a priority queue holding the tiles to visit ordered by their
         // distance to start.
-        toVisit.offer(new ImmutablePair<>(0, start));
+        toVisit.offer(new Pair<>(0, start));
 
         int remainingTargets = targets.size();
         while (!toVisit.isEmpty()) {
@@ -260,17 +260,17 @@ public class AreaInitializerImpl extends AreaImpl implements AreaInitializer {
                                 // To update next's distance, we need to remove-insert it from toVisit:
                                 //                                bwem_assert(iNext != range.second);
                                 final boolean removed =
-                                        toVisit.remove(new ImmutablePair<>(((TileImpl) nextTile).getInternalData(), next));
+                                        toVisit.remove(new Pair<>(((TileImpl) nextTile).getInternalData(), next));
                                 if (!removed) {
                                     throw new IllegalStateException();
                                 }
                                 ((TileImpl) nextTile).setInternalData(newNextDist);
-                                toVisit.offer(new ImmutablePair<>(newNextDist, next));
+                                toVisit.offer(new Pair<>(newNextDist, next));
                             }
                         } else if ((nextTile.getAreaId().equals(getId()))
                                 || (nextTile.getAreaId().equals(UNINITIALIZED))) {
                             ((TileImpl) nextTile).setInternalData(newNextDist);
-                            toVisit.offer(new ImmutablePair<>(newNextDist, next));
+                            toVisit.offer(new Pair<>(newNextDist, next));
                         }
                     }
                 }

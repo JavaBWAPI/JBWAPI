@@ -266,7 +266,7 @@ public enum UnitType {
         return UnitTypeContainer.unitRace[id];
     }
 
-    public Entry<UnitType, Integer> whatBuilds() {
+    public Pair<UnitType, Integer> whatBuilds() {
         // Retrieve the type
         final UnitType type = UnitTypeContainer.whatBuilds[id];
         int count = 1;
@@ -277,7 +277,7 @@ public enum UnitType {
             count = 2;
         }
         // Return the desired pair
-        return new AbstractMap.SimpleEntry<>(type, count);
+        return new Pair<>(type, count);
     }
 
     public Map<UnitType, Integer> requiredUnits() {

@@ -24,8 +24,7 @@ import bwem.typedef.Altitude;
 import bwem.typedef.CPPath;
 import bwem.typedef.Pred;
 import bwem.unit.NeutralData;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.MutablePair;
+import bwapi.Pair;
 
 import java.util.List;
 
@@ -150,7 +149,7 @@ public interface Map {
     //       To avoid this and the potential performance penalty, just make sure getArea(a) != nullptr
     // and getArea(b) != nullptr.
     //       Then GetPath should perform very quick.
-    CPPath getPath(Position a, Position b, MutableInt pLength);
+    int getPathLength(Position a, Position b);
 
     CPPath getPath(Position a, Position b);
 
@@ -167,6 +166,6 @@ public interface Map {
     WalkPosition breadthFirstSearch(WalkPosition start, Pred findCond, Pred visitCond);
 
     // Returns the union of the geometry of all the ChokePoints. Cf. ChokePoint::Geometry()
-    List<MutablePair<MutablePair<AreaId, AreaId>, WalkPosition>> getRawFrontier();
+    List<Pair<Pair<AreaId, AreaId>, WalkPosition>> getRawFrontier();
 
 }

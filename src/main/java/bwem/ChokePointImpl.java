@@ -20,9 +20,9 @@ import bwem.tile.MiniTileImpl;
 import bwem.typedef.CPPath;
 import bwem.typedef.Index;
 import bwem.unit.Neutral;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
+import bwapi.Pair;
+import bwapi.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ChokePointImpl implements ChokePoint {
     private final Index index;
     private final Pair<Area, Area> areas;
     private final WalkPosition[] nodes;
-    private final List<MutablePair<WalkPosition, WalkPosition>> nodesInArea;
+    private final List<Pair<WalkPosition, WalkPosition>> nodesInArea;
     private final List<WalkPosition> geometry;
     private boolean isBlocked;
     private Neutral blockingNeutral;
@@ -53,7 +53,7 @@ public class ChokePointImpl implements ChokePoint {
 
         this.graph = graph;
         this.index = index;
-        this.areas = new ImmutablePair<>(area1, area2);
+        this.areas = new Pair<>(area1, area2);
         this.geometry = geometry;
 
         // Ensures that in the case where several neutrals are stacked, blockingNeutral points to the
@@ -72,7 +72,7 @@ public class ChokePointImpl implements ChokePoint {
 
         this.nodesInArea = new ArrayList<>(Node.NODE_COUNT.ordinal());
         for (int i = 0; i < Node.NODE_COUNT.ordinal(); ++i) {
-            this.nodesInArea.add(new MutablePair<>(new WalkPosition(0, 0), new WalkPosition(0, 0)));
+            this.nodesInArea.add(new Pair<>(new WalkPosition(0, 0), new WalkPosition(0, 0)));
         }
 
         int i = geometry.size() / 2;
@@ -143,8 +143,8 @@ public class ChokePointImpl implements ChokePoint {
                  */
                 final WalkPosition left = nodesInArea.get(n).getLeft();
                 final WalkPosition right = nodesInArea.get(n).getRight();
-                final MutablePair<WalkPosition, WalkPosition> replacementPair =
-                        new MutablePair<>(left, right);
+                final Pair<WalkPosition, WalkPosition> replacementPair =
+                        new Pair<>(left, right);
                 if (area.equals(this.areas.getLeft())) {
                     replacementPair.setLeft(nodeInArea);
                 } else {

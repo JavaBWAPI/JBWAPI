@@ -23,7 +23,7 @@ import bwem.typedef.Altitude;
 import bwem.unit.Mineral;
 import bwem.unit.Neutral;
 import bwem.unit.StaticBuilding;
-import org.apache.commons.lang3.tuple.MutablePair;
+import bwapi.Pair;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,16 +44,16 @@ public interface MapInitializer {
 
     void computeAltitude(TerrainData terrainData);
 
-    List<MutablePair<WalkPosition, Altitude>> getSortedDeltasByAscendingAltitude(
+    List<Pair<WalkPosition, Altitude>> getSortedDeltasByAscendingAltitude(
             int mapWalkTileWidth, int mapWalkTileHeight, int altitudeScale);
 
-    List<MutablePair<WalkPosition, Altitude>> getActiveSeaSideList(TerrainData terrainData);
+    List<Pair<WalkPosition, Altitude>> getActiveSeaSideList(TerrainData terrainData);
 
     Altitude setAltitudesAndGetUpdatedHighestAltitude(
             Altitude currentHighestAltitude,
             TerrainData terrainData,
-            List<MutablePair<WalkPosition, Altitude>> deltasByAscendingAltitude,
-            List<MutablePair<WalkPosition, Altitude>> activeSeaSideList,
+            List<Pair<WalkPosition, Altitude>> deltasByAscendingAltitude,
+            List<Pair<WalkPosition, Altitude>> activeSeaSideList,
             int altitudeScale);
 
     void setHighestAltitude(Altitude altitude);
@@ -74,10 +74,10 @@ public interface MapInitializer {
 
     void computeAreas(List<TempAreaInfo> tempAreaList, int areaMinMiniTiles);
 
-    List<MutablePair<WalkPosition, MiniTile>> getSortedMiniTilesByDescendingAltitude();
+    List<Pair<WalkPosition, MiniTile>> getSortedMiniTilesByDescendingAltitude();
 
     List<TempAreaInfo> computeTempAreas(
-            List<MutablePair<WalkPosition, MiniTile>> miniTilesByDescendingAltitude);
+            List<Pair<WalkPosition, MiniTile>> miniTilesByDescendingAltitude);
 
     void replaceAreaIds(WalkPosition p, AreaId newAreaId);
 

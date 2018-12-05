@@ -34,10 +34,7 @@ import bwem.unit.Neutral;
 import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
 import bwem.util.Utils;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
 
 import java.util.*;
 
@@ -287,7 +284,7 @@ public final class Graph {
 
     // Creates a new Area for each pair (top, miniTiles) in areasList (See Area::top() and
     // Area::miniTiles())
-    public void createAreas(final List<MutablePair<WalkPosition, Integer>> areasList) {
+    public void createAreas(final List<Pair<WalkPosition, Integer>> areasList) {
         for (int id = 1; id <= areasList.size(); ++id) {
             final WalkPosition top = areasList.get(id - 1).getLeft();
             final int miniTileCount = areasList.get(id - 1).getRight();
@@ -322,13 +319,13 @@ public final class Graph {
     // ----------------------------------------------------------------------
     // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
     // ----------------------------------------------------------------------
-    private java.util.Map<MutablePair<AreaId, AreaId>, List<WalkPosition>>
+    private java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>>
     createRawFrontierByAreaPairMap(
-            final List<MutablePair<MutablePair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
-        final java.util.Map<MutablePair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
+            final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
+        final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
                 new HashMap<>();
 
-        for (final MutablePair<MutablePair<AreaId, AreaId>, WalkPosition> raw : rawFrontier) {
+        for (final Pair<Pair<AreaId, AreaId>, WalkPosition> raw : rawFrontier) {
             int a = raw.getLeft().getLeft().intValue();
             int b = raw.getLeft().getRight().intValue();
             if (a > b) {
@@ -345,7 +342,7 @@ public final class Graph {
                 throw new IllegalStateException();
             }
 
-            final MutablePair<AreaId, AreaId> key = new MutablePair<>(new AreaId(a), new AreaId(b));
+            final Pair<AreaId, AreaId> key = new Pair<>(new AreaId(a), new AreaId(b));
             rawFrontierByAreaPair.computeIfAbsent(key, mp -> new ArrayList<>()).add(raw.getRight());
         }
 
@@ -360,7 +357,7 @@ public final class Graph {
     public void createChokePoints(
             final List<StaticBuilding> staticBuildings,
             final List<Mineral> minerals,
-            final List<MutablePair<MutablePair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
+            final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
         Index newIndex = new Index(0);
 
         final List<Neutral> blockingNeutrals = new ArrayList<>();
@@ -389,13 +386,13 @@ public final class Graph {
         initializeChokePointsMatrix(this.chokePointsMatrix, getAreaCount());
 
         // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
-        final java.util.Map<MutablePair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
+        final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
                 createRawFrontierByAreaPairMap(rawFrontier);
 
         // 3) For each pair of areas (A, B):
-        for (final java.util.Map.Entry<MutablePair<AreaId, AreaId>, List<WalkPosition>> entry :
+        for (final java.util.Map.Entry<Pair<AreaId, AreaId>, List<WalkPosition>> entry :
                 rawFrontierByAreaPair.entrySet()) {
-            MutablePair<AreaId, AreaId> rawleft = entry.getKey();
+            Pair<AreaId, AreaId> rawleft = entry.getKey();
             final List<WalkPosition> rawFrontierAB = entry.getValue();
 
             // Because our dispatching preserved order,
@@ -709,7 +706,7 @@ public final class Graph {
 
         final Queue<Pair<Integer, ChokePoint>> toVisit =
                 new PriorityQueue<>(Comparator.comparingInt(a -> a.getLeft()));
-        toVisit.offer(new ImmutablePair<>(0, start));
+        toVisit.offer(new Pair<>(0, start));
 
         int remainingTargets = targets.size();
         while (!toVisit.isEmpty()) {
@@ -753,18 +750,18 @@ public final class Graph {
                                     // To update next's distance, we need to remove-insert it from toVisit:
                                     //                                    bwem_assert(iNext != range.second);
                                     final boolean removed =
-                                            toVisit.remove(new ImmutablePair<>(((TileImpl) nextTile).getInternalData(), next));
+                                            toVisit.remove(new Pair<>(((TileImpl) nextTile).getInternalData(), next));
                                     if (!removed) {
                                         throw new IllegalStateException();
                                     }
                                     ((TileImpl) nextTile).setInternalData(newNextDist);
                                     ((ChokePointImpl) next).setPathBackTrace(current);
-                                    toVisit.offer(new ImmutablePair<>(newNextDist, next));
+                                    toVisit.offer(new Pair<>(newNextDist, next));
                                 }
                             } else {
                                 ((TileImpl) nextTile).setInternalData(newNextDist);
                                 ((ChokePointImpl) next).setPathBackTrace(current);
-                                toVisit.offer(new ImmutablePair<>(newNextDist, next));
+                                toVisit.offer(new Pair<>(newNextDist, next));
                             }
                         }
                     }

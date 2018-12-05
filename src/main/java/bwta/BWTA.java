@@ -8,8 +8,6 @@ import bwem.BWEM;
 import bwem.Base;
 import bwem.ChokePoint;
 import bwem.area.Area;
-import bwem.tile.Tile;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -103,9 +101,7 @@ public class BWTA {
 
 
     public static double getGroundDistance(final TilePosition start, final TilePosition end) {
-        final MutableInt L = new MutableInt();
-        bwem.getMap().getPath(start.toPosition(), end.toPosition(), L);
-        return L.intValue();
+        return bwem.getMap().getPathLength(start.toPosition(), end.toPosition());
     }
 
     public static List<TilePosition> getShortestPath(final TilePosition start, final TilePosition end) {

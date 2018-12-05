@@ -16,7 +16,7 @@ import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.typedef.CPPath;
 import bwem.unit.Neutral;
-import org.apache.commons.lang3.tuple.Pair;
+import bwapi.Pair;
 
 import java.util.List;
 

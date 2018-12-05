@@ -13,14 +13,14 @@
 package bwem.util;
 
 import bwem.typedef.Altitude;
-import org.apache.commons.lang3.tuple.MutablePair;
+import bwapi.Pair;
 
 import java.util.Comparator;
 
 public final class PairGenericAltitudeComparator<T>
-        implements Comparator<MutablePair<T, Altitude>> {
+        implements Comparator<Pair<T, Altitude>> {
     @Override
-    public int compare(MutablePair<T, Altitude> o1, MutablePair<T, Altitude> o2) {
+    public int compare(Pair<T, Altitude> o1, Pair<T, Altitude> o2) {
         int a1 = o1.getRight().intValue();
         int a2 = o2.getRight().intValue();
         return Integer.compare(a1, a2);

@@ -12,8 +12,6 @@
 
 package bwem.util;
 
-import org.apache.commons.lang3.mutable.MutableDouble;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.SplittableRandom;
@@ -55,9 +53,7 @@ public final class Utils {
             double p2X,
             double p2Y,
             double p3X,
-            double p3Y,
-            MutableDouble iX,
-            MutableDouble iY) {
+            double p3Y) {
         double s1X, s1Y;
         double s2X, s2Y;
         s1X = p1X - p0X;
@@ -71,8 +67,6 @@ public final class Utils {
 
         if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
             // Collision detected
-            if (iX != null) iX.setValue(p0X + (t * s1X));
-            if (iY != null) iY.setValue(p0Y + (t * s1Y));
             return true;
         }
 
@@ -81,7 +75,7 @@ public final class Utils {
 
     // Returns whether the line segments [a, b] and [c, d] intersect.
     public static boolean intersect(int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy) {
-        return getLineIntersection(ax, ay, bx, by, cx, cy, dx, dy, null, null);
+        return getLineIntersection(ax, ay, bx, by, cx, cy, dx, dy);
     }
 
     /**

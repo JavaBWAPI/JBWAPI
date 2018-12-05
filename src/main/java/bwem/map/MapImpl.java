@@ -29,9 +29,7 @@ import bwem.unit.Neutral;
 import bwem.unit.NeutralData;
 import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.MutablePair;
+import bwapi.Pair;
 
 import java.util.*;
 
@@ -39,14 +37,14 @@ import static bwem.area.typedef.AreaId.UNINITIALIZED;
 
 public abstract class MapImpl implements Map {
 
-    protected final List<MutablePair<MutablePair<AreaId, AreaId>, WalkPosition>> rawFrontier =
+    protected final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
             new ArrayList<>();
     protected final Game game;
     protected final Set<Unit> mineralPatches;
     protected final Set<Player> players;
     protected final Set<Unit> vespeneGeysers;
     protected final Set<Unit> units;
-    private final MutableBoolean automaticPathUpdate = new MutableBoolean(false);
+    private boolean automaticPathUpdate = false;
     private final Graph graph;
     private final NeighboringAreaChooser neighboringAreaChooser;
     protected TerrainData terrainData = null;
@@ -79,18 +77,18 @@ public abstract class MapImpl implements Map {
     }
 
     @Override
-    public List<MutablePair<MutablePair<AreaId, AreaId>, WalkPosition>> getRawFrontier() {
+    public List<Pair<Pair<AreaId, AreaId>, WalkPosition>> getRawFrontier() {
         return rawFrontier;
     }
 
     @Override
     public boolean automaticPathUpdate() {
-        return automaticPathUpdate.booleanValue();
+        return automaticPathUpdate;
     }
 
     @Override
     public void enableAutomaticPathAnalysis() {
-        automaticPathUpdate.setTrue();
+        automaticPathUpdate = true;
     }
 
     @Override
@@ -341,9 +339,15 @@ public abstract class MapImpl implements Map {
         // ----------------------------------------------------------------------
     }
 
-    @Override
-    public CPPath getPath(Position a, Position b, MutableInt pLength) {
+    private CPPath getPath(Position a, Position b, MutableInt pLength) {
         return graph.getPath(a, b, pLength);
+    }
+
+    @Override
+    public int getPathLength(Position a, Position b) {
+        MutableInt pLength = new MutableInt();
+        getPath(a, b, pLength);
+        return pLength.intValue();
     }
 
     @Override
@@ -534,8 +538,8 @@ public abstract class MapImpl implements Map {
         }
     }
 
-    public MutablePair<AreaId, AreaId> findNeighboringAreas(final WalkPosition p) {
-        final MutablePair<AreaId, AreaId> result = new MutablePair<>(null, null);
+    public Pair<AreaId, AreaId> findNeighboringAreas(final WalkPosition p) {
+        final Pair<AreaId, AreaId> result = new Pair<>(null, null);
 
         final WalkPosition[] deltas = {
                 new WalkPosition(0, -1),
