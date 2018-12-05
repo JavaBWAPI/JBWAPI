@@ -97,7 +97,7 @@ class Client {
     }
 
     interface MappingKernel extends Kernel32 {
-        MappingKernel INSTANCE = Native.loadLibrary(MappingKernel.class, W32APIOptions.DEFAULT_OPTIONS);
+        MappingKernel INSTANCE = Native.load(MappingKernel.class, W32APIOptions.DEFAULT_OPTIONS);
 
         HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
     }
