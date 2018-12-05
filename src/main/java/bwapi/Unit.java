@@ -123,19 +123,19 @@ public class Unit {
     }
 
     public int getLeft() {
-        return unitData.positionX() - getType().dimensionLeft();
+        return position.x - getType().dimensionLeft();
     }
 
     public int getTop() {
-        return unitData.positionY() - getType().dimensionUp();
+        return position.y - getType().dimensionUp();
     }
 
     public int getRight() {
-        return unitData.positionX() - getType().dimensionRight();
+        return position.x - getType().dimensionRight();
     }
 
     public int getBottom() {
-        return unitData.positionY() - getType().dimensionDown();
+        return position.y - getType().dimensionDown();
     }
 
     public int getHitPoints() {
