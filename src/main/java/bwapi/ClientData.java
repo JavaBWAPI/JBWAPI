@@ -78,7 +78,8 @@ final class ClientData {
       int offset = myOffset + 8;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsDebug(boolean value) {      sharedMemory.put(myOffset + 8, (byte) (value ? 1 : 0));
+    void setIsDebug(boolean value) {
+      sharedMemory.put(myOffset + 8, (byte) (value ? 1 : 0));
     }
     int getInstanceID() {
       int offset = myOffset + 12;
@@ -202,13 +203,15 @@ final class ClientData {
       int offset = myOffset + 3446084;
       return sharedMemory.get(offset) != 0;
     }
-    void setHasLatCom(boolean value) {      sharedMemory.put(myOffset + 3446084, (byte) (value ? 1 : 0));
+    void setHasLatCom(boolean value) {
+      sharedMemory.put(myOffset + 3446084, (byte) (value ? 1 : 0));
     }
     boolean getHasGUI() {
       int offset = myOffset + 3446085;
       return sharedMemory.get(offset) != 0;
     }
-    void setHasGUI(boolean value) {      sharedMemory.put(myOffset + 3446085, (byte) (value ? 1 : 0));
+    void setHasGUI(boolean value) {
+      sharedMemory.put(myOffset + 3446085, (byte) (value ? 1 : 0));
     }
     int getReplayFrameCount() {
       int offset = myOffset + 3446088;
@@ -256,7 +259,8 @@ final class ClientData {
       int offset = myOffset + 3446112;
       return sharedMemory.getDouble(offset);
     }
-    void setAverageFPS(double value) {      sharedMemory.putDouble(myOffset + 3446112, value);
+    void setAverageFPS(double value) {
+      sharedMemory.putDouble(myOffset + 3446112, value);
     }
     int getMouseX() {
       int offset = myOffset + 3446120;
@@ -276,13 +280,15 @@ final class ClientData {
       int offset = myOffset + 3446128 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setMouseState(int i, boolean value) {      sharedMemory.put(myOffset + 3446128 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setMouseState(int i, boolean value) {
+      sharedMemory.put(myOffset + 3446128 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean getKeyState(int i) {
       int offset = myOffset + 3446131 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setKeyState(int i, boolean value) {      sharedMemory.put(myOffset + 3446131 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setKeyState(int i, boolean value) {
+      sharedMemory.put(myOffset + 3446131 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     int getScreenX() {
       int offset = myOffset + 3446388;
@@ -302,7 +308,8 @@ final class ClientData {
       int offset = myOffset + 3446396 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setFlags(int i, boolean value) {      sharedMemory.put(myOffset + 3446396 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setFlags(int i, boolean value) {
+      sharedMemory.put(myOffset + 3446396 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     int getMapWidth() {
       int offset = myOffset + 3446400;
@@ -357,61 +364,71 @@ final class ClientData {
       int offset = myOffset + 3709148 + 1 * 1 * j + 1 * 1024 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsWalkable(int i, int j, boolean value) {      sharedMemory.put(myOffset + 3709148 + 1 * 1 * j + 1 * 1024 * i, (byte) (value ? 1 : 0));
+    void setIsWalkable(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 3709148 + 1 * 1 * j + 1 * 1024 * i, (byte) (value ? 1 : 0));
     }
     boolean isBuildable(int i, int j) {
       int offset = myOffset + 4757724 + 1 * 1 * j + 1 * 256 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBuildable(int i, int j, boolean value) {      sharedMemory.put(myOffset + 4757724 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
+    void setIsBuildable(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 4757724 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
     }
     boolean isVisible(int i, int j) {
       int offset = myOffset + 4823260 + 1 * 1 * j + 1 * 256 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsVisible(int i, int j, boolean value) {      sharedMemory.put(myOffset + 4823260 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
+    void setIsVisible(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 4823260 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
     }
     boolean isExplored(int i, int j) {
       int offset = myOffset + 4888796 + 1 * 1 * j + 1 * 256 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsExplored(int i, int j, boolean value) {      sharedMemory.put(myOffset + 4888796 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
+    void setIsExplored(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 4888796 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
     }
     boolean getHasCreep(int i, int j) {
       int offset = myOffset + 4954332 + 1 * 1 * j + 1 * 256 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setHasCreep(int i, int j, boolean value) {      sharedMemory.put(myOffset + 4954332 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
+    void setHasCreep(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 4954332 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
     }
     boolean isOccupied(int i, int j) {
       int offset = myOffset + 5019868 + 1 * 1 * j + 1 * 256 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsOccupied(int i, int j, boolean value) {      sharedMemory.put(myOffset + 5019868 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
+    void setIsOccupied(int i, int j, boolean value) {
+      sharedMemory.put(myOffset + 5019868 + 1 * 1 * j + 1 * 256 * i, (byte) (value ? 1 : 0));
     }
     short getMapTileRegionId(int i, int j) {
       int offset = myOffset + 5085404 + 2 * 1 * j + 2 * 256 * i;
       return sharedMemory.getShort(offset);
     }
-    void setMapTileRegionId(int i, int j, short value) {      sharedMemory.putShort(myOffset + 5085404 + 2 * 1 * j + 2 * 256 * i, value);
+    void setMapTileRegionId(int i, int j, short value) {
+      sharedMemory.putShort(myOffset + 5085404 + 2 * 1 * j + 2 * 256 * i, value);
     }
     short getMapSplitTilesMiniTileMask(int i) {
       int offset = myOffset + 5216476 + 2 * 1 * i;
       return sharedMemory.getShort(offset);
     }
-    void setMapSplitTilesMiniTileMask(int i, short value) {      sharedMemory.putShort(myOffset + 5216476 + 2 * 1 * i, value);
+    void setMapSplitTilesMiniTileMask(int i, short value) {
+      sharedMemory.putShort(myOffset + 5216476 + 2 * 1 * i, value);
     }
     short getMapSplitTilesRegion1(int i) {
       int offset = myOffset + 5226476 + 2 * 1 * i;
       return sharedMemory.getShort(offset);
     }
-    void setMapSplitTilesRegion1(int i, short value) {      sharedMemory.putShort(myOffset + 5226476 + 2 * 1 * i, value);
+    void setMapSplitTilesRegion1(int i, short value) {
+      sharedMemory.putShort(myOffset + 5226476 + 2 * 1 * i, value);
     }
     short getMapSplitTilesRegion2(int i) {
       int offset = myOffset + 5236476 + 2 * 1 * i;
       return sharedMemory.getShort(offset);
     }
-    void setMapSplitTilesRegion2(int i, short value) {      sharedMemory.putShort(myOffset + 5236476 + 2 * 1 * i, value);
+    void setMapSplitTilesRegion2(int i, short value) {
+      sharedMemory.putShort(myOffset + 5236476 + 2 * 1 * i, value);
     }
     int getRegionCount() {
       int offset = myOffset + 5246476;
@@ -439,31 +456,36 @@ final class ClientData {
       int offset = myOffset + 10586548;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsInGame(boolean value) {      sharedMemory.put(myOffset + 10586548, (byte) (value ? 1 : 0));
+    void setIsInGame(boolean value) {
+      sharedMemory.put(myOffset + 10586548, (byte) (value ? 1 : 0));
     }
     boolean isMultiplayer() {
       int offset = myOffset + 10586549;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsMultiplayer(boolean value) {      sharedMemory.put(myOffset + 10586549, (byte) (value ? 1 : 0));
+    void setIsMultiplayer(boolean value) {
+      sharedMemory.put(myOffset + 10586549, (byte) (value ? 1 : 0));
     }
     boolean isBattleNet() {
       int offset = myOffset + 10586550;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBattleNet(boolean value) {      sharedMemory.put(myOffset + 10586550, (byte) (value ? 1 : 0));
+    void setIsBattleNet(boolean value) {
+      sharedMemory.put(myOffset + 10586550, (byte) (value ? 1 : 0));
     }
     boolean isPaused() {
       int offset = myOffset + 10586551;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsPaused(boolean value) {      sharedMemory.put(myOffset + 10586551, (byte) (value ? 1 : 0));
+    void setIsPaused(boolean value) {
+      sharedMemory.put(myOffset + 10586551, (byte) (value ? 1 : 0));
     }
     boolean isReplay() {
       int offset = myOffset + 10586552;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsReplay(boolean value) {      sharedMemory.put(myOffset + 10586552, (byte) (value ? 1 : 0));
+    void setIsReplay(boolean value) {
+      sharedMemory.put(myOffset + 10586552, (byte) (value ? 1 : 0));
     }
     int getSelectedUnitCount() {
       int offset = myOffset + 10586556;
@@ -661,7 +683,8 @@ final class ClientData {
       int offset = myOffset + 36;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsSolid(boolean value) {      sharedMemory.put(myOffset + 36, (byte) (value ? 1 : 0));
+    void setIsSolid(boolean value) {
+      sharedMemory.put(myOffset + 36, (byte) (value ? 1 : 0));
     }
   }
   class Command {
@@ -828,13 +851,15 @@ final class ClientData {
       int offset = myOffset + 1064;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsAccessible(boolean value) {      sharedMemory.put(myOffset + 1064, (byte) (value ? 1 : 0));
+    void setIsAccessible(boolean value) {
+      sharedMemory.put(myOffset + 1064, (byte) (value ? 1 : 0));
     }
     boolean isHigherGround() {
       int offset = myOffset + 1065;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsHigherGround(boolean value) {      sharedMemory.put(myOffset + 1065, (byte) (value ? 1 : 0));
+    void setIsHigherGround(boolean value) {
+      sharedMemory.put(myOffset + 1065, (byte) (value ? 1 : 0));
     }
   }
   class ForceData {
@@ -889,19 +914,22 @@ final class ClientData {
       int offset = myOffset + 40 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsAlly(int i, boolean value) {      sharedMemory.put(myOffset + 40 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsAlly(int i, boolean value) {
+      sharedMemory.put(myOffset + 40 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean isEnemy(int i) {
       int offset = myOffset + 52 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsEnemy(int i, boolean value) {      sharedMemory.put(myOffset + 52 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsEnemy(int i, boolean value) {
+      sharedMemory.put(myOffset + 52 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean isNeutral() {
       int offset = myOffset + 64;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsNeutral(boolean value) {      sharedMemory.put(myOffset + 64, (byte) (value ? 1 : 0));
+    void setIsNeutral(boolean value) {
+      sharedMemory.put(myOffset + 64, (byte) (value ? 1 : 0));
     }
     int getStartLocationX() {
       int offset = myOffset + 68;
@@ -921,25 +949,29 @@ final class ClientData {
       int offset = myOffset + 76;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsVictorious(boolean value) {      sharedMemory.put(myOffset + 76, (byte) (value ? 1 : 0));
+    void setIsVictorious(boolean value) {
+      sharedMemory.put(myOffset + 76, (byte) (value ? 1 : 0));
     }
     boolean isDefeated() {
       int offset = myOffset + 77;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsDefeated(boolean value) {      sharedMemory.put(myOffset + 77, (byte) (value ? 1 : 0));
+    void setIsDefeated(boolean value) {
+      sharedMemory.put(myOffset + 77, (byte) (value ? 1 : 0));
     }
     boolean getLeftGame() {
       int offset = myOffset + 78;
       return sharedMemory.get(offset) != 0;
     }
-    void setLeftGame(boolean value) {      sharedMemory.put(myOffset + 78, (byte) (value ? 1 : 0));
+    void setLeftGame(boolean value) {
+      sharedMemory.put(myOffset + 78, (byte) (value ? 1 : 0));
     }
     boolean isParticipating() {
       int offset = myOffset + 79;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsParticipating(boolean value) {      sharedMemory.put(myOffset + 79, (byte) (value ? 1 : 0));
+    void setIsParticipating(boolean value) {
+      sharedMemory.put(myOffset + 79, (byte) (value ? 1 : 0));
     }
     int getMinerals() {
       int offset = myOffset + 80;
@@ -1057,19 +1089,22 @@ final class ClientData {
       int offset = myOffset + 5068 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setHasResearched(int i, boolean value) {      sharedMemory.put(myOffset + 5068 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setHasResearched(int i, boolean value) {
+      sharedMemory.put(myOffset + 5068 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean isResearching(int i) {
       int offset = myOffset + 5115 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsResearching(int i, boolean value) {      sharedMemory.put(myOffset + 5115 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsResearching(int i, boolean value) {
+      sharedMemory.put(myOffset + 5115 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean isUpgrading(int i) {
       int offset = myOffset + 5162 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsUpgrading(int i, boolean value) {      sharedMemory.put(myOffset + 5162 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsUpgrading(int i, boolean value) {
+      sharedMemory.put(myOffset + 5162 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     int getColor() {
       int offset = myOffset + 5228;
@@ -1124,13 +1159,15 @@ final class ClientData {
       int offset = myOffset + 5504 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsResearchAvailable(int i, boolean value) {      sharedMemory.put(myOffset + 5504 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsResearchAvailable(int i, boolean value) {
+      sharedMemory.put(myOffset + 5504 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     boolean isUnitAvailable(int i) {
       int offset = myOffset + 5551 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsUnitAvailable(int i, boolean value) {      sharedMemory.put(myOffset + 5551 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsUnitAvailable(int i, boolean value) {
+      sharedMemory.put(myOffset + 5551 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
   }
   class BulletData {
@@ -1185,19 +1222,22 @@ final class ClientData {
       int offset = myOffset + 24;
       return sharedMemory.getDouble(offset);
     }
-    void setAngle(double value) {      sharedMemory.putDouble(myOffset + 24, value);
+    void setAngle(double value) {
+      sharedMemory.putDouble(myOffset + 24, value);
     }
     double getVelocityX() {
       int offset = myOffset + 32;
       return sharedMemory.getDouble(offset);
     }
-    void setVelocityX(double value) {      sharedMemory.putDouble(myOffset + 32, value);
+    void setVelocityX(double value) {
+      sharedMemory.putDouble(myOffset + 32, value);
     }
     double getVelocityY() {
       int offset = myOffset + 40;
       return sharedMemory.getDouble(offset);
     }
-    void setVelocityY(double value) {      sharedMemory.putDouble(myOffset + 40, value);
+    void setVelocityY(double value) {
+      sharedMemory.putDouble(myOffset + 40, value);
     }
     int getTarget() {
       int offset = myOffset + 48;
@@ -1231,13 +1271,15 @@ final class ClientData {
       int offset = myOffset + 64;
       return sharedMemory.get(offset) != 0;
     }
-    void setExists(boolean value) {      sharedMemory.put(myOffset + 64, (byte) (value ? 1 : 0));
+    void setExists(boolean value) {
+      sharedMemory.put(myOffset + 64, (byte) (value ? 1 : 0));
     }
     boolean isVisible(int i) {
       int offset = myOffset + 65 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsVisible(int i, boolean value) {      sharedMemory.put(myOffset + 65 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsVisible(int i, boolean value) {
+      sharedMemory.put(myOffset + 65 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
   }
   class unitFinder {
@@ -1313,19 +1355,22 @@ final class ClientData {
       int offset = myOffset + 24;
       return sharedMemory.getDouble(offset);
     }
-    void setAngle(double value) {      sharedMemory.putDouble(myOffset + 24, value);
+    void setAngle(double value) {
+      sharedMemory.putDouble(myOffset + 24, value);
     }
     double getVelocityX() {
       int offset = myOffset + 32;
       return sharedMemory.getDouble(offset);
     }
-    void setVelocityX(double value) {      sharedMemory.putDouble(myOffset + 32, value);
+    void setVelocityX(double value) {
+      sharedMemory.putDouble(myOffset + 32, value);
     }
     double getVelocityY() {
       int offset = myOffset + 40;
       return sharedMemory.getDouble(offset);
     }
-    void setVelocityY(double value) {      sharedMemory.putDouble(myOffset + 40, value);
+    void setVelocityY(double value) {
+      sharedMemory.putDouble(myOffset + 40, value);
     }
     int getHitPoints() {
       int offset = myOffset + 48;
@@ -1695,55 +1740,64 @@ final class ClientData {
       int offset = myOffset + 272;
       return sharedMemory.get(offset) != 0;
     }
-    void setExists(boolean value) {      sharedMemory.put(myOffset + 272, (byte) (value ? 1 : 0));
+    void setExists(boolean value) {
+      sharedMemory.put(myOffset + 272, (byte) (value ? 1 : 0));
     }
     boolean getHasNuke() {
       int offset = myOffset + 273;
       return sharedMemory.get(offset) != 0;
     }
-    void setHasNuke(boolean value) {      sharedMemory.put(myOffset + 273, (byte) (value ? 1 : 0));
+    void setHasNuke(boolean value) {
+      sharedMemory.put(myOffset + 273, (byte) (value ? 1 : 0));
     }
     boolean isAccelerating() {
       int offset = myOffset + 274;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsAccelerating(boolean value) {      sharedMemory.put(myOffset + 274, (byte) (value ? 1 : 0));
+    void setIsAccelerating(boolean value) {
+      sharedMemory.put(myOffset + 274, (byte) (value ? 1 : 0));
     }
     boolean isAttacking() {
       int offset = myOffset + 275;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsAttacking(boolean value) {      sharedMemory.put(myOffset + 275, (byte) (value ? 1 : 0));
+    void setIsAttacking(boolean value) {
+      sharedMemory.put(myOffset + 275, (byte) (value ? 1 : 0));
     }
     boolean isAttackFrame() {
       int offset = myOffset + 276;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsAttackFrame(boolean value) {      sharedMemory.put(myOffset + 276, (byte) (value ? 1 : 0));
+    void setIsAttackFrame(boolean value) {
+      sharedMemory.put(myOffset + 276, (byte) (value ? 1 : 0));
     }
     boolean isBeingGathered() {
       int offset = myOffset + 277;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBeingGathered(boolean value) {      sharedMemory.put(myOffset + 277, (byte) (value ? 1 : 0));
+    void setIsBeingGathered(boolean value) {
+      sharedMemory.put(myOffset + 277, (byte) (value ? 1 : 0));
     }
     boolean isBlind() {
       int offset = myOffset + 278;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBlind(boolean value) {      sharedMemory.put(myOffset + 278, (byte) (value ? 1 : 0));
+    void setIsBlind(boolean value) {
+      sharedMemory.put(myOffset + 278, (byte) (value ? 1 : 0));
     }
     boolean isBraking() {
       int offset = myOffset + 279;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBraking(boolean value) {      sharedMemory.put(myOffset + 279, (byte) (value ? 1 : 0));
+    void setIsBraking(boolean value) {
+      sharedMemory.put(myOffset + 279, (byte) (value ? 1 : 0));
     }
     boolean isBurrowed() {
       int offset = myOffset + 280;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsBurrowed(boolean value) {      sharedMemory.put(myOffset + 280, (byte) (value ? 1 : 0));
+    void setIsBurrowed(boolean value) {
+      sharedMemory.put(myOffset + 280, (byte) (value ? 1 : 0));
     }
     int getCarryResourceType() {
       int offset = myOffset + 284;
@@ -1756,133 +1810,155 @@ final class ClientData {
       int offset = myOffset + 288;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsCloaked(boolean value) {      sharedMemory.put(myOffset + 288, (byte) (value ? 1 : 0));
+    void setIsCloaked(boolean value) {
+      sharedMemory.put(myOffset + 288, (byte) (value ? 1 : 0));
     }
     boolean isCompleted() {
       int offset = myOffset + 289;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsCompleted(boolean value) {      sharedMemory.put(myOffset + 289, (byte) (value ? 1 : 0));
+    void setIsCompleted(boolean value) {
+      sharedMemory.put(myOffset + 289, (byte) (value ? 1 : 0));
     }
     boolean isConstructing() {
       int offset = myOffset + 290;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsConstructing(boolean value) {      sharedMemory.put(myOffset + 290, (byte) (value ? 1 : 0));
+    void setIsConstructing(boolean value) {
+      sharedMemory.put(myOffset + 290, (byte) (value ? 1 : 0));
     }
     boolean isDetected() {
       int offset = myOffset + 291;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsDetected(boolean value) {      sharedMemory.put(myOffset + 291, (byte) (value ? 1 : 0));
+    void setIsDetected(boolean value) {
+      sharedMemory.put(myOffset + 291, (byte) (value ? 1 : 0));
     }
     boolean isGathering() {
       int offset = myOffset + 292;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsGathering(boolean value) {      sharedMemory.put(myOffset + 292, (byte) (value ? 1 : 0));
+    void setIsGathering(boolean value) {
+      sharedMemory.put(myOffset + 292, (byte) (value ? 1 : 0));
     }
     boolean isHallucination() {
       int offset = myOffset + 293;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsHallucination(boolean value) {      sharedMemory.put(myOffset + 293, (byte) (value ? 1 : 0));
+    void setIsHallucination(boolean value) {
+      sharedMemory.put(myOffset + 293, (byte) (value ? 1 : 0));
     }
     boolean isIdle() {
       int offset = myOffset + 294;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsIdle(boolean value) {      sharedMemory.put(myOffset + 294, (byte) (value ? 1 : 0));
+    void setIsIdle(boolean value) {
+      sharedMemory.put(myOffset + 294, (byte) (value ? 1 : 0));
     }
     boolean isInterruptible() {
       int offset = myOffset + 295;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsInterruptible(boolean value) {      sharedMemory.put(myOffset + 295, (byte) (value ? 1 : 0));
+    void setIsInterruptible(boolean value) {
+      sharedMemory.put(myOffset + 295, (byte) (value ? 1 : 0));
     }
     boolean isInvincible() {
       int offset = myOffset + 296;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsInvincible(boolean value) {      sharedMemory.put(myOffset + 296, (byte) (value ? 1 : 0));
+    void setIsInvincible(boolean value) {
+      sharedMemory.put(myOffset + 296, (byte) (value ? 1 : 0));
     }
     boolean isLifted() {
       int offset = myOffset + 297;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsLifted(boolean value) {      sharedMemory.put(myOffset + 297, (byte) (value ? 1 : 0));
+    void setIsLifted(boolean value) {
+      sharedMemory.put(myOffset + 297, (byte) (value ? 1 : 0));
     }
     boolean isMorphing() {
       int offset = myOffset + 298;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsMorphing(boolean value) {      sharedMemory.put(myOffset + 298, (byte) (value ? 1 : 0));
+    void setIsMorphing(boolean value) {
+      sharedMemory.put(myOffset + 298, (byte) (value ? 1 : 0));
     }
     boolean isMoving() {
       int offset = myOffset + 299;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsMoving(boolean value) {      sharedMemory.put(myOffset + 299, (byte) (value ? 1 : 0));
+    void setIsMoving(boolean value) {
+      sharedMemory.put(myOffset + 299, (byte) (value ? 1 : 0));
     }
     boolean isParasited() {
       int offset = myOffset + 300;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsParasited(boolean value) {      sharedMemory.put(myOffset + 300, (byte) (value ? 1 : 0));
+    void setIsParasited(boolean value) {
+      sharedMemory.put(myOffset + 300, (byte) (value ? 1 : 0));
     }
     boolean isSelected() {
       int offset = myOffset + 301;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsSelected(boolean value) {      sharedMemory.put(myOffset + 301, (byte) (value ? 1 : 0));
+    void setIsSelected(boolean value) {
+      sharedMemory.put(myOffset + 301, (byte) (value ? 1 : 0));
     }
     boolean isStartingAttack() {
       int offset = myOffset + 302;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsStartingAttack(boolean value) {      sharedMemory.put(myOffset + 302, (byte) (value ? 1 : 0));
+    void setIsStartingAttack(boolean value) {
+      sharedMemory.put(myOffset + 302, (byte) (value ? 1 : 0));
     }
     boolean isStuck() {
       int offset = myOffset + 303;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsStuck(boolean value) {      sharedMemory.put(myOffset + 303, (byte) (value ? 1 : 0));
+    void setIsStuck(boolean value) {
+      sharedMemory.put(myOffset + 303, (byte) (value ? 1 : 0));
     }
     boolean isTraining() {
       int offset = myOffset + 304;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsTraining(boolean value) {      sharedMemory.put(myOffset + 304, (byte) (value ? 1 : 0));
+    void setIsTraining(boolean value) {
+      sharedMemory.put(myOffset + 304, (byte) (value ? 1 : 0));
     }
     boolean isUnderStorm() {
       int offset = myOffset + 305;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsUnderStorm(boolean value) {      sharedMemory.put(myOffset + 305, (byte) (value ? 1 : 0));
+    void setIsUnderStorm(boolean value) {
+      sharedMemory.put(myOffset + 305, (byte) (value ? 1 : 0));
     }
     boolean isUnderDarkSwarm() {
       int offset = myOffset + 306;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsUnderDarkSwarm(boolean value) {      sharedMemory.put(myOffset + 306, (byte) (value ? 1 : 0));
+    void setIsUnderDarkSwarm(boolean value) {
+      sharedMemory.put(myOffset + 306, (byte) (value ? 1 : 0));
     }
     boolean isUnderDWeb() {
       int offset = myOffset + 307;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsUnderDWeb(boolean value) {      sharedMemory.put(myOffset + 307, (byte) (value ? 1 : 0));
+    void setIsUnderDWeb(boolean value) {
+      sharedMemory.put(myOffset + 307, (byte) (value ? 1 : 0));
     }
     boolean isPowered() {
       int offset = myOffset + 308;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsPowered(boolean value) {      sharedMemory.put(myOffset + 308, (byte) (value ? 1 : 0));
+    void setIsPowered(boolean value) {
+      sharedMemory.put(myOffset + 308, (byte) (value ? 1 : 0));
     }
     boolean isVisible(int i) {
       int offset = myOffset + 309 + 1 * 1 * i;
       return sharedMemory.get(offset) != 0;
     }
-    void setIsVisible(int i, boolean value) {      sharedMemory.put(myOffset + 309 + 1 * 1 * i, (byte) (value ? 1 : 0));
+    void setIsVisible(int i, boolean value) {
+      sharedMemory.put(myOffset + 309 + 1 * 1 * i, (byte) (value ? 1 : 0));
     }
     int getButtonset() {
       int offset = myOffset + 320;
@@ -1902,7 +1978,8 @@ final class ClientData {
       int offset = myOffset + 328;
       return sharedMemory.get(offset) != 0;
     }
-    void setRecentlyAttacked(boolean value) {      sharedMemory.put(myOffset + 328, (byte) (value ? 1 : 0));
+    void setRecentlyAttacked(boolean value) {
+      sharedMemory.put(myOffset + 328, (byte) (value ? 1 : 0));
     }
     int getReplayID() {
       int offset = myOffset + 332;

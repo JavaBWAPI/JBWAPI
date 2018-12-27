@@ -223,15 +223,15 @@ public class DumpToClient {
                 out.printf("      sharedMemory.putInt(%s, value.id);\n", offsetString);
                 break;
               case UNSIGNED_SHORT:
-                out.print("short value) {");
+                out.println("short value) {");
                 out.printf("      sharedMemory.putShort(%s, value);\n", offsetString);
                 break;
               case DOUBLE:
-                out.print("double value) {");
+                out.println("double value) {");
                 out.printf("      sharedMemory.putDouble(%s, value);\n", offsetString);
                 break;
               case BOOLEAN:
-                out.print("boolean value) {");
+                out.println("boolean value) {");
                 out.printf("      sharedMemory.put(%s, (byte) (value ? 1 : 0));\n", offsetString);
                 break;
               case CHAR:
