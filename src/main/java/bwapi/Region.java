@@ -23,7 +23,7 @@ public class Region {
     private Region closestAccessibleRegion;
     private Region closestInaccessibleRegion;
 
-    Region(final ClientData.RegionData regionData, final Game game) {
+    Region(final RegionData regionData, final Game game) {
         this.regionData = regionData;
         this.game = game;
         this.id = regionData.getId();

@@ -19,7 +19,7 @@ public class Player {
     private final Force force;
     private final TilePosition startLocation;
 
-    Player(final ClientData.PlayerData playerData, int id, final Game game) {
+    Player(final PlayerData playerData, int id, final Game game) {
         this.playerData = playerData;
         this.game = game;
         this.id = id;

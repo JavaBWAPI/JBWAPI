@@ -6,7 +6,7 @@ public class Bullet {
     private final BulletData bulletData;
     private final Game game;
 
-    Bullet(final ClientData.BulletData bulletData, final Game game) {
+    Bullet(final BulletData bulletData, final Game game) {
         this.bulletData = bulletData;
         this.game = game;
     }

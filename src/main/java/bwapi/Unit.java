@@ -40,7 +40,7 @@ public class Unit {
     private UnitCommand lastCommand;
 
 
-    Unit(final ClientData.UnitData unitData, int id, final Game game) {
+    Unit(final UnitData unitData, int id, final Game game) {
         this.unitData = unitData;
         this.game = game;
 

@@ -47,7 +47,6 @@ class Client {
 
     private static final int maxNumGames = 8;
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
-    private ByteBuffer sharedMemory;
     private LittleEndianPipe pipe;
     private ClientData.GameData data;
 
@@ -76,7 +75,9 @@ class Client {
 
     private void connect(final int procID) throws Exception {
         pipe = new LittleEndianPipe("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
-        sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE, 0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
+        ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
+            0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
         sharedMemory.order(ByteOrder.LITTLE_ENDIAN);
         int code = 1;
         while (code != 2) {
