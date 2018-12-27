@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Variable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -145,7 +144,9 @@ public class DumpToClient {
           List<String> params = new ArrayList<>();
           String offsetString;
           int arrayIndices = v.arraySizes.size();
-          if (v.type == Type.CHAR) arrayIndices--;
+          if (v.type == Type.CHAR) {
+            arrayIndices--;
+          }
           if (arrayIndices > 0) {
             List<String> index = new ArrayList<>();
             int offset = 1;
@@ -237,7 +238,8 @@ public class DumpToClient {
               case CHAR:
                 out.println("String value) {");
                 int maxLength = v.arraySizes.get(v.arraySizes.size() - 1);
-                out.printf("      Buffers.fromString(sharedMemory, %s, %d, value);\n", offsetString, maxLength);
+                out.printf("      Buffers.fromString(sharedMemory, %s, %d, value);\n", offsetString,
+                    maxLength);
                 break;
             }
             out.println("    }");
