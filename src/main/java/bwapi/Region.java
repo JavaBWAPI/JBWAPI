@@ -1,11 +1,12 @@
 package bwapi;
 
 
+import bwapi.ClientData.RegionData;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Region {
-    private final Client.GameData.RegionData regionData;
+    private final RegionData regionData;
     private final Game game;
 
     private final Set<Region> neighbours = new HashSet<>();
@@ -22,27 +23,27 @@ public class Region {
     private Region closestAccessibleRegion;
     private Region closestInaccessibleRegion;
 
-    Region(final Client.GameData.RegionData regionData, final Game game) {
+    Region(final ClientData.RegionData regionData, final Game game) {
         this.regionData = regionData;
         this.game = game;
-        this.id = regionData.id();
+        this.id = regionData.getId();
         this.regionGroupID = regionData.islandID();
-        this.center = new Position(regionData.centerX(), regionData.centerY());
+        this.center = new Position(regionData.getCenter_x(), regionData.getCenter_y());
         this.higherGround = regionData.isHigherGround();
-        this.defensePriority = regionData.priority();
+        this.defensePriority = regionData.getPriority();
         this.accessible = regionData.isAccessible();
-        this.boundsLeft = regionData.leftMost();
-        this.boundsTop = regionData.topMost();
-        this.boundsRight = regionData.rightMost();
-        this.boundsBottom = regionData.bottomMost();
+        this.boundsLeft = regionData.getLeftMost();
+        this.boundsTop = regionData.getTopMost();
+        this.boundsRight = regionData.getRightMost();
+        this.boundsBottom = regionData.getBottomMost();
     }
 
     void updateNeighbours() {
         int accessibleBestDist = Integer.MAX_VALUE;
         int inaccessibleBestDist = Integer.MAX_VALUE;
 
-        for (int i = 0; i < regionData.neighborCount(); i++) {
-            final Region region = game.getRegion(regionData.neighbor(i));
+        for (int i = 0; i < regionData.getNeighborCount(); i++) {
+            final Region region = game.getRegion(regionData.getNeighbors(i));
             neighbours.add(region);
             final int d = getDistance(region);
             if (region.isAccessible()) {

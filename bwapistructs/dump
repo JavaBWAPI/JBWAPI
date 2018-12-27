@@ -1,0 +1,1059 @@
+
+*** Dumping AST Record Layout
+         0 | struct stat
+         0 |   _dev_t st_dev
+         4 |   _ino_t st_ino
+         6 |   unsigned short st_mode
+         8 |   short st_nlink
+        10 |   short st_uid
+        12 |   short st_gid
+        16 |   _dev_t st_rdev
+        20 |   _off_t st_size
+        24 |   time_t st_atime
+        32 |   time_t st_mtime
+        40 |   time_t st_ctime
+           | [sizeof=48, align=8,
+           |  nvsize=48, nvalign=8]
+
+*** Dumping AST Record Layout
+         0 | struct _stat64i32
+         0 |   _dev_t st_dev
+         4 |   _ino_t st_ino
+         6 |   unsigned short st_mode
+         8 |   short st_nlink
+        10 |   short st_uid
+        12 |   short st_gid
+        16 |   _dev_t st_rdev
+        20 |   _off_t st_size
+        24 |   __time64_t st_atime
+        32 |   __time64_t st_mtime
+        40 |   __time64_t st_ctime
+           | [sizeof=48, align=8,
+           |  nvsize=48, nvalign=8]
+
+*** Dumping AST Record Layout
+         0 | struct std::piecewise_construct_t (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Distance_unknown (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::allocator_arg_t (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ignore (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | class std::tuple<> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<1> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<2> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<3> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<4> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<5> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<6> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<7> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<8> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<9> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<10> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<11> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<12> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<13> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<14> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<15> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<16> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<17> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<18> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<19> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Ph<20> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Container_base0 (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | union std::_String_val<struct std::_Simple_types<char> >::_Bxty
+         0 |   std::_String_val<struct std::_Simple_types<char> >::value_type [16] _Buf
+         0 |   std::_String_val<struct std::_Simple_types<char> >::pointer _Ptr
+         0 |   char [16] _Alias
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_String_val<struct std::_Simple_types<char> >
+         0 |   struct std::_Container_base0 (base) (empty)
+         0 |   union std::_String_val<struct std::_Simple_types<char> >::_Bxty _Bx
+         0 |     std::_String_val<struct std::_Simple_types<char> >::value_type [16] _Buf
+         0 |     std::_String_val<struct std::_Simple_types<char> >::pointer _Ptr
+         0 |     char [16] _Alias
+        16 |   std::_String_val<struct std::_Simple_types<char> >::size_type _Mysize
+        20 |   std::_String_val<struct std::_Simple_types<char> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_Facet_base
+         0 |   (_Facet_base vftable pointer)
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct std::_Crt_new_delete (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | class std::locale::facet
+         0 |   class std::_Facet_base (primary base)
+         0 |     (_Facet_base vftable pointer)
+         4 |   struct std::_Crt_new_delete (base) (empty)
+         4 |   std::_Atomic_counter_t _Myrefs
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::codecvt_base
+         0 |   class std::locale::facet (primary base)
+         0 |     class std::_Facet_base (primary base)
+         0 |       (_Facet_base vftable pointer)
+         4 |     struct std::_Crt_new_delete (base) (empty)
+         4 |     std::_Atomic_counter_t _Myrefs
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::codecvt<char16_t, char, _Mbstatet>
+         0 |   class std::codecvt_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   unsigned long _Maxcode
+        12 |   enum std::_Codecvt_mode _Mode
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::codecvt<char32_t, char, _Mbstatet>
+         0 |   class std::codecvt_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   unsigned long _Maxcode
+        12 |   enum std::_Codecvt_mode _Mode
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct _Cvtvec
+         0 |   unsigned int _Page
+         4 |   unsigned int _Mbcurmax
+         8 |   int _Isclocale
+        12 |   unsigned char [32] _Isleadbyte
+           | [sizeof=44, align=4,
+           |  nvsize=44, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::codecvt<wchar_t, char, _Mbstatet>
+         0 |   class std::codecvt_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   struct _Cvtvec _Cvt
+         8 |     unsigned int _Page
+        12 |     unsigned int _Mbcurmax
+        16 |     int _Isclocale
+        20 |     unsigned char [32] _Isleadbyte
+           | [sizeof=52, align=4,
+           |  nvsize=52, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::codecvt<unsigned short, char, _Mbstatet>
+         0 |   class std::codecvt_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   struct _Cvtvec _Cvt
+         8 |     unsigned int _Page
+        12 |     unsigned int _Mbcurmax
+        16 |     int _Isclocale
+        20 |     unsigned char [32] _Isleadbyte
+           | [sizeof=52, align=4,
+           |  nvsize=52, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct std::ctype_base
+         0 |   class std::locale::facet (primary base)
+         0 |     class std::_Facet_base (primary base)
+         0 |       (_Facet_base vftable pointer)
+         4 |     struct std::_Crt_new_delete (base) (empty)
+         4 |     std::_Atomic_counter_t _Myrefs
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct _Ctypevec
+         0 |   unsigned int _Page
+         4 |   const short * _Table
+         8 |   int _Delfl
+        12 |   wchar_t * _LocaleName
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::ctype<char>
+         0 |   struct std::ctype_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   struct _Ctypevec _Ctype
+         8 |     unsigned int _Page
+        12 |     const short * _Table
+        16 |     int _Delfl
+        20 |     wchar_t * _LocaleName
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::ctype<wchar_t>
+         0 |   struct std::ctype_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   struct _Ctypevec _Ctype
+         8 |     unsigned int _Page
+        12 |     const short * _Table
+        16 |     int _Delfl
+        20 |     wchar_t * _LocaleName
+        24 |   struct _Cvtvec _Cvt
+        24 |     unsigned int _Page
+        28 |     unsigned int _Mbcurmax
+        32 |     int _Isclocale
+        36 |     unsigned char [32] _Isleadbyte
+           | [sizeof=68, align=4,
+           |  nvsize=68, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::ctype<unsigned short>
+         0 |   struct std::ctype_base (primary base)
+         0 |     class std::locale::facet (primary base)
+         0 |       class std::_Facet_base (primary base)
+         0 |         (_Facet_base vftable pointer)
+         4 |       struct std::_Crt_new_delete (base) (empty)
+         4 |       std::_Atomic_counter_t _Myrefs
+         8 |   struct _Ctypevec _Ctype
+         8 |     unsigned int _Page
+        12 |     const short * _Table
+        16 |     int _Delfl
+        20 |     wchar_t * _LocaleName
+        24 |   struct _Cvtvec _Cvt
+        24 |     unsigned int _Page
+        28 |     unsigned int _Mbcurmax
+        32 |     int _Isclocale
+        36 |     unsigned char [32] _Isleadbyte
+           | [sizeof=68, align=4,
+           |  nvsize=68, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct std::once_flag
+         0 |   void * _Opaque
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct std::ios_base::_Fnarray
+         0 |   struct std::_Crt_new_delete (base) (empty)
+         0 |   struct std::ios_base::_Fnarray * _Next
+         4 |   int _Index
+         8 |   std::ios_base::event_callback _Pfn
+           | [sizeof=12, align=4,
+           |  nvsize=12, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_Locbase<int> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | class std::locale
+         0 |   class std::_Locbase<int> (base) (empty)
+         1 |   struct std::_Crt_new_delete (base) (empty)
+         4 |   class std::locale::_Locimp * _Ptr
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct std::ios_base::_Iosarray
+         0 |   struct std::_Crt_new_delete (base) (empty)
+         0 |   struct std::ios_base::_Iosarray * _Next
+         4 |   int _Index
+         8 |   long _Lo
+        12 |   void * _Vp
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Point<int, 1>
+         0 |   int x
+         4 |   int y
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Point<int, 8>
+         0 |   int x
+         4 |   int y
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Point<int, 32>
+         0 |   int x
+         4 |   int y
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | union std::_String_val<struct std::_Simple_types<wchar_t> >::_Bxty
+         0 |   std::_String_val<struct std::_Simple_types<wchar_t> >::value_type [8] _Buf
+         0 |   std::_String_val<struct std::_Simple_types<wchar_t> >::pointer _Ptr
+         0 |   char [8] _Alias
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_String_val<struct std::_Simple_types<wchar_t> >
+         0 |   struct std::_Container_base0 (base) (empty)
+         0 |   union std::_String_val<struct std::_Simple_types<wchar_t> >::_Bxty _Bx
+         0 |     std::_String_val<struct std::_Simple_types<wchar_t> >::value_type [8] _Buf
+         0 |     std::_String_val<struct std::_Simple_types<wchar_t> >::pointer _Ptr
+         0 |     char [8] _Alias
+        16 |   std::_String_val<struct std::_Simple_types<wchar_t> >::size_type _Mysize
+        20 |   std::_String_val<struct std::_Simple_types<wchar_t> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | union std::_String_val<struct std::_Simple_types<char16_t> >::_Bxty
+         0 |   std::_String_val<struct std::_Simple_types<char16_t> >::value_type [8] _Buf
+         0 |   std::_String_val<struct std::_Simple_types<char16_t> >::pointer _Ptr
+         0 |   char [8] _Alias
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_String_val<struct std::_Simple_types<char16_t> >
+         0 |   struct std::_Container_base0 (base) (empty)
+         0 |   union std::_String_val<struct std::_Simple_types<char16_t> >::_Bxty _Bx
+         0 |     std::_String_val<struct std::_Simple_types<char16_t> >::value_type [8] _Buf
+         0 |     std::_String_val<struct std::_Simple_types<char16_t> >::pointer _Ptr
+         0 |     char [8] _Alias
+        16 |   std::_String_val<struct std::_Simple_types<char16_t> >::size_type _Mysize
+        20 |   std::_String_val<struct std::_Simple_types<char16_t> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | union std::_String_val<struct std::_Simple_types<char32_t> >::_Bxty
+         0 |   std::_String_val<struct std::_Simple_types<char32_t> >::value_type [4] _Buf
+         0 |   std::_String_val<struct std::_Simple_types<char32_t> >::pointer _Ptr
+         0 |   char [4] _Alias
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_String_val<struct std::_Simple_types<char32_t> >
+         0 |   struct std::_Container_base0 (base) (empty)
+         0 |   union std::_String_val<struct std::_Simple_types<char32_t> >::_Bxty _Bx
+         0 |     std::_String_val<struct std::_Simple_types<char32_t> >::value_type [4] _Buf
+         0 |     std::_String_val<struct std::_Simple_types<char32_t> >::pointer _Ptr
+         0 |     char [4] _Alias
+        16 |   std::_String_val<struct std::_Simple_types<char32_t> >::size_type _Mysize
+        20 |   std::_String_val<struct std::_Simple_types<char32_t> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::allocator<char> (empty)
+           | [sizeof=1, align=1,
+           |  nvsize=0, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | class std::_Compressed_pair<class std::allocator<char>, class std::_String_val<struct std::_Simple_types<char> >, true>
+         0 |   class std::allocator<char> (base) (empty)
+         0 |   class std::_String_val<struct std::_Simple_types<char> > _Myval2
+         0 |     struct std::_Container_base0 (base) (empty)
+         0 |     union std::_String_val<struct std::_Simple_types<char> >::_Bxty _Bx
+         0 |       std::_String_val<struct std::_Simple_types<char> >::value_type [16] _Buf
+         0 |       std::_String_val<struct std::_Simple_types<char> >::pointer _Ptr
+         0 |       char [16] _Alias
+        16 |     std::_String_val<struct std::_Simple_types<char> >::size_type _Mysize
+        20 |     std::_String_val<struct std::_Simple_types<char> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::_String_alloc<struct std::_String_base_types<char, class std::allocator<char> > >
+         0 |   class std::_Compressed_pair<class std::allocator<char>, class std::_String_val<struct std::_Simple_types<char> >, true> _Mypair
+         0 |     class std::allocator<char> (base) (empty)
+         0 |     class std::_String_val<struct std::_Simple_types<char> > _Myval2
+         0 |       struct std::_Container_base0 (base) (empty)
+         0 |       union std::_String_val<struct std::_Simple_types<char> >::_Bxty _Bx
+         0 |         std::_String_val<struct std::_Simple_types<char> >::value_type [16] _Buf
+         0 |         std::_String_val<struct std::_Simple_types<char> >::pointer _Ptr
+         0 |         char [16] _Alias
+        16 |       std::_String_val<struct std::_Simple_types<char> >::size_type _Mysize
+        20 |       std::_String_val<struct std::_Simple_types<char> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class std::basic_string<char, struct std::char_traits<char>, class std::allocator<char> >
+         0 |   class std::_String_alloc<struct std::_String_base_types<char, class std::allocator<char> > > (base)
+         0 |     class std::_Compressed_pair<class std::allocator<char>, class std::_String_val<struct std::_Simple_types<char> >, true> _Mypair
+         0 |       class std::allocator<char> (base) (empty)
+         0 |       class std::_String_val<struct std::_Simple_types<char> > _Myval2
+         0 |         struct std::_Container_base0 (base) (empty)
+         0 |         union std::_String_val<struct std::_Simple_types<char> >::_Bxty _Bx
+         0 |           std::_String_val<struct std::_Simple_types<char> >::value_type [16] _Buf
+         0 |           std::_String_val<struct std::_Simple_types<char> >::pointer _Ptr
+         0 |           char [16] _Alias
+        16 |         std::_String_val<struct std::_Simple_types<char> >::size_type _Mysize
+        20 |         std::_String_val<struct std::_Simple_types<char> >::size_type _Myres
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::UnitType, 233>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::UnitType
+         0 |   class BWAPI::Type<class BWAPI::UnitType, 233> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::UnitSizeType, 5>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::UnitSizeType
+         0 |   class BWAPI::Type<class BWAPI::UnitSizeType, 5> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::UpgradeType, 62>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::UpgradeType
+         0 |   class BWAPI::Type<class BWAPI::UpgradeType, 62> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::WeaponType, 131>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::WeaponType
+         0 |   class BWAPI::Type<class BWAPI::WeaponType, 131> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::Order, 190>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Order
+         0 |   class BWAPI::Type<class BWAPI::Order, 190> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::Race, 8>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Race
+         0 |   class BWAPI::Type<class BWAPI::Race, 8> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::BulletType, 210>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::BulletType
+         0 |   class BWAPI::Type<class BWAPI::BulletType, 210> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::Color, 255>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Color
+         0 |   class BWAPI::Type<class BWAPI::Color, 255> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::DamageType, 6>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::DamageType
+         0 |   class BWAPI::Type<class BWAPI::DamageType, 6> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::Error, 27>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Error
+         0 |   class BWAPI::Type<class BWAPI::Error, 27> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::ExplosionType, 25>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::ExplosionType
+         0 |   class BWAPI::Type<class BWAPI::ExplosionType, 25> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::GameType, 33>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::GameType
+         0 |   class BWAPI::Type<class BWAPI::GameType, 33> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::PlayerType, 12>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::PlayerType
+         0 |   class BWAPI::Type<class BWAPI::PlayerType, 12> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::TechType, 46>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::TechType
+         0 |   class BWAPI::Type<class BWAPI::TechType, 46> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::Type<class BWAPI::UnitCommandType, 45>
+         0 |   int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | class BWAPI::UnitCommandType
+         0 |   class BWAPI::Type<class BWAPI::UnitCommandType, 45> (base)
+         0 |     int tid
+           | [sizeof=4, align=4,
+           |  nvsize=4, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::ForceData
+         0 |   char [32] name
+           | [sizeof=32, align=1,
+           |  nvsize=32, nvalign=1]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::PlayerData
+         0 |   char [25] name
+        28 |   int race
+        32 |   int type
+        36 |   int force
+        40 |   _Bool [12] isAlly
+        52 |   _Bool [12] isEnemy
+        64 |   _Bool isNeutral
+        68 |   int startLocationX
+        72 |   int startLocationY
+        76 |   _Bool isVictorious
+        77 |   _Bool isDefeated
+        78 |   _Bool leftGame
+        79 |   _Bool isParticipating
+        80 |   int minerals
+        84 |   int gas
+        88 |   int gatheredMinerals
+        92 |   int gatheredGas
+        96 |   int repairedMinerals
+       100 |   int repairedGas
+       104 |   int refundedMinerals
+       108 |   int refundedGas
+       112 |   int [3] supplyTotal
+       124 |   int [3] supplyUsed
+       136 |   int [234] allUnitCount
+      1072 |   int [234] visibleUnitCount
+      2008 |   int [234] completedUnitCount
+      2944 |   int [234] deadUnitCount
+      3880 |   int [234] killedUnitCount
+      4816 |   int [63] upgradeLevel
+      5068 |   _Bool [47] hasResearched
+      5115 |   _Bool [47] isResearching
+      5162 |   _Bool [63] isUpgrading
+      5228 |   int color
+      5232 |   int totalUnitScore
+      5236 |   int totalKillScore
+      5240 |   int totalBuildingScore
+      5244 |   int totalRazingScore
+      5248 |   int customScore
+      5252 |   int [63] maxUpgradeLevel
+      5504 |   _Bool [47] isResearchAvailable
+      5551 |   _Bool [234] isUnitAvailable
+           | [sizeof=5788, align=4,
+           |  nvsize=5788, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::UnitData
+         0 |   int clearanceLevel
+         4 |   int id
+         8 |   int player
+        12 |   int type
+        16 |   int positionX
+        20 |   int positionY
+        24 |   double angle
+        32 |   double velocityX
+        40 |   double velocityY
+        48 |   int hitPoints
+        52 |   int lastHitPoints
+        56 |   int shields
+        60 |   int energy
+        64 |   int resources
+        68 |   int resourceGroup
+        72 |   int killCount
+        76 |   int acidSporeCount
+        80 |   int scarabCount
+        84 |   int interceptorCount
+        88 |   int spiderMineCount
+        92 |   int groundWeaponCooldown
+        96 |   int airWeaponCooldown
+       100 |   int spellCooldown
+       104 |   int defenseMatrixPoints
+       108 |   int defenseMatrixTimer
+       112 |   int ensnareTimer
+       116 |   int irradiateTimer
+       120 |   int lockdownTimer
+       124 |   int maelstromTimer
+       128 |   int orderTimer
+       132 |   int plagueTimer
+       136 |   int removeTimer
+       140 |   int stasisTimer
+       144 |   int stimTimer
+       148 |   int buildType
+       152 |   int trainingQueueCount
+       156 |   int [5] trainingQueue
+       176 |   int tech
+       180 |   int upgrade
+       184 |   int remainingBuildTime
+       188 |   int remainingTrainTime
+       192 |   int remainingResearchTime
+       196 |   int remainingUpgradeTime
+       200 |   int buildUnit
+       204 |   int target
+       208 |   int targetPositionX
+       212 |   int targetPositionY
+       216 |   int order
+       220 |   int orderTarget
+       224 |   int orderTargetPositionX
+       228 |   int orderTargetPositionY
+       232 |   int secondaryOrder
+       236 |   int rallyPositionX
+       240 |   int rallyPositionY
+       244 |   int rallyUnit
+       248 |   int addon
+       252 |   int nydusExit
+       256 |   int powerUp
+       260 |   int transport
+       264 |   int carrier
+       268 |   int hatchery
+       272 |   _Bool exists
+       273 |   _Bool hasNuke
+       274 |   _Bool isAccelerating
+       275 |   _Bool isAttacking
+       276 |   _Bool isAttackFrame
+       277 |   _Bool isBeingGathered
+       278 |   _Bool isBlind
+       279 |   _Bool isBraking
+       280 |   _Bool isBurrowed
+       284 |   int carryResourceType
+       288 |   _Bool isCloaked
+       289 |   _Bool isCompleted
+       290 |   _Bool isConstructing
+       291 |   _Bool isDetected
+       292 |   _Bool isGathering
+       293 |   _Bool isHallucination
+       294 |   _Bool isIdle
+       295 |   _Bool isInterruptible
+       296 |   _Bool isInvincible
+       297 |   _Bool isLifted
+       298 |   _Bool isMorphing
+       299 |   _Bool isMoving
+       300 |   _Bool isParasited
+       301 |   _Bool isSelected
+       302 |   _Bool isStartingAttack
+       303 |   _Bool isStuck
+       304 |   _Bool isTraining
+       305 |   _Bool isUnderStorm
+       306 |   _Bool isUnderDarkSwarm
+       307 |   _Bool isUnderDWeb
+       308 |   _Bool isPowered
+       309 |   _Bool [9] isVisible
+       320 |   int buttonset
+       324 |   int lastAttackerPlayer
+       328 |   _Bool recentlyAttacked
+       332 |   int replayID
+           | [sizeof=336, align=8,
+           |  nvsize=336, nvalign=8]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::BulletData
+         0 |   int id
+         4 |   int player
+         8 |   int type
+        12 |   int source
+        16 |   int positionX
+        20 |   int positionY
+        24 |   double angle
+        32 |   double velocityX
+        40 |   double velocityY
+        48 |   int target
+        52 |   int targetPositionX
+        56 |   int targetPositionY
+        60 |   int removeTimer
+        64 |   _Bool exists
+        65 |   _Bool [9] isVisible
+           | [sizeof=80, align=8,
+           |  nvsize=80, nvalign=8]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPIC::Position
+         0 |   int x
+         4 |   int y
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::RegionData
+         0 |   int id
+         4 |   int islandID
+         8 |   int center_x
+        12 |   int center_y
+        16 |   int priority
+        20 |   int leftMost
+        24 |   int rightMost
+        28 |   int topMost
+        32 |   int bottomMost
+        36 |   int neighborCount
+        40 |   int [256] neighbors
+      1064 |   _Bool isAccessible
+      1065 |   _Bool isHigherGround
+           | [sizeof=1068, align=4,
+           |  nvsize=1068, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPIC::Event
+         0 |   BWAPI::EventType::Enum type
+         4 |   int v1
+         8 |   int v2
+           | [sizeof=12, align=4,
+           |  nvsize=12, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPIC::Shape
+         0 |   ShapeType::Enum type
+         4 |   BWAPI::CoordinateType::Enum ctype
+         8 |   int x1
+        12 |   int y1
+        16 |   int x2
+        20 |   int y2
+        24 |   int extra1
+        28 |   int extra2
+        32 |   int color
+        36 |   _Bool isSolid
+           | [sizeof=40, align=4,
+           |  nvsize=40, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPIC::Command
+         0 |   CommandType::Enum type
+         4 |   int value1
+         8 |   int value2
+           | [sizeof=12, align=4,
+           |  nvsize=12, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPIC::UnitCommand
+         0 |   class BWAPI::UnitCommandType type
+         0 |     class BWAPI::Type<class BWAPI::UnitCommandType, 45> (base)
+         0 |       int tid
+         4 |   int unitIndex
+         8 |   int targetIndex
+        12 |   int x
+        16 |   int y
+        20 |   int extra
+           | [sizeof=24, align=4,
+           |  nvsize=24, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::unitFinder
+         0 |   int unitIndex
+         4 |   int searchValue
+           | [sizeof=8, align=4,
+           |  nvsize=8, nvalign=4]
+
+*** Dumping AST Record Layout
+         0 | struct BWAPI::GameData
+         0 |   int client_version
+         4 |   int revision
+         8 |   _Bool isDebug
+        12 |   int instanceID
+        16 |   int botAPM_noselects
+        20 |   int botAPM_selects
+        24 |   int forceCount
+        28 |   struct BWAPI::ForceData [5] forces
+       188 |   int playerCount
+       192 |   struct BWAPI::PlayerData [12] players
+     69648 |   int initialUnitCount
+     69656 |   struct BWAPI::UnitData [10000] units
+   3429656 |   int [1700] unitArray
+   3436456 |   struct BWAPI::BulletData [100] bullets
+   3444456 |   int nukeDotCount
+   3444460 |   BWAPIC::Position [200] nukeDots
+   3446060 |   int gameType
+   3446064 |   int latency
+   3446068 |   int latencyFrames
+   3446072 |   int latencyTime
+   3446076 |   int remainingLatencyFrames
+   3446080 |   int remainingLatencyTime
+   3446084 |   _Bool hasLatCom
+   3446085 |   _Bool hasGUI
+   3446088 |   int replayFrameCount
+   3446092 |   unsigned int randomSeed
+   3446096 |   int frameCount
+   3446100 |   int elapsedTime
+   3446104 |   int countdownTimer
+   3446108 |   int fps
+   3446112 |   double averageFPS
+   3446120 |   int mouseX
+   3446124 |   int mouseY
+   3446128 |   _Bool [3] mouseState
+   3446131 |   _Bool [255] keyState
+   3446388 |   int screenX
+   3446392 |   int screenY
+   3446396 |   _Bool [2] flags
+   3446400 |   int mapWidth
+   3446404 |   int mapHeight
+   3446408 |   char [261] mapFileName
+   3446669 |   char [261] mapPathName
+   3446930 |   char [33] mapName
+   3446963 |   char [41] mapHash
+   3447004 |   int [256][256] getGroundHeight
+   3709148 |   _Bool [1024][1024] isWalkable
+   4757724 |   _Bool [256][256] isBuildable
+   4823260 |   _Bool [256][256] isVisible
+   4888796 |   _Bool [256][256] isExplored
+   4954332 |   _Bool [256][256] hasCreep
+   5019868 |   _Bool [256][256] isOccupied
+   5085404 |   unsigned short [256][256] mapTileRegionId
+   5216476 |   unsigned short [5000] mapSplitTilesMiniTileMask
+   5226476 |   unsigned short [5000] mapSplitTilesRegion1
+   5236476 |   unsigned short [5000] mapSplitTilesRegion2
+   5246476 |   int regionCount
+   5246480 |   struct BWAPI::RegionData [5000] regions
+  10586480 |   int startLocationCount
+  10586484 |   BWAPIC::Position [8] startLocations
+  10586548 |   _Bool isInGame
+  10586549 |   _Bool isMultiplayer
+  10586550 |   _Bool isBattleNet
+  10586551 |   _Bool isPaused
+  10586552 |   _Bool isReplay
+  10586556 |   int selectedUnitCount
+  10586560 |   int [12] selectedUnits
+  10586608 |   int self
+  10586612 |   int enemy
+  10586616 |   int neutral
+  10586620 |   int eventCount
+  10586624 |   BWAPIC::Event [10000] events
+  10706624 |   int eventStringCount
+  10706628 |   char [1000][256] eventStrings
+  10962628 |   int stringCount
+  10962632 |   char [20000][1024] strings
+  31442632 |   int shapeCount
+  31442636 |   BWAPIC::Shape [20000] shapes
+  32242636 |   int commandCount
+  32242640 |   BWAPIC::Command [20000] commands
+  32482640 |   int unitCommandCount
+  32482644 |   BWAPIC::UnitCommand [20000] unitCommands
+  32962644 |   int unitSearchSize
+  32962648 |   struct BWAPI::unitFinder [3400] xUnitSearch
+  32989848 |   struct BWAPI::unitFinder [3400] yUnitSearch
+           | [sizeof=33017048, align=8,
+           |  nvsize=33017048, nvalign=8]

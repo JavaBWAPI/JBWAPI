@@ -1,60 +1,62 @@
 package bwapi;
 
+import bwapi.ClientData.BulletData;
+
 public class Bullet {
-    private final Client.GameData.BulletData bulletData;
+    private final BulletData bulletData;
     private final Game game;
 
-    Bullet(final Client.GameData.BulletData bulletData, final Game game) {
+    Bullet(final ClientData.BulletData bulletData, final Game game) {
         this.bulletData = bulletData;
         this.game = game;
     }
 
     public int getID() {
-        return bulletData.id();
+        return bulletData.getId();
     }
 
     public boolean exists() {
-        return bulletData.exists();
+        return bulletData.getExists();
     }
 
     public Player getPlayer() {
-        return game.getPlayer(bulletData.player());
+        return game.getPlayer(bulletData.getPlayer());
     }
 
     public BulletType getType() {
-        return BulletType.bulletTypes[bulletData.type()];
+        return BulletType.bulletTypes[bulletData.getType()];
     }
 
     public Unit getSource() {
-        return game.getUnit(bulletData.source());
+        return game.getUnit(bulletData.getSource());
     }
 
     public Position getPosition() {
-        return new Position(bulletData.positionX(), bulletData.positionY());
+        return new Position(bulletData.getPositionX(), bulletData.getPositionY());
     }
 
     public double getAngle() {
-        return bulletData.angle();
+        return bulletData.getAngle();
     }
 
     public double getVelocityX() {
-        return bulletData.velocityX();
+        return bulletData.getVelocityX();
     }
 
     public double getVelocityY() {
-        return bulletData.velocityY();
+        return bulletData.getVelocityY();
     }
 
     public Unit getTarget() {
-        return game.getUnit(bulletData.target());
+        return game.getUnit(bulletData.getTarget());
     }
 
     public Position getTargetPosition() {
-        return new Position(bulletData.targetPositionX(), bulletData.targetPositionY());
+        return new Position(bulletData.getTargetPositionX(), bulletData.getTargetPositionY());
     }
 
     public int getRemoveTimer() {
-        return bulletData.removeTimer();
+        return bulletData.getRemoveTimer();
     }
 
     public boolean isVisible() {

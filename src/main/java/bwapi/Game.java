@@ -1,5 +1,9 @@
 package bwapi;
 
+import bwapi.ClientData.Command;
+import bwapi.ClientData.GameData;
+import bwapi.ClientData.Shape;
+import bwapi.ClientData.UnitData;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,7 +43,8 @@ public class Game {
     private final Set<Unit> staticGeysers = new HashSet<>();
     private final Set<Unit> staticNeutralUnits = new HashSet<>();
     private final Set<Integer> visibleUnits = new HashSet<>();
-    private final Client.GameData gameData;
+    private final Client client;
+    private final GameData gameData;
     // CONSTANT
     private Player[] players;
     private Region[] regions;
@@ -79,8 +84,9 @@ public class Game {
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
 
-    public Game(final Client.GameData gameData) {
-        this.gameData = gameData;
+    public Game(Client client) {
+        this.client = client;
+        this.gameData = client.data();
     }
 
     private static boolean hasPower(final int x, final int y, final UnitType unitType, final Set<Unit> pylons) {
@@ -120,7 +126,7 @@ public class Game {
         final int forceCount = gameData.getForceCount();
         forces = new Force[forceCount];
         for (int id = 0; id < forceCount; id++) {
-            forces[id] = new Force(gameData.getForce(id), this);
+            forces[id] = new Force(gameData.getForces(id), id, this);
         }
 
         forceSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(forces)));
@@ -128,21 +134,21 @@ public class Game {
         final int playerCount = gameData.getPlayerCount();
         players = new Player[playerCount];
         for (int id = 0; id < playerCount; id++) {
-            players[id] = new Player(gameData.getPlayer(id), this);
+            players[id] = new Player(gameData.getPlayers(id), id, this);
         }
 
         playerSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(players)));
 
-        final int bulletCount = gameData.bulletCount();
+        final int bulletCount = 100;
         bullets = new Bullet[bulletCount];
         for (int id = 0; id < bulletCount; id++) {
-            bullets[id] = new Bullet(gameData.getBullet(id), this);
+            bullets[id] = new Bullet(gameData.getBullets(id), this);
         }
 
-        final int regionCount = gameData.regionCount();
+        final int regionCount = gameData.getRegionCount();
         regions = new Region[regionCount];
         for (int id = 0; id < regionCount; id++) {
-            regions[id] = new Region(gameData.getRegion(id), this);
+            regions[id] = new Region(gameData.getRegions(id), this);
         }
 
         for (final Region region : regions) {
@@ -153,12 +159,12 @@ public class Game {
 
         units = new Unit[10000];
         for (int id = 0; id < gameData.getInitialUnitCount(); id++) {
-            final Unit unit = new Unit(gameData.getUnit(id), this);
+            final Unit unit = new Unit(gameData.getUnits(id), id,this);
             //skip ghost units
             if (unit.getInitialType() == UnitType.Terran_Marine && unit.getInitialHitPoints() == 0) {
                 continue;
             }
-            units[id] = unit;
+            this.units[id] = unit;
 
             if (unit.getType().isMineralField()) {
                 staticMinerals.add(unit);
@@ -171,39 +177,39 @@ public class Game {
             }
         }
 
-        randomSeed = gameData.randomSeed();
+        randomSeed = gameData.getRandomSeed();
         revision = gameData.getRevision();
         debug = gameData.isDebug();
-        self = players[gameData.self()];
-        enemy = players[gameData.enemy()];
-        neutral = players[gameData.neutral()];
+        self = players[gameData.getSelf()];
+        enemy = players[gameData.getEnemy()];
+        neutral = players[gameData.getNeutral()];
         replay = gameData.isReplay();
         multiplayer = gameData.isMultiplayer();
         battleNet = gameData.isBattleNet();
-        startLocations = IntStream.range(0, gameData.startLocationCount())
-                .mapToObj(i -> new TilePosition(gameData.startLocationX(i), gameData.startLocationY(i)))
+        startLocations = IntStream.range(0, gameData.getStartLocationCount())
+                .mapToObj(i -> new TilePosition(gameData.getStartLocations(i)))
                 .collect(Collectors.toList());
-        mapWidth = gameData.mapWidth();
-        mapHeight = gameData.mapHeight();
-        mapFileName = gameData.mapFileName();
-        mapPathName = gameData.mapPathName();
-        mapName = gameData.mapName();
-        mapHash = gameData.mapHash();
+        mapWidth = gameData.getMapWidth();
+        mapHeight = gameData.getMapHeight();
+        mapFileName = gameData.getMapFileName();
+        mapPathName = gameData.getMapPathName();
+        mapName = gameData.getMapName();
+        mapHash = gameData.getMapHash();
 
         buildable = new boolean[mapWidth][mapHeight];
         groundHeight = new int[mapWidth][mapHeight];
         mapTileRegionID = new short[mapWidth][mapHeight];
         for (int x = 0; x < mapWidth; x++) {
             for (int y = 0; y < mapHeight; y++) {
-                buildable[x][y] = gameData.buildable(x, y);
-                groundHeight[x][y] = gameData.groundHeight(x, y);
-                mapTileRegionID[x][y] = gameData.mapTileRegionID(x, y);
+                buildable[x][y] = gameData.isBuildable(x, y);
+                groundHeight[x][y] = gameData.getGroundHeight(x, y);
+                mapTileRegionID[x][y] = gameData.getMapTileRegionId(x, y);
             }
         }
         walkable = new boolean[mapWidth * TILE_WALK_FACTOR][mapHeight * TILE_WALK_FACTOR];
         for (int i = 0; i < mapWidth * TILE_WALK_FACTOR; i++) {
             for (int j = 0; j < mapHeight * TILE_WALK_FACTOR; j++) {
-                walkable[i][j] = gameData.walkable(i, j);
+                walkable[i][j] = gameData.isWalkable(i, j);
             }
         }
 
@@ -211,9 +217,9 @@ public class Game {
         mapSplitTilesRegion1 = new short[REGION_DATA_SIZE];
         mapSplitTilesRegion2 = new short[REGION_DATA_SIZE];
         for (int i = 0; i < REGION_DATA_SIZE; i++) {
-            mapSplitTilesMiniTileMask[i] = gameData.mapSplitTilesMiniTileMask(i);
-            mapSplitTilesRegion1[i] = gameData.mapSplitTilesRegion1(i);
-            mapSplitTilesRegion2[i] = gameData.mapSplitTilesRegion2(i);
+            mapSplitTilesMiniTileMask[i] = gameData.getMapSplitTilesMiniTileMask(i);
+            mapSplitTilesRegion1[i] = gameData.getMapSplitTilesRegion1(i);
+            mapSplitTilesRegion2[i] = gameData.getMapSplitTilesRegion2(i);
         }
 
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
@@ -229,7 +235,7 @@ public class Game {
         }
 
         if (units[id] == null) {
-            final Unit u = new Unit(gameData.getUnit(id), this);
+            final Unit u = new Unit(gameData.getUnits(id), id, this);
             units[id] = u;
         }
     }
@@ -248,15 +254,34 @@ public class Game {
     }
 
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
-        gameData.addUnitCommand(new Client.UnitCommand(type, unit, target, x, y, extra));
+        ClientData.UnitCommand unitCommand = client.addUnitCommand();
+        unitCommand.setTid(type);
+        unitCommand.setUnitIndex(unit);
+        unitCommand.setTargetIndex(target);
+        unitCommand.setX(x);
+        unitCommand.setY(y);
+        unitCommand.setExtra(extra);
     }
 
-    void addCommand(final int type, final int value1, final int value2) {
-        gameData.addCommand(new Client.Command(type, value1, value2));
+    void addCommand(final CommandType type, final int value1, final int value2) {
+        Command command = client.addCommand();
+        command.setType(type);
+        command.setValue1(value1);
+        command.setValue2(value2);
     }
 
-    void addShape(final int type, final int coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
-        gameData.addShape(new Client.Shape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
+    void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
+        Shape shape = client.addShape();
+        shape.setType(type);
+        shape.setCtype(coordType);
+        shape.setX1(x1);
+        shape.setY1(y1);
+        shape.setX2(x2);
+        shape.setY2(y2);
+        shape.setExtra1(extra1);
+        shape.setExtra2(extra2);
+        shape.setColor(color);
+        shape.setIsSolid(isSolid);
     }
 
     public Set<Force> getForces() {
@@ -323,8 +348,8 @@ public class Game {
     }
 
     public Set<Position> getNukeDots() {
-        return IntStream.range(0, gameData.nukeDotCount())
-                .mapToObj(id -> new Position(gameData.getNukeDotX(id), gameData.getNukeDotY(id)))
+        return IntStream.range(0, gameData.getNukeDotCount())
+                .mapToObj(id -> new Position(gameData.getNukeDots(id)))
                 .collect(Collectors.toSet());
     }
 
@@ -348,43 +373,43 @@ public class Game {
     }
 
     public GameType getGameType() {
-        return GameType.gameTypes[gameData.gameType()];
+        return GameType.gameTypes[gameData.getGameType()];
     }
 
     public int getLatency() {
-        return gameData.latency();
+        return gameData.getLatency();
     }
 
     public int getFrameCount() {
-        return gameData.frameCount();
+        return gameData.getFrameCount();
     }
 
     public int getReplayFrameCount() {
-        return gameData.replayFrameCount();
+        return gameData.getReplayFrameCount();
     }
 
     public int getFPS() {
-        return gameData.fps();
+        return gameData.getFps();
     }
 
     public double getAverageFPS() {
-        return gameData.averageFPS();
+        return gameData.getAverageFPS();
     }
 
     public Position getMousePosition() {
-        return new Position(gameData.mouseX(), gameData.mouseY());
+        return new Position(gameData.getMouseX(), gameData.getMouseY());
     }
 
     public boolean getMouseState(final MouseButton button) {
-        return gameData.mouseState(button.value);
+        return gameData.getMouseState(button.value);
     }
 
     public boolean getKeyState(final Key key) {
-        return gameData.keyState(key.value);
+        return gameData.getKeyState(key.value);
     }
 
     public Position getScreenPosition() {
-        return new Position(gameData.screenX(), gameData.screenY());
+        return new Position(gameData.getScreenX(), gameData.getScreenY());
     }
 
     public void setScreenPosition(final Position p) {
@@ -392,11 +417,11 @@ public class Game {
     }
 
     public void setScreenPosition(final int x, final int y) {
-        addCommand(SetScreenPosition.value, x, y);
+        addCommand(SetScreenPosition, x, y);
     }
 
     public void pingMinimap(final int x, final int y) {
-        addCommand(PingMinimap.value, x, y);
+        addCommand(PingMinimap, x, y);
     }
 
     public void pingMinimap(final Position p) {
@@ -404,11 +429,11 @@ public class Game {
     }
 
     public boolean isFlagEnabled(final Flag flag) {
-        return gameData.getFlag(flag.value);
+        return gameData.getFlags(flag.value);
     }
 
     public void enableFlag(final Flag flag) {
-        addCommand(EnableFlag.value, flag.value, 1);
+        addCommand(EnableFlag, flag.value, 1);
     }
 
     public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
@@ -545,7 +570,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return buildable[position.x][position.y] && (includeBuildings ? !gameData.occupied(position.x, position.y) : true);
+        return buildable[position.x][position.y] && (includeBuildings ? !gameData.isOccupied(position.x, position.y) : true);
     }
 
     public boolean isVisible(final int tileX, final int tileY) {
@@ -556,7 +581,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return gameData.visible(position.x, position.y);
+        return gameData.isVisible(position.x, position.y);
     }
 
     public boolean isExplored(final int tileX, final int tileY) {
@@ -567,7 +592,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return gameData.explored(position.x, position.y);
+        return gameData.isExplored(position.x, position.y);
     }
 
     public boolean hasCreep(final int tileX, final int tileY) {
@@ -578,7 +603,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return gameData.hasCreep(position.x, position.y);
+        return gameData.getHasCreep(position.x, position.y);
     }
 
     public boolean hasPowerPrecise(final int x, final int y) {
@@ -987,15 +1012,15 @@ public class Game {
     }
 
     public void printf(final String cstr_format) {
-        addCommand(Printf.value, gameData.addString(cstr_format), 0);
+        addCommand(Printf, client.addString(cstr_format), 0);
     }
 
     public void sendText(final String cstr_format) {
-        addCommand(SendText.value, gameData.addString(cstr_format), 0);
+        addCommand(SendText, client.addString(cstr_format), 0);
     }
 
     public void sendTextEx(final boolean toAllies, final String cstr_format) {
-        addCommand(SendText.value, gameData.addString(cstr_format), toAllies ? 1 : 0);
+        addCommand(SendText, client.addString(cstr_format), toAllies ? 1 : 0);
     }
 
     public boolean isInGame() {
@@ -1019,23 +1044,23 @@ public class Game {
     }
 
     public void pauseGame() {
-        addCommand(PauseGame.value, 0, 0);
+        addCommand(PauseGame, 0, 0);
     }
 
     public void resumeGame() {
-        addCommand(ResumeGame.value, 0, 0);
+        addCommand(ResumeGame, 0, 0);
     }
 
     public void leaveGame() {
-        addCommand(LeaveGame.value, 0, 0);
+        addCommand(LeaveGame, 0, 0);
     }
 
     public void restartGame() {
-        addCommand(RestartGame.value, 0, 0);
+        addCommand(RestartGame, 0, 0);
     }
 
     public void setLocalSpeed(final int speed) {
-        addCommand(SetLocalSpeed.value, speed, 0);
+        addCommand(SetLocalSpeed, speed, 0);
     }
 
     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
@@ -1046,8 +1071,8 @@ public class Game {
     }
 
     public Set<Unit> getSelectedUnits() {
-        return IntStream.range(0, gameData.selectedUnitCount())
-                .mapToObj(i -> units[gameData.selectedUnit(i)])
+        return IntStream.range(0, gameData.getSelectedUnitCount())
+                .mapToObj(i -> units[gameData.getSelectedUnits(i)])
                 .collect(Collectors.toSet());
     }
 
@@ -1085,13 +1110,13 @@ public class Game {
                 .collect(Collectors.toSet());
     }
 
-    public void drawText(final Coordinate ctype, final int x, final int y, final String cstr_format) {
-        final int stringId = gameData.addString(cstr_format);
-        addShape(Shape.Text.value, ctype.value, x, y, 0, 0, stringId, textSize.value, 0, false);
+    public void drawText(final CoordinateType ctype, final int x, final int y, final String cstr_format) {
+        final int stringId = client.addString(cstr_format);
+        addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.value, 0, false);
     }
 
     public void drawTextMap(final int x, final int y, final String cstr_format) {
-        drawText(Coordinate.Map, x, y, cstr_format);
+        drawText(CoordinateType.Map, x, y, cstr_format);
     }
 
     public void drawTextMap(final Position p, final String cstr_format) {
@@ -1099,7 +1124,7 @@ public class Game {
     }
 
     public void drawTextMouse(final int x, final int y, final String cstr_format) {
-        drawText(Coordinate.Mouse, x, y, cstr_format);
+        drawText(CoordinateType.Mouse, x, y, cstr_format);
     }
 
     public void drawTextMouse(final Position p, final String cstr_format) {
@@ -1108,310 +1133,310 @@ public class Game {
     }
 
     public void drawTextScreen(final int x, final int y, final String cstr_format) {
-        drawText(Coordinate.Screen, x, y, cstr_format);
+        drawText(CoordinateType.Screen, x, y, cstr_format);
     }
 
     public void drawTextScreen(final Position p, final String cstr_format) {
         drawTextScreen(p.x, p.y, cstr_format);
     }
 
-    public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color) {
+    public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color) {
         drawBox(ctype, left, top, right, bottom, color, false);
     }
 
-    public void drawBox(final Coordinate ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
-        addShape(Shape.Box.value, ctype.value, left, top, right, bottom, 0, 0, color.id, isSolid);
+    public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
+        addShape(ShapeType.Box, ctype, left, top, right, bottom, 0, 0, color.id, isSolid);
     }
 
     public void drawBoxMap(int left, int top, int right, int bottom, Color color) {
-        drawBox(Coordinate.Map, left, top, right, bottom, color);
+        drawBox(CoordinateType.Map, left, top, right, bottom, color);
     }
 
     public void drawBoxMap(int left, int top, int right, int bottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Map, left, top, right, bottom, color, isSolid);
+        drawBox(CoordinateType.Map, left, top, right, bottom, color, isSolid);
     }
 
     public void drawBoxMap(Position leftTop, Position rightBottom, Color color) {
-        drawBox(Coordinate.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+        drawBox(CoordinateType.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
     }
 
     public void drawBoxMap(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+        drawBox(CoordinateType.Map, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
     }
 
     public void drawBoxMouse(int left, int top, int right, int bottom, Color color) {
-        drawBox(Coordinate.Mouse, left, top, right, bottom, color);
+        drawBox(CoordinateType.Mouse, left, top, right, bottom, color);
     }
 
     public void drawBoxMouse(int left, int top, int right, int bottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Mouse, left, top, right, bottom, color, isSolid);
+        drawBox(CoordinateType.Mouse, left, top, right, bottom, color, isSolid);
     }
 
     public void drawBoxMouse(Position leftTop, Position rightBottom, Color color) {
-        drawBox(Coordinate.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+        drawBox(CoordinateType.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
     }
 
     public void drawBoxMouse(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+        drawBox(CoordinateType.Mouse, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
     }
 
     public void drawBoxScreen(int left, int top, int right, int bottom, Color color) {
-        drawBox(Coordinate.Screen, left, top, right, bottom, color);
+        drawBox(CoordinateType.Screen, left, top, right, bottom, color);
     }
 
     public void drawBoxScreen(int left, int top, int right, int bottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Screen, left, top, right, bottom, color, isSolid);
+        drawBox(CoordinateType.Screen, left, top, right, bottom, color, isSolid);
     }
 
     public void drawBoxScreen(Position leftTop, Position rightBottom, Color color) {
-        drawBox(Coordinate.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
+        drawBox(CoordinateType.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color);
     }
 
     public void drawBoxScreen(Position leftTop, Position rightBottom, Color color, boolean isSolid) {
-        drawBox(Coordinate.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
+        drawBox(CoordinateType.Screen, leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, color, isSolid);
     }
 
-    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color) {
+    public void drawTriangle(CoordinateType ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color) {
         drawTriangle(ctype, ax, ay, bx, by, cx, cy, color, false);
     }
 
-    public void drawTriangle(Coordinate ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
-        addShape(Shape.Triangle.value, ctype.value, ax, ay, bx, by, cx, cy, color.id, isSolid);
+    public void drawTriangle(CoordinateType ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
+        addShape(ShapeType.Triangle, ctype, ax, ay, bx, by, cx, cy, color.id, isSolid);
     }
 
     public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
-        drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color);
+        drawTriangle(CoordinateType.Map, ax, ay, bx, by, cx, cy, color);
     }
 
     public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Map, ax, ay, bx, by, cx, cy, color, isSolid);
+        drawTriangle(CoordinateType.Map, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
     public void drawTriangleMap(Position a, Position b, Position c, Color color) {
-        drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color);
+        drawTriangle(CoordinateType.Map, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
     public void drawTriangleMap(Position a, Position b, Position c, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Map, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
+        drawTriangle(CoordinateType.Map, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
     }
 
     public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
-        drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color);
+        drawTriangle(CoordinateType.Mouse, ax, ay, bx, by, cx, cy, color);
     }
 
     public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Mouse, ax, ay, bx, by, cx, cy, color, isSolid);
+        drawTriangle(CoordinateType.Mouse, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
     public void drawTriangleMouse(Position a, Position b, Position c, Color color) {
-        drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color);
+        drawTriangle(CoordinateType.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
     public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
+        drawTriangle(CoordinateType.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
 
     }
 
     public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
-        drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color);
+        drawTriangle(CoordinateType.Screen, ax, ay, bx, by, cx, cy, color);
     }
 
     public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Screen, ax, ay, bx, by, cx, cy, color, isSolid);
+        drawTriangle(CoordinateType.Screen, ax, ay, bx, by, cx, cy, color, isSolid);
     }
 
     public void drawTriangleScreen(Position a, Position b, Position c, Color color) {
-        drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color);
+        drawTriangle(CoordinateType.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color);
     }
 
     public void drawTriangleScreen(Position a, Position b, Position c, Color color, boolean isSolid) {
-        drawTriangle(Coordinate.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
+        drawTriangle(CoordinateType.Screen, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
     }
 
-    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color) {
+    public void drawCircle(CoordinateType ctype, int x, int y, int radius, Color color) {
         drawCircle(ctype, x, y, radius, color, false);
     }
 
-    public void drawCircle(Coordinate ctype, int x, int y, int radius, Color color, boolean isSolid) {
-        addShape(Shape.Circle.value, ctype.value, x, y, 0, 0, radius, 0, color.id, isSolid);
+    public void drawCircle(CoordinateType ctype, int x, int y, int radius, Color color, boolean isSolid) {
+        addShape(ShapeType.Circle, ctype, x, y, 0, 0, radius, 0, color.id, isSolid);
     }
 
     public void drawCircleMap(int x, int y, int radius, Color color) {
-        drawCircle(Coordinate.Map, x, y, radius, color);
+        drawCircle(CoordinateType.Map, x, y, radius, color);
     }
 
     public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Map, x, y, radius, color, isSolid);
+        drawCircle(CoordinateType.Map, x, y, radius, color, isSolid);
     }
 
     public void drawCircleMap(Position p, int radius, Color color) {
-        drawCircle(Coordinate.Map, p.x, p.y, radius, color);
+        drawCircle(CoordinateType.Map, p.x, p.y, radius, color);
     }
 
     public void drawCircleMap(Position p, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Map, p.x, p.y, radius, color, isSolid);
+        drawCircle(CoordinateType.Map, p.x, p.y, radius, color, isSolid);
     }
 
     public void drawCircleMouse(int x, int y, int radius, Color color) {
-        drawCircle(Coordinate.Mouse, x, y, radius, color);
+        drawCircle(CoordinateType.Mouse, x, y, radius, color);
     }
 
     public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Mouse, x, y, radius, color, isSolid);
+        drawCircle(CoordinateType.Mouse, x, y, radius, color, isSolid);
     }
 
     public void drawCircleMouse(Position p, int radius, Color color) {
-        drawCircle(Coordinate.Mouse, p.x, p.y, radius, color);
+        drawCircle(CoordinateType.Mouse, p.x, p.y, radius, color);
     }
 
     public void drawCircleMouse(Position p, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Mouse, p.x, p.y, radius, color, isSolid);
+        drawCircle(CoordinateType.Mouse, p.x, p.y, radius, color, isSolid);
     }
 
     public void drawCircleScreen(int x, int y, int radius, Color color) {
-        drawCircle(Coordinate.Screen, x, y, radius, color);
+        drawCircle(CoordinateType.Screen, x, y, radius, color);
     }
 
     public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Screen, x, y, radius, color, isSolid);
+        drawCircle(CoordinateType.Screen, x, y, radius, color, isSolid);
     }
 
     public void drawCircleScreen(Position p, int radius, Color color) {
-        drawCircle(Coordinate.Screen, p.x, p.y, radius, color);
+        drawCircle(CoordinateType.Screen, p.x, p.y, radius, color);
     }
 
     public void drawCircleScreen(Position p, int radius, Color color, boolean isSolid) {
-        drawCircle(Coordinate.Screen, p.x, p.y, radius, color, isSolid);
+        drawCircle(CoordinateType.Screen, p.x, p.y, radius, color, isSolid);
     }
 
-    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color) {
+    public void drawEllipse(CoordinateType ctype, int x, int y, int xrad, int yrad, Color color) {
         drawEllipse(ctype, x, y, xrad, yrad, color, false);
     }
 
-    public void drawEllipse(Coordinate ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        addShape(Shape.Ellipse.value, ctype.value, x, y, 0, 0, xrad, yrad, color.id, isSolid);
+    public void drawEllipse(CoordinateType ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
+        addShape(ShapeType.Ellipse, ctype, x, y, 0, 0, xrad, yrad, color.id, isSolid);
     }
 
     public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Map, x, y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Map, x, y, xrad, yrad, color);
     }
 
     public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Map, x, y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Map, x, y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseMap(Position p, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Map, p.x, p.y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Map, p.x, p.y, xrad, yrad, color);
     }
 
     public void drawEllipseMap(Position p, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Map, p.x, p.y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Map, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color);
     }
 
     public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseMouse(Position p, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color);
     }
 
     public void drawEllipseMouse(Position p, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Screen, x, y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Screen, x, y, xrad, yrad, color);
     }
 
     public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Mouse, x, y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color) {
-        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(Coordinate.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
-    public void drawDot(Coordinate ctype, int x, int y, Color color) {
-        addShape(Shape.Dot.value, ctype.value, x, y, 0, 0, 0, 0, color.id, false);
+    public void drawDot(CoordinateType ctype, int x, int y, Color color) {
+        addShape(ShapeType.Dot, ctype, x, y, 0, 0, 0, 0, color.id, false);
     }
 
     public void drawDotMap(int x, int y, Color color) {
-        drawDot(Coordinate.Map, x, y, color);
+        drawDot(CoordinateType.Map, x, y, color);
     }
 
     public void drawDotMap(Position p, Color color) {
-        drawDot(Coordinate.Map, p.x, p.y, color);
+        drawDot(CoordinateType.Map, p.x, p.y, color);
     }
 
     public void drawDotMouse(int x, int y, Color color) {
-        drawDot(Coordinate.Mouse, x, y, color);
+        drawDot(CoordinateType.Mouse, x, y, color);
     }
 
     public void drawDotMouse(Position p, Color color) {
-        drawDot(Coordinate.Mouse, p.x, p.y, color);
+        drawDot(CoordinateType.Mouse, p.x, p.y, color);
     }
 
     public void drawDotScreen(int x, int y, Color color) {
-        drawDot(Coordinate.Screen, x, y, color);
+        drawDot(CoordinateType.Screen, x, y, color);
     }
 
     public void drawDotScreen(Position p, Color color) {
-        drawDot(Coordinate.Screen, p.x, p.y, color);
+        drawDot(CoordinateType.Screen, p.x, p.y, color);
     }
 
-    public void drawLine(Coordinate ctype, int x1, int y1, int x2, int y2, Color color) {
-        addShape(Shape.Line.value, ctype.value, x1, y1, x2, y2, 0, 0, color.id, false);
+    public void drawLine(CoordinateType ctype, int x1, int y1, int x2, int y2, Color color) {
+        addShape(ShapeType.Line, ctype, x1, y1, x2, y2, 0, 0, color.id, false);
     }
 
     public void drawLineMap(int x1, int y1, int x2, int y2, Color color) {
-        drawLine(Coordinate.Map, x1, y1, x2, y2, color);
+        drawLine(CoordinateType.Map, x1, y1, x2, y2, color);
     }
 
     public void drawLineMap(Position a, Position b, Color color) {
-        drawLine(Coordinate.Map, a.x, a.y, b.x, b.y, color);
+        drawLine(CoordinateType.Map, a.x, a.y, b.x, b.y, color);
     }
 
     public void drawLineMouse(int x1, int y1, int x2, int y2, Color color) {
-        drawLine(Coordinate.Mouse, x1, y1, x2, y2, color);
+        drawLine(CoordinateType.Mouse, x1, y1, x2, y2, color);
 
     }
 
     public void drawLineMouse(Position a, Position b, Color color) {
-        drawLine(Coordinate.Mouse, a.x, a.y, b.x, b.y, color);
+        drawLine(CoordinateType.Mouse, a.x, a.y, b.x, b.y, color);
 
     }
 
     public void drawLineScreen(int x1, int y1, int x2, int y2, Color color) {
-        drawLine(Coordinate.Screen, x1, y1, x2, y2, color);
+        drawLine(CoordinateType.Screen, x1, y1, x2, y2, color);
     }
 
     public void drawLineScreen(Position a, Position b, Color color) {
-        drawLine(Coordinate.Screen, a.x, a.y, b.x, b.y, color);
+        drawLine(CoordinateType.Screen, a.x, a.y, b.x, b.y, color);
     }
 
     public int getLatencyFrames() {
-        return gameData.latencyFrames();
+        return gameData.getLatencyFrames();
     }
 
     public int getLatencyTime() {
-        return gameData.latencyTime();
+        return gameData.getLatencyTime();
     }
 
     public int getRemainingLatencyFrames() {
-        return gameData.remainingLatencyFrames();
+        return gameData.getRemainingLatencyFrames();
     }
 
     public int getRemainingLatencyTime() {
-        return gameData.remainingLatencyTime();
+        return gameData.getRemainingLatencyTime();
     }
 
     public int getRevision() {
@@ -1423,11 +1448,11 @@ public class Game {
     }
 
     public boolean isLatComEnabled() {
-        return gameData.hasLatCom();
+        return gameData.getHasLatCom();
     }
 
     public void setLatCom(final boolean isEnabled) {
-        addCommand(SetLatCom.value, isEnabled ? 1 : 0, 0);
+        addCommand(SetLatCom, isEnabled ? 1 : 0, 0);
     }
 
     public int getInstanceNumber() {
@@ -1443,7 +1468,7 @@ public class Game {
     }
 
     public void setFrameSkip(int frameSkip) {
-        addCommand(SetFrameSkip.value, frameSkip, 0);
+        addCommand(SetFrameSkip, frameSkip, 0);
     }
 
     // If you need these please implement (see addCommand and make a PR to the github repo)
@@ -1477,15 +1502,15 @@ public class Game {
     }
 
     public int elapsedTime() {
-        return gameData.elapsedTime();
+        return gameData.getElapsedTime();
     }
 
     public void setCommandOptimizationLevel(final int level) {
-        addCommand(SetCommandOptimizerLevel.value, level, 0);
+        addCommand(SetCommandOptimizerLevel, level, 0);
     }
 
     public int countdownTimer() {
-        return gameData.countdownTimer();
+        return gameData.getCountdownTimer();
     }
 
     public Set<Region> getAllRegions() {
