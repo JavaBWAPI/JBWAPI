@@ -1,6 +1,8 @@
 package bwapi;
 
-public enum CommandType implements WithId {
+import java.util.Arrays;
+
+public enum CommandType {
     None(0),
     SetScreenPosition(1),
     PingMinimap(2),
@@ -21,28 +23,15 @@ public enum CommandType implements WithId {
     SetCommandOptimizerLevel(17),
     SetRevealAll(18);
 
-    public final int value;
+    static final CommandType[] idToEnum = new CommandType[19];
 
-    CommandType(final int value) {
-        this.value = value;
+    static {
+        Arrays.stream(CommandType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    @Override
-    public int getId() {
-        return value;
-    }
+    public final int id;
 
-    static CommandType withId(int id) {
-        if (id < 0) return null;
-        CommandType commandType = IdMapper.commandTypeForId[id];
-        if (commandType == null) {
-            throw new IllegalArgumentException("No CommandType with id " + id);
-        }
-        return commandType;
-    }
-
-    private static class IdMapper {
-
-        static final CommandType[] commandTypeForId = IdMapperHelper.toIdTypeArray(CommandType.class);
+    CommandType(final int id) {
+        this.id = id;
     }
 }

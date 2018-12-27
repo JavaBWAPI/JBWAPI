@@ -1,34 +1,22 @@
 package bwapi;
 
-public enum CoordinateType implements WithId {
+import java.util.Arrays;
+
+public enum CoordinateType {
     None(0),
     Screen(1),
     Map(2),
     Mouse(3);
 
-    public final int value;
+    static final CoordinateType[] idToEnum = new CoordinateType[4];
 
-    CoordinateType(final int value) {
-        this.value = value;
+    static {
+        Arrays.stream(CoordinateType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    @Override
-    public int getId() {
-        return value;
+    public final int id;
+
+    CoordinateType(final int id) {
+        this.id = id;
     }
-
-    static CoordinateType withId(int id) {
-        if (id < 0) return null;
-        CoordinateType coordinateType = IdMapper.coordinateTypes[id];
-        if (coordinateType == null) {
-            throw new IllegalArgumentException("No CoordinateType with id " + id);
-        }
-        return coordinateType;
-    }
-
-    private static class IdMapper {
-
-        static final CoordinateType[] coordinateTypes = IdMapperHelper.toIdTypeArray(CoordinateType.class);
-    }
-
 }

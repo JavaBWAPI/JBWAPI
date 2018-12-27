@@ -596,17 +596,17 @@ final class ClientData {
     }
     ShapeType getType() {
       int offset = myOffset + 0;
-      return ShapeType.withId(sharedMemory.getInt(offset));
+      return ShapeType.idToEnum[sharedMemory.getInt(offset)];
     }
     void setType(ShapeType value) {
-      sharedMemory.putInt(myOffset + 0, value.getId());
+      sharedMemory.putInt(myOffset + 0, value.id);
     }
     CoordinateType getCtype() {
       int offset = myOffset + 4;
-      return CoordinateType.withId(sharedMemory.getInt(offset));
+      return CoordinateType.idToEnum[sharedMemory.getInt(offset)];
     }
     void setCtype(CoordinateType value) {
-      sharedMemory.putInt(myOffset + 4, value.getId());
+      sharedMemory.putInt(myOffset + 4, value.id);
     }
     int getX1() {
       int offset = myOffset + 8;
@@ -672,10 +672,10 @@ final class ClientData {
     }
     CommandType getType() {
       int offset = myOffset + 0;
-      return CommandType.withId(sharedMemory.getInt(offset));
+      return CommandType.idToEnum[sharedMemory.getInt(offset)];
     }
     void setType(CommandType value) {
-      sharedMemory.putInt(myOffset + 0, value.getId());
+      sharedMemory.putInt(myOffset + 0, value.id);
     }
     int getValue1() {
       int offset = myOffset + 4;
@@ -721,10 +721,10 @@ final class ClientData {
     }
     EventType getType() {
       int offset = myOffset + 0;
-      return EventType.withId(sharedMemory.getInt(offset));
+      return EventType.idToEnum[sharedMemory.getInt(offset)];
     }
     void setType(EventType value) {
-      sharedMemory.putInt(myOffset + 0, value.getId());
+      sharedMemory.putInt(myOffset + 0, value.id);
     }
     int getV1() {
       int offset = myOffset + 4;

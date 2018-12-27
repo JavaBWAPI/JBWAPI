@@ -188,7 +188,7 @@ public class DumpToClient {
               out.printf("Buffers.toString(sharedMemory, offset, %d)", v.arraySizes.size());
               break;
             case ENUM:
-              out.print(v.enumName + ".withId(sharedMemory.getInt(offset))");
+              out.print(v.enumName + ".idToEnum[sharedMemory.getInt(offset)]");
               break;
             case DOUBLE:
               out.print("sharedMemory.getDouble(offset)");
@@ -220,7 +220,7 @@ public class DumpToClient {
                 break;
               case ENUM:
                 out.printf("%s value) {\n", v.enumName);
-                out.printf("      sharedMemory.putInt(%s, value.getId());\n", offsetString);
+                out.printf("      sharedMemory.putInt(%s, value.id);\n", offsetString);
                 break;
               case UNSIGNED_SHORT:
                 out.print("short value) {");

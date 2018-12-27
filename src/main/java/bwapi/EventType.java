@@ -1,6 +1,8 @@
 package bwapi;
 
-public enum EventType implements WithId {
+import java.util.Arrays;
+
+public enum EventType {
   MatchStart(0),
   MatchEnd(1),
   MatchFrame(2),
@@ -22,32 +24,16 @@ public enum EventType implements WithId {
   //TriggerAction,
   None(18);
 
-  private final int value;
+  static final EventType[] idToEnum = new EventType[19];
 
-  EventType(int value) {
-
-    this.value = value;
+  static {
+    Arrays.stream(EventType.values()).forEach(v -> idToEnum[v.id] = v);
   }
 
-  @Override
-  public int getId() {
-    return value;
+  final int id;
+
+  EventType(int id) {
+
+    this.id = id;
   }
-
-  static EventType withId(int id) {
-    if (id < 0) {
-      return null;
-    }
-    EventType eventType = IdMapper.eventTypes[id];
-    if (eventType == null) {
-      throw new IllegalArgumentException("No EventType with id " + id);
-    }
-    return eventType;
-  }
-
-  private static class IdMapper {
-
-    static final EventType[] eventTypes = IdMapperHelper.toIdTypeArray(EventType.class);
-  }
-
 }
