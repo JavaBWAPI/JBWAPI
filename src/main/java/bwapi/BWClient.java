@@ -31,7 +31,7 @@ public class BWClient {
             }
         }
 
-        handler = new EventHandler(eventListener, client.data());
+        handler = new EventHandler(eventListener, client);
 
         try {
             while (!client.data().isInGame()) {

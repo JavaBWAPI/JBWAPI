@@ -1,5 +1,6 @@
 package bwapi;
 
+import bwapi.ClientData.PlayerData;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,7 +10,7 @@ import static bwapi.UpgradeType.*;
 import static bwapi.WeaponType.*;
 
 public class Player {
-    private final Client.GameData.PlayerData playerData;
+    private final PlayerData playerData;
     private final Game game;
     private final int id;
     private final String name;
@@ -18,15 +19,15 @@ public class Player {
     private final Force force;
     private final TilePosition startLocation;
 
-    Player(final Client.GameData.PlayerData playerData, final Game game) {
+    Player(final PlayerData playerData, int id, final Game game) {
         this.playerData = playerData;
         this.game = game;
-        this.id = playerData.id();
-        this.name = playerData.name();
-        this.race = Race.races[playerData.race()];
-        this.playerType = PlayerType.playerTypes[playerData.type()];
-        this.force = game.getForce(playerData.force());
-        this.startLocation = new TilePosition(playerData.startLocationX(), playerData.startLocationY());
+        this.id = id;
+        this.name = playerData.getName();
+        this.race = Race.races[playerData.getRace()];
+        this.playerType = PlayerType.playerTypes[playerData.getType()];
+        this.force = game.getForce(playerData.getForce());
+        this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
     }
 
     public int getID() {
@@ -81,39 +82,39 @@ public class Player {
     }
 
     public boolean leftGame() {
-        return playerData.leftGame();
+        return playerData.getLeftGame();
     }
 
     public int minerals() {
-        return playerData.minerals();
+        return playerData.getMinerals();
     }
 
     public int gas() {
-        return playerData.gas();
+        return playerData.getGas();
     }
 
     public int gatheredMinerals() {
-        return playerData.gatheredMinerals();
+        return playerData.getGatheredMinerals();
     }
 
     public int gatheredGas() {
-        return playerData.gatheredGas();
+        return playerData.getGatheredGas();
     }
 
     public int repairedMinerals() {
-        return playerData.repairedMinerals();
+        return playerData.getRepairedMinerals();
     }
 
     public int repairedGas() {
-        return playerData.repairedGas();
+        return playerData.getRepairedGas();
     }
 
     public int refundedMinerals() {
-        return playerData.refundedMinerals();
+        return playerData.getRefundedMinerals();
     }
 
     public int refundedGas() {
-        return playerData.refundedGas();
+        return playerData.getRefundedGas();
     }
 
     public int spentMinerals() {
@@ -129,7 +130,7 @@ public class Player {
     }
 
     public int supplyTotal(final Race race) {
-        return playerData.supplyTotal(race.id);
+        return playerData.getSupplyTotal(race.id);
     }
 
     public int supplyUsed() {
@@ -137,7 +138,7 @@ public class Player {
     }
 
     public int supplyUsed(final Race race) {
-        return playerData.supplyUsed(race.id);
+        return playerData.getSupplyUsed(race.id);
     }
 
     public int allUnitCount() {
@@ -145,7 +146,7 @@ public class Player {
     }
 
     public int allUnitCount(final UnitType unit) {
-        return playerData.allUnitCount(unit.id);
+        return playerData.getAllUnitCount(unit.id);
     }
 
     public int visibleUnitCount() {
@@ -153,7 +154,7 @@ public class Player {
     }
 
     public int visibleUnitCount(final UnitType unit) {
-        return playerData.visibleUnitCount(unit.id);
+        return playerData.getVisibleUnitCount(unit.id);
     }
 
     public int completedUnitCount() {
@@ -161,7 +162,7 @@ public class Player {
     }
 
     public int completedUnitCount(final UnitType unit) {
-        return playerData.completedUnitCount(unit.id);
+        return playerData.getCompletedUnitCount(unit.id);
     }
 
     public int incompleteUnitCount() {
@@ -177,7 +178,7 @@ public class Player {
     }
 
     public int deadUnitCount(final UnitType unit) {
-        return playerData.deadUnitCount(unit.id);
+        return playerData.getDeadUnitCount(unit.id);
     }
 
     public int killedUnitCount() {
@@ -185,15 +186,15 @@ public class Player {
     }
 
     public int killedUnitCount(final UnitType unit) {
-        return playerData.killedUnitCount(unit.id);
+        return playerData.getKilledUnitCount(unit.id);
     }
 
     public int getUpgradeLevel(final UpgradeType upgrade) {
-        return playerData.upgradeLevel(upgrade.id);
+        return playerData.getUpgradeLevel(upgrade.id);
     }
 
     public boolean hasResearched(final TechType tech) {
-        return playerData.hasResearched(tech.id);
+        return playerData.getHasResearched(tech.id);
     }
 
     public boolean isResearching(final TechType tech) {
@@ -205,11 +206,11 @@ public class Player {
     }
 
     public Color getColor() {
-        return new Color(playerData.color());
+        return new Color(playerData.getColor());
     }
 
     public TextColor getTextColor() {
-        switch (playerData.color()) {
+        switch (playerData.getColor()) {
             case 111: // red
                 return BrightRed;
             case 165: // blue
@@ -334,23 +335,23 @@ public class Player {
     }
 
     public int getUnitScore() {
-        return playerData.totalUnitScore();
+        return playerData.getTotalUnitScore();
     }
 
     public int getKillScore() {
-        return playerData.totalKillScore();
+        return playerData.getTotalKillScore();
     }
 
     public int getBuildingScore() {
-        return playerData.totalBuildingScore();
+        return playerData.getTotalBuildingScore();
     }
 
     public int getRazingScore() {
-        return playerData.totalRazingScore();
+        return playerData.getTotalRazingScore();
     }
 
     public int getCustomScore() {
-        return playerData.customScore();
+        return playerData.getCustomScore();
     }
 
     public boolean isObserver() {
@@ -358,7 +359,7 @@ public class Player {
     }
 
     public int getMaxUpgradeLevel(final UpgradeType upgrade) {
-        return playerData.maxUpgradeLevel(upgrade.id);
+        return playerData.getMaxUpgradeLevel(upgrade.id);
     }
 
     public boolean isResearchAvailable(final TechType tech) {

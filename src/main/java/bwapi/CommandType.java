@@ -1,5 +1,7 @@
 package bwapi;
 
+import java.util.Arrays;
+
 public enum CommandType {
     None(0),
     SetScreenPosition(1),
@@ -21,9 +23,15 @@ public enum CommandType {
     SetCommandOptimizerLevel(17),
     SetRevealAll(18);
 
-    public final int value;
+    static final CommandType[] idToEnum = new CommandType[19];
 
-    CommandType(final int value) {
-        this.value = value;
+    static {
+        Arrays.stream(CommandType.values()).forEach(v -> idToEnum[v.id] = v);
+    }
+
+    public final int id;
+
+    CommandType(final int id) {
+        this.id = id;
     }
 }
