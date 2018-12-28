@@ -1,6 +1,7 @@
 package bwapi;
 
 
+import bwapi.ClientData.UnitData;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,7 @@ public class Unit {
             Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision));
     private static Set<Order> gatheringMineralOrders = new HashSet<>(Arrays.asList(
             Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision));
-    private final Client.GameData.UnitData unitData;
+    private final UnitData unitData;
     private final Game game;
     // static
     private final UnitType initialType;
@@ -39,7 +40,7 @@ public class Unit {
     private UnitCommand lastCommand;
 
 
-    Unit(final Client.GameData.UnitData unitData, final Game game) {
+    Unit(final UnitData unitData, int id, final Game game) {
         this.unitData = unitData;
         this.game = game;
 
@@ -53,8 +54,8 @@ public class Unit {
         initialPosition = getPosition();
         initialTilePosition = getTilePosition();
 
-        id = unitData.id();
-        replayID = unitData.replayID();
+        this.id = id;
+        replayID = unitData.getReplayID();
     }
 
     private static boolean reallyGatheringGas(final Unit targ, final Player player) {
@@ -72,7 +73,7 @@ public class Unit {
     }
 
     public boolean exists() {
-        return unitData.exists();
+        return unitData.getExists();
     }
 
     public int getReplayID() {
@@ -107,15 +108,15 @@ public class Unit {
     }
 
     public double getAngle() {
-        return unitData.angle();
+        return unitData.getAngle();
     }
 
     public double getVelocityX() {
-        return unitData.velocityX();
+        return unitData.getVelocityX();
     }
 
     public double getVelocityY() {
-        return unitData.velocityY();
+        return unitData.getVelocityY();
     }
 
     public Region getRegion() {
@@ -139,23 +140,23 @@ public class Unit {
     }
 
     public int getHitPoints() {
-        return unitData.hitPoints();
+        return unitData.getHitPoints();
     }
 
     public int getShields() {
-        return unitData.shields();
+        return unitData.getShields();
     }
 
     public int getEnergy() {
-        return unitData.energy();
+        return unitData.getEnergy();
     }
 
     public int getResources() {
-        return unitData.resources();
+        return unitData.getResources();
     }
 
     public int getResourceGroup() {
-        return unitData.resourceGroup();
+        return unitData.getResourceGroup();
     }
 
     public int getDistance(final Position target) {
@@ -257,7 +258,7 @@ public class Unit {
     }
 
     public Player getLastAttackingPlayer() {
-        return game.getPlayer(unitData.lastAttackerPlayer());
+        return game.getPlayer(unitData.getLastAttackerPlayer());
     }
 
     public UnitType getInitialType() {
@@ -281,165 +282,165 @@ public class Unit {
     }
 
     public int getKillCount() {
-        return unitData.killCount();
+        return unitData.getKillCount();
     }
 
     public int getAcidSporeCount() {
-        return unitData.acidSporeCount();
+        return unitData.getAcidSporeCount();
     }
 
     public int getInterceptorCount() {
-        return unitData.interceptorCount();
+        return unitData.getInterceptorCount();
     }
 
     public int getScarabCount() {
-        return unitData.scarabCount();
+        return unitData.getScarabCount();
     }
 
     public int getSpiderMineCount() {
-        return unitData.spiderMineCount();
+        return unitData.getSpiderMineCount();
     }
 
     public int getGroundWeaponCooldown() {
-        return unitData.groundWeaponCooldown();
+        return unitData.getGroundWeaponCooldown();
     }
 
     public int getAirWeaponCooldown() {
-        return unitData.airWeaponCooldown();
+        return unitData.getAirWeaponCooldown();
     }
 
     public int getSpellCooldown() {
-        return unitData.spellCooldown();
+        return unitData.getSpellCooldown();
     }
 
     public int getDefenseMatrixPoints() {
-        return unitData.defenseMatrixPoints();
+        return unitData.getDefenseMatrixPoints();
     }
 
     public int getDefenseMatrixTimer() {
-        return unitData.defenseMatrixTimer();
+        return unitData.getDefenseMatrixTimer();
     }
 
     public int getEnsnareTimer() {
-        return unitData.ensnareTimer();
+        return unitData.getEnsnareTimer();
     }
 
     public int getIrradiateTimer() {
-        return unitData.irradiateTimer();
+        return unitData.getIrradiateTimer();
     }
 
     public int getLockdownTimer() {
-        return unitData.lockdownTimer();
+        return unitData.getLockdownTimer();
     }
 
     public int getMaelstromTimer() {
-        return unitData.maelstromTimer();
+        return unitData.getMaelstromTimer();
     }
 
     public int getOrderTimer() {
-        return unitData.orderTimer();
+        return unitData.getOrderTimer();
     }
 
     public int getPlagueTimer() {
-        return unitData.plagueTimer();
+        return unitData.getPlagueTimer();
     }
 
     public int getRemoveTimer() {
-        return unitData.removeTimer();
+        return unitData.getRemoveTimer();
     }
 
     public int getStasisTimer() {
-        return unitData.stasisTimer();
+        return unitData.getStasisTimer();
     }
 
     public int getStimTimer() {
-        return unitData.stimTimer();
+        return unitData.getStimTimer();
     }
 
     public UnitType getBuildType() {
-        return UnitType.unitTypes[unitData.buildType()];
+        return UnitType.unitTypes[unitData.getBuildType()];
     }
 
     public List<UnitType> getTrainingQueue() {
-        return IntStream.range(0, unitData.trainingQueueCount())
-                .mapToObj(i -> UnitType.unitTypes[unitData.trainingQueue(i)])
+        return IntStream.range(0, unitData.getTrainingQueueCount())
+                .mapToObj(i -> UnitType.unitTypes[unitData.getTrainingQueue(i)])
                 .collect(Collectors.toList());
     }
 
     public TechType getTech() {
-        return TechType.techTypes[unitData.tech()];
+        return TechType.techTypes[unitData.getTech()];
     }
 
     public UpgradeType getUpgrade() {
-        return UpgradeType.upgradeTypes[unitData.upgrade()];
+        return UpgradeType.upgradeTypes[unitData.getUpgrade()];
     }
 
     public int getRemainingBuildTime() {
-        return unitData.remainingBuildTime();
+        return unitData.getRemainingBuildTime();
     }
 
     public int getRemainingTrainTime() {
-        return unitData.remainingTrainTime();
+        return unitData.getRemainingTrainTime();
     }
 
     public int getRemainingResearchTime() {
-        return unitData.remainingResearchTime();
+        return unitData.getRemainingResearchTime();
     }
 
     public int getRemainingUpgradeTime() {
-        return unitData.remainingUpgradeTime();
+        return unitData.getRemainingUpgradeTime();
     }
 
     public Unit getBuildUnit() {
-        return game.getUnit(unitData.buildUnit());
+        return game.getUnit(unitData.getBuildUnit());
     }
 
     public Unit getTarget() {
-        return game.getUnit(unitData.target());
+        return game.getUnit(unitData.getTarget());
     }
 
     public Position getTargetPosition() {
-        return new Position(unitData.orderTargetPositionX(), unitData.orderTargetPositionY());
+        return new Position(unitData.getOrderTargetPositionX(), unitData.getOrderTargetPositionY());
     }
 
     public Order getOrder() {
-        return Order.orders[unitData.order()];
+        return Order.orders[unitData.getOrder()];
     }
 
     public Order getSecondaryOrder() {
-        return Order.orders[unitData.secondaryOrder()];
+        return Order.orders[unitData.getSecondaryOrder()];
     }
 
     public Unit getOrderTarget() {
-        return game.getUnit(unitData.orderTarget());
+        return game.getUnit(unitData.getOrderTarget());
     }
 
     public Position getOrderTargetPosition() {
-        return new Position(unitData.orderTargetPositionX(), unitData.orderTargetPositionY());
+        return new Position(unitData.getOrderTargetPositionX(), unitData.getOrderTargetPositionY());
     }
 
     public Position getRallyPosition() {
-        return new Position(unitData.rallyPositionX(), unitData.rallyPositionY());
+        return new Position(unitData.getRallyPositionX(), unitData.getRallyPositionY());
     }
 
     public Unit getRallyUnit() {
-        return game.getUnit(unitData.rallyUnit());
+        return game.getUnit(unitData.getRallyUnit());
     }
 
     public Unit getAddon() {
-        return game.getUnit(unitData.addon());
+        return game.getUnit(unitData.getAddon());
     }
 
     public Unit getNydusExit() {
-        return game.getUnit(unitData.nydusExit());
+        return game.getUnit(unitData.getNydusExit());
     }
 
     public Unit getPowerUp() {
-        return game.getUnit(unitData.powerUp());
+        return game.getUnit(unitData.getPowerUp());
     }
 
     public Unit getTransport() {
-        return game.getUnit(unitData.transport());
+        return game.getUnit(unitData.getTransport());
     }
 
     public Set<Unit> getLoadedUnits() {
@@ -462,7 +463,7 @@ public class Unit {
     }
 
     public Unit getCarrier() {
-        return game.getUnit(unitData.carrier());
+        return game.getUnit(unitData.getCarrier());
     }
 
     public Set<Unit> getInterceptors() {
@@ -475,7 +476,7 @@ public class Unit {
     }
 
     public Unit getHatchery() {
-        return game.getUnit(unitData.hatchery());
+        return game.getUnit(unitData.getHatchery());
     }
 
     public Set<Unit> getLarva() {
@@ -538,7 +539,7 @@ public class Unit {
     }
 
     public boolean hasNuke() {
-        return unitData.hasNuke();
+        return unitData.getHasNuke();
     }
 
     public boolean isAccelerating() {
@@ -571,7 +572,7 @@ public class Unit {
     }
 
     public boolean isBeingHealed() {
-        return getType().getRace() == Terran && isCompleted() && getHitPoints() > unitData.lastHitPoints();
+        return getType().getRace() == Terran && isCompleted() && getHitPoints() > unitData.getLastHitPoints();
     }
 
     public boolean isBlind() {
@@ -591,11 +592,11 @@ public class Unit {
     }
 
     public boolean isCarryingGas() {
-        return unitData.carryResourceType() == 1;
+        return unitData.getCarryResourceType() == 1;
     }
 
     public boolean isCarryingMinerals() {
-        return unitData.carryResourceType() == 2;
+        return unitData.getCarryResourceType() == 2;
     }
 
     public boolean isCloaked() {
@@ -639,7 +640,7 @@ public class Unit {
             return false;
         }
         if (order == ResetCollision) {
-            return unitData.carryResourceType() == 1;
+            return unitData.getCarryResourceType() == 1;
         }
         //return true if BWOrder is WaitForGas, HarvestGas, or ReturnGas
         if (order == WaitForGas || order == HarvestGas || order == ReturnGas) {
@@ -658,7 +659,7 @@ public class Unit {
             return false;
         }
         if (order == ResetCollision) {
-            return unitData.carryResourceType() == 2;
+            return unitData.getCarryResourceType() == 2;
         }
         //return true if BWOrder is WaitForMinerals, MiningMinerals, or ReturnMinerals
         if (order == WaitForMinerals || order == MiningMinerals || order == ReturnMinerals) {
@@ -794,7 +795,7 @@ public class Unit {
     }
 
     public boolean isUnderAttack() {
-        return unitData.recentlyAttacked();
+        return unitData.getRecentlyAttacked();
     }
 
     public boolean isUnderDarkSwarm() {
@@ -4092,7 +4093,7 @@ public class Unit {
             return false;
         }
 
-        return unitData.buttonset() != 228 && getOrder() == CTFCOPInit;
+        return unitData.getButtonset() != 228 && getOrder() == CTFCOPInit;
     }
 
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType) {
@@ -4130,22 +4131,22 @@ public class Unit {
     void updateType(final int frame) {
         if (frame > lastTypeUpdate) {
             lastTypeUpdate = frame;
-            position = new Position(unitData.positionX(), unitData.positionY());
+            position = new Position(unitData.getPositionX(), unitData.getPositionY());
         }
-        unitType = UnitType.unitTypes[unitData.type()];
+        unitType = UnitType.unitTypes[unitData.getType()];
     }
 
     void updatePlayer(final int frame) {
         if (frame > lastPlayerUpdate) {
             lastPlayerUpdate = frame;
-            player = game.getPlayer(unitData.player());
+            player = game.getPlayer(unitData.getPlayer());
         }
     }
 
     void updatePosition(final int frame) {
         if (frame > lastPositionUpdate) {
             lastPositionUpdate = frame;
-            position = new Position(unitData.positionX(), unitData.positionY());
+            position = new Position(unitData.getPositionX(), unitData.getPositionY());
         }
     }
 }

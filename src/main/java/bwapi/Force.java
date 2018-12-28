@@ -1,5 +1,6 @@
 package bwapi;
 
+import bwapi.ClientData.ForceData;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,10 +10,10 @@ public class Force {
     private final int id;
     private final String name;
 
-    Force(final Client.GameData.ForceData forceData, final Game game) {
+    Force(final ForceData forceData, int id, final Game game) {
         this.game = game;
-        this.id = forceData.id();
-        this.name = forceData.name();
+        this.id = id;
+        this.name = forceData.getName();
     }
 
     public int getID() {

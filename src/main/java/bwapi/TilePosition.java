@@ -12,6 +12,10 @@ public class TilePosition extends Point {
         super(x, y, SIZE_IN_PIXELS);
     }
 
+    TilePosition(ClientData.Position position) {
+        this(position.getX(), position.getY());
+    }
+
     public Position toPosition() {
         return new Position(x * SIZE_IN_PIXELS, y * SIZE_IN_PIXELS);
     }

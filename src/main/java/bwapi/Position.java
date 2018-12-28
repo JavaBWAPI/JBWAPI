@@ -13,7 +13,11 @@ public class Position extends Point {
         super(x, y, SIZE_IN_PIXELS);
     }
 
-    private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
+  Position(ClientData.Position position) {
+    this(position.getX(), position.getY());
+  }
+
+  private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
         int min = Math.abs(x1 - x2);
         int max = Math.abs(y1 - y2);
         if (max < min) {

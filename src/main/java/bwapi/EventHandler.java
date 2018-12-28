@@ -4,101 +4,102 @@ package bwapi;
 class EventHandler implements Client.EventHandler {
     private final BWEventListener eventListener;
     private final Game game;
-    private final Client.GameData data;
+    private final Client client;
     private int frames;
 
-    public EventHandler(final BWEventListener eventListener, final Client.GameData data) {
+    public EventHandler(final BWEventListener eventListener, final Client client) {
         this.eventListener = eventListener;
-        game = new Game(data);
-        this.data = data;
+        game = new Game(client);
+        this.client = client;
     }
 
-    public void operation(final Client.GameData.Event event) {
+    @Override
+    public void operation(final ClientData.Event event) {
         final Unit u;
-        switch (event.type()) {
-            case 0: //MatchStart
+        switch (event.getType()) {
+            case MatchStart: //MatchStart
                 frames = 0;
                 game.init();
                 game.setLatCom(false);
                 eventListener.onStart();
                 break;
-            case 1: //MatchEnd
-                eventListener.onEnd(event.v1() != 0);
+            case MatchEnd: //MatchEnd
+                eventListener.onEnd(event.getV1() != 0);
                 break;
-            case 2: //MatchFrame
+            case MatchFrame: //MatchFrame
                 game.updateUnitPositions(frames);
                 eventListener.onFrame();
                 frames += 1;
                 break;
             //case 3: //MenuFrame
-            case 4: //SendText
-                eventListener.onSendText(data.eventString(event.v1()));
+            case SendText: //SendText
+                eventListener.onSendText(client.eventString(event.getV1()));
                 break;
-            case 5: //ReceiveText
-                eventListener.onReceiveText(game.getPlayer(event.v1()), data.eventString(event.v2()));
+            case ReceiveText: //ReceiveText
+                eventListener.onReceiveText(game.getPlayer(event.getV1()), client.eventString(event.getV2()));
                 break;
-            case 6: //PlayerLeft
-                eventListener.onPlayerLeft(game.getPlayer(event.v1()));
+            case PlayerLeft: //PlayerLeft
+                eventListener.onPlayerLeft(game.getPlayer(event.getV1()));
                 break;
-            case 7: //NukeDetect
-                eventListener.onNukeDetect(new Position(event.v1(), event.v2()));
+            case NukeDetect: //NukeDetect
+                eventListener.onNukeDetect(new Position(event.getV1(), event.getV2()));
                 break;
-            case 16: //SaveGame
-                eventListener.onSaveGame(data.eventString(event.v1()));
+            case SaveGame: //SaveGame
+                eventListener.onSaveGame(client.eventString(event.getV1()));
                 break;
-            case 8: //UnitDiscover
-                game.unitCreate(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitDiscover: //UnitDiscover
+                game.unitCreate(event.getV1());
+                u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 u.updateType(frames);
                 u.updatePlayer(frames);
                 eventListener.onUnitDiscover(u);
                 break;
-            case 9: //UnitEvade
-                u = game.getUnit(event.v1());
+            case UnitEvade: //UnitEvade
+                u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 eventListener.onUnitEvade(u);
                 break;
-            case 10: // UnitShow
-                game.unitShow(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitShow: // UnitShow
+                game.unitShow(event.getV1());
+                u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 u.updateType(frames);
                 u.updatePlayer(frames);
                 eventListener.onUnitShow(u);
                 break;
-            case 11: //UnitHide
-                game.unitHide(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitHide: //UnitHide
+                game.unitHide(event.getV1());
+                u = game.getUnit(event.getV1());
                 eventListener.onUnitHide(u);
                 break;
-            case 12: //UnitCreate
-                game.unitCreate(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitCreate: //UnitCreate
+                game.unitCreate(event.getV1());
+                u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 u.updateType(frames);
                 u.updatePlayer(frames);
                 eventListener.onUnitCreate(u);
                 break;
-            case 13: //UnitDestroy
-                game.unitHide(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitDestroy: //UnitDestroy
+                game.unitHide(event.getV1());
+                u = game.getUnit(event.getV1());
                 eventListener.onUnitDestroy(u);
                 break;
-            case 14: //UnitMorph
-                u = game.getUnit(event.v1());
+            case UnitMorph: //UnitMorph
+                u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 u.updateType(frames);
                 eventListener.onUnitMorph(u);
                 break;
-            case 15: //UnitRenegade
-                u = game.getUnit(event.v1());
+            case UnitRenegade: //UnitRenegade
+                u = game.getUnit(event.getV1());
                 u.updatePlayer(frames);
                 eventListener.onUnitRenegade(u);
                 break;
-            case 17: //UnitComplete
-                game.unitCreate(event.v1());
-                u = game.getUnit(event.v1());
+            case UnitComplete: //UnitComplete
+                game.unitCreate(event.getV1());
+                u = game.getUnit(event.getV1());
                 u.updatePlayer(frames);
                 eventListener.onUnitComplete(u);
                 break;
