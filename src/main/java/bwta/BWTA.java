@@ -17,11 +17,12 @@ public class BWTA {
     static Map<Area, Region> regionMap;
     static Map<ChokePoint, Chokepoint> chokeMap;
     static Map<Base, BaseLocation> baseMap;
-    private static Set<Region> regions;
-    private static Set<Chokepoint> chokepoints;
-    private static Set<BaseLocation> baseLocations;
+    private static List<Region> regions;
+    private static List<Chokepoint> chokepoints;
+    private static List<BaseLocation> baseLocations;
 
     public static void readMap(final Game game) {
+        System.err.println("WARNING: this BWTA is fake and only translates BWTA calls to their respective BWEM calls. Please use BWEM directly if possible.");
         bwem = new BWEM(game);
     }
 
@@ -32,37 +33,37 @@ public class BWTA {
         for (final Area a : bwem.getMap().getAreas()) {
             regionMap.put(a, new Region(a));
         }
-        regions = new HashSet<>(regionMap.values());
+        regions = new ArrayList<>(regionMap.values());
 
         chokeMap = new HashMap<>();
         for (final ChokePoint c : bwem.getMap().getChokePoints()) {
             chokeMap.put(c, new Chokepoint(c));
         }
-        chokepoints = new HashSet<>(chokeMap.values());
+        chokepoints = new ArrayList<>(chokeMap.values());
 
         baseMap = new HashMap<>();
         for (final Base b : bwem.getMap().getBases()) {
             baseMap.put(b, new BaseLocation(b));
         }
-        baseLocations = new HashSet<>(baseMap.values());
+        baseLocations = new ArrayList<>(baseMap.values());
     }
 
-    public static Set<Region> getRegions() {
-        return regions;
+    public static List<Region> getRegions() {
+        return new ArrayList<>(regions);
     }
 
-    public static Set<Chokepoint> getChokepoints() {
-        return chokepoints;
+    public static List<Chokepoint> getChokepoints() {
+        return new ArrayList<>(chokepoints);
     }
 
-    public static Set<BaseLocation> getBaseLocations() {
-        return baseLocations;
+    public static List<BaseLocation> getBaseLocations() {
+        return new ArrayList<>(baseLocations);
     }
 
-    public static Set<BaseLocation> getStartLocations() {
+    public static List<BaseLocation> getStartLocations() {
         return getBaseLocations().stream()
                 .filter(BaseLocation::isStartLocation)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public static BaseLocation getStartLocation(final Player player) {

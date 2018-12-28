@@ -5,6 +5,8 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwem.Base;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,8 +16,8 @@ public class BaseLocation {
     private final TilePosition tilePosition;
     private final int minerals;
     private final int gas;
-    private final Set<Unit> mineralSet;
-    private final Set<Unit> geyserSet;
+    private final List<Unit> mineralSet;
+    private final List<Unit> geyserSet;
     private final boolean island;
     private final boolean mineralOnly;
     private final boolean startLocation;
@@ -27,8 +29,8 @@ public class BaseLocation {
         this.tilePosition = base.getLocation();
         this.minerals = 1;
         this.gas = 1;
-        this.mineralSet = base.getMinerals().stream().map(m -> m.getUnit()).collect(Collectors.toSet());
-        this.geyserSet =  base.getGeysers().stream().map(g -> g.getUnit()).collect(Collectors.toSet());
+        this.mineralSet = base.getMinerals().stream().map(m -> m.getUnit()).collect(Collectors.toList());
+        this.geyserSet =  base.getGeysers().stream().map(g -> g.getUnit()).collect(Collectors.toList());
         this.island = base.getArea().getAccessibleNeighbors().isEmpty();
         this.mineralOnly = !mineralSet.isEmpty() && geyserSet.isEmpty();
         this.startLocation = base.isStartingLocation();
@@ -54,12 +56,12 @@ public class BaseLocation {
         return gas;
     }
 
-    public Set<Unit> getMinerals() {
-        return mineralSet;
+    public List<Unit> getMinerals() {
+        return new ArrayList<>(mineralSet);
     }
 
-    public Set<Unit> getGeysers() {
-        return geyserSet;
+    public List<Unit> getGeysers() {
+        return new ArrayList<>(geyserSet);
     }
 
     public double getGroundDistance(final BaseLocation other) {

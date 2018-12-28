@@ -9,8 +9,8 @@ import java.util.List;
 
 
 public class Chokepoint {
-    private  ChokePoint chokePoint;
-    private  Pair<Position, Position> sides;
+    private ChokePoint chokePoint;
+    private Pair<Position, Position> sides;
     private Position center;
     private double width;
 

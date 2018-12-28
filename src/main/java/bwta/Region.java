@@ -3,6 +3,7 @@ package bwta;
 import bwapi.Position;
 import bwem.area.Area;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,31 +16,30 @@ public class Region {
         this.center = area.getWalkPositionWithHighestAltitude().toPosition();
     }
 
-
     public Position getCenter() {
         return center;
     }
 
-    public Set<Chokepoint> getChokepoints() {
+    public List<Chokepoint> getChokepoints() {
         return area.getChokePoints().stream()
                 .map(c -> BWTA.chokeMap.get(c))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<BaseLocation> getBaseLocations() {
+    public List<BaseLocation> getBaseLocations() {
         return area.getBases().stream()
                 .map(b -> BWTA.baseMap.get(b))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public boolean isReachable(final Region region) {
         return area.isAccessibleFrom(region.area);
     }
 
-    public Set<Region> getReachableRegions() {
+    public List<Region> getReachableRegions() {
         return area.getAccessibleNeighbors().stream()
                 .map(a -> BWTA.regionMap.get(a))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
