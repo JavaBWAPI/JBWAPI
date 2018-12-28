@@ -1,16 +1,13 @@
 package bwapi;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import static bwapi.UnitCommandType.*;
 
 public class UnitCommand {
-    private static Set<UnitCommandType> posComs = new HashSet<>(
-            Arrays.asList(Build, Land, Place_COP)
-    );
+    private static Set<UnitCommandType> posComs = EnumSet.of(Build, Land, Place_COP);
     final UnitCommandType type;
     final Unit target;
     final int x;

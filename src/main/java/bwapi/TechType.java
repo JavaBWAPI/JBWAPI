@@ -1,8 +1,7 @@
 package bwapi;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static bwapi.Order.*;
 
@@ -223,8 +222,8 @@ public enum TechType {
         return (techTypeFlags[id] & TARG_POS) != 0;
     }
 
-    public Set<UnitType> whatsUses() {
-        return Arrays.stream(techWhatUses[id]).collect(Collectors.toSet());
+    public List<UnitType> whatsUses() {
+        return Arrays.asList(techWhatUses[id]);
     }
 
     public Order getOrder() {

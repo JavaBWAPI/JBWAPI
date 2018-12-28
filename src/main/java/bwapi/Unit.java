@@ -13,10 +13,10 @@ import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 public class Unit {
-    private static Set<Order> gatheringGasOrders = new HashSet<>(Arrays.asList(
-            Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision));
-    private static Set<Order> gatheringMineralOrders = new HashSet<>(Arrays.asList(
-            Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision));
+    private static Set<Order> gatheringGasOrders = EnumSet.of(
+            Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision);
+    private static Set<Order> gatheringMineralOrders = EnumSet.of(
+            Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision);
     private final UnitData unitData;
     private final Game game;
     // static

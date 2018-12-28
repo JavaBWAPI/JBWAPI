@@ -1,8 +1,7 @@
 package bwapi;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public enum UpgradeType {
     Terran_Infantry_Armor(0),
@@ -252,8 +251,8 @@ public enum UpgradeType {
         return whatUpgrades[id];
     }
 
-    public Set<UnitType> whatUses() {
-        return Arrays.stream(upgradeWhatUses[id]).collect(Collectors.toSet());
+    public List<UnitType> whatUses() {
+        return Arrays.asList(upgradeWhatUses[id]);
     }
 
     public int maxRepeats() {
