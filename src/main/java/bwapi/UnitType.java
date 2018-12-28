@@ -304,12 +304,12 @@ public enum UnitType {
         }
     }
 
-    public Set<TechType> abilities() {
-        return Arrays.stream(UnitTypeContainer.unitTechs[id]).collect(Collectors.toSet());
+    public List<TechType> abilities() {
+        return Arrays.asList(UnitTypeContainer.unitTechs[id]);
     }
 
-    public Set<UpgradeType> upgrades() {
-        return Arrays.stream(UnitTypeContainer.upgrades[id]).collect(Collectors.toSet());
+    public List<UpgradeType> upgrades() {
+        return Arrays.asList(UnitTypeContainer.upgrades[id]);
     }
 
     public UpgradeType armorUpgrade() {
@@ -643,16 +643,16 @@ public enum UnitType {
                 this == Terran_Science_Facility;
     }
 
-    public Set<UnitType> buildsWhat() {
-        return Arrays.stream(UnitTypeContainer.buildsWhat[id]).collect(Collectors.toSet());
+    public List<UnitType> buildsWhat() {
+        return Arrays.asList(UnitTypeContainer.buildsWhat[id]);
     }
 
-    public Set<TechType> researchesWhat() {
-        return Arrays.stream(UnitTypeContainer.researchesWhat[id]).collect(Collectors.toSet());
+    public List<TechType> researchesWhat() {
+        return Arrays.asList(UnitTypeContainer.researchesWhat[id]);
     }
 
-    public Set<UpgradeType> upgradesWhat() {
-        return Arrays.stream(UnitTypeContainer.upgradesWhat[id]).collect(Collectors.toSet());
+    public List<UpgradeType> upgradesWhat() {
+        return Arrays.asList(UnitTypeContainer.upgradesWhat[id]);
     }
 
     public boolean isSuccessorOf(final UnitType type) {
