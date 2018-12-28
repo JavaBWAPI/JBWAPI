@@ -33,7 +33,6 @@ public enum EventType {
     final int id;
 
     EventType(int id) {
-
         this.id = id;
     }
 }

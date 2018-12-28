@@ -3,7 +3,7 @@ package bwapi;
 import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
-import bwapi.ClientData.UnitData;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -141,13 +141,13 @@ public class Game {
         final int bulletCount = 100;
         bullets = new Bullet[bulletCount];
         for (int id = 0; id < bulletCount; id++) {
-            bullets[id] = new Bullet(gameData.getBullets(id), this);
+            bullets[id] = new Bullet(gameData.getBullets(id), id,this);
         }
 
         final int regionCount = gameData.getRegionCount();
         regions = new Region[regionCount];
         for (int id = 0; id < regionCount; id++) {
-            regions[id] = new Region(gameData.getRegions(id), this);
+            regions[id] = new Region(gameData.getRegions(id),this);
         }
 
         for (final Region region : regions) {
@@ -373,7 +373,7 @@ public class Game {
     }
 
     public GameType getGameType() {
-        return GameType.gameTypes[gameData.getGameType()];
+        return GameType.idToEnum[gameData.getGameType()];
     }
 
     public int getLatency() {
@@ -429,11 +429,11 @@ public class Game {
     }
 
     public boolean isFlagEnabled(final Flag flag) {
-        return gameData.getFlags(flag.value);
+        return gameData.getFlags(flag.id);
     }
 
     public void enableFlag(final Flag flag) {
-        addCommand(EnableFlag, flag.value, 1);
+        addCommand(EnableFlag, flag.id, 1);
     }
 
     public List<Unit> getUnitsOnTile(final int tileX, final int tileY) {
@@ -1114,7 +1114,7 @@ public class Game {
 
     public void drawText(final CoordinateType ctype, final int x, final int y, final String cstr_format) {
         final int stringId = client.addString(cstr_format);
-        addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.value, 0, false);
+        addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
     }
 
     public void drawTextMap(final int x, final int y, final String cstr_format) {

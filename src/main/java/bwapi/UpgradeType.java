@@ -64,7 +64,6 @@ public enum UpgradeType {
     None(61),
     Unknown(62);
 
-    public static UpgradeType[] upgradeTypes = new UpgradeType[62 + 1];
     // DEFAULTS
     private static int defaultOreCostBase[] = {   // same as default gas cost base
             100, 100, 150, 150, 150, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 200, 150, 100, 200, 150, 100, 150, 200, 150, 200, 150, 150, 100, 200,
@@ -197,11 +196,13 @@ public enum UpgradeType {
             Race.Protoss, Race.Protoss, Race.Protoss, Race.None, Race.None, Race.Protoss, Race.None, Race.Protoss, Race.None, Race.Terran, Race.Zerg, Race.Zerg, Race.Terran, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
     };
 
+    public static UpgradeType[] idToEnum = new UpgradeType[62 + 1];
+
     static {
-        Arrays.stream(UpgradeType.values()).forEach(v -> upgradeTypes[v.id] = v);
+        Arrays.stream(UpgradeType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     UpgradeType(final int id) {
         this.id = id;

@@ -6,10 +6,9 @@ public enum TextSize {
     Large(2),
     Huge(3);
 
-    public final int value;
+    final int id;
 
-
-    TextSize(final int value) {
-        this.value = value;
+    TextSize(final int id) {
+        this.id = id;
     }
 }

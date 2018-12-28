@@ -4,15 +4,17 @@ import bwapi.ClientData.BulletData;
 
 public class Bullet {
     private final BulletData bulletData;
+    private final int id;
     private final Game game;
 
-    Bullet(final BulletData bulletData, final Game game) {
+    Bullet(final BulletData bulletData, final int id, final Game game) {
         this.bulletData = bulletData;
+        this.id = id;
         this.game = game;
     }
 
     public int getID() {
-        return bulletData.getId();
+        return id;
     }
 
     public boolean exists() {
@@ -24,7 +26,7 @@ public class Bullet {
     }
 
     public BulletType getType() {
-        return BulletType.bulletTypes[bulletData.getType()];
+        return BulletType.idToEnum[bulletData.getType()];
     }
 
     public Unit getSource() {

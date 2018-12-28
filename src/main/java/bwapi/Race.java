@@ -47,7 +47,7 @@ public enum Race {
         Arrays.stream(Race.values()).forEach(v -> races[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     Race(final int id) {
         this.id = id;

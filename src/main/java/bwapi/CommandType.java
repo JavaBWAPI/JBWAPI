@@ -29,7 +29,7 @@ public enum CommandType {
         Arrays.stream(CommandType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     CommandType(final int id) {
         this.id = id;

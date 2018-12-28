@@ -19,13 +19,13 @@ public class Player {
     private final Force force;
     private final TilePosition startLocation;
 
-    Player(final PlayerData playerData, int id, final Game game) {
+    Player(final PlayerData playerData, final int id, final Game game) {
         this.playerData = playerData;
         this.game = game;
         this.id = id;
         this.name = playerData.getName();
         this.race = Race.races[playerData.getRace()];
-        this.playerType = PlayerType.playerTypes[playerData.getType()];
+        this.playerType = PlayerType.idToEnum[playerData.getType()];
         this.force = game.getForce(playerData.getForce());
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
     }

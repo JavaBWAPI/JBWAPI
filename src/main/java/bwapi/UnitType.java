@@ -1,7 +1,6 @@
 package bwapi;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static bwapi.TechType.*;
@@ -242,13 +241,13 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    public static UnitType[] unitTypes = new UnitType[233 + 1];
+    static UnitType[] idToEnum = new UnitType[233 + 1];
 
     static {
-        Arrays.stream(UnitType.values()).forEach(v -> unitTypes[v.id] = v);
+        Arrays.stream(UnitType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     UnitType(final int id) {
         this.id = id;

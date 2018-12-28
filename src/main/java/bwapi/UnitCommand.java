@@ -290,20 +290,20 @@ public class UnitCommand {
 
     public UnitType getUnitType() {
         if (type == Build || type == Build_Addon || type == Train || type == Morph) {
-            return UnitType.unitTypes[extra];
+            return UnitType.idToEnum[extra];
         }
         return UnitType.None;
     }
 
     public TechType getTechType() {
         if (type == Research || type == Use_Tech || type == Use_Tech_Position || type == Use_Tech_Unit) {
-            return TechType.techTypes[extra];
+            return TechType.idToEnum[extra];
         }
         return TechType.None;
     }
 
     public UpgradeType getUpgradeType() {
-        return type == UnitCommandType.Upgrade ? UpgradeType.upgradeTypes[extra] : UpgradeType.None;
+        return type == UnitCommandType.Upgrade ? UpgradeType.idToEnum[extra] : UpgradeType.None;
     }
 
     public boolean isQueued() {

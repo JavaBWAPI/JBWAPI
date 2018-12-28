@@ -29,10 +29,10 @@ public enum TextColor {
     GreyCyan(30),
     Turquoise(31);
 
-    public final byte value;
+    final byte id;
 
-    TextColor(final int value) {
-        this.value = (byte) value;
+    TextColor(final int id) {
+        this.id = (byte) id;
     }
 
     /**
@@ -42,7 +42,7 @@ public enum TextColor {
         final byte[] data = text.getBytes();
         final int len = text.length();
         final byte[] formatted = new byte[len + 1];
-        formatted[0] = format.value;
+        formatted[0] = format.id;
         System.arraycopy(data, 0, formatted, 1, len);
         return new String(formatted);
     }
@@ -50,7 +50,7 @@ public enum TextColor {
     //SINCE 4.2
     //C hecks if the given character is a color-changing control code.
     boolean isColor() {
-        final int c = this.value;
+        final int c = this.id;
         return (2 <= c && c <= 8) || (14 <= c && c <= 17) || (21 <= c && c <= 31);
     }
 }

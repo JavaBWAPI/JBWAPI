@@ -48,7 +48,6 @@ public enum TechType {
     Nuclear_Strike(45),
     Unknown(46);
 
-    public static TechType[] techTypes = new TechType[46 + 1];
     /// IMPLEMENTATION
     private static int defaultOreCost[] =         // Same as default gas cost
             {100, 200, 200, 100, 0, 150, 0, 200, 100, 150, 100, 100, 0, 100, 0, 200, 100, 100, 0, 200, 150, 150, 150, 0, 100, 200, 0, 200, 0, 100, 100, 100, 200};
@@ -176,11 +175,13 @@ public enum TechType {
             {}
     };
 
+    static final TechType[] idToEnum = new TechType[46 + 1];
+
     static {
-        Arrays.stream(TechType.values()).forEach(v -> techTypes[v.id] = v);
+        Arrays.stream(TechType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     TechType(final int id) {
         this.id = id;

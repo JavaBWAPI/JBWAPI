@@ -17,13 +17,13 @@ public enum PlayerType {
     ComputerLeft(11),
     Unknown(12);
 
-    public static PlayerType[] playerTypes = new PlayerType[12 + 1];
+    static final PlayerType[] idToEnum = new PlayerType[12 + 1];
 
     static {
-        Arrays.stream(PlayerType.values()).forEach(v -> playerTypes[v.id] = v);
+        Arrays.stream(PlayerType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     PlayerType(final int id) {
         this.id = id;

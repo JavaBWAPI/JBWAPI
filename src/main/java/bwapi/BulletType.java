@@ -48,13 +48,13 @@ public enum BulletType {
     None(209),
     Unknown(210);
 
-    public static BulletType[] bulletTypes = new BulletType[210 + 1];
+    static final BulletType[] idToEnum = new BulletType[210 + 1];
 
     static {
-        Arrays.stream(BulletType.values()).forEach(v -> bulletTypes[v.id] = v);
+        Arrays.stream(BulletType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    private int id;
+    final int id;
 
     BulletType(final int id) {
         this.id = id;

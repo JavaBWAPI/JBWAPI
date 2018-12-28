@@ -356,21 +356,21 @@ public class Unit {
     }
 
     public UnitType getBuildType() {
-        return UnitType.unitTypes[unitData.getBuildType()];
+        return UnitType.idToEnum[unitData.getBuildType()];
     }
 
     public List<UnitType> getTrainingQueue() {
         return IntStream.range(0, unitData.getTrainingQueueCount())
-                .mapToObj(i -> UnitType.unitTypes[unitData.getTrainingQueue(i)])
+                .mapToObj(i -> UnitType.idToEnum[unitData.getTrainingQueue(i)])
                 .collect(Collectors.toList());
     }
 
     public TechType getTech() {
-        return TechType.techTypes[unitData.getTech()];
+        return TechType.idToEnum[unitData.getTech()];
     }
 
     public UpgradeType getUpgrade() {
-        return UpgradeType.upgradeTypes[unitData.getUpgrade()];
+        return UpgradeType.idToEnum[unitData.getUpgrade()];
     }
 
     public int getRemainingBuildTime() {
@@ -1235,11 +1235,11 @@ public class Unit {
             case Cancel_Upgrade:
                 return true;
             case Use_Tech:
-                return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
+                return canUseTechWithoutTarget(TechType.idToEnum[command.extra], false, false);
             case Use_Tech_Unit:
-                return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+                return canUseTechUnit(TechType.idToEnum[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
             case Use_Tech_Position:
-                return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+                return canUseTechPosition(TechType.idToEnum[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
             case Place_COP:
                 return canPlaceCOP(new TilePosition(command.x, command.y), false, false);
         }
@@ -1369,11 +1369,11 @@ public class Unit {
             case Cancel_Upgrade:
                 return false;
             case Use_Tech:
-                return canUseTechWithoutTarget(TechType.techTypes[command.extra], false, false);
+                return canUseTechWithoutTarget(TechType.idToEnum[command.extra], false, false);
             case Use_Tech_Unit:
-                return canUseTechUnit(TechType.techTypes[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
+                return canUseTechUnit(TechType.idToEnum[command.extra], command.target, checkCanTargetUnit, checkCanUseTechUnitOnUnits, false, false);
             case Use_Tech_Position:
-                return canUseTechPosition(TechType.techTypes[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
+                return canUseTechPosition(TechType.idToEnum[command.extra], command.getTargetPosition(), checkCanUseTechPositionOnPositions, false, false);
             case Place_COP:
                 return false;
         }
@@ -4131,7 +4131,7 @@ public class Unit {
             lastTypeUpdate = frame;
             position = new Position(unitData.getPositionX(), unitData.getPositionY());
         }
-        unitType = UnitType.unitTypes[unitData.getType()];
+        unitType = UnitType.idToEnum[unitData.getType()];
     }
 
     void updatePlayer(final int frame) {

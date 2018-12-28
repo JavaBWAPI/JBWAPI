@@ -14,7 +14,7 @@ public enum CoordinateType {
         Arrays.stream(CoordinateType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    public final int id;
+    final int id;
 
     CoordinateType(final int id) {
         this.id = id;

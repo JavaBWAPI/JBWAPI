@@ -230,7 +230,7 @@ public enum Key {
     K_PA1(253),
     K_OEM_CLEAR(254);
 
-    public final int value;
+    final int value;
 
     Key(final int value) {
         this.value = value;
