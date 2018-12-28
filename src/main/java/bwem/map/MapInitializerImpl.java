@@ -100,9 +100,9 @@ public class MapInitializerImpl extends MapImpl implements MapInitializer {
 
     @Override
     public void initializeNeutralData(
-            final Set<Unit> mineralPatches,
-            final Set<Unit> vespeneGeysers,
-            final Set<Unit> neutralUnits) {
+            final List<Unit> mineralPatches,
+            final List<Unit> vespeneGeysers,
+            final List<Unit> neutralUnits) {
         super.neutralData = new NeutralDataImpl(this, mineralPatches, vespeneGeysers, neutralUnits);
     }
 
@@ -663,12 +663,12 @@ public class MapInitializerImpl extends MapImpl implements MapInitializer {
     ////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Set<Unit> filterPlayerUnits(final Collection<Unit> units, final Player player) {
+    public List<Unit> filterPlayerUnits(final Collection<Unit> units, final Player player) {
         return super.filterPlayerUnits(units, player);
     }
 
     @Override
-    public Set<Unit> filterNeutralPlayerUnits(
+    public List<Unit> filterNeutralPlayerUnits(
             final Collection<Unit> units, final Collection<Player> players) {
         return super.filterNeutralPlayerUnits(units, players);
     }

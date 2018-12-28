@@ -2,10 +2,8 @@ package bwapi;
 
 
 import bwapi.ClientData.UnitData;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -488,9 +486,9 @@ public class Unit {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Unit> getUnitsInRadius(final int radius) {
+    public List<Unit> getUnitsInRadius(final int radius) {
         if (!exists()) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         return game.getUnitsInRectangle(
                 getLeft() - radius,
@@ -500,10 +498,10 @@ public class Unit {
                 u -> getDistance(u) <= radius);
     }
 
-    public Set<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
+    public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
         // Return if this unit does not exist
         if (!exists()) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
 
         final int max = getPlayer().weaponMaxRange(weapon);

@@ -39,20 +39,22 @@ public class Game {
 
     private static final int REGION_DATA_SIZE = 5000;
 
-    private final Set<Unit> staticMinerals = new HashSet<>();
-    private final Set<Unit> staticGeysers = new HashSet<>();
-    private final Set<Unit> staticNeutralUnits = new HashSet<>();
     private final Set<Integer> visibleUnits = new HashSet<>();
     private final Client client;
     private final GameData gameData;
+
+    private List<Unit> staticMinerals;
+    private List<Unit> staticGeysers;
+    private List<Unit> staticNeutralUnits;
+
     // CONSTANT
     private Player[] players;
     private Region[] regions;
     private Force[] forces;
     private Bullet[] bullets;
-    private Set<Force> forceSet;
-    private Set<Player> playerSet;
-    private Set<Region> regionSet;
+    private List<Force> forceSet;
+    private List<Player> playerSet;
+    private List<Region> regionSet;
     // CHANGING
     private Unit[] units;
     //CACHED
@@ -89,7 +91,7 @@ public class Game {
         this.gameData = client.data();
     }
 
-    private static boolean hasPower(final int x, final int y, final UnitType unitType, final Set<Unit> pylons) {
+    private static boolean hasPower(final int x, final int y, final UnitType unitType, final List<Unit> pylons) {
         if (unitType.id >= 0 && unitType.id < UnitType.None.id && (!unitType.requiresPsi() || !unitType.isBuilding())) {
             return true;
         }
@@ -118,9 +120,6 @@ public class Game {
     Call this method in EventHander::OnMatchStart
     */
     void init() {
-        staticMinerals.clear();
-        staticGeysers.clear();
-        staticNeutralUnits.clear();
         visibleUnits.clear();
 
         final int forceCount = gameData.getForceCount();
@@ -129,7 +128,7 @@ public class Game {
             forces[id] = new Force(gameData.getForces(id), id, this);
         }
 
-        forceSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(forces)));
+        forceSet = Collections.unmodifiableList(Arrays.asList(forces));
 
         final int playerCount = gameData.getPlayerCount();
         players = new Player[playerCount];
@@ -137,7 +136,7 @@ public class Game {
             players[id] = new Player(gameData.getPlayers(id), id, this);
         }
 
-        playerSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(players)));
+        playerSet = Collections.unmodifiableList(Arrays.asList(players));
 
         final int bulletCount = 100;
         bullets = new Bullet[bulletCount];
@@ -155,9 +154,13 @@ public class Game {
             region.updateNeighbours();
         }
 
-        regionSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(regions)));
+        regionSet = Collections.unmodifiableList(Arrays.asList(regions));
 
         units = new Unit[10000];
+
+        final List<Unit> staticMinerals = new ArrayList<>();
+        final List<Unit> staticGeysers = new ArrayList<>();
+        final List<Unit> staticNeutralUnits = new ArrayList<>();
         for (int id = 0; id < gameData.getInitialUnitCount(); id++) {
             final Unit unit = new Unit(gameData.getUnits(id), id,this);
             //skip ghost units
@@ -177,7 +180,12 @@ public class Game {
             }
         }
 
+        this.staticMinerals = Collections.unmodifiableList(staticMinerals);
+        this.staticGeysers = Collections.unmodifiableList(staticGeysers);
+        this.staticNeutralUnits = Collections.unmodifiableList(staticNeutralUnits);
+
         randomSeed = gameData.getRandomSeed();
+
         revision = gameData.getRevision();
         debug = gameData.isDebug();
         self = players[gameData.getSelf()];
@@ -284,73 +292,65 @@ public class Game {
         shape.setIsSolid(isSolid);
     }
 
-    public Set<Force> getForces() {
+    public List<Force> getForces() {
         return forceSet;
     }
 
-    public Set<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return playerSet;
     }
 
-    public Set<Unit> getAllUnits() {
+    public List<Unit> getAllUnits() {
         if (getFrameCount() == 0) {
-            final HashSet<Unit> us = new HashSet<>();
-            for (final Unit u : units) {
-                if (u != null) {
-                    us.add(u);
-                }
-            }
-            return us;
+            return Arrays.stream(units)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
         return visibleUnits.stream()
                 .map(i -> units[i])
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<Unit> getMinerals() {
+    public List<Unit> getMinerals() {
         return getAllUnits().stream()
                 .filter(u -> u.getType().isMineralField())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<Unit> getGeysers() {
+    public List<Unit> getGeysers() {
         return getAllUnits().stream()
                 .filter(u -> u.getType() == Resource_Vespene_Geyser)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<Unit> getNeutralUnits() {
+    public List<Unit> getNeutralUnits() {
         return getAllUnits().stream()
                 .filter(u -> u.getPlayer().equals(neutral()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    public Set<Unit> getStaticMinerals() {
-        return new HashSet<>(staticMinerals);
+    public List<Unit> getStaticMinerals() {
+        return staticMinerals;
     }
 
-    public Set<Unit> getStaticGeysers() {
-        return new HashSet<>(staticGeysers);
+    public List<Unit> getStaticGeysers() {
+        return staticGeysers;
     }
 
-    public Set<Unit> getStaticNeutralUnits() {
-        return new HashSet<>(staticNeutralUnits);
+    public List<Unit> getStaticNeutralUnits() {
+        return staticNeutralUnits;
     }
 
-    public Set<Bullet> getBullets() {
-        final Set<Bullet> bs = new HashSet<>();
-        for (final Bullet bullet : bullets) {
-            if (bullet.exists()) {
-                bs.add(bullet);
-            }
-        }
-        return bs;
+    public List<Bullet> getBullets() {
+        return Arrays.stream(bullets)
+                .filter(Bullet::exists)
+                .collect(Collectors.toList());
     }
 
-    public Set<Position> getNukeDots() {
+    public List<Position> getNukeDots() {
         return IntStream.range(0, gameData.getNukeDotCount())
                 .mapToObj(id -> new Position(gameData.getNukeDots(id)))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public Force getForce(final int forceID) {
@@ -436,50 +436,52 @@ public class Game {
         addCommand(EnableFlag, flag.value, 1);
     }
 
-    public Set<Unit> getUnitsOnTile(final int tileX, final int tileY) {
+    public List<Unit> getUnitsOnTile(final int tileX, final int tileY) {
         return getAllUnits().stream().filter(u -> {
             final TilePosition tp = u.getTilePosition();
             return tp.x == tileX && tp.y == tileY;
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
     }
 
-    public Set<Unit> getUnitsOnTile(final TilePosition tile) {
+    public List<Unit> getUnitsOnTile(final TilePosition tile) {
         return getUnitsOnTile(tile.x, tile.y);
     }
 
-    public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom) {
+    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom) {
         return getUnitsInRectangle(left, top, right, bottom, u -> true);
     }
 
-    public Set<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
         return getAllUnits().stream().filter(u -> {
             final Position p = u.getPosition();
             return left <= p.x && top <= p.y && p.x < right && p.y < bottom && filter.operation(u);
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
     }
 
-    public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom) {
+    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom) {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, u -> true);
     }
 
-    public Set<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
+    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
     }
 
-    public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
+    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
         return getUnitsInRadius(x, y, radius, u -> true);
     }
 
-    public Set<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
+    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
         return getUnitsInRadius(new Position(x, y), radius, filter);
     }
 
-    public Set<Unit> getUnitsInRadius(final Position center, final int radius) {
+    public List<Unit> getUnitsInRadius(final Position center, final int radius) {
         return getUnitsInRadius(center, radius, u -> true);
     }
 
-    public Set<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
-        return getAllUnits().stream().filter(u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u)).collect(Collectors.toSet());
+    public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
+        return getAllUnits().stream()
+                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u))
+                .collect(Collectors.toList());
     }
 
     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom) {
@@ -622,7 +624,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return hasPower(position.x, position.y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toSet()));
+        return hasPower(position.x, position.y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toList()));
     }
 
     public boolean hasPower(final int tileX, final int tileY) {
@@ -715,7 +717,7 @@ public class Game {
         // Ground getUnit dimension check
         if (type != Special_Start_Location) {
             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-            final Set<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
+            final List<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
                     u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
                             && u.getLeft() <= targPos.x + type.dimensionRight()
                             && u.getTop() <= targPos.y + type.dimensionDown()
@@ -1070,10 +1072,10 @@ public class Game {
                 .contains(false);
     }
 
-    public Set<Unit> getSelectedUnits() {
+    public List<Unit> getSelectedUnits() {
         return IntStream.range(0, gameData.getSelectedUnitCount())
                 .mapToObj(i -> units[gameData.getSelectedUnits(i)])
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public Player self() {
@@ -1088,26 +1090,26 @@ public class Game {
         return neutral;
     }
 
-    public Set<Player> allies() {
+    public List<Player> allies() {
         final Player self = self();
         return getPlayers().stream()
                 .filter(self::isAlly)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     //TODO FIX in 4.3.0
-    public Set<Player> enemies() {
+    public List<Player> enemies() {
         final Player self = self();
         return getPlayers().stream()
                 .filter(p -> !(p.isNeutral() || self.isAlly(p)))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     //TODO FIX in 4.3.0
-    public Set<Player> observers() {
+    public List<Player> observers() {
         return getPlayers().stream()
                 .filter(Player::isObserver)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public void drawText(final CoordinateType ctype, final int x, final int y, final String cstr_format) {
@@ -1513,7 +1515,7 @@ public class Game {
         return gameData.getCountdownTimer();
     }
 
-    public Set<Region> getAllRegions() {
+    public List<Region> getAllRegions() {
         return regionSet;
     }
 

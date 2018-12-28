@@ -38,9 +38,9 @@ public interface MapInitializer {
             int mapTileWidth, int mapTileHeight, List<TilePosition> startingLocations);
 
     void initializeNeutralData(
-            Set<Unit> mineralPatches,
-            Set<Unit> vespeneGeysers,
-            Set<Unit> neutralUnits);
+            List<Unit> mineralPatches,
+            List<Unit> vespeneGeysers,
+            List<Unit> neutralUnits);
 
     void computeAltitude(TerrainData terrainData);
 
@@ -85,7 +85,7 @@ public interface MapInitializer {
 
     void setLowestAltitudeInTile(TilePosition t);
 
-    Set<Unit> filterPlayerUnits(Collection<Unit> units, Player player);
+    List<Unit> filterPlayerUnits(Collection<Unit> units, Player player);
 
-    Set<Unit> filterNeutralPlayerUnits(Collection<Unit> units, Collection<Player> players);
+    List<Unit> filterNeutralPlayerUnits(Collection<Unit> units, Collection<Player> players);
 }

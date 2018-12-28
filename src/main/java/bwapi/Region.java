@@ -2,14 +2,12 @@ package bwapi;
 
 
 import bwapi.ClientData.RegionData;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Region {
     private final RegionData regionData;
     private final Game game;
 
-    private final Set<Region> neighbours = new HashSet<>();
     private final int id;
     private final int regionGroupID;
     private final Position center;
@@ -22,6 +20,8 @@ public class Region {
     private final int boundsBottom;
     private Region closestAccessibleRegion;
     private Region closestInaccessibleRegion;
+
+    private List<Region> neighbours;
 
     Region(final RegionData regionData, final Game game) {
         this.regionData = regionData;
@@ -42,6 +42,7 @@ public class Region {
         int accessibleBestDist = Integer.MAX_VALUE;
         int inaccessibleBestDist = Integer.MAX_VALUE;
 
+        final List<Region> neighbours = new ArrayList<>();
         for (int i = 0; i < regionData.getNeighborCount(); i++) {
             final Region region = game.getRegion(regionData.getNeighbors(i));
             neighbours.add(region);
@@ -56,6 +57,7 @@ public class Region {
                 inaccessibleBestDist = d;
             }
         }
+        this.neighbours = Collections.unmodifiableList(neighbours);
     }
 
     public int getID() {
@@ -82,8 +84,8 @@ public class Region {
         return accessible;
     }
 
-    public Set<Region> getNeighbors() {
-        return new HashSet<>(neighbours);
+    public List<Region> getNeighbors() {
+        return neighbours;
     }
 
     public int getBoundsLeft() {
@@ -114,7 +116,7 @@ public class Region {
         return getCenter().getApproxDistance(other.getCenter());
     }
 
-    public Set<Unit> getUnits() {
+    public List<Unit> getUnits() {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),
                 u -> equals(u.getRegion()));
     }

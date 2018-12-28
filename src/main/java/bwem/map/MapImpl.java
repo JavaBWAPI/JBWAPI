@@ -40,10 +40,10 @@ public abstract class MapImpl implements Map {
     protected final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
             new ArrayList<>();
     protected final Game game;
-    protected final Set<Unit> mineralPatches;
-    protected final Set<Player> players;
-    protected final Set<Unit> vespeneGeysers;
-    protected final Set<Unit> units;
+    protected final List<Unit> mineralPatches;
+    protected final List<Player> players;
+    protected final List<Unit> vespeneGeysers;
+    protected final List<Unit> units;
     private boolean automaticPathUpdate = false;
     private final Graph graph;
     private final NeighboringAreaChooser neighboringAreaChooser;
@@ -486,12 +486,12 @@ public abstract class MapImpl implements Map {
         return breadthFirstSearch(start, findCond, visitCond, true);
     }
 
-    protected Set<Unit> filterPlayerUnits(final Collection<Unit> units,
+    protected List<Unit> filterPlayerUnits(final Collection<Unit> units,
                                           final Player player) {
         //        return this.units.stream().filter(u -> u instanceof PlayerUnit
         //                && ((PlayerUnit)u).getPlayer().equals(player)).map(u ->
         // (PlayerUnit)u).collect(Collectors.toList());
-        final Set<Unit> ret = new HashSet<>();
+        final List<Unit> ret = new ArrayList<>();
         for (final Unit u : units) {
             if (!(u.getType().isMineralField() || u.getType().equals(UnitType.Resource_Vespene_Geyser))) {
                 if (u.getPlayer().equals(player)) {
@@ -502,9 +502,9 @@ public abstract class MapImpl implements Map {
         return ret;
     }
 
-    protected Set<Unit> filterNeutralPlayerUnits(
+    protected List<Unit> filterNeutralPlayerUnits(
             final Collection<Unit> units, final Collection<Player> players) {
-        final Set<Unit> ret = new HashSet<>();
+        final List<Unit> ret = new ArrayList<>();
         for (final Player player : players) {
             if (player.isNeutral()) {
                 ret.addAll(filterPlayerUnits(units, player));

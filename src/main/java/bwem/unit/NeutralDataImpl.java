@@ -26,9 +26,9 @@ public class NeutralDataImpl implements NeutralData {
 
     public NeutralDataImpl(
             final Map map,
-            final Set<Unit> mineralPatches,
-            final Set<Unit> vespeneGeysers,
-            final Set<Unit> neutralUnits) {
+            final List<Unit> mineralPatches,
+            final List<Unit> vespeneGeysers,
+            final List<Unit> neutralUnits) {
         ////////////////////////////////////////////////////////////////////////
         // MapImpl::InitializeNeutrals
         ////////////////////////////////////////////////////////////////////////
