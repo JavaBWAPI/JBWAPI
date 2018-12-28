@@ -1,6 +1,7 @@
 package bwapi;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public enum UpgradeType {
@@ -252,7 +253,7 @@ public enum UpgradeType {
     }
 
     public List<UnitType> whatUses() {
-        return Arrays.asList(upgradeWhatUses[id]);
+        return Collections.unmodifiableList(Arrays.asList(upgradeWhatUses[id]));
     }
 
     public int maxRepeats() {

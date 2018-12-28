@@ -1,6 +1,7 @@
 package bwapi;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static bwapi.Order.*;
@@ -223,7 +224,7 @@ public enum TechType {
     }
 
     public List<UnitType> whatsUses() {
-        return Arrays.asList(techWhatUses[id]);
+        return Collections.unmodifiableList(Arrays.asList(techWhatUses[id]));
     }
 
     public Order getOrder() {

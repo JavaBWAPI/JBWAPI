@@ -305,11 +305,11 @@ public enum UnitType {
     }
 
     public List<TechType> abilities() {
-        return Arrays.asList(UnitTypeContainer.unitTechs[id]);
+        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.unitTechs[id]));
     }
 
     public List<UpgradeType> upgrades() {
-        return Arrays.asList(UnitTypeContainer.upgrades[id]);
+        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgrades[id]));
     }
 
     public UpgradeType armorUpgrade() {
@@ -644,15 +644,15 @@ public enum UnitType {
     }
 
     public List<UnitType> buildsWhat() {
-        return Arrays.asList(UnitTypeContainer.buildsWhat[id]);
+        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.buildsWhat[id]));
     }
 
     public List<TechType> researchesWhat() {
-        return Arrays.asList(UnitTypeContainer.researchesWhat[id]);
+        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.researchesWhat[id]));
     }
 
     public List<UpgradeType> upgradesWhat() {
-        return Arrays.asList(UnitTypeContainer.upgradesWhat[id]);
+        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgradesWhat[id]));
     }
 
     public boolean isSuccessorOf(final UnitType type) {
