@@ -19,6 +19,7 @@ class EventHandler implements Client.EventHandler {
             case 0: //MatchStart
                 frames = 0;
                 game.init();
+                game.setLatCom(false);
                 eventListener.onStart();
                 break;
             case 1: //MatchEnd
