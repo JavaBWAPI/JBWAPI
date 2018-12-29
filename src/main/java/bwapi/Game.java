@@ -262,9 +262,11 @@ public class Game {
     }
 
     void onFrame(final int frame) {
-        allUnits = Collections.unmodifiableList(visibleUnits.stream()
-            .map(i -> units[i])
-            .collect(Collectors.toList()));
+        if (frame > 0) {
+            allUnits = Collections.unmodifiableList(visibleUnits.stream()
+                .map(i -> units[i])
+                .collect(Collectors.toList()));
+        }
         getAllUnits().forEach(u -> u.updatePosition(frame));
     }
 
