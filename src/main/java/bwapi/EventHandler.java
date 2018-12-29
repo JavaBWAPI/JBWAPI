@@ -27,7 +27,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onEnd(event.getV1() != 0);
                 break;
             case MatchFrame:
-                game.updateUnitPositions(frames);
+                game.onFrame(frames);
                 eventListener.onFrame();
                 frames += 1;
                 break;

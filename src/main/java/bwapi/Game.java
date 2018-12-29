@@ -40,6 +40,7 @@ public class Game {
     private static final int REGION_DATA_SIZE = 5000;
 
     private final Set<Integer> visibleUnits = new HashSet<>();
+    private List<Unit> allUnits;
     private final Client client;
     private final GameData gameData;
 
@@ -147,7 +148,7 @@ public class Game {
         final int regionCount = gameData.getRegionCount();
         regions = new Region[regionCount];
         for (int id = 0; id < regionCount; id++) {
-            regions[id] = new Region(gameData.getRegions(id),this);
+            regions[id] = new Region(gameData.getRegions(id), this);
         }
 
         for (final Region region : regions) {
@@ -161,13 +162,15 @@ public class Game {
         final List<Unit> staticMinerals = new ArrayList<>();
         final List<Unit> staticGeysers = new ArrayList<>();
         final List<Unit> staticNeutralUnits = new ArrayList<>();
+        final List<Unit> allUnits = new ArrayList<>();
         for (int id = 0; id < gameData.getInitialUnitCount(); id++) {
-            final Unit unit = new Unit(gameData.getUnits(id), id,this);
+            final Unit unit = new Unit(gameData.getUnits(id), id, this);
             //skip ghost units
             if (unit.getInitialType() == UnitType.Terran_Marine && unit.getInitialHitPoints() == 0) {
                 continue;
             }
             this.units[id] = unit;
+            allUnits.add(unit);
 
             if (unit.getType().isMineralField()) {
                 staticMinerals.add(unit);
@@ -183,6 +186,7 @@ public class Game {
         this.staticMinerals = Collections.unmodifiableList(staticMinerals);
         this.staticGeysers = Collections.unmodifiableList(staticGeysers);
         this.staticNeutralUnits = Collections.unmodifiableList(staticNeutralUnits);
+        this.allUnits = Collections.unmodifiableList(allUnits);
 
         randomSeed = gameData.getRandomSeed();
 
@@ -257,7 +261,10 @@ public class Game {
         visibleUnits.remove(id);
     }
 
-    void updateUnitPositions(final int frame) {
+    void onFrame(final int frame) {
+        allUnits = Collections.unmodifiableList(visibleUnits.stream()
+            .map(i -> units[i])
+            .collect(Collectors.toList()));
         getAllUnits().forEach(u -> u.updatePosition(frame));
     }
 
@@ -301,14 +308,7 @@ public class Game {
     }
 
     public List<Unit> getAllUnits() {
-        if (getFrameCount() == 0) {
-            return Arrays.stream(units)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        return visibleUnits.stream()
-                .map(i -> units[i])
-                .collect(Collectors.toList());
+        return allUnits;
     }
 
     public List<Unit> getMinerals() {
