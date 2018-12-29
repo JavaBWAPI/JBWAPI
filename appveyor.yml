@@ -1,0 +1,6 @@
+version: 1.0.{build}
+image: Ubuntu1804
+build_script:
+- sh: ./mvnw package
+artifacts:
+- path: target/*-with-dependencies.jar
