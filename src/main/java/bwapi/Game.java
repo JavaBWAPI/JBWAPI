@@ -720,11 +720,11 @@ public class Game {
         if (type != Special_Start_Location) {
             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
             final List<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
-                    u -> !u.isFlying() && !u.isLoaded() && builder != null || type == Zerg_Nydus_Canal
+                    u -> !u.isFlying() && !u.isLoaded() && (builder != u || type == Zerg_Nydus_Canal)
                             && u.getLeft() <= targPos.x + type.dimensionRight()
                             && u.getTop() <= targPos.y + type.dimensionDown()
-                            && u.getRight() <= targPos.x + type.dimensionLeft()
-                            && u.getBottom() <= targPos.y + type.dimensionUp());
+                            && u.getRight() >= targPos.x - type.dimensionLeft()
+                            && u.getBottom() >= targPos.y - type.dimensionUp());
 
             for (final Unit u : unitsInRect) {
                 // Addons can be placed over units that can move, pushing them out of the way
