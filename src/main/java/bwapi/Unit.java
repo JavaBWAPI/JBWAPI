@@ -130,11 +130,11 @@ public class Unit {
     }
 
     public int getRight() {
-        return position.x - getType().dimensionRight();
+        return position.x + getType().dimensionRight();
     }
 
     public int getBottom() {
-        return position.y - getType().dimensionDown();
+        return position.y + getType().dimensionDown();
     }
 
     public int getHitPoints() {
