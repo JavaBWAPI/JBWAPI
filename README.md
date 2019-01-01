@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/JasperGeurtz/JBWAPI.svg?branch=develop)](https://travis-ci.org/JasperGeurtz/JBWAPI)
+[![Build Status](https://travis-ci.org/JavaBWAPI/JBWAPI.svg?branch=develop)](https://travis-ci.org/JavaBWAPI/JBWAPI)
 # JBWAPI
 Pure Java [bwapi](https://github.com/bwapi/bwapi) client (4.2.0) implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
 
