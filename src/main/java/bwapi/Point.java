@@ -36,11 +36,12 @@ class Point {
     }
 
     public boolean equals(final Object o) {
-        if (!(o instanceof Point)) {
-            return false;
+        if (o != null && this.getClass().equals(o.getClass())) {
+            final Point point = (Point) o;
+            return x == point.x && y == point.y;
         }
-        final Point point = (Point) o;
-        return scalar == point.scalar && x == point.x && y == point.y;
+        return false;
+
     }
 
     /**
@@ -53,7 +54,6 @@ class Point {
     }
 
     public int hashCode() {
-        //alternatively return Objects.hash(x, y); ?
-        return (x << 16) + y;
+        return (x << 16) ^ y;
     }
 }
