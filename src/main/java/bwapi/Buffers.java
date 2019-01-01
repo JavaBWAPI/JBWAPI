@@ -34,6 +34,7 @@ final class Buffers {
         }
         buffer.position(offset);
         enc.encode(CharBuffer.wrap(s), buffer, true);
+        buffer.put((byte) 0);
         buffer.rewind();
     }
 }
