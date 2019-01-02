@@ -91,11 +91,11 @@ public class Unit {
     }
 
     public int getX() {
-        return position.x;
+        return getPosition().x;
     }
 
     public int getY() {
-        return position.y;
+        return getPosition().y;
     }
 
     public TilePosition getTilePosition() {
@@ -122,19 +122,19 @@ public class Unit {
     }
 
     public int getLeft() {
-        return position.x - getType().dimensionLeft();
+        return getX() - getType().dimensionLeft();
     }
 
     public int getTop() {
-        return position.y - getType().dimensionUp();
+        return getY() - getType().dimensionUp();
     }
 
     public int getRight() {
-        return position.x + getType().dimensionRight();
+        return getX() + getType().dimensionRight();
     }
 
     public int getBottom() {
-        return position.y + getType().dimensionDown();
+        return getY() + getType().dimensionDown();
     }
 
     public int getHitPoints() {
