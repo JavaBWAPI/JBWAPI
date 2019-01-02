@@ -109,33 +109,18 @@ class Client {
     }
 
     class LittleEndianPipe {
-        RandomAccessFile pipe;
+        private final RandomAccessFile pipe;
 
         LittleEndianPipe(final String name, final String mode) throws FileNotFoundException {
             pipe = new RandomAccessFile(name, mode);
         }
 
-        final int readByte() throws IOException {
-            return pipe.readByte();
-        }
-
-        final void writeByte(final int b) throws IOException {
-            pipe.writeByte(b);
-        }
-
         final int readInt() throws IOException {
-            final int b1 = readByte();
-            final int b2 = readByte();
-            final int b3 = readByte();
-            final int b4 = readByte();
-            return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
+            return Integer.reverseBytes(pipe.readInt());
         }
 
         final void writeInt(final int i) throws IOException {
-            writeByte(i >> 24);
-            writeByte((i >> 16) & 0xff);
-            writeByte((i >> 8) & 0xff);
-            writeByte(i & 0xff);
+            pipe.writeInt(Integer.reverseBytes(i));
         }
     }
 
