@@ -454,10 +454,9 @@ public class Game {
     }
 
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-        return getAllUnits().stream().filter(u -> {
-            final Position p = u.getPosition();
-            return left <= p.x && top <= p.y && p.x < right && p.y < bottom && filter.operation(u);
-        }).collect(Collectors.toList());
+        return getAllUnits().stream().filter(u ->
+            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && filter.operation(u))
+            .collect(Collectors.toList());
     }
 
     public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom) {
@@ -719,12 +718,10 @@ public class Game {
         // Ground getUnit dimension check
         if (type != Special_Start_Location) {
             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-            final List<Unit> unitsInRect = getUnitsInRectangle(lt.toPosition(), rb.toPosition(),
-                    u -> !u.isFlying() && !u.isLoaded() && (builder != u || type == Zerg_Nydus_Canal)
-                            && u.getLeft() <= targPos.x + type.dimensionRight()
-                            && u.getTop() <= targPos.y + type.dimensionDown()
-                            && u.getRight() >= targPos.x - type.dimensionLeft()
-                            && u.getBottom() >= targPos.y - type.dimensionUp());
+            final List<Unit> unitsInRect = getUnitsInRectangle(
+                targPos.subtract(new Position(type.dimensionLeft(), type.dimensionUp())),
+                targPos.add(new Position(type.dimensionRight(), type.dimensionDown())),
+                    u -> !u.isFlying() && !u.isLoaded() && (builder != u || type == Zerg_Nydus_Canal));
 
             for (final Unit u : unitsInRect) {
                 // Addons can be placed over units that can move, pushing them out of the way

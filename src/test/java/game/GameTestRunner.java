@@ -4,12 +4,12 @@ import bwapi.BWClient;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
 
-class GameTest extends DefaultBWListener {
+class GameTestRunner extends DefaultBWListener {
     final BWClient bwClient;
 
     Game game;
 
-    GameTest() {
+    GameTestRunner() {
         bwClient = new BWClient(this);
         bwClient.startGame();
     }
@@ -23,6 +23,6 @@ class GameTest extends DefaultBWListener {
     }
 
     public static void main(String[] args) {
-        new GameTest();
+        new GameTestRunner();
     }
 }
