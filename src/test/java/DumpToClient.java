@@ -188,7 +188,7 @@ public class DumpToClient {
                             break;
                         case CHAR:
                             out.printf("Buffers.toString(sharedMemory, offset, %d)",
-                                v.arraySizes.size());
+                                v.arraySizes.get(v.arraySizes.size() - 1));
                             break;
                         case ENUM:
                             out.print(v.enumName + ".idToEnum[sharedMemory.getInt(offset)]");

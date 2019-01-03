@@ -70,6 +70,7 @@ public class MarineHell extends DefaultBWListener {
         BWTA.analyze();
 
         int i = 0;
+        System.out.printf("Map name: %s; Map file name: %s\n", game.mapName(), game.mapFileName());
     }
 
     @Override
@@ -90,6 +91,10 @@ public class MarineHell extends DefaultBWListener {
 
         if (maxCyclesForSearching > 300000) {
             dontBuild = true;
+        }
+
+        if (game.getFrameCount() == 48) {
+            game.sendText("Hello from JBWAPI!");
         }
 
         game.setLocalSpeed(0);

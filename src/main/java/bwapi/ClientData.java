@@ -327,28 +327,28 @@ final class ClientData {
         }
         String getMapFileName() {
             int offset = myOffset + 3446408;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 261);
         }
         void setMapFileName(String value) {
             Buffers.fromString(sharedMemory, myOffset + 3446408, 261, value);
         }
         String getMapPathName() {
             int offset = myOffset + 3446669;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 261);
         }
         void setMapPathName(String value) {
             Buffers.fromString(sharedMemory, myOffset + 3446669, 261, value);
         }
         String getMapName() {
             int offset = myOffset + 3446930;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 33);
         }
         void setMapName(String value) {
             Buffers.fromString(sharedMemory, myOffset + 3446930, 33, value);
         }
         String getMapHash() {
             int offset = myOffset + 3446963;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 41);
         }
         void setMapHash(String value) {
             Buffers.fromString(sharedMemory, myOffset + 3446963, 41, value);
@@ -542,7 +542,7 @@ final class ClientData {
         }
         String getEventStrings(int i) {
             int offset = myOffset + 10706628 + 1 * 256 * i;
-            return Buffers.toString(sharedMemory, offset, 2);
+            return Buffers.toString(sharedMemory, offset, 256);
         }
         void setEventStrings(int i, String value) {
             Buffers.fromString(sharedMemory, myOffset + 10706628 + 1 * 256 * i, 256, value);
@@ -556,7 +556,7 @@ final class ClientData {
         }
         String getStrings(int i) {
             int offset = myOffset + 10962632 + 1 * 1024 * i;
-            return Buffers.toString(sharedMemory, offset, 2);
+            return Buffers.toString(sharedMemory, offset, 1024);
         }
         void setStrings(int i, String value) {
             Buffers.fromString(sharedMemory, myOffset + 10962632 + 1 * 1024 * i, 1024, value);
@@ -870,7 +870,7 @@ final class ClientData {
         }
         String getName() {
             int offset = myOffset + 0;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 32);
         }
         void setName(String value) {
             Buffers.fromString(sharedMemory, myOffset + 0, 32, value);
@@ -884,7 +884,7 @@ final class ClientData {
         }
         String getName() {
             int offset = myOffset + 0;
-            return Buffers.toString(sharedMemory, offset, 1);
+            return Buffers.toString(sharedMemory, offset, 25);
         }
         void setName(String value) {
             Buffers.fromString(sharedMemory, myOffset + 0, 25, value);
