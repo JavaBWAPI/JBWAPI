@@ -115,12 +115,27 @@ class Client {
             pipe = new RandomAccessFile(name, mode);
         }
 
+        final int readByte() throws IOException {
+            return pipe.readByte();
+        }
+
+        final void writeByte(final int b) throws IOException {
+            pipe.writeByte(b);
+        }
+
         final int readInt() throws IOException {
-            return Integer.reverseBytes(pipe.readInt());
+            final int b1 = readByte();
+            final int b2 = readByte();
+            final int b3 = readByte();
+            final int b4 = readByte();
+            return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
         }
 
         final void writeInt(final int i) throws IOException {
-            pipe.writeInt(Integer.reverseBytes(i));
+            writeByte(i >> 24);
+            writeByte((i >> 16) & 0xff);
+            writeByte((i >> 8) & 0xff);
+            writeByte(i & 0xff);
         }
     }
 
