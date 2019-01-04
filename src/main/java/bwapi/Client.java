@@ -62,8 +62,8 @@ class Client {
                 try {
                     this.connect(procID);
                     return;
-                } catch (final Exception exception) {
-                    System.err.println(exception);
+                } catch (final Exception e) {
+                    System.err.println(e.getMessage());
                 }
             }
         }
