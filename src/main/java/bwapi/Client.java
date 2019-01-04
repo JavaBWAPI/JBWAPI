@@ -85,7 +85,6 @@ class Client {
         final ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                         .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
                 0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        sharedMemory.order(ByteOrder.LITTLE_ENDIAN);
         data = new ClientData(sharedMemory).new GameData(0);
 
         final int clientVersion = data.getClient_version();

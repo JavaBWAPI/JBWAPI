@@ -92,9 +92,9 @@ public class DumpToClient {
             out.println("package bwapi;");
             out.println("import java.nio.ByteBuffer;");
             out.println("final class ClientData {");
-            out.println("    private final ByteBuffer sharedMemory;");
-            out.println("    ClientData(ByteBuffer sharedMemory) {");
-            out.println("        this.sharedMemory = sharedMemory;");
+            out.println("    private final WrappedBuffer buffer;");
+            out.println("    ClientData(final ByteBuffer buffer) {");
+            out.println("        this.buffer = new WrappedBuffer(buffer);");
             out.println("    }");
             structs.values().forEach(s -> {
                 out.printf("    class %s {\n", s.name);
@@ -184,26 +184,26 @@ public class DumpToClient {
                     switch (v.type) {
                         case UNSIGNED_INT:
                         case INT:
-                            out.print("sharedMemory.getInt(offset)");
+                            out.print("buffer.getInt(offset)");
                             break;
                         case CHAR:
-                            out.printf("Buffers.toString(sharedMemory, offset, %d)",
+                            out.printf("buffer.getString(offset, %d)",
                                 v.arraySizes.get(v.arraySizes.size() - 1));
                             break;
                         case ENUM:
-                            out.print(v.enumName + ".idToEnum[sharedMemory.getInt(offset)]");
+                            out.print(v.enumName + ".idToEnum[buffer.getInt(offset)]");
                             break;
                         case DOUBLE:
-                            out.print("sharedMemory.getDouble(offset)");
+                            out.print("buffer.getDouble(offset)");
                             break;
                         case STRUCT:
                             out.printf("new %s(offset)", v.structRef.name);
                             break;
                         case BOOLEAN:
-                            out.print("sharedMemory.get(offset) != 0");
+                            out.print("buffer.getByte(offset) != 0");
                             break;
                         case UNSIGNED_SHORT:
-                            out.print("sharedMemory.getShort(offset)");
+                            out.print("buffer.getShort(offset)");
                             break;
                     }
                     out.println(";");
@@ -219,35 +219,35 @@ public class DumpToClient {
                             case INT:
                             case UNSIGNED_INT:
                                 out.println("int value) {");
-                                out.printf("            sharedMemory.putInt(%s, value);\n",
+                                out.printf("            buffer.putInt(%s, value);\n",
                                     offsetString);
                                 break;
                             case ENUM:
                                 out.printf("%s value) {\n", v.enumName);
-                                out.printf("            sharedMemory.putInt(%s, value.id);\n",
+                                out.printf("            buffer.putInt(%s, value.id);\n",
                                     offsetString);
                                 break;
                             case UNSIGNED_SHORT:
                                 out.println("short value) {");
-                                out.printf("            sharedMemory.putShort(%s, value);\n",
+                                out.printf("            buffer.putShort(%s, value);\n",
                                     offsetString);
                                 break;
                             case DOUBLE:
                                 out.println("double value) {");
-                                out.printf("            sharedMemory.putDouble(%s, value);\n",
+                                out.printf("            buffer.putDouble(%s, value);\n",
                                     offsetString);
                                 break;
                             case BOOLEAN:
                                 out.println("boolean value) {");
                                 out.printf(
-                                    "            sharedMemory.put(%s, (byte) (value ? 1 : 0));\n",
+                                    "            buffer.putByte(%s, (byte) (value ? 1 : 0));\n",
                                     offsetString);
                                 break;
                             case CHAR:
                                 out.println("String value) {");
                                 int maxLength = v.arraySizes.get(v.arraySizes.size() - 1);
                                 out.printf(
-                                    "            Buffers.fromString(sharedMemory, %s, %d, value);\n",
+                                    "            buffer.putString(%s, %d, value);\n",
                                     offsetString,
                                     maxLength);
                                 break;
