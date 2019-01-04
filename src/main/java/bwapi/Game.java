@@ -58,6 +58,8 @@ public class Game {
     private List<Region> regionSet;
     // CHANGING
     private Unit[] units;
+    private int frameCount = 0;
+
     //CACHED
     private int randomSeed;
     private int revision;
@@ -261,13 +263,14 @@ public class Game {
         visibleUnits.remove(id);
     }
 
-    void onFrame(final int frame) {
-        if (frame > 0) {
+    void onFrame() {
+        this.frameCount = gameData.getFrameCount();
+
+        if (getFrameCount() > 0) {
             allUnits = Collections.unmodifiableList(visibleUnits.stream()
                 .map(i -> units[i])
                 .collect(Collectors.toList()));
         }
-        getAllUnits().forEach(u -> u.updatePosition(frame));
     }
 
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
@@ -383,7 +386,7 @@ public class Game {
     }
 
     public int getFrameCount() {
-        return gameData.getFrameCount();
+        return frameCount;
     }
 
     public int getReplayFrameCount() {
