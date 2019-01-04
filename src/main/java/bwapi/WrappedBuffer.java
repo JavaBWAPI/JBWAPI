@@ -119,9 +119,15 @@ class WrappedBuffer {
 
     public String getString(final int offset, final int maxLen) {
         final byte[] buf = new byte[maxLen];
-        buffer.position(offset);
-        buffer.get(buf, 0, maxLen);
-        buffer.position(0);
+
+        if (useUnsafe) {
+            unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
+        }
+        else {
+            buffer.position(offset);
+            buffer.get(buf, 0, maxLen);
+        }
+
         int len = 0;
         while (len < maxLen && buf[len] != 0) {
             ++len;
@@ -130,13 +136,11 @@ class WrappedBuffer {
     }
 
     public void putString(final int offset, final int maxLen, final String string) {
-        final int len = string.length() + 1;
-        if (len >= maxLen) {
+        if (string.length() + 1 >= maxLen) {
             throw new StringIndexOutOfBoundsException();
         }
         buffer.position(offset);
         enc.encode(CharBuffer.wrap(string), buffer, true);
         buffer.put((byte) 0);
-        buffer.rewind();
     }
 }
