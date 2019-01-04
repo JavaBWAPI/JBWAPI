@@ -39,18 +39,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 class Client {
-    public static final int READ_WRITE = 0x1 | 0x2 | 0x4;
+    private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
     private static final int GAME_SIZE = 4 // ServerProcID
             + 4 // IsConnected
             + 4 // LastKeepAliveTime
             ;
+    private static final int BWAPI_VERSION = 10002;
 
     private static final int maxNumGames = 8;
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
     private LittleEndianPipe pipe;
     private ClientData.GameData data;
 
-    public Client() throws Exception {
+    Client() throws Exception {
         final ByteBuffer gameList = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, gameTableSize).getByteBuffer(0, GAME_SIZE * 8);
         gameList.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < 8; ++i) {
@@ -61,8 +62,8 @@ class Client {
                 try {
                     this.connect(procID);
                     return;
-                } catch (Exception ignored) {
-                    System.err.println(ignored);
+                } catch (final Exception exception) {
+                    System.err.println(exception);
                 }
             }
         }
@@ -75,19 +76,27 @@ class Client {
 
     private void connect(final int procID) throws Exception {
         pipe = new LittleEndianPipe("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
-        ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
-                .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
-            0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        sharedMemory.order(ByteOrder.LITTLE_ENDIAN);
+
         int code = 1;
         while (code != 2) {
             code = pipe.readInt();
         }
+
+        final ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                        .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
+                0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
+        sharedMemory.order(ByteOrder.LITTLE_ENDIAN);
         data = new ClientData(sharedMemory).new GameData(0);
-        System.out.println("Connected to BWAPI@" + procID + " with version " + data.getClient_version() + ": " + data.getRevision());
+
+        final int clientVersion = data.getClient_version();
+        if (clientVersion != BWAPI_VERSION) {
+            throw new Exception("BWAPI version mismatch, expected: " + BWAPI_VERSION + ", got: " + clientVersion);
+        }
+
+        System.out.println("Connected to BWAPI@" + procID + " with version " + clientVersion + ": " + data.getRevision());
     }
 
-    public void update(final EventHandler handler) throws Exception {
+    void update(final EventHandler handler) throws Exception {
         int code = 1;
         pipe.writeInt(code);
         while (code != 2) {
