@@ -32,8 +32,6 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -48,7 +46,7 @@ class Client {
 
     private static final int maxNumGames = 8;
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
-    private LittleEndianPipe pipe;
+    private RandomAccessFile pipe;
     private ClientData.GameData data;
 
     Client() throws Exception {
@@ -75,11 +73,11 @@ class Client {
     }
 
     private void connect(final int procID) throws Exception {
-        pipe = new LittleEndianPipe("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
+        pipe = new RandomAccessFile("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
 
-        int code = 1;
+        byte code = 1;
         while (code != 2) {
-            code = pipe.readInt();
+            code = pipe.readByte();
         }
 
         final ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
@@ -96,10 +94,10 @@ class Client {
     }
 
     void update(final EventHandler handler) throws Exception {
-        int code = 1;
-        pipe.writeInt(code);
+        byte code = 1;
+        pipe.writeByte(code);
         while (code != 2) {
-            code = pipe.readInt();
+            code = pipe.readByte();
         }
         for (int i = 0; i < data.getEventCount(); ++i) {
             handler.operation(data.getEvents(i));
@@ -116,68 +114,37 @@ class Client {
         void operation(ClientData.Event event);
     }
 
-    class LittleEndianPipe {
-        private final RandomAccessFile pipe;
 
-        LittleEndianPipe(final String name, final String mode) throws FileNotFoundException {
-            pipe = new RandomAccessFile(name, mode);
-        }
-
-        final int readByte() throws IOException {
-            return pipe.readByte();
-        }
-
-        final void writeByte(final int b) throws IOException {
-            pipe.writeByte(b);
-        }
-
-        final int readInt() throws IOException {
-            final int b1 = readByte();
-            final int b2 = readByte();
-            final int b3 = readByte();
-            final int b4 = readByte();
-            return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
-        }
-
-        final void writeInt(final int i) throws IOException {
-            writeByte(i >> 24);
-            writeByte((i >> 16) & 0xff);
-            writeByte((i >> 8) & 0xff);
-            writeByte(i & 0xff);
-        }
+    public String eventString(final int s) {
+        return data.getEventStrings(s);
     }
 
+    public int addString(final String s) {
+        int stringCount = data.getStringCount();
+        if (stringCount >= 19999) throw new IllegalStateException("Too many shapes!");
+        data.setStringCount(stringCount + 1);
+        data.setStrings(stringCount, s);
+        return stringCount;
+    }
 
-        public String eventString(final int s) {
-            return data.getEventStrings(s);
-        }
+    public Shape addShape() {
+        int shapeCount = data.getShapeCount();
+        if (shapeCount >= 19999) throw new IllegalStateException("Too many shapes!");
+        data.setShapeCount(shapeCount + 1);
+        return data.getShapes(shapeCount);
+    }
 
-        public int addString(final String s) {
-            int stringCount = data.getStringCount();
-            if (stringCount >= 19999) throw new IllegalStateException("Too many shapes!");
-            data.setStringCount(stringCount + 1);
-            data.setStrings(stringCount, s);
-            return stringCount;
-        }
+    public Command addCommand() {
+        final int commandCount = data.getCommandCount();
+        if (commandCount >= 19999) throw new IllegalStateException("Too many commands!");
+        data.setCommandCount(commandCount + 1);
+        return data.getCommands(commandCount);
+    }
 
-        public Shape addShape() {
-            int shapeCount = data.getShapeCount();
-            if (shapeCount >= 19999) throw new IllegalStateException("Too many shapes!");
-            data.setShapeCount(shapeCount + 1);
-            return data.getShapes(shapeCount);
-        }
-
-        public Command addCommand() {
-            final int commandCount = data.getCommandCount();
-            if (commandCount >= 19999) throw new IllegalStateException("Too many commands!");
-            data.setCommandCount(commandCount + 1);
-            return data.getCommands(commandCount);
-        }
-
-        public ClientData.UnitCommand addUnitCommand() {
-            int unitCommandCount = data.getUnitCommandCount();
-            if (unitCommandCount >= 19999) throw new IllegalStateException("Too many unit commands!");
-            data.setUnitCommandCount(unitCommandCount + 1);
-            return data.getUnitCommands(unitCommandCount);
-        }
+    public ClientData.UnitCommand addUnitCommand() {
+        int unitCommandCount = data.getUnitCommandCount();
+        if (unitCommandCount >= 19999) throw new IllegalStateException("Too many unit commands!");
+        data.setUnitCommandCount(unitCommandCount + 1);
+        return data.getUnitCommands(unitCommandCount);
+    }
 }
