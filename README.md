@@ -4,20 +4,21 @@ Pure Java [bwapi](https://github.com/bwapi/bwapi) client (4.2.0) implementation 
 
 Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.com/OpenBW/BWAPI4J).
 
-### goals
+## goals
 Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy without all the DLL and JNI hassle and overhead.
 
-### advantages
+## advantages
  - no dependency on external DLL's
  - no type marshalling
  - fast (citation needed)
+ - supports both 32 and 64-bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64bit Java which bwmirror doesn't support)
  - BWEM instead of BWTA as map analyser
 
-### warnings
+## warnings
  - JBWAPI by default has Lateny Compensation disabled (and at the moment has no LatCom at all).
  - A fake BWTA is provided for easier porting, but it translates BWTA calls to their respective BWEM calls, so specific Regions/Chokepoints etc. may differ.
 
-### usage
+## usage
 **maven**
 
 Add JitPack as a repository
@@ -60,7 +61,7 @@ dependencies {
 
 Alternatively add the latest .jar from the [releases](https://github.com/JasperGeurtz/JBWAPI/releases) page to your project.
 
-### compilation
+## compilation
 `mvnw.cmd package`
 
 or if you already have maven installed
