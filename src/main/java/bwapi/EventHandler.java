@@ -8,7 +8,7 @@ class EventHandler implements Client.EventHandler {
 
     public EventHandler(final BWEventListener eventListener, final Client client) {
         this.eventListener = eventListener;
-        game = new Game(client);
+        this.game = new Game(client);
         this.client = client;
     }
 

@@ -58,7 +58,6 @@ public class Game {
     private List<Region> regionSet;
     // CHANGING
     private Unit[] units;
-    private int frameCount = 0;
 
     //CACHED
     private int randomSeed;
@@ -264,8 +263,6 @@ public class Game {
     }
 
     void onFrame() {
-        this.frameCount = gameData.getFrameCount();
-
         if (getFrameCount() > 0) {
             allUnits = Collections.unmodifiableList(visibleUnits.stream()
                 .map(i -> units[i])
@@ -386,7 +383,7 @@ public class Game {
     }
 
     public int getFrameCount() {
-        return frameCount;
+        return gameData.getFrameCount();
     }
 
     public int getReplayFrameCount() {
