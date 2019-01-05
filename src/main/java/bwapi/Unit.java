@@ -42,8 +42,9 @@ public class Unit {
         this.unitData = unitData;
         this.game = game;
 
-        updateType();
-        updatePlayer();
+        updateType(0);
+        updatePlayer(0);
+        updatePosition(0);
 
         initialType = getType();
         initialResources = getResources();
@@ -86,11 +87,6 @@ public class Unit {
     }
 
     public Position getPosition() {
-        final int frame = game.getFrameCount();
-        if (frame > lastPositionUpdate) {
-            lastPositionUpdate = frame;
-            position = new Position(unitData.getPositionX(), unitData.getPositionY());
-        }
         return position;
     }
 
@@ -4130,8 +4126,7 @@ public class Unit {
         return getID();
     }
 
-    void updateType() {
-        final int frame = game.getFrameCount();
+    void updateType(final int frame) {
         if (frame > lastTypeUpdate) {
             lastTypeUpdate = frame;
             position = new Position(unitData.getPositionX(), unitData.getPositionY());
@@ -4139,11 +4134,17 @@ public class Unit {
         unitType = UnitType.idToEnum[unitData.getType()];
     }
 
-    void updatePlayer() {
-        final int frame = game.getFrameCount();
+    void updatePlayer(final int frame) {
         if (frame > lastPlayerUpdate) {
             lastPlayerUpdate = frame;
             player = game.getPlayer(unitData.getPlayer());
+        }
+    }
+
+    void updatePosition(final int frame) {
+        if (frame > lastPositionUpdate) {
+            lastPositionUpdate = frame;
+            position = new Position(unitData.getPositionX(), unitData.getPositionY());
         }
     }
 }

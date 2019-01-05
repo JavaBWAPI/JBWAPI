@@ -262,12 +262,13 @@ public class Game {
         visibleUnits.remove(id);
     }
 
-    void onFrame() {
-        if (getFrameCount() > 0) {
+    void onFrame(final int frame) {
+        if (frame > 0) {
             allUnits = Collections.unmodifiableList(visibleUnits.stream()
                 .map(i -> units[i])
                 .collect(Collectors.toList()));
         }
+        getAllUnits().forEach(u -> u.updatePosition(frame));
     }
 
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
