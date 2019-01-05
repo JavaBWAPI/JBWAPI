@@ -1,9 +1,10 @@
 package bwapi;
-import java.nio.ByteBuffer;
+import bwapi.MemoryAccesses.MemoryAccess;
+
 final class ClientData {
-    private final WrappedBuffer buffer;
-    ClientData(final ByteBuffer buffer) {
-        this.buffer = new WrappedBuffer(buffer);
+    private final MemoryAccess buffer;
+    ClientData(final MemoryAccess buffer) {
+        this.buffer = buffer;
     }
     class UnitCommand {
         static final int SIZE = 24;

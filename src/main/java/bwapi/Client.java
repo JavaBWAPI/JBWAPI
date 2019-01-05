@@ -28,6 +28,9 @@ package bwapi;
 import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
+import bwapi.MemoryAccesses.MemoryAccess;
+import bwapi.MemoryAccesses.UnsafeAccess;
+import bwapi.MemoryAccesses.DirectBufferAccess;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
@@ -80,10 +83,20 @@ class Client {
             code = pipe.readByte();
         }
 
-        final ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+        final ByteBuffer buffer = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                         .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
                 0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        data = new ClientData(sharedMemory).new GameData(0);
+
+        MemoryAccess memoryAccess;
+        try {
+            memoryAccess = new UnsafeAccess(buffer);
+        }
+        catch (final Exception e) {
+            System.err.println(e.getMessage());
+            memoryAccess = new DirectBufferAccess(buffer);
+        }
+
+        data = new ClientData(memoryAccess).new GameData(0);
 
         final int clientVersion = data.getClient_version();
         if (clientVersion != BWAPI_VERSION) {
