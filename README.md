@@ -11,7 +11,7 @@ Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy w
  - no dependency on external DLL's
  - no type marshalling
  - fast (citation needed)
- - supports both 32 and 64-bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64bit Java which bwmirror doesn't support)
+ - supports both 32 and 64 bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64 bit Java which bwmirror doesn't support)
  - BWEM instead of BWTA as map analyser
 
 ## warnings
@@ -33,9 +33,9 @@ Add JitPack as a repository
 Add JBWAPI as a dependecy
 ```
 <dependency>
-    <groupId>com.github.JasperGeurtz</groupId>
+    <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 </dependency>
 ```
 
@@ -53,13 +53,13 @@ allprojects {
 Add JBWAPI as a dependecy
 ```
 dependencies {
-    implementation 'com.github.JasperGeurtz:JBWAPI:0.3'
+    implementation 'com.github.JavaBWAPI:JBWAPI:0.4'
 }
 ```
 
 **jar**
 
-Alternatively add the latest .jar from the [releases](https://github.com/JasperGeurtz/JBWAPI/releases) page to your project.
+Alternatively add the latest .jar from the [releases](https://github.com/JavaBWAPI/JBWAPI/releases) page to your project.
 
 ## compilation
 `mvnw.cmd package`
