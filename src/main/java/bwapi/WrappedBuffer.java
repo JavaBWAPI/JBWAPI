@@ -9,130 +9,79 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 /**
  * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
  * If not available it will fall back on using the ByteBuffer itself.
  */
 class WrappedBuffer {
-    private static final CharsetEncoder enc = Charset.forName("ISO-8859-1").newEncoder();
+    private static final Charset charSet = StandardCharsets.ISO_8859_1;
+    private static final CharsetEncoder enc = charSet.newEncoder();
 
     private final ByteBuffer buffer;
     private final long address;
     private final Unsafe unsafe;
-    private final boolean useUnsafe;
 
     WrappedBuffer(final ByteBuffer byteBuffer) {
-        final Optional<Unsafe> optionalUnsafe = getTheUnsafe();
-
+        unsafe = getTheUnsafe();
         buffer = byteBuffer;
-
-        useUnsafe = optionalUnsafe.isPresent();
-        address = useUnsafe ? ((DirectBuffer) buffer).address() : 0;
-        unsafe = useUnsafe ? optionalUnsafe.get() : null;
+        address = ((DirectBuffer) buffer).address();
     }
 
-    private static Optional<Unsafe> getTheUnsafe() {
+    private static Unsafe getTheUnsafe() {
         try {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            return Optional.of((Unsafe) theUnsafe.get(null));
+            return (Unsafe) theUnsafe.get(null);
         }
         catch (final Exception e) {
             e.printStackTrace();
-            return Optional.empty();
+            return null;
         }
     }
 
     public byte getByte(final int offset) {
-        if (useUnsafe) {
-            return unsafe.getByte(address + offset);
-        }
-        else {
-            return buffer.get(offset);
-        }
+        return unsafe.getByte(address + offset);
     }
 
     public void putByte(final int offset, final byte value) {
-        if (useUnsafe) {
-            unsafe.putByte(address + offset, value);
-        }
-        else {
-            buffer.put(offset, value);
-        }
+        unsafe.putByte(address + offset, value);
     }
 
     public short getShort(final int offset) {
-        if (useUnsafe) {
-            return unsafe.getShort(address + offset);
-        }
-        else {
-            return buffer.getShort(offset);
-        }
+        return unsafe.getShort(address + offset);
     }
 
     public void putShort(final int offset, final short value) {
-        if (useUnsafe) {
-            unsafe.putShort(address + offset, value);
-        }
-        else {
-            buffer.putShort(offset, value);
-        }
+        unsafe.putShort(address + offset, value);
     }
 
     public int getInt(final int offset) {
-        if (useUnsafe) {
-            return unsafe.getInt(address + offset);
-        }
-        else {
-            return buffer.getInt(offset);
-        }
+        return unsafe.getInt(address + offset);
     }
 
     public void putInt(final int offset, final int value) {
-        if (useUnsafe) {
-            unsafe.putInt(address + offset, value);
-        }
-        else {
-            buffer.putInt(offset, value);
-        }
+        unsafe.putInt(address + offset, value);
     }
 
     public double getDouble(final int offset) {
-        if (useUnsafe) {
-            return unsafe.getDouble(address + offset);
-        }
-        else {
-            return buffer.getDouble(offset);
-        }
+        return unsafe.getDouble(address + offset);
     }
 
     public void putDouble(final int offset, final double value) {
-        if (useUnsafe) {
-            unsafe.putDouble(address + offset, value);
-        }
-        else {
-            buffer.putDouble(offset, value);
-        }
+        unsafe.putDouble(address + offset, value);
     }
 
     public String getString(final int offset, final int maxLen) {
         final byte[] buf = new byte[maxLen];
 
-        if (useUnsafe) {
-            unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
-        }
-        else {
-            buffer.position(offset);
-            buffer.get(buf, 0, maxLen);
-        }
+        unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
 
         int len = 0;
         while (len < maxLen && buf[len] != 0) {
             ++len;
         }
-        return new String(buf, 0, len, StandardCharsets.ISO_8859_1);
+        return new String(buf, 0, len, charSet);
     }
 
     public void putString(final int offset, final int maxLen, final String string) {
