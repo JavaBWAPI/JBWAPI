@@ -5,7 +5,6 @@ class EventHandler implements Client.EventHandler {
     private final BWEventListener eventListener;
     private final Game game;
     private final Client client;
-    private int frames;
 
     public EventHandler(final BWEventListener eventListener, final Client client) {
         this.eventListener = eventListener;
@@ -16,9 +15,9 @@ class EventHandler implements Client.EventHandler {
     @Override
     public void operation(final ClientData.Event event) {
         final Unit u;
+        final int frames = game.getFrameCount();
         switch (event.getType()) {
             case MatchStart:
-                frames = 0;
                 game.init();
                 game.setLatCom(false);
                 eventListener.onStart();
@@ -29,7 +28,6 @@ class EventHandler implements Client.EventHandler {
             case MatchFrame:
                 game.onFrame(frames);
                 eventListener.onFrame();
-                frames += 1;
                 break;
             //case 3: //MenuFrame
             case SendText:
