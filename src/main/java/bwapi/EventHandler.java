@@ -88,6 +88,7 @@ class EventHandler implements Client.EventHandler {
                 u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
                 u.updateType(frames);
+                u.updatePlayer(frames);
                 eventListener.onUnitMorph(u);
                 break;
             case UnitRenegade:
