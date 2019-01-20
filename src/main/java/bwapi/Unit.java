@@ -4129,9 +4129,8 @@ public class Unit {
     void updateType(final int frame) {
         if (frame > lastTypeUpdate) {
             lastTypeUpdate = frame;
-            position = new Position(unitData.getPositionX(), unitData.getPositionY());
+            unitType = UnitType.idToEnum[unitData.getType()];
         }
-        unitType = UnitType.idToEnum[unitData.getType()];
     }
 
     void updatePlayer(final int frame) {
