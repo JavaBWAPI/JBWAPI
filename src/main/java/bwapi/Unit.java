@@ -12,7 +12,7 @@ import static bwapi.Race.Terran;
 import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
-public class Unit {
+public class Unit implements Comparable<Unit>{
     private static Set<Order> gatheringGasOrders = EnumSet.of(
             Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision);
     private static Set<Order> gatheringMineralOrders = EnumSet.of(
@@ -4115,15 +4115,19 @@ public class Unit {
     }
 
 
-    public boolean equals(final Object that) {
-        if (!(that instanceof Unit)) {
+    public boolean equals(final Object other) {
+        if (!(other instanceof Unit)) {
             return false;
         }
-        return getID() == ((Unit) that).getID();
+        return getID() == ((Unit) other).getID();
     }
 
     public int hashCode() {
         return getID();
+    }
+
+    public int compareTo(final Unit other) {
+        return getID() - other.getID();
     }
 
     void updateType(final int frame) {
