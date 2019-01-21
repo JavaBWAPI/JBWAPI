@@ -379,8 +379,8 @@ public class Game {
         return GameType.idToEnum[gameData.getGameType()];
     }
 
-    public int getLatency() {
-        return gameData.getLatency();
+    public Latency getLatency() {
+        return Latency.idToEnum[gameData.getLatency()];
     }
 
     public int getFrameCount() {
