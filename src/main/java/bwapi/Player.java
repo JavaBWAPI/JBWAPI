@@ -60,9 +60,12 @@ public class Player {
         return playerData.isAlly(player.getID());
     }
 
-    //TODO FIX in 4.3.0
+    //TODO FIX OBSERVERS in 4.3.0
     public boolean isEnemy(final Player player) {
-        return !(player.isNeutral() || isAlly(player));
+        if (player.isNeutral()) {
+            return false;
+        }
+        return !isAlly(player);
     }
 
     public boolean isNeutral() {
