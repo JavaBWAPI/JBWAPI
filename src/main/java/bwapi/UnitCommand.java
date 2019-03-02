@@ -62,7 +62,7 @@ public class UnitCommand {
     }
 
     public static UnitCommand upgrade(final Unit unit, final UpgradeType upgrade) {
-        return new UnitCommand(unit, Research, null, -1, -1, upgrade.id);
+        return new UnitCommand(unit, Upgrade, null, -1, -1, upgrade.id);
     }
 
     public static UnitCommand setRallyPoint(final Unit unit, final Position target) {
