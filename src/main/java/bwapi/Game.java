@@ -745,7 +745,7 @@ public class Game {
             }
 
             // Power Check
-            if (type.requiresPsi() && hasPower(lt, type)) {
+            if (type.requiresPsi() && !hasPower(lt, type)) {
                 return false;
             }
 
