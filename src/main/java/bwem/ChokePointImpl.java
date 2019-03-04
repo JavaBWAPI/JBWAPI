@@ -243,7 +243,7 @@ public class ChokePointImpl implements ChokePoint {
             throw new IllegalStateException();
         }
 
-        if (this.blockingNeutral.equals(pBlocking)) {
+        if (this.blockingNeutral == pBlocking) {
             // Ensures that in the case where several neutrals are stacked, blockingNeutral points to the
             // bottom one:
             this.blockingNeutral =
