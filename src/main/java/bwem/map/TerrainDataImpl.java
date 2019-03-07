@@ -77,7 +77,7 @@ public abstract class TerrainDataImpl implements TerrainData {
             return false;
         }
 
-        final WalkPosition deltas[] = {
+        final WalkPosition[] deltas = {
                 new WalkPosition(0, -1),
                 new WalkPosition(-1, 0),
                 new WalkPosition(1, 0),

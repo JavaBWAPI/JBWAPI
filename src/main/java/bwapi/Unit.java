@@ -735,8 +735,6 @@ public class Unit implements Comparable<Unit>{
         return unitData.isMoving();
     }
 
-    ;
-
     public boolean isParasited() {
         return unitData.isParasited();
     }

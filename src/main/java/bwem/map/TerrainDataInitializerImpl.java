@@ -133,7 +133,7 @@ public class TerrainDataInitializerImpl extends TerrainDataImpl implements Terra
                         if (current.getX() > bottomRightX) bottomRightX = current.getX();
                         if (current.getY() > bottomRightY) bottomRightY = current.getY();
 
-                        final WalkPosition deltas[] = {
+                        final WalkPosition[] deltas = {
                                 new WalkPosition(0, -1),
                                 new WalkPosition(-1, 0),
                                 new WalkPosition(1, 0),

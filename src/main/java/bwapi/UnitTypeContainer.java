@@ -14,7 +14,7 @@ import static bwapi.WeaponType.*;
 
 class UnitTypeContainer {
     // DEFAULTS
-    static final int defaultMaxHP[] = {
+    static final int[] defaultMaxHP = {
             40, 45, 80, 125, 0, 150, 0, 60, 120, 200, 160, 150, 500, 20, 100, 40, 250, 300, 0, 300, 200, 500, 800, 400, 0, 400, 0, 1000,
             850, 700, 150, 0, 50, 0, 60, 25, 200, 35, 80, 400, 30, 40, 200, 120, 150, 120, 80, 25, 800, 300, 60, 400, 250, 160, 120, 300,
             400, 1000, 200, 200, 100, 80, 250, 25, 20, 100, 100, 40, 10, 80, 150, 200, 300, 40, 40, 60, 100, 240, 240, 80, 400, 200, 800,
@@ -26,7 +26,7 @@ class UnitTypeContainer {
             2500, 800, 50, 100000, 100000, 100000, 100000, 100000, 50, 50, 50, 50, 50, 800, 100000, 800, 800, 800, 800, 800, 800, 800, 800,
             800, 800, 800, 800, 0, 0, 0, 0, 0, 0
     };
-    static final int defaultMaxSP[] = {
+    static final int[] defaultMaxSP = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 40, 0, 200, 20, 60, 80, 40, 350, 60, 100, 150, 150, 40, 80, 400, 800, 240,
             240, 300, 400, 400, 500, 80, 20, 10, 500, 300, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -66,7 +66,7 @@ class UnitTypeContainer {
     static final int Invincible = 0x20000000;
     static final int Mechanical = 0x40000000;
     static final int ProducesUnits = 0x80000000; /* < It can produce units directly (making buildings doesn't count) */
-    static final int unitFlags[] = {
+    static final int[] unitFlags = {
             OrganicUnit | AutoAttackAndMove | Attack,
             Cloakable | OrganicUnit | Spellcaster | AutoAttackAndMove | Attack,
             AutoAttackAndMove | Attack | Mechanical,
@@ -297,7 +297,7 @@ class UnitTypeContainer {
             NeutralAccessories | NPCOrAccessories,
             0, 0, 0, 0, 0, 0
     };
-    static final int defaultArmorAmount[] = {
+    static final int[] defaultArmorAmount = {
             0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 3, 1, 3, 0, 0, 0, 3, 3, 0, 3, 3, 4, 4, 3, 0, 3, 0, 4, 4, 4, 1, 0, 1, 0, 1, 10, 10, 0,
             0, 1, 0, 0, 0, 0, 2, 0, 1, 0, 4, 3, 0, 2, 3, 2, 3, 3, 4, 4, 2, 0, 1, 1, 2, 1, 0, 1, 1, 0, 0, 1, 0, 1, 4, 0, 0, 0, 3,
             2, 3, 2, 3, 3, 4, 0, 0, 0, 3, 2, 3, 0, 0, 1, 1, 0, 0, 0, 0, 10, 0, 2, 3, 0, 4, 1, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -305,7 +305,7 @@ class UnitTypeContainer {
             1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int defaultOreCost[] = {
+    static final int[] defaultOreCost = {
             50, 25, 75, 100, 1, 150, 1, 50, 150, 100, 100, 100, 400, 1, 200, 0, 50, 200, 1, 150, 50, 400, 50, 300, 1, 300, 1, 800,
             800, 800, 150, 1, 50, 0, 50, 1, 1, 50, 75, 200, 1, 50, 100, 100, 50, 100, 50, 25, 400, 200, 100, 200, 50, 150, 100, 200,
             100, 200, 250, 1, 150, 125, 150, 0, 50, 100, 125, 50, 0, 200, 275, 100, 350, 25, 150, 100, 0, 200, 300, 100, 600, 400,
@@ -315,7 +315,7 @@ class UnitTypeContainer {
             150, 150, 150, 300, 200, 150, 100, 250, 250, 1500, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 600, 1000, 250, 50, 100, 250,
             50, 100, 250, 50, 100, 200, 1000, 250, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-    static final int defaultGasCost[] = {
+    static final int[] defaultGasCost = {
             0, 75, 0, 50, 1, 100, 1, 0, 100, 225, 50, 100, 300, 0, 200, 0, 150, 100, 1, 0, 0, 200, 600, 200, 1, 200, 1, 600, 600, 600, 100,
             1, 25, 0, 25, 1, 1, 0, 25, 200, 1, 0, 0, 100, 100, 100, 150, 75, 400, 300, 50, 300, 200, 50, 0, 200, 200, 0, 125, 1, 100, 100,
             50, 0, 0, 0, 50, 150, 0, 0, 125, 350, 250, 0, 150, 300, 0, 0, 100, 300, 300, 200, 600, 100, 75, 0, 1000, 300, 300, 1, 1, 100,
@@ -324,7 +324,7 @@ class UnitTypeContainer {
             0, 100, 0, 200, 0, 150, 0, 200, 150, 100, 0, 0, 0, 500, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 200, 400, 0, 50, 100, 0, 50, 100,
             0, 50, 100, 50, 500, 200, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-    static final int defaultTimeCost[] = {
+    static final int[] defaultTimeCost = {
             360, 750, 450, 600, 1, 750, 1, 300, 900, 1200, 720, 750, 2000, 1, 1500, 1, 1500, 1200, 1, 900, 1, 1800, 2400, 1500, 1, 1500, 1,
             4800, 2400, 4800, 750, 1, 360, 1, 450, 1, 1, 420, 420, 900, 1, 300, 600, 600, 600, 750, 750, 450, 1800, 1500, 600, 1500, 1500,
             780, 840, 1200, 1200, 1200, 750, 1, 600, 750, 600, 300, 300, 600, 750, 750, 300, 900, 1200, 2400, 2100, 300, 750, 1500, 600,
@@ -335,7 +335,7 @@ class UnitTypeContainer {
             1, 1, 1, 1, 1, 1, 2400, 4800, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2400, 2400, 2400, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
     };
-    static final int unitSupplyProvided[] = {
+    static final int[] unitSupplyProvided = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -343,7 +343,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitSupplyRequired[] = {
+    static final int[] unitSupplyRequired = {
             2, 2, 4, 4, 0, 4, 0, 2, 4, 4, 0, 4, 12, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 2, 0, 0, 1, 2, 8, 0, 2,
             0, 4, 4, 4, 4, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 6, 0, 4, 4, 4, 8, 2, 4, 4, 4, 8, 4, 6, 8, 12, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 8, 2,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -351,7 +351,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitSpaceRequired[] = {
+    static final int[] unitSpaceRequired = {
             1, 1, 2, 2, 255, 4, 255, 1, 255, 255, 1, 255, 255, 255, 255, 1, 1, 2, 255, 2, 1, 255, 255, 4, 255, 255, 255, 255, 255,
             255, 255, 255, 1, 255, 1, 255, 255, 1, 2, 4, 1, 1, 255, 255, 255, 255, 2, 255, 4, 255, 1, 1, 2, 2, 1, 255, 255, 255, 255,
             255, 255, 2, 255, 4, 1, 2, 4, 2, 4, 255, 255, 255, 255, 255, 2, 2, 4, 2, 4, 2, 255, 4, 255, 4, 255, 255, 255, 2, 255, 255,
@@ -362,7 +362,7 @@ class UnitTypeContainer {
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
             255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0
     };
-    static final int unitSpaceProvided[] = {
+    static final int[] unitSpaceProvided = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -370,7 +370,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitBuildScore[] = {
+    static final int[] unitBuildScore = {
             50, 175, 75, 200, 0, 350, 0, 50, 400, 625, 0, 300, 1200, 0, 800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 125,
             0, 0, 25, 125, 650, 0, 50, 100, 300, 550, 400, 225, 100, 0, 0, 200, 0, 0, 0, 0, 0, 0, 0, 400, 0, 350, 325, 550, 650, 50, 100, 250,
             350, 700, 200, 650, 1025, 950, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 400, 225, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250,
@@ -379,7 +379,7 @@ class UnitTypeContainer {
             300, 0, 350, 450, 125, 50, 0, 0, 0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitDestroyScore[] = {
+    static final int[] unitDestroyScore = {
             100, 350, 150, 400, 0, 700, 0, 100, 800, 1250, 400, 600, 2400, 25, 0, 10, 700, 800, 0, 300, 200, 1600, 2500, 1400, 0, 1400, 0, 4800,
             4800, 4800, 700, 0, 200, 0, 250, 10, 25, 50, 350, 1300, 25, 100, 200, 600, 1100, 800, 450, 200, 2600, 1600, 400, 4000, 900, 500, 100,
             1200, 2200, 400, 800, 1100, 700, 650, 1100, 1300, 100, 200, 500, 700, 1400, 400, 1300, 2050, 1900, 60, 400, 800, 2800, 400, 1000, 1400,
@@ -390,7 +390,7 @@ class UnitTypeContainer {
             3600, 0, 0, 0, 0, 0, 0, 0, 0, 0, 600, 4000, 0, 100, 10, 10, 10, 10, 10, 100, 100, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitDimensions[][] = {
+    static final int[][] unitDimensions = {
             {1, 1, 8, 9, 8, 10}, {1, 1, 7, 10, 7, 11}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 11, 11, 11, 11}, {1, 1, 19, 15, 18, 14},
             {2, 2, 32, 33, 32, 16}, {1, 1, 11, 7, 11, 14}, {2, 2, 24, 16, 24, 20}, {2, 2, 37, 29, 37, 29}, {1, 1, 7, 7, 7, 7}, {1, 1, 7, 14, 7, 14}, {1, 1, 8, 9, 8, 10}, {1, 1, 7, 10, 7, 11}, {1, 1, 16, 16, 15, 15},
             {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 8, 9, 8, 10}, {1, 1, 19, 15, 18, 14}, {2, 2, 32, 33, 32, 16}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1}, {1, 1, 16, 16, 15, 15}, {1, 1, 1, 1, 1, 1},
@@ -420,7 +420,7 @@ class UnitTypeContainer {
             {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15}, {1, 1, 16, 16, 15, 15},
             {1, 1, 16, 16, 15, 15}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}
     };
-    static final int seekRangeTiles[] = {
+    static final int[] seekRangeTiles = {
             0, 0, 0, 5, 0, 8, 8, 1, 0, 0, 3, 0, 0, 3, 0, 0, 0, 5, 0, 0, 0, 0, 0, 8, 0, 0, 12, 0, 0, 0, 0, 12, 3, 0, 9, 0, 0, 3, 0, 3, 3, 0,
             0, 3, 0, 8, 0, 3, 3, 8, 3, 3, 0, 0, 3, 3, 0, 0, 0, 0, 9, 3, 7, 7, 0, 3, 0, 3, 3, 0, 0, 0, 8, 0, 3, 3, 3, 3, 0, 3, 0, 8, 8, 8, 0,
             3, 0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -428,7 +428,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 5, 2, 5, 2,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int sightRangeTiles[] = {
+    static final int[] sightRangeTiles = {
             7, 9, 8, 8, 8, 10, 10, 7, 7, 10, 7, 8, 11, 3, 3, 7, 11, 8, 8, 8, 7, 7, 10, 10, 10, 10, 10, 8, 11, 11, 10, 10, 7, 10, 9, 4, 4, 5, 6,
             7, 5, 7, 9, 7, 11, 10, 10, 5, 7, 10, 5, 9, 10, 8, 5, 7, 11, 11, 8, 4, 9, 7, 10, 10, 8, 7, 8, 7, 8, 8, 8, 9, 11, 6, 7, 7, 8, 7, 8,
             7, 10, 10, 9, 10, 9, 5, 9, 7, 10, 7, 7, 8, 7, 7, 7, 7, 7, 4, 9, 10, 11, 10, 11, 8, 11, 8, 10, 10, 8, 8, 8, 8, 8, 8, 10, 8, 10, 8,
@@ -436,7 +436,7 @@ class UnitTypeContainer {
             7, 10, 10, 10, 11, 10, 10, 10, 10, 10, 8, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 10, 8, 8, 8, 8, 8,
             8, 8, 8, 8, 8, 10, 8, 6, 7, 1, 1, 1, 1, 6, 6, 3, 6, 3, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0
     };
-    static final int groundWeaponHits[] = {
+    static final int[] groundWeaponHits = {
             1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
             1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 2, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 1,
             1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -444,7 +444,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int airWeaponHits[] = {
+    static final int[] airWeaponHits = {
             1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
             1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
             1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
@@ -452,7 +452,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitAcceleration[] = {
+    static final int[] unitAcceleration = {
             1, 1, 100, 1, 0, 1, 0, 67, 67, 50, 1, 17, 27, 1, 33, 1, 1, 1, 0, 100, 1, 67, 50, 1, 0, 1, 0, 27, 27, 27, 1, 0, 1, 0, 1, 1, 0, 1,
             1, 1, 1, 67, 27, 67, 27, 67, 1, 107, 1, 67, 1, 1, 1, 1, 1, 67, 27, 27, 65, 0, 67, 27, 48, 160, 67, 1, 1, 27, 160, 17, 48, 33, 27,
             427, 27, 27, 160, 1, 1, 27, 48, 1, 27, 1, 27, 1, 33, 27, 48, 1, 1, 0, 0, 1, 16, 1, 1, 0, 67, 1, 1, 0, 27, 1, 1, 0, 33, 0, 0, 0,
@@ -460,7 +460,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitHaltDistance[] = {
+    static final int[] unitHaltDistance = {
             1, 1, 14569, 1, 0, 1, 0, 12227, 21745, 5120, 1, 37756, 7585, 1, 1103213, 1, 1, 1, 0, 14569, 1, 21745, 5120, 1, 0, 1, 0,
             7585, 7585, 7585, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 12227, 840, 21745, 7585, 21745, 1, 13616, 1, 21745, 1, 1, 1, 1, 1, 21745,
             7585, 840, 21901, 0, 17067, 13474, 17067, 5120, 12227, 1, 1, 13474, 5120, 37756, 17067, 24824, 13474, 13640, 13474, 13474,
@@ -470,7 +470,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static final int unitTurnRadius[] = {
+    static final int[] unitTurnRadius = {
             40, 40, 40, 17, 0, 13, 0, 40, 40, 40, 40, 20, 20, 127, 127, 40, 40, 17, 0, 40, 40, 40, 40, 13, 0, 40, 0, 20, 20, 20, 40, 0, 40,
             0, 40, 20, 0, 27, 27, 40, 27, 40, 20, 40, 20, 40, 27, 40, 40, 40, 40, 40, 27, 27, 27, 40, 20, 20, 30, 0, 30, 40, 30, 40, 40, 40,
             40, 40, 40, 20, 30, 40, 20, 40, 40, 40, 40, 40, 40, 40, 30, 20, 20, 20, 20, 27, 40, 40, 30, 27, 27, 0, 0, 27, 14, 27, 27, 0, 30,
@@ -479,7 +479,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static Race unitRace[] = {
+    static Race[] unitRace = {
             Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
             Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
             Terran, Terran, Terran, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
@@ -495,7 +495,7 @@ class UnitTypeContainer {
             Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
             Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
     };
-    static UpgradeType armorUpgrade[] = {
+    static UpgradeType[] armorUpgrade = {
             Terran_Infantry_Armor, Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
             Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating,
             Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating, Upgrade_60, Upgrade_60, Terran_Infantry_Armor,
@@ -528,7 +528,7 @@ class UnitTypeContainer {
             Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
             UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.Unknown
     };
-    static UnitType whatBuilds[] = {
+    static UnitType[] whatBuilds = {
             Terran_Barracks, Terran_Barracks, Terran_Factory, Terran_Factory, UnitType.None, Terran_Factory, UnitType.None, Terran_Command_Center, Terran_Starport,
             Terran_Starport, UnitType.None, Terran_Starport, Terran_Starport, UnitType.None, Terran_Nuclear_Silo, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, Terran_Factory, UnitType.None, Terran_Barracks, UnitType.None, Terran_Barracks, Zerg_Hatchery, Zerg_Larva,
@@ -548,7 +548,7 @@ class UnitTypeContainer {
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Unknown
     };
-    static UnitType buildsWhat[][] = {
+    static UnitType[][] buildsWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
@@ -785,7 +785,7 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-    static WeaponType groundWeapon[] = {
+    static WeaponType[] groundWeapon = {
             Gauss_Rifle, C_10_Canister_Rifle, Fragmentation_Grenade, Twin_Autocannons, Twin_Autocannons, Arclite_Cannon, Arclite_Cannon,
             Fusion_Cutter, Burst_Lasers, WeaponType.None, Flame_Thrower_Gui_Montag, WeaponType.None, ATS_Laser_Battery, WeaponType.Spider_Mines, WeaponType.None, WeaponType.None,
             C_10_Canister_Rifle_Sarah_Kerrigan, Twin_Autocannons_Alan_Schezar, Twin_Autocannons_Alan_Schezar, Fragmentation_Grenade_Jim_Raynor,
@@ -858,50 +858,50 @@ class UnitTypeContainer {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
-    static UpgradeType infantry_no_wpnUpgrade[] = {Terran_Infantry_Armor};
-    static UpgradeType infantryUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons};
-    static UpgradeType marineUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells};
-    static UpgradeType ghostUpgrade[] = {Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor};
-    static UpgradeType mechUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons};
-    static UpgradeType vultureUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters};
-    static UpgradeType goliathUpgrade[] = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters};
-    static UpgradeType terran_air_no_wpnUpgrade[] = {Terran_Ship_Plating};
-    static UpgradeType terran_airUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons};
-    static UpgradeType science_vesselUpgrade[] = {Terran_Ship_Plating, Titan_Reactor};
-    static UpgradeType wraithUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor};
-    static UpgradeType battlecruiserUpgrade[] = {Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor};
-    static UpgradeType medicUpgrade[] = {Terran_Infantry_Armor, Caduceus_Reactor};
-    static UpgradeType carapaceUpgrade[] = {Zerg_Carapace};
-    static UpgradeType zerg_meleeUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks};
-    static UpgradeType zerg_rangeUpgrade[] = {Zerg_Carapace, Zerg_Missile_Attacks};
-    static UpgradeType zerglingUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands};
-    static UpgradeType hydraliskUpgrade[] = {Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines};
-    static UpgradeType defilerUpgrade[] = {Zerg_Carapace, Metasynaptic_Node};
-    static UpgradeType ultraliskUpgrade[] = {Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis};
-    static UpgradeType zerg_air_no_wpnUpgrade[] = {Zerg_Flyer_Carapace};
-    static UpgradeType zerg_airUpgrade[] = {Zerg_Flyer_Carapace, Zerg_Flyer_Attacks};
-    static UpgradeType overlordUpgrade[] = {Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace};
-    static UpgradeType queenUpgrade[] = {Zerg_Flyer_Carapace, Gamete_Meiosis};
-    static UpgradeType shieldsUpgrade[] = {Protoss_Plasma_Shields};
-    static UpgradeType protoss_ground_no_wpnUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor};
-    static UpgradeType protoss_groundUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons};
-    static UpgradeType zealotUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements};
-    static UpgradeType dragoonUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge};
-    static UpgradeType reaverUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity};
-    static UpgradeType templarUpgrade[] = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet};
-    static UpgradeType protoss_air_no_wpnUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor};
-    static UpgradeType protoss_airUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons};
-    static UpgradeType shuttleUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive};
-    static UpgradeType observerUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters};
-    static UpgradeType scoutUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters};
-    static UpgradeType carrierUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity};
-    static UpgradeType arbiterUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core};
-    static UpgradeType corsairUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel};
-    static UpgradeType dark_archonUpgrade[] = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman};
-    static UpgradeType infested_duranUpgrade[] = {Zerg_Carapace, Terran_Infantry_Weapons};
-    static UpgradeType trapUpgrade[] = {Terran_Vehicle_Weapons};
-    static UpgradeType flame_trapUpgrade[] = {Terran_Infantry_Weapons};
-    static UpgradeType upgrades[][] = {
+    static UpgradeType[] infantry_no_wpnUpgrade = {Terran_Infantry_Armor};
+    static UpgradeType[] infantryUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons};
+    static UpgradeType[] marineUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells};
+    static UpgradeType[] ghostUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor};
+    static UpgradeType[] mechUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons};
+    static UpgradeType[] vultureUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters};
+    static UpgradeType[] goliathUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters};
+    static UpgradeType[] terran_air_no_wpnUpgrade = {Terran_Ship_Plating};
+    static UpgradeType[] terran_airUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons};
+    static UpgradeType[] science_vesselUpgrade = {Terran_Ship_Plating, Titan_Reactor};
+    static UpgradeType[] wraithUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor};
+    static UpgradeType[] battlecruiserUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor};
+    static UpgradeType[] medicUpgrade = {Terran_Infantry_Armor, Caduceus_Reactor};
+    static UpgradeType[] carapaceUpgrade = {Zerg_Carapace};
+    static UpgradeType[] zerg_meleeUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks};
+    static UpgradeType[] zerg_rangeUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks};
+    static UpgradeType[] zerglingUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands};
+    static UpgradeType[] hydraliskUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines};
+    static UpgradeType[] defilerUpgrade = {Zerg_Carapace, Metasynaptic_Node};
+    static UpgradeType[] ultraliskUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis};
+    static UpgradeType[] zerg_air_no_wpnUpgrade = {Zerg_Flyer_Carapace};
+    static UpgradeType[] zerg_airUpgrade = {Zerg_Flyer_Carapace, Zerg_Flyer_Attacks};
+    static UpgradeType[] overlordUpgrade = {Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace};
+    static UpgradeType[] queenUpgrade = {Zerg_Flyer_Carapace, Gamete_Meiosis};
+    static UpgradeType[] shieldsUpgrade = {Protoss_Plasma_Shields};
+    static UpgradeType[] protoss_ground_no_wpnUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor};
+    static UpgradeType[] protoss_groundUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons};
+    static UpgradeType[] zealotUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements};
+    static UpgradeType[] dragoonUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge};
+    static UpgradeType[] reaverUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity};
+    static UpgradeType[] templarUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet};
+    static UpgradeType[] protoss_air_no_wpnUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor};
+    static UpgradeType[] protoss_airUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons};
+    static UpgradeType[] shuttleUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive};
+    static UpgradeType[] observerUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters};
+    static UpgradeType[] scoutUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters};
+    static UpgradeType[] carrierUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity};
+    static UpgradeType[] arbiterUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core};
+    static UpgradeType[] corsairUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel};
+    static UpgradeType[] dark_archonUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman};
+    static UpgradeType[] infested_duranUpgrade = {Zerg_Carapace, Terran_Infantry_Weapons};
+    static UpgradeType[] trapUpgrade = {Terran_Vehicle_Weapons};
+    static UpgradeType[] flame_trapUpgrade = {Terran_Infantry_Weapons};
+    static UpgradeType[][] upgrades = {
             marineUpgrade, ghostUpgrade, vultureUpgrade, goliathUpgrade, goliathUpgrade, mechUpgrade, mechUpgrade, infantry_no_wpnUpgrade,
             wraithUpgrade, science_vesselUpgrade, infantryUpgrade, terran_air_no_wpnUpgrade, battlecruiserUpgrade, {}, {},
             infantry_no_wpnUpgrade, infantryUpgrade, mechUpgrade, mechUpgrade, mechUpgrade, infantryUpgrade, terran_airUpgrade,
@@ -930,7 +930,7 @@ class UnitTypeContainer {
             trapUpgrade, flame_trapUpgrade, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-    static UpgradeType upgradesWhat[][] = {
+    static UpgradeType[][] upgradesWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
@@ -1167,28 +1167,28 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-    static TechType stimTech[] = {Stim_Packs};
-    static TechType ghost_fullTech[] = {TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike};
-    static TechType vultureTech[] = {TechType.Spider_Mines};
-    static TechType siegeTech[] = {Tank_Siege_Mode};
-    static TechType wraithTech[] = {Cloaking_Field};
-    static TechType vesselTech[] = {TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate};
-    static TechType cruiserTech[] = {TechType.Yamato_Gun};
-    static TechType ghost_heroTech[] = {TechType.Lockdown, Personnel_Cloaking};
-    static TechType medicTech[] = {TechType.Restoration, TechType.Optical_Flare, Healing};
-    static TechType burrowTech[] = {Burrowing};
-    static TechType queenTech[] = {Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite};
-    static TechType defilerTech[] = {Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume};
-    static TechType ikerriganTech[] = {Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume};
-    static TechType corsairTech[] = {TechType.Disruption_Web};
-    static TechType dtTech[] = {Dark_Archon_Meld};
-    static TechType darchonTech[] = {TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom};
-    static TechType templar_fullTech[] = {TechType.Psionic_Storm, Hallucination, Archon_Warp};
-    static TechType arbiterTech[] = {Recall, TechType.Stasis_Field};
-    static TechType templar_heroTech[] = {TechType.Psionic_Storm, Hallucination};
-    static TechType iduranTech[] = {TechType.Lockdown, Personnel_Cloaking, TechType.Consume};
-    static TechType comsatTech[] = {Scanner_Sweep};
-    static TechType unitTechs[][] = {
+    static TechType[] stimTech = {Stim_Packs};
+    static TechType[] ghost_fullTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike};
+    static TechType[] vultureTech = {TechType.Spider_Mines};
+    static TechType[] siegeTech = {Tank_Siege_Mode};
+    static TechType[] wraithTech = {Cloaking_Field};
+    static TechType[] vesselTech = {TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate};
+    static TechType[] cruiserTech = {TechType.Yamato_Gun};
+    static TechType[] ghost_heroTech = {TechType.Lockdown, Personnel_Cloaking};
+    static TechType[] medicTech = {TechType.Restoration, TechType.Optical_Flare, Healing};
+    static TechType[] burrowTech = {Burrowing};
+    static TechType[] queenTech = {Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite};
+    static TechType[] defilerTech = {Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume};
+    static TechType[] ikerriganTech = {Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume};
+    static TechType[] corsairTech = {TechType.Disruption_Web};
+    static TechType[] dtTech = {Dark_Archon_Meld};
+    static TechType[] darchonTech = {TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom};
+    static TechType[] templar_fullTech = {TechType.Psionic_Storm, Hallucination, Archon_Warp};
+    static TechType[] arbiterTech = {Recall, TechType.Stasis_Field};
+    static TechType[] templar_heroTech = {TechType.Psionic_Storm, Hallucination};
+    static TechType[] iduranTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Consume};
+    static TechType[] comsatTech = {Scanner_Sweep};
+    static TechType[][] unitTechs = {
             stimTech, ghost_fullTech, vultureTech, {}, {}, siegeTech, {}, {}, wraithTech, vesselTech,
             stimTech, {}, cruiserTech, {}, {}, {}, ghost_heroTech, {}, {}, vultureTech,
             stimTech, wraithTech, vesselTech, siegeTech, {}, siegeTech, {}, {}, cruiserTech, cruiserTech,
@@ -1211,7 +1211,7 @@ class UnitTypeContainer {
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-    static TechType researchesWhat[][] = {
+    static TechType[][] researchesWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
