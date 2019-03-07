@@ -26,7 +26,6 @@ import bwem.tile.TileImpl;
 import bwem.unit.*;
 import bwem.util.BwemExt;
 import bwapi.Pair;
-import bwapi.Pair;
 
 import java.util.*;
 

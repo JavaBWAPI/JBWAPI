@@ -20,7 +20,6 @@ import bwem.tile.*;
 import bwem.typedef.Altitude;
 import bwem.unit.*;
 import bwem.util.*;
-import bwapi.Pair;
 
 import java.util.*;
 

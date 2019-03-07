@@ -1,7 +1,6 @@
 package bwapi;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static bwapi.TechType.*;
 

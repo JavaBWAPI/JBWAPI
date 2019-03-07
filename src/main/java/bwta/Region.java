@@ -4,7 +4,6 @@ import bwapi.Position;
 import bwem.area.Area;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Region {
