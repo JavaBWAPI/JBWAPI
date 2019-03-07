@@ -164,25 +164,19 @@ public class Unit implements Comparable<Unit>{
         }
         /////// Compute distance
 
-        // retrieve left/top/right/bottom values for calculations
-        final int left = target.x - 1;
-        final int top = target.y - 1;
-        final int right = target.x + 1;
-        final int bottom = target.y + 1;
-
         // compute x distance
-        int xDist = getLeft() - right;
+        int xDist = getLeft() - target.x;
         if (xDist < 0) {
-            xDist = left - getRight();
+            xDist = target.x - (getRight() + 1);
             if (xDist < 0) {
                 xDist = 0;
             }
         }
 
         // compute y distance
-        int yDist = getTop() - bottom;
+        int yDist = getTop() - target.y;
         if (yDist < 0) {
-            yDist = top - getBottom();
+            yDist = target.y - (getBottom() + 1);
             if (yDist < 0) {
                 yDist = 0;
             }
