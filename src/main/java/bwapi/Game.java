@@ -14,7 +14,7 @@ import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 public class Game {
-    private static final int damageRatio[][] = {
+    private static final int[][] damageRatio = {
             // Ind, Sml, Med, Lrg, Non, Unk
             {0, 0, 0, 0, 0, 0}, // Independent
             {0, 128, 192, 256, 0, 0}, // Explosive
@@ -24,7 +24,7 @@ public class Game {
             {0, 0, 0, 0, 0, 0}, // None
             {0, 0, 0, 0, 0, 0}  // Unknown
     };
-    private static final boolean bPsiFieldMask[][] = {
+    private static final boolean[][] bPsiFieldMask = {
             {false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false},
             {false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false},
             {false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false},

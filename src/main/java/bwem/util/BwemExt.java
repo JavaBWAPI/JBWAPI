@@ -18,7 +18,6 @@ import bwapi.WalkPosition;
 import bwem.CheckMode;
 import bwem.map.MapImpl;
 import bwapi.Pair;
-import bwapi.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +50,7 @@ public final class BwemExt {
     }
 
     public static Position center(final WalkPosition walkPosition) {
-        final Position ret = walkPosition.toPosition().add(BwemExt.WALK_POSITION_CENTER_IN_PIXELS);
-        return ret;
+        return walkPosition.toPosition().add(BwemExt.WALK_POSITION_CENTER_IN_PIXELS);
     }
 
     public static Position centerOfBuilding(

@@ -525,9 +525,9 @@ public final class Graph {
         }
         //    	for (auto & line : chokePointDistanceMatrix)
         //    		line.resize (chokePoints.size(), -1);
-        for (int i = 0; i < chokePointDistanceMatrix.size(); ++i) {
+        for (List<Integer> chokePointDistanceMatrix1 : chokePointDistanceMatrix) {
             for (int n = 0; n < chokePoints.size(); ++n) {
-                chokePointDistanceMatrix.get(i).add(-1);
+                chokePointDistanceMatrix1.add(-1);
             }
         }
 
@@ -538,9 +538,9 @@ public final class Graph {
         }
         //    	for (auto & line : pathsBetweenChokePoints)
         //    		line.resize (chokePoints.size());
-        for (int i = 0; i < pathsBetweenChokePoints.size(); ++i) {
+        for (List<CPPath> pathsBetweenChokePoint : pathsBetweenChokePoints) {
             for (int n = 0; n < chokePoints.size(); ++n) {
-                pathsBetweenChokePoints.get(i).add(new CPPath());
+                pathsBetweenChokePoint.add(new CPPath());
             }
         }
 

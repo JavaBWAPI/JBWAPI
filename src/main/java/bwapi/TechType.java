@@ -49,13 +49,13 @@ public enum TechType {
     Unknown(46);
 
     /// IMPLEMENTATION
-    private static int defaultOreCost[] =         // Same as default gas cost
+    private static int[] defaultOreCost =         // Same as default gas cost
             {100, 200, 200, 100, 0, 150, 0, 200, 100, 150, 100, 100, 0, 100, 0, 200, 100, 100, 0, 200, 150, 150, 150, 0, 100, 200, 0, 200, 0, 100, 100, 100, 200};
-    private static int defaultTimeCost[] =
+    private static int[] defaultTimeCost =
             {1200, 1500, 1800, 1200, 0, 1200, 0, 1200, 1800, 1500, 1200, 1200, 0, 1200, 0, 1500, 1500, 1200, 0, 1800, 1200, 1800, 1500, 0, 1200, 1200, 0, 1800, 0, 1800, 1800, 1500, 1800};
-    private static int defaultEnergyCost[] =
+    private static int[] defaultEnergyCost =
             {0, 100, 100, 0, 50, 0, 100, 75, 150, 25, 25, 0, 0, 150, 100, 150, 0, 75, 75, 75, 100, 150, 100, 0, 50, 125, 0, 150, 0, 50, 75, 100, 0, 0, 1};
-    private static UnitType whatResearches[] = {
+    private static UnitType[] whatResearches = {
             UnitType.Terran_Academy, UnitType.Terran_Covert_Ops, UnitType.Terran_Science_Facility, UnitType.Terran_Machine_Shop,
             UnitType.None, UnitType.Terran_Machine_Shop, UnitType.None, UnitType.Terran_Science_Facility, UnitType.Terran_Physics_Lab,
             UnitType.Terran_Control_Tower, UnitType.Terran_Covert_Ops, UnitType.Zerg_Hatchery, UnitType.None, UnitType.Zerg_Queens_Nest,
@@ -66,14 +66,14 @@ public enum TechType {
             UnitType.Zerg_Hydralisk_Den, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.Unknown
     };
-    private static Race techRaces[] = {
+    private static Race[] techRaces = {
             Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran, Race.Terran,
             Race.Zerg, Race.Zerg, Race.Zerg, Race.Zerg, Race.Zerg, Race.Zerg, Race.Zerg, Race.Zerg,
             Race.Protoss, Race.Protoss, Race.Protoss, Race.Protoss, Race.Protoss,
             Race.Terran, Race.Protoss, Race.None, Race.Protoss, Race.Protoss, Race.Protoss, Race.Terran, Race.Protoss, Race.Zerg, Race.None, Race.Terran,
             Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Terran, Race.Unknown
     };
-    private static WeaponType techWeapons[] = {
+    private static WeaponType[] techWeapons = {
             WeaponType.None, WeaponType.Lockdown, WeaponType.EMP_Shockwave, WeaponType.Spider_Mines, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Irradiate, WeaponType.Yamato_Gun,
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Spawn_Broodlings, WeaponType.Dark_Swarm, WeaponType.Plague, WeaponType.Consume, WeaponType.Ensnare, WeaponType.Parasite,
             WeaponType.Psionic_Storm, WeaponType.None, WeaponType.None, WeaponType.Stasis_Field, WeaponType.None, WeaponType.Restoration, WeaponType.Disruption_Web, WeaponType.None, WeaponType.Mind_Control,
@@ -83,13 +83,13 @@ public enum TechType {
     private static int TARG_UNIT = 1;
     private static int TARG_POS = 2;
     private static int TARG_BOTH = 3;
-    private static int techTypeFlags[] = {
+    private static int[] techTypeFlags = {
             0, TARG_UNIT, TARG_BOTH, TARG_POS, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, 0, 0, 0,
             TARG_UNIT, TARG_UNIT, TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT,
             TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_UNIT, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, TARG_UNIT,
             TARG_BOTH, 0, 0, TARG_BOTH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TARG_BOTH
     };
-    private static Order techOrders[] = {
+    private static Order[] techOrders = {
             Order.None, CastLockdown, CastEMPShockwave, PlaceMine, CastScannerSweep, Order.None, CastDefensiveMatrix,
             CastIrradiate, FireYamatoGun, Order.None, Order.None, Order.None, CastInfestation, CastSpawnBroodlings,
             CastDarkSwarm, CastPlague, CastConsume, CastEnsnare, CastParasite, CastPsionicStorm,
@@ -97,7 +97,7 @@ public enum TechType {
             Order.None, CastMindControl, Order.None, CastFeedback, CastOpticalFlare, CastMaelstrom, Order.None, Order.None, MedicHeal,
             Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, Order.None, NukePaint, Order.Unknown
     };
-    private static UnitType techWhatUses[][] = {
+    private static UnitType[][] techWhatUses = {
             // Stimpacks
             {UnitType.Terran_Marine, UnitType.Terran_Firebat, UnitType.Hero_Jim_Raynor_Marine, UnitType.Hero_Gui_Montag},
             // Lockdown

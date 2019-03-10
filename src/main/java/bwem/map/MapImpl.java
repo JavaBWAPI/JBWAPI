@@ -29,7 +29,6 @@ import bwem.unit.Neutral;
 import bwem.unit.NeutralData;
 import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
-import bwapi.Pair;
 
 import java.util.*;
 

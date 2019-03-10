@@ -21,8 +21,6 @@ import bwem.typedef.CPPath;
 import bwem.typedef.Index;
 import bwem.unit.Neutral;
 import bwapi.Pair;
-import bwapi.Pair;
-import bwapi.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

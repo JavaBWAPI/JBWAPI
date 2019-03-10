@@ -8,7 +8,7 @@ public class Color {
     public final static Color Blue = new Color(165);
     public final static Color Teal = new Color(159);
     public final static Color Purple = new Color(164);
-    public final static Color Orange = new Color(179);
+    public final static Color Orange = new Color(156);
     public final static Color Brown = new Color(19);
     public final static Color White = new Color(255);
     public final static Color Yellow = new Color(135);
@@ -19,7 +19,7 @@ public class Color {
 
     private static final RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
 
-    private static final RGBQUAD defaultPalette[] = {
+    private static final RGBQUAD[] defaultPalette = {
             new RGBQUAD(0, 0, 0), RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE,
             new RGBQUAD(24, 36, 44), new RGBQUAD(72, 36, 20), new RGBQUAD(92, 44, 20), new RGBQUAD(112, 48, 20), new RGBQUAD(104, 60, 36), new RGBQUAD(124, 64, 24), new RGBQUAD(120, 76, 44), new RGBQUAD(168, 8, 8),
@@ -55,7 +55,7 @@ public class Color {
     };
 
     private static boolean rgbInitialized;
-    private static byte closestColor[][][] = new byte[64][64][64];
+    private static byte[][][] closestColor = new byte[64][64][64];
     public final int id;
 
     public Color(final int r, final int g, final int b) {

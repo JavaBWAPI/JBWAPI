@@ -20,8 +20,6 @@ import bwem.tile.*;
 import bwem.typedef.Altitude;
 import bwem.unit.*;
 import bwem.util.*;
-import bwem.util.Timer;
-import bwapi.Pair;
 
 import java.util.*;
 
@@ -32,10 +30,6 @@ public class MapInitializerImpl extends MapImpl implements MapInitializer {
 
     @Override
     public void initialize() {
-
-        final Timer overallTimer = new Timer();
-        final Timer timer = new Timer();
-
         initializeTerrainData(
                 game.mapWidth(), game.mapHeight(), game.getStartLocations());
 

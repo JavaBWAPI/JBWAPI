@@ -4,7 +4,6 @@ import bwapi.ClientData.PlayerData;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static bwapi.TextColor.*;
 import static bwapi.UnitType.*;
 import static bwapi.UpgradeType.*;
 import static bwapi.WeaponType.*;
@@ -215,31 +214,31 @@ public class Player {
     public TextColor getTextColor() {
         switch (playerData.getColor()) {
             case 111: // red
-                return BrightRed;
+                return TextColor.BrightRed;
             case 165: // blue
-                return Blue;
+                return TextColor.Blue;
             case 159: // teal
-                return Teal;
+                return TextColor.Teal;
             case 164: // purp
-                return Purple;
-            case 179: // oj
-                return Orange;
+                return TextColor.Purple;
+            case 156: // orange with fix from @n00byEdge
+                return TextColor.Orange;
             case 19:  // brown
-                return Brown;
+                return TextColor.Brown;
             case 84:  // white
-                return PlayerWhite;
+                return TextColor.PlayerWhite;
             case 135: // yellow
-                return PlayerYellow;
+                return TextColor.PlayerYellow;
             case 185: // green p9
-                return DarkGreen;
+                return TextColor.DarkGreen;
             case 136: // p10
-                return LightYellow;
+                return TextColor.LightYellow;
             case 134: // p11
-                return Tan;
+                return TextColor.Tan;
             case 51:  // p12
-                return GreyBlue;
+                return TextColor.GreyBlue;
             default:
-                return Default;
+                return TextColor.Default;
         }
     }
 

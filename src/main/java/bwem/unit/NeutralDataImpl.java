@@ -17,7 +17,6 @@ import bwem.map.Map;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class NeutralDataImpl implements NeutralData {
     private final List<Mineral> minerals;
