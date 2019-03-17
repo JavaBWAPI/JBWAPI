@@ -202,20 +202,21 @@ public abstract class NeutralImpl implements Neutral {
                     }
                 } else {
                     Neutral prevStacked = tile.getNeutral();
-                    while (!this.equals(prevStacked.getNextStacked()) && !this.equals(prevStacked.getNextStacked())) {
+                    while (prevStacked != null && !this.equals(prevStacked.getNextStacked())) {
                         prevStacked = prevStacked.getNextStacked();
                     }
-                    if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
-                        //                    bwem_assert(pPrevStacked->Type() == Type());
-                        throw new IllegalStateException();
-                    } else if (!(prevStacked.getTopLeft().equals(getTopLeft()))) {
-                        //                    bwem_assert(pPrevStacked->topLeft() == topLeft());
-                        throw new IllegalStateException();
-                    } else if (!(dx == 0 && dy == 0)) {
+                    if (!(dx == 0 && dy == 0)) {
                         //                    bwem_assert((dx == 0) && (dy == 0));
                         throw new IllegalStateException();
                     }
                     if (prevStacked != null) {
+                        if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
+                            //                    bwem_assert(pPrevStacked->Type() == Type());
+                            throw new IllegalStateException();
+                        } else if (!(prevStacked.getTopLeft().equals(getTopLeft()))) {
+                            //                    bwem_assert(pPrevStacked->topLeft() == topLeft());
+                            throw new IllegalStateException();
+                        }
                         ((NeutralImpl) prevStacked).nextStacked = nextStacked;
                     }
                     this.nextStacked = null;
