@@ -104,7 +104,9 @@ public abstract class NeutralImpl implements Neutral {
     public List<Area> getBlockedAreas() {
         final List<Area> blockedAreas = new ArrayList<>();
         for (final WalkPosition w : this.blockedAreas) {
-            blockedAreas.add(getMap().getArea(w));
+            if (getMap().getArea(w) != null) {
+                blockedAreas.add(getMap().getArea(w));
+            }
         }
         return blockedAreas;
     }
@@ -200,7 +202,7 @@ public abstract class NeutralImpl implements Neutral {
                     }
                 } else {
                     Neutral prevStacked = tile.getNeutral();
-                    while (!prevStacked.getNextStacked().equals(this)) {
+                    while (!this.equals(prevStacked.getNextStacked()) && !this.equals(prevStacked.getNextStacked())) {
                         prevStacked = prevStacked.getNextStacked();
                     }
                     if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
@@ -213,8 +215,9 @@ public abstract class NeutralImpl implements Neutral {
                         //                    bwem_assert((dx == 0) && (dy == 0));
                         throw new IllegalStateException();
                     }
-
-                    ((NeutralImpl) prevStacked).nextStacked = nextStacked;
+                    if (prevStacked != null) {
+                        ((NeutralImpl) prevStacked).nextStacked = nextStacked;
+                    }
                     this.nextStacked = null;
                     return;
                 }
