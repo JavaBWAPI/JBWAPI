@@ -1,7 +1,8 @@
 package bwapi;
 
 import bwapi.ClientData.ForceData;
-import java.util.Set;
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Force {
@@ -24,10 +25,10 @@ public class Force {
         return name;
     }
 
-    public Set<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return game.getPlayers().stream()
                 .filter(p -> equals(p.getForce()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public boolean equals(final Object that) {

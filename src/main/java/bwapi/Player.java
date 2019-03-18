@@ -1,7 +1,8 @@
 package bwapi;
 
 import bwapi.ClientData.PlayerData;
-import java.util.Set;
+
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static bwapi.UnitType.*;
@@ -37,10 +38,10 @@ public class Player {
         return name;
     }
 
-    public Set<Unit> getUnits() {
+    public List<Unit> getUnits() {
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getPlayer()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public Race getRace() {
