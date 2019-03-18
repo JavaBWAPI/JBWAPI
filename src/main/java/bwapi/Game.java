@@ -365,7 +365,7 @@ public class Game {
     }
 
     public Unit getUnit(final int unitID) {
-        if (unitID < 0) {
+        if (unitID < 0 || unitID >= units.length) {
             return null;
         }
         return units[unitID];
