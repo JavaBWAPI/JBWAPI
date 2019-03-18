@@ -6,7 +6,7 @@ Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.co
 
 ## goals
  - Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy without all the DLL and JNI hassle and overhead.
- - Stay as update as possible with the BWAPI releases
+ - Stay as updated as possible with the BWAPI releases
 
 ## advantages
  - no dependency on external DLL's
