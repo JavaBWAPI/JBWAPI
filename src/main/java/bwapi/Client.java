@@ -35,6 +35,8 @@ import com.sun.jna.win32.W32APIOptions;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.List;
 
 class Client {
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
@@ -42,7 +44,8 @@ class Client {
             + 4 // IsConnected
             + 4 // LastKeepAliveTime
             ;
-    private static final int BWAPI_VERSION = 10002;
+    private static final List<Integer> SUPPORTED_BWAPI_VERSIONS = Arrays.asList(10002, 10003);
+    private static final int MAX_COUNT = 19999;
 
     private static final int maxNumGames = 8;
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
@@ -86,8 +89,8 @@ class Client {
         data = new ClientData(sharedMemory).new GameData(0);
 
         final int clientVersion = data.getClient_version();
-        if (clientVersion != BWAPI_VERSION) {
-            throw new Exception("BWAPI version mismatch, expected: " + BWAPI_VERSION + ", got: " + clientVersion);
+        if (!SUPPORTED_BWAPI_VERSIONS.contains(clientVersion)) {
+            throw new Exception("BWAPI version mismatch, expected one of: " + SUPPORTED_BWAPI_VERSIONS + ", got: " + clientVersion);
         }
 
         System.out.println("Connected to BWAPI@" + procID + " with version " + clientVersion + ": " + data.getRevision());
@@ -115,35 +118,35 @@ class Client {
     }
 
 
-    public String eventString(final int s) {
+    String eventString(final int s) {
         return data.getEventStrings(s);
     }
 
-    public int addString(final String s) {
+    int addString(final String s) {
         int stringCount = data.getStringCount();
-        if (stringCount >= 19999) throw new IllegalStateException("Too many shapes!");
+        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
         data.setStringCount(stringCount + 1);
         data.setStrings(stringCount, s);
         return stringCount;
     }
 
-    public Shape addShape() {
+    Shape addShape() {
         int shapeCount = data.getShapeCount();
-        if (shapeCount >= 19999) throw new IllegalStateException("Too many shapes!");
+        if (shapeCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
         data.setShapeCount(shapeCount + 1);
         return data.getShapes(shapeCount);
     }
 
-    public Command addCommand() {
+    Command addCommand() {
         final int commandCount = data.getCommandCount();
-        if (commandCount >= 19999) throw new IllegalStateException("Too many commands!");
+        if (commandCount >= MAX_COUNT) throw new IllegalStateException("Too many commands!");
         data.setCommandCount(commandCount + 1);
         return data.getCommands(commandCount);
     }
 
-    public ClientData.UnitCommand addUnitCommand() {
+    ClientData.UnitCommand addUnitCommand() {
         int unitCommandCount = data.getUnitCommandCount();
-        if (unitCommandCount >= 19999) throw new IllegalStateException("Too many unit commands!");
+        if (unitCommandCount >= MAX_COUNT) throw new IllegalStateException("Too many unit commands!");
         data.setUnitCommandCount(unitCommandCount + 1);
         return data.getUnitCommands(unitCommandCount);
     }
