@@ -435,13 +435,13 @@ public class Unit implements Comparable<Unit>{
         return game.getUnit(unitData.getTransport());
     }
 
-    public Set<Unit> getLoadedUnits() {
+    public List<Unit> getLoadedUnits() {
         if (getType().spaceProvided() < 1) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getTransport()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public int getSpaceRemaining() {
@@ -458,26 +458,26 @@ public class Unit implements Comparable<Unit>{
         return game.getUnit(unitData.getCarrier());
     }
 
-    public Set<Unit> getInterceptors() {
+    public List<Unit> getInterceptors() {
         if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getCarrier()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public Unit getHatchery() {
         return game.getUnit(unitData.getHatchery());
     }
 
-    public Set<Unit> getLarva() {
+    public List<Unit> getLarva() {
         if (!getType().producesLarva()) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getHatchery()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public List<Unit> getUnitsInRadius(final int radius) {

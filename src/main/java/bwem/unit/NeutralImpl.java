@@ -104,7 +104,9 @@ public abstract class NeutralImpl implements Neutral {
     public List<Area> getBlockedAreas() {
         final List<Area> blockedAreas = new ArrayList<>();
         for (final WalkPosition w : this.blockedAreas) {
-            blockedAreas.add(getMap().getArea(w));
+            if (getMap().getArea(w) != null) {
+                blockedAreas.add(getMap().getArea(w));
+            }
         }
         return blockedAreas;
     }
@@ -200,21 +202,23 @@ public abstract class NeutralImpl implements Neutral {
                     }
                 } else {
                     Neutral prevStacked = tile.getNeutral();
-                    while (!prevStacked.getNextStacked().equals(this)) {
+                    while (prevStacked != null && !this.equals(prevStacked.getNextStacked())) {
                         prevStacked = prevStacked.getNextStacked();
                     }
-                    if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
-                        //                    bwem_assert(pPrevStacked->Type() == Type());
-                        throw new IllegalStateException();
-                    } else if (!(prevStacked.getTopLeft().equals(getTopLeft()))) {
-                        //                    bwem_assert(pPrevStacked->topLeft() == topLeft());
-                        throw new IllegalStateException();
-                    } else if (!(dx == 0 && dy == 0)) {
+                    if (!(dx == 0 && dy == 0)) {
                         //                    bwem_assert((dx == 0) && (dy == 0));
                         throw new IllegalStateException();
                     }
-
-                    ((NeutralImpl) prevStacked).nextStacked = nextStacked;
+                    if (prevStacked != null) {
+                        if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
+                            //                    bwem_assert(pPrevStacked->Type() == Type());
+                            throw new IllegalStateException();
+                        } else if (!(prevStacked.getTopLeft().equals(getTopLeft()))) {
+                            //                    bwem_assert(pPrevStacked->topLeft() == topLeft());
+                            throw new IllegalStateException();
+                        }
+                        ((NeutralImpl) prevStacked).nextStacked = nextStacked;
+                    }
                     this.nextStacked = null;
                     return;
                 }

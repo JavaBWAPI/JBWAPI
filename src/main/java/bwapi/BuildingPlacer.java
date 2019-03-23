@@ -447,11 +447,11 @@ class BuildingPlacer {
         }
 
         void backup() {
-            System.arraycopy(save, 0, data, 0, save.length);
+            System.arraycopy(data, 0, save, 0, data.length);
         }
 
         void restore() {
-            System.arraycopy(data, 0, save, 0, data.length);
+            System.arraycopy(save, 0, data, 0, save.length);
         }
 
         void restoreIfInvalid() {

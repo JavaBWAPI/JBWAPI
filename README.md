@@ -1,11 +1,12 @@
 [![Build Status](https://travis-ci.org/JavaBWAPI/JBWAPI.svg?branch=develop)](https://travis-ci.org/JavaBWAPI/JBWAPI)
 # JBWAPI
-Pure Java [bwapi](https://github.com/bwapi/bwapi) client (4.2.0) implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
+Pure Java [bwapi](https://github.com/bwapi/bwapi) client (4.2.0 & 4.4.0) implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
 
 Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.com/OpenBW/BWAPI4J).
 
 ## goals
-Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy without all the DLL and JNI hassle and overhead.
+ - Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy without all the DLL and JNI hassle and overhead.
+ - Stay as updated as possible with the BWAPI releases
 
 ## advantages
  - no dependency on external DLL's
@@ -35,7 +36,7 @@ Add JBWAPI as a dependecy
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>0.5</version>
+    <version>0.6</version>
 </dependency>
 ```
 
@@ -53,7 +54,7 @@ allprojects {
 Add JBWAPI as a dependecy
 ```
 dependencies {
-    implementation 'com.github.JavaBWAPI:JBWAPI:0.5'
+    implementation 'com.github.JavaBWAPI:JBWAPI:0.6'
 }
 ```
 
@@ -67,3 +68,7 @@ Alternatively add the latest .jar from the [releases](https://github.com/JavaBWA
 or if you already have maven installed
 
 `mvn package`
+
+## tutorial
+
+If you are a just starting out with bot development, it might be helpful to follow the [tutorial](https://github.com/JavaBWAPI/Java-BWAPI-Tutorial/wiki)!
