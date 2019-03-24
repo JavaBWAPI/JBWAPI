@@ -47,7 +47,7 @@ public final class Graph {
         return areas;
     }
 
-    private int getAreaCount() {
+    public int getAreaCount() {
         return areas.size();
     }
 

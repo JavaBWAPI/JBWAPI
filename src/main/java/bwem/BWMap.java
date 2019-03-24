@@ -199,53 +199,19 @@ public abstract class BWMap {
     // graph.cpp:30:Area * mainArea(MapImpl * pMap, TilePosition topLeft, TilePosition size)
     // Note: The original C++ code appears to return the last discovered area instead of the area with
     // the highest frequency.
+    // Bytekeeper: Further analysis shows there is usually one exactly one area, so we just return thatv
     // TODO: Determine if we desire the last discovered area or the area with the highest frequency.
     public Area getMainArea(final TilePosition topLeft, final TilePosition size) {
-        //        //----------------------------------------------------------------------
-        //        // Area with the highest frequency.
-        //        //----------------------------------------------------------------------
-        //        final java.util.BWMap<Area, Integer> areaFrequency = new HashMap<>();
-        //        for (int dy = 0; dy < size.getY(); ++dy)
-        //        for (int dx = 0; dx < size.getX(); ++dx) {
-        //            final Area area = getArea(topLeft.add(new TilePosition(dx, dy)));
-        //            if (area != null) {
-        //                Integer val = areaFrequency.get(area);
-        //                if (val == null) {
-        //                    val = 0;
-        //                }
-        //                areaFrequency.put(area, val + 1);
-        //            }
-        //        }
-        //
-        //        if (!areaFrequency.isEmpty()) {
-        //            java.util.BWMap.Entry<Area, Integer> highestFreqEntry = null;
-        //            for (final java.util.BWMap.Entry<Area, Integer> currentEntry :
-        // areaFrequency.entrySet()) {
-        //                if (highestFreqEntry == null || (currentEntry.getValue() >
-        // highestFreqEntry.getValue())) {
-        //                    highestFreqEntry = currentEntry;
-        //                }
-        //            }
-        //            return highestFreqEntry.getKey();
-        //        } else {
-        //            return null;
-        //        }
-        //        //----------------------------------------------------------------------
-
         // ----------------------------------------------------------------------
-        // Last area.
+        // Any area.
         // ----------------------------------------------------------------------
-        final List<Area> areas = new ArrayList<>();
         for (int dy = 0; dy < size.getY(); ++dy)
             for (int dx = 0; dx < size.getX(); ++dx) {
                 final Area area = getArea(topLeft.add(new TilePosition(dx, dy)));
-                if (area != null && !areas.contains(area)) {
-                    areas.add(area);
-                }
+                if (area != null) return area;
             }
-
-        return areas.isEmpty() ? null : areas.get(areas.size() - 1);
         // ----------------------------------------------------------------------
+        return null;
     }
 
     private CPPath getPath(Position a, Position b, MutableInt pLength) {
@@ -270,13 +236,8 @@ public abstract class BWMap {
 
         final Set<TilePosition> visited =
                 new TreeSet<>(
-                        (a, b) -> {
-                            int result = Integer.compare(a.getX(), b.getX());
-                            if (result != 0) {
-                                return result;
-                            }
-                            return Integer.compare(a.getY(), b.getY());
-                        });
+                        Comparator.comparing(TilePosition::getX)
+                            .thenComparing(TilePosition::getY));
         Queue<TilePosition> toVisit = new ArrayDeque<>();
 
         toVisit.add(start);
@@ -334,13 +295,8 @@ public abstract class BWMap {
 
         final Set<WalkPosition> visited =
                 new TreeSet<>(
-                        (a, b) -> {
-                            int result = Integer.compare(a.getX(), b.getX());
-                            if (result != 0) {
-                                return result;
-                            }
-                            return Integer.compare(a.getY(), b.getY());
-                        });
+                    Comparator.comparing(WalkPosition::getX)
+                        .thenComparing(WalkPosition::getY));
         final Queue<WalkPosition> toVisit = new ArrayDeque<>();
 
         toVisit.add(start);
