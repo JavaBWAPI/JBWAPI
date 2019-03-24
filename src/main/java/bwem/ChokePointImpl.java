@@ -19,7 +19,6 @@ import bwem.map.Map;
 import bwem.tile.MiniTile;
 import bwem.tile.MiniTileImpl;
 import bwem.typedef.CPPath;
-import bwem.typedef.Index;
 import bwem.unit.Neutral;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.Objects;
 public class ChokePointImpl implements ChokePoint {
     private final Graph graph;
     private final boolean isPseudo;
-    private final Index index;
+    private final int index;
     private final Pair<Area, Area> areas;
     private final WalkPosition[] nodes;
     private final List<Pair<WalkPosition, WalkPosition>> nodesInArea;
@@ -39,7 +38,7 @@ public class ChokePointImpl implements ChokePoint {
 
     ChokePointImpl(
         final Graph graph,
-        final Index index,
+        final int index,
         final Area area1,
         final Area area2,
         final List<WalkPosition> geometry,
@@ -129,7 +128,7 @@ public class ChokePointImpl implements ChokePoint {
 
     ChokePointImpl(
         final Graph graph,
-        final Index index,
+        final int index,
         final Area area1,
         final Area area2,
         final List<WalkPosition> geometry) {
@@ -224,7 +223,7 @@ public class ChokePointImpl implements ChokePoint {
         }
     }
 
-    Index getIndex() {
+    int getIndex() {
         return this.index;
     }
 

@@ -27,7 +27,6 @@ import bwem.tile.Tile;
 import bwem.tile.TileImpl;
 import bwem.typedef.Altitude;
 import bwem.typedef.CPPath;
-import bwem.typedef.Index;
 import bwem.unit.Geyser;
 import bwem.unit.Mineral;
 import bwem.unit.Neutral;
@@ -152,16 +151,16 @@ public final class Graph {
     // Returns the ground distance in pixels between cpA->center() and cpB>center()
     public int distance(ChokePoint cpA, ChokePoint cpB) {
         return chokePointDistanceMatrix
-                .get(((ChokePointImpl) cpA).getIndex().intValue())
-                .get(((ChokePointImpl) cpB).getIndex().intValue());
+                .get(((ChokePointImpl) cpA).getIndex())
+                .get(((ChokePointImpl) cpB).getIndex());
     }
 
     // Returns a list of getChokePoints, which is intended to be the shortest walking path from cpA to
     // cpB.
     public CPPath getPath(ChokePoint cpA, ChokePoint cpB) {
         return pathsBetweenChokePoints
-                .get(((ChokePointImpl) cpA).getIndex().intValue())
-                .get(((ChokePointImpl) cpB).getIndex().intValue());
+                .get(((ChokePointImpl) cpA).getIndex())
+                .get(((ChokePointImpl) cpB).getIndex());
     }
 
     public CPPath getPath(final Position a, final Position b, final MutableInt pLength) {
@@ -326,8 +325,7 @@ public final class Graph {
             final List<StaticBuilding> staticBuildings,
             final List<Mineral> minerals,
             final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
-        Index newIndex = new Index(0);
-
+        int newIndex = 0;
         final List<Neutral> blockingNeutrals = new ArrayList<>();
         for (final StaticBuilding s : staticBuildings) {
             if (s.isBlocking()) {
@@ -418,7 +416,7 @@ public final class Graph {
             for (final List<WalkPosition> cluster : clusters) {
                 getChokePoints(a, b)
                         .add(new ChokePointImpl(this, newIndex, getArea(a), getArea(b), cluster));
-                newIndex = newIndex.add(1);
+                newIndex++;
             }
         }
 
@@ -447,7 +445,7 @@ public final class Graph {
                                 .add(
                                         new ChokePointImpl(
                                                 this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
-                        newIndex = newIndex.add(1);
+                        newIndex++;
                     }
             }
         }
@@ -758,15 +756,15 @@ public final class Graph {
     }
 
     private void setDistance(final ChokePoint cpA, final ChokePoint cpB, final int value) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex().intValue();
-        final int indexB = ((ChokePointImpl) cpB).getIndex().intValue();
+        final int indexA = ((ChokePointImpl) cpA).getIndex();
+        final int indexB = ((ChokePointImpl) cpB).getIndex();
         this.chokePointDistanceMatrix.get(indexA).set(indexB, value);
         this.chokePointDistanceMatrix.get(indexB).set(indexA, value);
     }
 
     private void setPath(final ChokePoint cpA, final ChokePoint cpB, final CPPath pathAB) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex().intValue();
-        final int indexB = ((ChokePointImpl) cpB).getIndex().intValue();
+        final int indexA = ((ChokePointImpl) cpA).getIndex();
+        final int indexB = ((ChokePointImpl) cpB).getIndex();
 
         this.pathsBetweenChokePoints.get(indexA).set(indexB, pathAB);
 
