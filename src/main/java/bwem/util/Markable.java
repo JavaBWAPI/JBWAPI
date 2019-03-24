@@ -22,22 +22,13 @@ public final class Markable {
 
     public Markable(final StaticMarkable staticMarkable) {
         this.staticMarkable = staticMarkable;
-        this.lastMark = 0;
-    }
-
-    private StaticMarkable getStaticMarkable() {
-        return this.staticMarkable;
     }
 
     public boolean isUnmarked() {
-        return (this.lastMark != getStaticMarkable().getCurrentMark());
+        return (this.lastMark != staticMarkable.getCurrentMark());
     }
 
     public void setMarked() {
-        this.lastMark = getStaticMarkable().getCurrentMark();
-    }
-
-    public void setUnmarked() {
-        this.lastMark = getStaticMarkable().getCurrentMark() - 1;
+        this.lastMark = staticMarkable.getCurrentMark();
     }
 }

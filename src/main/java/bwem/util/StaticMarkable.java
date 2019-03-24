@@ -19,11 +19,7 @@ package bwem.util;
 public final class StaticMarkable {
     private int currentMark;
 
-    public StaticMarkable() {
-        this.currentMark = 0;
-    }
-
-    public int getCurrentMark() {
+    int getCurrentMark() {
         return this.currentMark;
     }
 

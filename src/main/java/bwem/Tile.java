@@ -210,27 +210,12 @@ public class Tile {
      * Corresponds to BWAPI::getGroundHeight divided by 2.
      */
     public enum GroundHeight {
-        LOW_GROUND(0),
-        HIGH_GROUND(1),
-        VERY_HIGH_GROUND(2);
+        LOW_GROUND, // Height 0
+        HIGH_GROUND, // Height 1
+        VERY_HIGH_GROUND; // Height 2
 
-        private final int val;
-
-        GroundHeight(final int val) {
-            this.val = val;
-        }
-
-        static GroundHeight parseGroundHeight(final int height) {
-            for (final GroundHeight val : GroundHeight.values()) {
-                if (val.intValue() == height) {
-                    return val;
-                }
-            }
-            throw new IllegalArgumentException("Unrecognized height: " + height);
-        }
-
-        int intValue() {
-            return this.val;
+        static GroundHeight parseGroundHeight(int height) {
+            return values()[height];
         }
     }
 }

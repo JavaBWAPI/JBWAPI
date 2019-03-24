@@ -68,7 +68,6 @@ class BWMapInitializer extends BWMap {
 
         getGraph().collectInformation();
 
-
         getGraph().createBases(getData());
     }
 
@@ -649,8 +648,7 @@ class BWMapInitializer extends BWMap {
         // Unblock the Tiles of pBlocking:
         for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy)
             for (int dx = 0; dx < pBlocking.getSize().getX(); ++dx) {
-                getData()
-                                .getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)))
+                getData().getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)))
                         .resetAreaId();
                 setAreaIdInTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)));
             }

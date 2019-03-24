@@ -3,7 +3,7 @@ package bwem;
 /**
  * Result of a path query including the approximated length of the path.
  */
-public class PathingResult {
+public final class PathingResult {
 
     private final CPPath cpPath;
     private final int approxDistance;

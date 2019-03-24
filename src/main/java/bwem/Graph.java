@@ -18,6 +18,7 @@ import bwapi.TilePosition;
 import bwapi.WalkPosition;
 import bwem.util.BwemExt;
 import bwem.util.CheckMode;
+import bwem.util.Pred;
 import bwem.util.Utils;
 
 import java.util.*;
@@ -80,7 +81,7 @@ public final class Graph {
                                 // findCond
                             (MiniTile miniTile, WalkPosition unused) -> (miniTile.getAreaId().intValue() > 0),
                                 // visitCond
-                            (MiniTile miniTile, WalkPosition unused) -> true);
+                            Pred.accept());
 
         return getArea(w);
     }
@@ -338,7 +339,7 @@ public final class Graph {
                                 // findCond
                                 (MiniTile miniTile, WalkPosition unused) -> miniTile.isWalkable(),
                                 // visitCond
-                                (MiniTile miniTile, WalkPosition unused) -> true);
+                                Pred.accept());
 
                         final List<WalkPosition> list = new ArrayList<>();
                         list.add(center);

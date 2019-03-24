@@ -15,4 +15,8 @@ package bwem.util;
 @FunctionalInterface
 public interface Pred<T, P> {
     boolean test(T tile, P position);
+
+    static <T, P> Pred<T, P> accept() {
+        return (tile, position) -> true;
+    }
 }
