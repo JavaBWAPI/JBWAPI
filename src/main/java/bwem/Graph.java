@@ -31,6 +31,7 @@ import bwem.unit.Mineral;
 import bwem.unit.Neutral;
 import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
+import bwem.util.MutableInt;
 import bwem.util.Utils;
 import java.util.ArrayList;
 import java.util.Comparator;

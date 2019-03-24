@@ -10,24 +10,34 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem;
+package bwem.util;
 
 /**
  * See original C++ BWEM for an explanation of this code. Do NOT mimic BWEM's C++ inheritance for
  * this code. See "src/test/util/OldMarkable.java" for what NOT to do.
  */
-public final class StaticMarkable {
-    private int currentMark;
+public final class Markable {
+    private final StaticMarkable staticMarkable;
+    private int lastMark;
 
-    public StaticMarkable() {
-        this.currentMark = 0;
+    public Markable(final StaticMarkable staticMarkable) {
+        this.staticMarkable = staticMarkable;
+        this.lastMark = 0;
     }
 
-    public int getCurrentMark() {
-        return this.currentMark;
+    private StaticMarkable getStaticMarkable() {
+        return this.staticMarkable;
     }
 
-    public void unmarkAll() {
-        ++this.currentMark;
+    public boolean isUnmarked() {
+        return (this.lastMark != getStaticMarkable().getCurrentMark());
+    }
+
+    public void setMarked() {
+        this.lastMark = getStaticMarkable().getCurrentMark();
+    }
+
+    public void setUnmarked() {
+        this.lastMark = getStaticMarkable().getCurrentMark() - 1;
     }
 }

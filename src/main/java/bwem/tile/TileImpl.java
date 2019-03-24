@@ -12,8 +12,8 @@
 
 package bwem.tile;
 
-import bwem.Markable;
-import bwem.StaticMarkable;
+import bwem.util.Markable;
+import bwem.util.StaticMarkable;
 import bwem.area.typedef.AreaId;
 import bwem.typedef.Altitude;
 import bwem.unit.Neutral;

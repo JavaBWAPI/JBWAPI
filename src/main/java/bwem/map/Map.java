@@ -27,6 +27,7 @@ import bwem.unit.Mineral;
 import bwem.unit.NeutralData;
 import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
+import bwem.util.MutableInt;
 
 import java.util.*;
 
