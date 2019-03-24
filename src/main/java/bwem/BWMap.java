@@ -234,8 +234,8 @@ public abstract class BWMap {
 
         final Set<TilePosition> visited =
                 new TreeSet<>(
-                        Comparator.comparing(TilePosition::getX)
-                            .thenComparing(TilePosition::getY));
+                        Comparator.comparing((TilePosition tilePosition) -> tilePosition.x)
+                            .thenComparing((TilePosition tilePosition) -> tilePosition.y));
         Queue<TilePosition> toVisit = new ArrayDeque<>();
 
         toVisit.add(start);
@@ -293,8 +293,8 @@ public abstract class BWMap {
 
         final Set<WalkPosition> visited =
                 new TreeSet<>(
-                    Comparator.comparing(WalkPosition::getX)
-                        .thenComparing(WalkPosition::getY));
+                    Comparator.comparing((WalkPosition pos) -> pos.x)
+                        .thenComparing((WalkPosition pos) -> pos.y));
         final Queue<WalkPosition> toVisit = new ArrayDeque<>();
 
         toVisit.add(start);
