@@ -19,7 +19,6 @@ import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.area.AreaInitializer;
 import bwem.area.typedef.AreaId;
-import bwem.area.typedef.GroupId;
 import bwem.map.Map;
 import bwem.map.TerrainData;
 import bwem.tile.MiniTile;
@@ -741,7 +740,7 @@ public final class Graph {
                 toVisit.add(start);
                 while (!toVisit.isEmpty()) {
                     final Area current = toVisit.remove(toVisit.size() - 1);
-                    ((AreaInitializer) current).setGroupId(new GroupId(nextGroupId));
+                    ((AreaInitializer) current).setGroupId(nextGroupId);
 
                     for (final Area next : current.getAccessibleNeighbors()) {
                         if (((AreaInitializer) next).getMarkable().isUnmarked()) {

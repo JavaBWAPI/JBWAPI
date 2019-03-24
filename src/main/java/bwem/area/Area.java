@@ -17,7 +17,6 @@ import bwapi.WalkPosition;
 import bwem.Base;
 import bwem.ChokePoint;
 import bwem.area.typedef.AreaId;
-import bwem.area.typedef.GroupId;
 import bwem.typedef.Altitude;
 import bwem.unit.Geyser;
 import bwem.unit.Mineral;
@@ -36,7 +35,7 @@ public abstract class Area {
     private final AreaId id;
     private final WalkPosition walkPositionWithHighestAltitude;
     private final int miniTileCount;
-    GroupId groupId = GroupId.ZERO;
+    int groupId = 0;
     Altitude highestAltitude;
     TilePosition topLeft = new TilePosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
     TilePosition bottomRight = new TilePosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
@@ -56,7 +55,7 @@ public abstract class Area {
         return this.id;
     }
 
-    public GroupId getGroupId() {
+    public int getGroupId() {
         return this.groupId;
     }
 
@@ -123,7 +122,7 @@ public abstract class Area {
     }
 
     public boolean isAccessibleFrom(final Area area) {
-        return getGroupId().equals(area.getGroupId());
+        return groupId == area.getGroupId();
     }
 
     public List<Mineral> getMinerals() {

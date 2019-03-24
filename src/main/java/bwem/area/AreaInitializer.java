@@ -25,7 +25,6 @@ import bwem.ChokePoint;
 import bwem.Markable;
 import bwem.StaticMarkable;
 import bwem.area.typedef.AreaId;
-import bwem.area.typedef.GroupId;
 import bwem.map.Map;
 import bwem.map.TerrainData;
 import bwem.tile.MiniTile;
@@ -133,10 +132,7 @@ public class AreaInitializer extends Area {
         }
     }
 
-    public void setGroupId(final GroupId gid) {
-        if (!(gid.intValue() >= 1)) {
-            throw new IllegalArgumentException();
-        }
+    public void setGroupId(int gid) {
         super.groupId = gid;
     }
 
