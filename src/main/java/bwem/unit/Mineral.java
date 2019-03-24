@@ -31,16 +31,6 @@ public final class Mineral extends Resource {
     }
 
     @Override
-    public int getInitialAmount() {
-        return super.getUnit().getInitialResources();
-    }
-
-    @Override
-    public int getAmount() {
-        return super.getUnit().getResources();
-    }
-
-    @Override
     public boolean equals(final Object object) {
         if (this == object) {
             return true;

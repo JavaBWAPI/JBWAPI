@@ -27,12 +27,16 @@ public abstract class Resource extends NeutralImpl {
      * Returns the initial amount of resources for this Resource (same as
      * unit()->getInitialResources).
      */
-    public abstract int getInitialAmount();
+    public int getInitialAmount() {
+        return getUnit().getInitialResources();
+    }
 
     /**
      * Returns the current amount of resources for this Resource (same as unit()->getResources).
      */
-    public abstract int getAmount();
+    public int getAmount() {
+        return getUnit().getResources();
+    }
 
     @Override
     public boolean equals(final Object object) {
