@@ -15,7 +15,6 @@ package bwem;
 import bwapi.*;
 import bwem.util.BwemExt;
 import bwem.util.CheckMode;
-import bwem.util.MutableInt;
 import bwem.util.Pred;
 
 import java.util.*;
@@ -212,18 +211,13 @@ public abstract class BWMap {
         return null;
     }
 
-    private CPPath getPath(Position a, Position b, MutableInt pLength) {
-        return graph.getPath(a, b, pLength);
-    }
-
     public int getPathLength(Position a, Position b) {
-        MutableInt pLength = new MutableInt();
-        getPath(a, b, pLength);
-        return pLength.intValue();
+        return graph.getPathingResult(a, b).map(PathingResult::getLength).orElse(-1);
     }
 
+    // TODO: This might be a bad method: What is the difference between no path and "same area"?
     public CPPath getPath(Position a, Position b) {
-        return getPath(a, b, null);
+        return graph.getPath(a, b).orElse(CPPath.EMPTY_PATH);
     }
 
     public TilePosition breadthFirstSearch(

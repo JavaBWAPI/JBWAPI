@@ -18,7 +18,6 @@ import bwapi.TilePosition;
 import bwapi.WalkPosition;
 import bwem.util.BwemExt;
 import bwem.util.CheckMode;
-import bwem.util.MutableInt;
 import bwem.util.Utils;
 
 import java.util.*;
@@ -146,94 +145,12 @@ public final class Graph {
                 .get(cpB.getIndex());
     }
 
-    public CPPath getPath(final Position a, final Position b, final MutableInt pLength) {
-        final Area areaA = getNearestArea(a.toWalkPosition());
-        final Area areaB = getNearestArea(b.toWalkPosition());
-
-        if (areaA.equals(areaB)) {
-            if (pLength != null) {
-                pLength.setValue(BwemExt.getApproxDistance(a, b));
-            }
-            return new CPPath();
-        }
-
-        if (!areaA.isAccessibleFrom(areaB)) {
-            if (pLength != null) {
-                pLength.setValue(-1);
-            }
-            return new CPPath();
-        }
-
-        int minDistAB = Integer.MAX_VALUE;
-
-        ChokePoint pBestCpA = null;
-        ChokePoint pBestCpB = null;
-
-        for (final ChokePoint cpA : areaA.getChokePoints()) {
-            if (!cpA.isBlocked()) {
-                final int distACpA = BwemExt.getApproxDistance(a, cpA.getCenter().toPosition());
-                for (final ChokePoint cpB : areaB.getChokePoints()) {
-                    if (!cpB.isBlocked()) {
-                        final int distBToCPB = BwemExt.getApproxDistance(b, cpB.getCenter().toPosition());
-                        final int distAToB = distACpA + distBToCPB + distance(cpA, cpB);
-                        if (distAToB < minDistAB) {
-                            minDistAB = distAToB;
-                            pBestCpA = cpA;
-                            pBestCpB = cpB;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (minDistAB == Integer.MAX_VALUE) {
-            throw new IllegalStateException();
-        }
-
-        final CPPath path = getPath(pBestCpA, pBestCpB);
-
-        if (pLength != null) {
-            if (!(path.size() >= 1)) {
-                throw new IllegalStateException();
-            }
-
-            pLength.setValue(minDistAB);
-
-            if (path.size() == 1) {
-                if (!pBestCpA.equals(pBestCpB)) {
-                    throw new IllegalStateException();
-                }
-
-                final Position cpEnd1 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END1));
-                final Position cpEnd2 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END2));
-                if (Utils.intersect(
-                        a.getX(),
-                        a.getY(),
-                        b.getX(),
-                        b.getY(),
-                        cpEnd1.getX(),
-                        cpEnd1.getY(),
-                        cpEnd2.getX(),
-                        cpEnd2.getY())) {
-                    pLength.setValue(BwemExt.getApproxDistance(a, b));
-                } else {
-                    for (final ChokePoint.Node node :
-                            new ChokePoint.Node[]{ChokePoint.Node.END1, ChokePoint.Node.END2}) {
-                        final Position c = BwemExt.center(pBestCpA.getNodePosition(node));
-                        final int distAToB = BwemExt.getApproxDistance(a, c) + BwemExt.getApproxDistance(b, c);
-                        if (distAToB < pLength.intValue()) {
-                            pLength.setValue(distAToB);
-                        }
-                    }
-                }
-            }
-        }
-
-        return getPath(pBestCpA, pBestCpB);
+    public Optional<PathingResult> getPathingResult(Position a, Position b) {
+        return new Pathing(a, b).getPathWithLength();
     }
 
-    public CPPath getPath(Position a, Position b) {
-        return getPath(a, b, null);
+    public Optional<CPPath> getPath(final Position a, final Position b) {
+        return new Pathing(a, b).getPath();
     }
 
     public List<Base> getBases() {
@@ -761,5 +678,101 @@ public final class Graph {
 
     private boolean isValid(AreaId id) {
         return (1 <= id.intValue() && id.intValue() <= getAreaCount());
+    }
+
+    private class Pathing {
+        private final Position a;
+        private final Position b;
+        private final Area areaA;
+        private final Area areaB;
+        private final CPPath path;
+        private ChokePoint pBestCpA;
+        private ChokePoint pBestCpB;
+        private int minDistAB;
+
+        Pathing(Position a, Position b) {
+            this.a = a;
+            this.b = b;
+            areaA = getNearestArea(a.toWalkPosition());
+            areaB = getNearestArea(b.toWalkPosition());
+
+            if (areaA.equals(areaB)) {
+                path = CPPath.EMPTY_PATH;
+                return;
+            }
+
+            if (!areaA.isAccessibleFrom(areaB)) {
+                path = null;
+                return;
+            }
+
+            minDistAB = Integer.MAX_VALUE;
+
+            for (final ChokePoint cpA : areaA.getChokePoints()) {
+                if (!cpA.isBlocked()) {
+                    final int distACpA = BwemExt.getApproxDistance(a, cpA.getCenter().toPosition());
+                    for (final ChokePoint cpB : areaB.getChokePoints()) {
+                        if (!cpB.isBlocked()) {
+                            final int distBToCPB = BwemExt.getApproxDistance(b, cpB.getCenter().toPosition());
+                            final int distAToB = distACpA + distBToCPB + distance(cpA, cpB);
+                            if (distAToB < minDistAB) {
+                                minDistAB = distAToB;
+                                pBestCpA = cpA;
+                                pBestCpB = cpB;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (minDistAB == Integer.MAX_VALUE) {
+                throw new IllegalStateException();
+            }
+
+            path = Graph.this.getPath(pBestCpA, pBestCpB);
+        }
+
+        Optional<PathingResult> getPathWithLength() {
+            if (path == null) {
+                return Optional.empty();
+            }
+            if (areaA.equals(areaB)) {
+                return Optional.of(new PathingResult(path, BwemExt.getApproxDistance(a, b)));
+            }
+
+            if (path.size() == 1) {
+                if (!pBestCpA.equals(pBestCpB)) {
+                    throw new IllegalStateException();
+                }
+
+                final Position cpEnd1 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END1));
+                final Position cpEnd2 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END2));
+                if (Utils.intersect(
+                    a.getX(),
+                    a.getY(),
+                    b.getX(),
+                    b.getY(),
+                    cpEnd1.getX(),
+                    cpEnd1.getY(),
+                    cpEnd2.getX(),
+                    cpEnd2.getY())) {
+                    return Optional.of(new PathingResult(path, BwemExt.getApproxDistance(a, b)));
+                } else {
+                    int pLength = minDistAB;
+                    for (final ChokePoint.Node node :
+                        new ChokePoint.Node[]{ChokePoint.Node.END1, ChokePoint.Node.END2}) {
+                        Position c = BwemExt.center(pBestCpA.getNodePosition(node));
+                        int distAToB = BwemExt.getApproxDistance(a, c) + BwemExt.getApproxDistance(b, c);
+                        pLength = Math.min(pLength, distAToB);
+                    }
+                    return Optional.of(new PathingResult(path, pLength));
+                }
+            }
+            return Optional.of(new PathingResult(path, minDistAB));
+        }
+
+        Optional<CPPath> getPath() {
+            return Optional.ofNullable(path);
+        }
     }
 }

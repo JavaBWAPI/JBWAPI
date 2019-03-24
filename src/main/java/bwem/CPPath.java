@@ -23,6 +23,8 @@ import java.util.List;
  * CPPath;
  */
 public class CPPath implements Iterable<ChokePoint> {
+
+    static final CPPath EMPTY_PATH = new CPPath();
     private final List<ChokePoint> chokepoints;
 
     CPPath() {
