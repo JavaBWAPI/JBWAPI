@@ -14,6 +14,9 @@ package bwem.map;
 
 import bwapi.*;
 import bwem.CheckMode;
+import bwem.ChokePoint;
+import bwem.ChokePointImpl;
+import bwem.area.Area;
 import bwem.area.TempAreaInfo;
 import bwem.area.typedef.AreaId;
 import bwem.tile.*;
@@ -23,8 +26,8 @@ import bwem.util.*;
 
 import java.util.*;
 
-public class MapInitializerImpl extends MapImpl {
-    public MapInitializerImpl(final Game game) {
+public class MapInitializer extends Map {
+    public MapInitializer(final Game game) {
         super(game);
     }
 
@@ -35,11 +38,11 @@ public class MapInitializerImpl extends MapImpl {
 
         // Computes walkability, buildability and groundHeight and doodad information, using BWAPI
         // corresponding functions
-        ((TerrainDataInitializerImpl) getData()).markUnwalkableMiniTiles(game);
-        ((TerrainDataInitializerImpl) getData()).markBuildableTilesAndGroundHeight(game);
+        ((TerrainDataInitializer) getData()).markUnwalkableMiniTiles(game);
+        ((TerrainDataInitializer) getData()).markBuildableTilesAndGroundHeight(game);
 
         //
-        ((TerrainDataInitializerImpl) getData())
+        ((TerrainDataInitializer) getData())
                 .decideSeasOrLakes(BwemExt.LAKE_MAX_MINI_TILES, BwemExt.LAKE_MAX_WIDTH_IN_MINI_TILES);
 
 
@@ -78,29 +81,29 @@ public class MapInitializerImpl extends MapImpl {
 
     private void initializeTerrainData(
         final int mapTileWidth, final int mapTileHeight, final List<TilePosition> startingLocations) {
-        final MapData mapData = new MapDataImpl(mapTileWidth, mapTileHeight, startingLocations);
+        final MapData mapData = new MapData(mapTileWidth, mapTileHeight, startingLocations);
         final TileData tileData =
-                new TileDataImpl(
+                new TileData(
                         mapData.getTileSize().getX() * mapData.getTileSize().getY(),
                         mapData.getWalkSize().getX() * mapData.getWalkSize().getY());
-        super.terrainData = new TerrainDataInitializerImpl(mapData, tileData);
+        super.terrainData = new TerrainDataInitializer(mapData, tileData);
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // MapImpl::InitializeNeutrals
+    // Map::InitializeNeutrals
     ////////////////////////////////////////////////////////////////////////
 
     private void initializeNeutralData(
         final List<Unit> mineralPatches,
         final List<Unit> vespeneGeysers,
         final List<Unit> neutralUnits) {
-        super.neutralData = new NeutralDataImpl(this, mineralPatches, vespeneGeysers, neutralUnits);
+        super.neutralData = new NeutralData(this, mineralPatches, vespeneGeysers, neutralUnits);
     }
 
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // MapImpl::ComputeAltitude
+    // Map::ComputeAltitude
     ////////////////////////////////////////////////////////////////////////
 
     // Assigns MiniTile::m_altitude foar each miniTile having AltitudeMissing()
@@ -237,7 +240,7 @@ public class MapInitializerImpl extends MapImpl {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // MapImpl::processBlockingNeutrals
+    // Map::processBlockingNeutrals
     ////////////////////////////////////////////////////////////////////////
 
     private void processBlockingNeutrals(final List<Neutral> candidates) {
@@ -417,7 +420,7 @@ public class MapInitializerImpl extends MapImpl {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // MapImpl::ComputeAreas
+    // Map::ComputeAreas
     ////////////////////////////////////////////////////////////////////////
 
     // Assigns MiniTile::m_areaId for each miniTile having AreaIdMissing()
@@ -593,7 +596,7 @@ public class MapInitializerImpl extends MapImpl {
         getGraph().createAreas(areasList);
     }
 
-    // Renamed from "MapImpl::SetAltitudeInTile"
+    // Renamed from "Map::SetAltitudeInTile"
     private void setLowestAltitudeInTile(final TilePosition t) {
         Altitude lowestAltitude = new Altitude(Integer.MAX_VALUE);
 
@@ -613,7 +616,7 @@ public class MapInitializerImpl extends MapImpl {
         ((TileImpl) getData().getTile(t)).setLowestAltitude(lowestAltitude);
     }
 
-    // Renamed from "MapImpl::SetAreaIdInTiles"
+    // Renamed from "Map::SetAreaIdInTiles"
     private void setAreaIdAndLowestAltitudeInTiles() {
         for (int y = 0; y < getData().getMapData().getTileSize().getY(); ++y)
             for (int x = 0; x < getData().getMapData().getTileSize().getX(); ++x) {
@@ -621,5 +624,46 @@ public class MapInitializerImpl extends MapImpl {
                 setAreaIdInTile(t);
                 setLowestAltitudeInTile(t);
             }
+    }
+
+    public void onBlockingNeutralDestroyed(Neutral pBlocking) {
+        if (!(pBlocking != null && pBlocking.isBlocking())) {
+            throw new IllegalArgumentException();
+        }
+
+        for (Area pArea : pBlocking.getBlockedAreas())
+            for (ChokePoint cp : pArea.getChokePoints()) {
+                ((ChokePointImpl) cp).onBlockingNeutralDestroyed(pBlocking);
+            }
+
+        if (getData().getTile(pBlocking.getTopLeft()).getNeutral()
+                != null) { // there remains some blocking Neutrals at the same location
+            return;
+        }
+
+        // Unblock the miniTiles of pBlocking:
+        AreaId newId = pBlocking.getBlockedAreas().iterator().next().getId();
+        WalkPosition pBlockingW = pBlocking.getSize().toWalkPosition();
+        for (int dy = 0; dy < pBlockingW.getY(); ++dy)
+            for (int dx = 0; dx < pBlockingW.getX(); ++dx) {
+                MiniTile miniTile = getData().getMiniTile(
+                                        pBlocking.getTopLeft().toWalkPosition().add(new WalkPosition(dx, dy)));
+                if (miniTile.isWalkable()) {
+                    ((MiniTileImpl) miniTile).replaceBlockedAreaId(newId);
+                }
+            }
+
+        // Unblock the Tiles of pBlocking:
+        for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy)
+            for (int dx = 0; dx < pBlocking.getSize().getX(); ++dx) {
+                ((TileImpl) getData()
+                                .getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy))))
+                        .resetAreaId();
+                setAreaIdInTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)));
+            }
+
+        if (automaticPathUpdate()) {
+            getGraph().computeChokePointDistanceMatrix();
+        }
     }
 }

@@ -14,23 +14,78 @@ package bwem.unit;
 
 import bwapi.Unit;
 
+import bwem.map.Map;
+import java.util.ArrayList;
 import java.util.List;
 
-public interface NeutralData {
-    List<Mineral> getMinerals();
+public class NeutralData {
+    private final List<Mineral> minerals;
+    private final List<Geyser> geysers;
+    private final List<StaticBuilding> staticBuildings;
 
-    /**
-     * If a Mineral wrappers the given BWAPI unit, returns a pointer to it. Otherwise, returns null.
-     */
-    Mineral getMineral(Unit u);
+    public NeutralData(
+            final Map map,
+            final List<Unit> mineralPatches,
+            final List<Unit> vespeneGeysers,
+            final List<Unit> neutralUnits) {
+        ////////////////////////////////////////////////////////////////////////
+        // Map::InitializeNeutrals
+        ////////////////////////////////////////////////////////////////////////
 
-    // Returns a reference to the geysers (Cf. Geyser).
-    List<Geyser> getGeysers();
+        this.minerals = new ArrayList<>();
+        for (final Unit mineralPatch : mineralPatches) {
+            this.minerals.add(new Mineral(mineralPatch, map));
+        }
 
-    // If a Geyser wrappers the given BWAPI unit, returns a pointer to it.
-    // Otherwise, returns nullptr.
-    Geyser getGeyser(Unit g);
+        this.geysers = new ArrayList<>();
+        for (final Unit vespeneGeyser : vespeneGeysers) {
+            this.geysers.add(new Geyser(vespeneGeyser, map));
+        }
 
-    // Returns a reference to the StaticBuildings (Cf. StaticBuilding).
-    List<StaticBuilding> getStaticBuildings();
+        this.staticBuildings = new ArrayList<>();
+        for (final Unit neutralUnit : neutralUnits) {
+            if (neutralUnit.getType().isBuilding()) {
+                this.staticBuildings.add(new StaticBuilding(neutralUnit, map));
+            }
+        }
+
+        // TODO: Add "Special_Pit_Door" and "Special_Right_Pit_Door" to static buildings list? See
+        // mapImpl.cpp:238.
+        //				if (n->getType() == Special_Pit_Door)
+        //					m_StaticBuildings.push_back(make_unique<StaticBuilding>(n, this));
+        //				if (n->getType() == Special_Right_Pit_Door)
+        //					m_StaticBuildings.push_back(make_unique<StaticBuilding>(n, this));
+
+        ////////////////////////////////////////////////////////////////////////
+    }
+
+    public List<Mineral> getMinerals() {
+        return this.minerals;
+    }
+
+    public Mineral getMineral(final Unit unit) {
+        for (final Mineral mineral : getMinerals()) {
+            if (mineral.getUnit().equals(unit)) {
+                return mineral;
+            }
+        }
+        return null;
+    }
+
+    public List<Geyser> getGeysers() {
+        return this.geysers;
+    }
+
+    public Geyser getGeyser(final Unit unit) {
+        for (final Geyser geyser : getGeysers()) {
+            if (geyser.getUnit().equals(unit)) {
+                return geyser;
+            }
+        }
+        return null;
+    }
+
+    public List<StaticBuilding> getStaticBuildings() {
+        return this.staticBuildings;
+    }
 }

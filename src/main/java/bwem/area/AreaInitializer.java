@@ -43,14 +43,14 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class AreaInitializerImpl extends AreaImpl {
+public class AreaInitializer extends Area {
 
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;
 
     private final Map map;
 
-    public AreaInitializerImpl(
+    public AreaInitializer(
         final Map map, final AreaId areaId, final WalkPosition top, final int miniTileCount) {
         super(areaId, top, miniTileCount);
 
@@ -550,5 +550,19 @@ public class AreaInitializerImpl extends AreaImpl {
         }
 
         return true;
+    }
+
+    public void onMineralDestroyed(final Mineral mineral) {
+        if (mineral == null) {
+            throw new IllegalArgumentException();
+        }
+
+        this.minerals.remove(mineral);
+
+        // let's examine the bases even if mineral was not found in this Area,
+        // which could arise if minerals were allowed to be assigned to neighboring areas.
+        for (final Base base : getBases()) {
+            ((BaseImpl) base).onMineralDestroyed(mineral);
+        }
     }
 }

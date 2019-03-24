@@ -18,7 +18,7 @@ import bwapi.Unit;
 import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.map.Map;
-import bwem.map.MapImpl;
+import bwem.map.MapInitializer;
 import bwem.tile.Tile;
 import bwem.tile.TileImpl;
 
@@ -48,7 +48,7 @@ public abstract class NeutralImpl implements Neutral {
         removeFromTiles();
 
         if (isBlocking()) {
-            MapImpl map = (MapImpl) getMap();
+            MapInitializer map = (MapInitializer) getMap();
             map.onBlockingNeutralDestroyed(this);
         }
     }
@@ -189,9 +189,8 @@ public abstract class NeutralImpl implements Neutral {
                         throw new IllegalStateException();
                     }
                     if (prevStacked != null) {
-                        if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this)) {
-                            throw new IllegalStateException();
-                        } else if (!(prevStacked.getTopLeft().equals(getTopLeft()))) {
+                        if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this) || !(prevStacked
+                            .getTopLeft().equals(getTopLeft()))) {
                             throw new IllegalStateException();
                         }
                         ((NeutralImpl) prevStacked).nextStacked = nextStacked;

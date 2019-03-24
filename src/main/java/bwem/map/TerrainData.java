@@ -19,18 +19,68 @@ import bwem.tile.MiniTile;
 import bwem.tile.Tile;
 import bwem.tile.TileData;
 
-public interface TerrainData {
-    MapData getMapData();
+public abstract class TerrainData {
+    private final MapData mapData;
+    private final TileData tileData;
 
-    TileData getTileData();
+    TerrainData(final MapData mapData, final TileData tileData) {
+        this.mapData = mapData;
+        this.tileData = tileData;
+    }
 
-    Tile getTile(TilePosition tilePosition, CheckMode checkMode);
+    public MapData getMapData() {
+        return this.mapData;
+    }
 
-    Tile getTile(TilePosition tilePosition);
+    public TileData getTileData() {
+        return this.tileData;
+    }
 
-    MiniTile getMiniTile(WalkPosition walkPosition, CheckMode checkMode);
+    public Tile getTile(final TilePosition tilePosition, final CheckMode checkMode) {
+        if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(tilePosition))) {
+            throw new IllegalArgumentException();
+        }
+        return getTileData()
+                .getTiles()
+                .get(getMapData().getTileSize().getX() * tilePosition.getY() + tilePosition.getX());
+    }
 
-    MiniTile getMiniTile(WalkPosition walkPosition);
+    public Tile getTile(final TilePosition tilePosition) {
+        return getTile(tilePosition, CheckMode.CHECK);
+    }
 
-    boolean isSeaWithNonSeaNeighbors(WalkPosition walkPosition);
+    public MiniTile getMiniTile(final WalkPosition walkPosition, final CheckMode checkMode) {
+        if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(walkPosition))) {
+            throw new IllegalArgumentException();
+        }
+        return getTileData()
+                .getMiniTiles()
+                .get(getMapData().getWalkSize().getX() * walkPosition.getY() + walkPosition.getX());
+    }
+
+    public MiniTile getMiniTile(final WalkPosition walkPosition) {
+        return getMiniTile(walkPosition, CheckMode.CHECK);
+    }
+
+    public boolean isSeaWithNonSeaNeighbors(final WalkPosition walkPosition) {
+        if (!getMiniTile(walkPosition).isSea()) {
+            return false;
+        }
+
+        final WalkPosition[] deltas = {
+                new WalkPosition(0, -1),
+                new WalkPosition(-1, 0),
+                new WalkPosition(1, 0),
+                new WalkPosition(0, 1)
+        };
+        for (final WalkPosition delta : deltas) {
+            final WalkPosition walkPositionDelta = walkPosition.add(delta);
+            if (getMapData().isValid(walkPositionDelta) && !getMiniTile(walkPositionDelta,
+                CheckMode.NO_CHECK).isSea()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

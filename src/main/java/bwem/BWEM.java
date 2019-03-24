@@ -14,13 +14,13 @@ package bwem;
 
 import bwapi.Game;
 import bwem.map.Map;
-import bwem.map.MapInitializerImpl;
+import bwem.map.MapInitializer;
 
 public final class BWEM {
     private final Map map;
 
     public BWEM(final Game game) {
-        this.map = new MapInitializerImpl(game);
+        this.map = new MapInitializer(game);
     }
 
     /**
@@ -35,10 +35,10 @@ public final class BWEM {
      * Initializes and pre-computes all of the internal data.
      */
     public void initialize() {
-        if (!(this.map instanceof MapInitializerImpl)) {
+        if (!(this.map instanceof MapInitializer)) {
             throw new IllegalStateException("BWEM was not instantiated properly.");
         }
-        ((MapInitializerImpl) this.map).initialize();
+        ((MapInitializer) this.map).initialize();
         this.map.assignStartingLocationsToSuitableBases();
     }
 }

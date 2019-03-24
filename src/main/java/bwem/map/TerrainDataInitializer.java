@@ -21,13 +21,13 @@ import bwem.tile.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class TerrainDataInitializerImpl extends TerrainDataImpl {
-    TerrainDataInitializerImpl(final MapData mapData, final TileData tileData) {
+class TerrainDataInitializer extends TerrainData {
+    TerrainDataInitializer(final MapData mapData, final TileData tileData) {
         super(mapData, tileData);
     }
 
      ////////////////////////////////////////////////////////////////////////
-    // MapImpl::LoadData
+    // Map::LoadData
     ////////////////////////////////////////////////////////////////////////
 
     void markUnwalkableMiniTiles(final Game game) {
@@ -81,7 +81,7 @@ class TerrainDataInitializerImpl extends TerrainDataImpl {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // MapImpl::DecideSeasOrLakes
+    // Map::DecideSeasOrLakes
     ////////////////////////////////////////////////////////////////////////
 
     void decideSeasOrLakes(final int lakeMaxMiniTiles, final int lakeMaxWidthInMiniTiles) {

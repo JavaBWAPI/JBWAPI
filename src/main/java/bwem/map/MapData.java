@@ -16,53 +16,63 @@ import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface MapData {
-    /**
-     * Returns the size of the map in tiles.
-     */
-    TilePosition getTileSize();
+public class MapData {
+    private final TilePosition tileSize;
+    private final WalkPosition walkSize;
+    private final Position pixelSize;
+    private final Position center;
+    private final List<TilePosition> startingLocations;
 
-    /**
-     * Returns the size of the map in walktiles.
-     */
-    WalkPosition getWalkSize();
+    public MapData(
+            final int tileWidth, final int tileHeight, final List<TilePosition> startingLocations) {
 
-    /**
-     * Returns the size of the map in pixels.
-     */
-    Position getPixelSize();
+        this.tileSize = new TilePosition(tileWidth, tileHeight);
+        this.walkSize = this.tileSize.toWalkPosition();
+        this.pixelSize = this.tileSize.toPosition();
 
-    /**
-     * Returns the center of the map in pixels.
-     */
-    Position getCenter();
+        this.center = new Position(this.pixelSize.getX() / 2, this.pixelSize.getY() / 2);
 
-    /**
-     * Returns the internal container of the starting Locations.<br>
-     * Note: these correspond to BWAPI::getStartLocations().
-     */
-    List<TilePosition> getStartingLocations();
+        this.startingLocations = new ArrayList<>(startingLocations);
+    }
 
-    /**
-     * Tests whether the specified position is inside the map.
-     *
-     * @param tilePosition the specified position
-     */
-    boolean isValid(TilePosition tilePosition);
+    public TilePosition getTileSize() {
+        return this.tileSize;
+    }
 
-    /**
-     * Tests whether the specified position is inside the map.
-     *
-     * @param walkPosition the specified position
-     */
-    boolean isValid(WalkPosition walkPosition);
+    public WalkPosition getWalkSize() {
+        return this.walkSize;
+    }
 
-    /**
-     * Tests whether the specified position is inside the map.
-     *
-     * @param position the specified position
-     */
-    boolean isValid(Position position);
+    public Position getPixelSize() {
+        return this.pixelSize;
+    }
+
+    public Position getCenter() {
+        return this.center;
+    }
+
+    public List<TilePosition> getStartingLocations() {
+        return this.startingLocations;
+    }
+
+    public boolean isValid(final TilePosition tilePosition) {
+        return isValid(
+                tilePosition.getX(), tilePosition.getY(), getTileSize().getX(), getTileSize().getY());
+    }
+
+    public boolean isValid(final WalkPosition walkPosition) {
+        return isValid(
+                walkPosition.getX(), walkPosition.getY(), getWalkSize().getX(), getWalkSize().getY());
+    }
+
+    public boolean isValid(final Position position) {
+        return isValid(position.getX(), position.getY(), getPixelSize().getX(), getPixelSize().getY());
+    }
+
+    private boolean isValid(final int x, final int y, final int maxX, final int maxY) {
+        return (x >= 0 && x < maxX && y >= 0 && y < maxY);
+    }
 }

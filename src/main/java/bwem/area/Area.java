@@ -22,154 +22,136 @@ import bwem.typedef.Altitude;
 import bwem.unit.Geyser;
 import bwem.unit.Mineral;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-/**
- * Areas are regions that BWEM automatically computes from Brood War's maps.<br>
- * Areas aim at capturing relevant regions that can be walked, though they may contain small inner
- * non walkable regions called lakes.<br>
- * More formally:<br>
- * - An area consists in a set of 4-connected MiniTiles, which are either Terrain-MiniTiles or
- * Lake-MiniTiles.<br>
- * - An Area is delimited by the side of the Map, by Water-MiniTiles, or by other Areas. In the
- * latter case the adjoining Areas are called neighboring Areas, and each pair of such Areas defines
- * at least one ChokePoint.<br>
- * Like ChokePoints and Bases, the number and the addresses of Area instances remain unchanged.<br>
- * To access Areas one can use their ids or their addresses with equivalent efficiency.<br>
- * Areas inherit utils::Markable, which provides marking ability.<br>
- * Areas inherit utils::UserData, which provides free-to-use data.
- */
-public interface Area {
-    /**
-     * - Unique id > 0 of this Area. Range = 1.. Map::Areas().size()<br>
-     * - this == Map::GetArea(id())<br>
-     * - id() == Map::GetMiniTile(w).AreaId() for each walkable MiniTile w in this Area.<br>
-     * - Area::ids are guaranteed to remain unchanged.
-     */
-    AreaId getId();
+public abstract class Area {
+    final java.util.Map<Area, List<ChokePoint>> chokePointsByArea = new HashMap<>();
+    final List<Area> accessibleNeighbors = new ArrayList<>();
+    final List<ChokePoint> chokePoints = new ArrayList<>();
+    final List<Mineral> minerals = new ArrayList<>();
+    final List<Geyser> geysers = new ArrayList<>();
+    final List<Base> bases = new ArrayList<>();
+    private final AreaId id;
+    private final WalkPosition walkPositionWithHighestAltitude;
+    private final int miniTileCount;
+    GroupId groupId = GroupId.ZERO;
+    Altitude highestAltitude;
+    TilePosition topLeft = new TilePosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    TilePosition bottomRight = new TilePosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    int tileCount = 0;
+    int buildableTileCount =
+            0; /* Set and later incremented but not used in original C++ BWEM 1.4.1. Remains for portability consistency. */
+    int highGroundTileCount = 0;
+    int veryHighGroundTileCount = 0;
 
-    /**
-     * - Unique id > 0 of the group of Areas which are accessible from this Area.<br>
-     * - For each pair (a, b) of Areas: a->GroupId() == b->GroupId() <==> a->AccessibleFrom(b)<br>
-     * - A groupId uniquely identifies a maximum set of mutually accessible Areas, that is, in the
-     * absence of blocking ChokePoints, a continent.
-     */
-    GroupId getGroupId();
+    Area(final AreaId areaId, final WalkPosition top, final int miniTileCount) {
+        this.id = areaId;
+        this.walkPositionWithHighestAltitude = top;
+        this.miniTileCount = miniTileCount;
+    }
 
-    /**
-     * Returns the top left position of the bounding box of this area.
-     */
-    TilePosition getTopLeft();
+    public AreaId getId() {
+        return this.id;
+    }
 
-    /**
-     * Returns the bottom right position of the bounding box of this area.
-     */
-    TilePosition getBottomRight();
+    public GroupId getGroupId() {
+        return this.groupId;
+    }
 
-    /**
-     * Returns the bounding box size of this area. The size is equal to (bottom right) subtract (top
-     * left) plus (1).
-     */
-    TilePosition getBoundingBoxSize();
+    public TilePosition getTopLeft() {
+        return this.topLeft;
+    }
 
-    /**
-     * Returns the position of the MiniTile with the highest altitude value.
-     */
-    WalkPosition getWalkPositionWithHighestAltitude();
+    public TilePosition getBottomRight() {
+        return this.bottomRight;
+    }
 
-    /**
-     * Alias for {@link #getWalkPositionWithHighestAltitude()}
-     */
-    WalkPosition getTop();
+    public TilePosition getBoundingBoxSize() {
+        return this.bottomRight.subtract(this.topLeft).add(new TilePosition(1, 1));
+    }
 
-    /**
-     * Returns the highest altitude observed in this area.
-     */
-    Altitude getHighestAltitude();
+    public WalkPosition getWalkPositionWithHighestAltitude() {
+        return this.walkPositionWithHighestAltitude;
+    }
 
-    /**
-     * Returns the number of MiniTiles in this area. This most accurately defines the size of this
-     * area.
-     */
-    int getSize();
+    public WalkPosition getTop() {
+        return getWalkPositionWithHighestAltitude();
+    }
 
-    /**
-     * Returns the percentage of low ground tiles in this area.
-     */
-    int getLowGroundPercentage();
+    public Altitude getHighestAltitude() {
+        return this.highestAltitude;
+    }
 
-    /**
-     * Returns the percentage of high ground tiles in this area.
-     */
-    int getHighGroundPercentage();
+    public int getSize() {
+        return this.miniTileCount;
+    }
 
-    /**
-     * Returns the percentage of very high ground tiles in this area.
-     */
-    int getVeryHighGroundPercentage();
+    public int getLowGroundPercentage() {
+        final int lowGroundTileCount =
+                this.tileCount - this.highGroundTileCount - this.veryHighGroundTileCount;
+        return ((lowGroundTileCount * 100) / this.tileCount);
+    }
 
-    /**
-     * Returns the ChokePoints between this Area and the neighboring ones.<br>
-     * - Note: if there are no neighboring Areas, then an empty set is returned.<br>
-     * - Note: there may be more ChokePoints returned than the number of neighboring Areas, as there
-     * may be several ChokePoints between two Areas.
-     *
-     * @see #getChokePoints(Area)
-     */
-    List<ChokePoint> getChokePoints();
+    public int getHighGroundPercentage() {
+        return ((this.highGroundTileCount * 100) / this.tileCount);
+    }
 
-    /**
-     * Returns the ChokePoints between this Area and the specified area.<br>
-     * - Assumes the specified area is a neighbor of this area, i.e. ChokePointsByArea().find(pArea)
-     * != ChokePointsByArea().end()<br>
-     * - Note: there is always at least one ChokePoint between two neighboring Areas.
-     *
-     * @param area the specified area
-     */
-    List<ChokePoint> getChokePoints(Area area);
+    public int getVeryHighGroundPercentage() {
+        return ((this.veryHighGroundTileCount * 100) / tileCount);
+    }
 
-    /**
-     * Returns the ChokePoints of this Area grouped by neighboring Areas. - Note: if there are no
-     * neighboring Areas, than an empty set is returned.
-     */
-    java.util.Map<Area, List<ChokePoint>> getChokePointsByArea();
+    public List<ChokePoint> getChokePoints() {
+        return this.chokePoints;
+    }
 
-    /**
-     * Returns the accessible neighboring Areas.<br>
-     * - The accessible neighboring Areas are a subset of the neighboring Areas (the neighboring Areas
-     * can be iterated using ChokePointsByArea()).<br>
-     * - Two neighboring Areas are accessible from each over if at least one the ChokePoints they
-     * share is not Blocked.
-     *
-     * @see ChokePoint#isBlocked()
-     */
-    List<Area> getAccessibleNeighbors();
+    public List<ChokePoint> getChokePoints(final Area area) {
+        final List<ChokePoint> ret = this.chokePointsByArea.get(area);
+        if (ret == null) {
+            throw new IllegalArgumentException();
+        }
+        return ret;
+    }
 
-    /**
-     * Returns whether this Area is accessible from the specified area, that is, if they share the
-     * same GroupId().<br>
-     * - Note: accessibility is always symmetrical.<br>
-     * - Note: even if a and b are neighboring Areas,<br>
-     * we can have: a->AccessibleFrom(b)<br>
-     * and not: contains(a->AccessibleNeighbors(), b)
-     *
-     * @param area the specified area
-     * @see #getGroupId()
-     */
-    boolean isAccessibleFrom(Area area);
+    public java.util.Map<Area, List<ChokePoint>> getChokePointsByArea() {
+        return this.chokePointsByArea;
+    }
 
-    /**
-     * Returns the Minerals contained in this Area.<br>
-     */
-    List<Mineral> getMinerals();
+    public List<Area> getAccessibleNeighbors() {
+        return this.accessibleNeighbors;
+    }
 
-    /**
-     * Returns the Geysers contained in this Area.
-     */
-    List<Geyser> getGeysers();
+    public boolean isAccessibleFrom(final Area area) {
+        return getGroupId().equals(area.getGroupId());
+    }
 
-    /**
-     * Returns the Bases contained in this Area.
-     */
-    List<Base> getBases();
+    public List<Mineral> getMinerals() {
+        return this.minerals;
+    }
+
+    public List<Geyser> getGeysers() {
+        return this.geysers;
+    }
+
+    public List<Base> getBases() {
+        return this.bases;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Area)) {
+            return false;
+        } else {
+            final Area that = (Area) object;
+            return (getId().equals(that.getId()));
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
 }

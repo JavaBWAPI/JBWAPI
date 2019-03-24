@@ -12,16 +12,30 @@
 
 package bwem.tile;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface TileData {
-    /**
-     * Provides access to the internal array of Tiles.
-     */
-    List<Tile> getTiles();
+public class TileData {
+    private final List<Tile> tiles;
+    private final List<MiniTile> miniTiles;
 
-    /**
-     * Provides access to the internal array of miniTiles.
-     */
-    List<MiniTile> getMiniTiles();
+    public TileData(final int tileCount, final int miniTileCount) {
+        this.tiles = new ArrayList<>(tileCount);
+        for (int i = 0; i < tileCount; ++i) {
+            this.tiles.add(new TileImpl());
+        }
+
+        this.miniTiles = new ArrayList<>(miniTileCount);
+        for (int i = 0; i < miniTileCount; ++i) {
+            this.miniTiles.add(new MiniTileImpl());
+        }
+    }
+
+    public List<Tile> getTiles() {
+        return this.tiles;
+    }
+
+    public List<MiniTile> getMiniTiles() {
+        return this.miniTiles;
+    }
 }

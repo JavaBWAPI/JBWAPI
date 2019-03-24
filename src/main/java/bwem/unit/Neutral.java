@@ -15,8 +15,8 @@ package bwem.unit;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
-import bwem.area.Area;
 
+import bwem.area.Area;
 import java.util.List;
 
 /**
