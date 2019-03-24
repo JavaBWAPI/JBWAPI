@@ -19,7 +19,6 @@ import bwapi.TilePosition;
 import bwapi.UnitType;
 import bwapi.WalkPosition;
 import bwem.Base;
-import bwem.BaseImpl;
 import bwem.CheckMode;
 import bwem.ChokePoint;
 import bwem.Markable;
@@ -470,7 +469,7 @@ public class AreaInitializer extends Area {
                 break;
             }
 
-            super.bases.add(new BaseImpl(this, bestLocation, assignedResources, blockingMinerals));
+            super.bases.add(new Base(this, bestLocation, assignedResources, blockingMinerals));
         }
     }
 
@@ -558,7 +557,7 @@ public class AreaInitializer extends Area {
         // let's examine the bases even if mineral was not found in this Area,
         // which could arise if minerals were allowed to be assigned to neighboring areas.
         for (final Base base : getBases()) {
-            ((BaseImpl) base).onMineralDestroyed(mineral);
+            base.onMineralDestroyed(mineral);
         }
     }
 }

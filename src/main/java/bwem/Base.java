@@ -14,13 +14,18 @@ package bwem;
 
 import bwapi.Position;
 import bwapi.TilePosition;
+import bwapi.UnitType;
 import bwem.area.Area;
 import bwem.map.MapData;
 import bwem.unit.Geyser;
 import bwem.unit.Mineral;
 import bwem.unit.Neutral;
+import bwem.unit.Resource;
+import bwem.util.BwemExt;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * After Areas and ChokePoints, Bases are the third kind of object BWEM automatically computes from
@@ -29,31 +34,73 @@ import java.util.List;
  * Base always belongs to some Area. An Area may contain zero, one or several Bases. Like Areas and
  * ChokePoints, the number and the addresses of Base instances remain unchanged.
  */
-public interface Base {
+public class Base {
+    private final Area area;
+    private final List<Mineral> minerals = new ArrayList<>();
+    private final List<Geyser> geysers = new ArrayList<>();
+    private final List<Mineral> blockingMinerals;
+    private TilePosition location;
+    private Position center;
+    private boolean isStartingLocation = false;
+
+    public Base(
+            final Area area,
+            final TilePosition location,
+            final List<Resource> assignedResources,
+            final List<Mineral> blockingMinerals) {
+        this.area = area;
+        this.location = location;
+        this.center = BwemExt.centerOfBuilding(location, UnitType.Terran_Command_Center.tileSize());
+        this.blockingMinerals = blockingMinerals;
+
+        //        bwem_assert(!AssignedResources.empty());
+        if (assignedResources.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        for (final Resource assignedResource : assignedResources) {
+            if (assignedResource instanceof Mineral) {
+                final Mineral assignedMineral = (Mineral) assignedResource;
+                this.minerals.add(assignedMineral);
+            } else if (assignedResource instanceof Geyser) {
+                final Geyser assignedGeyser = (Geyser) assignedResource;
+                this.geysers.add(assignedGeyser);
+            }
+        }
+    }
+
     /**
      * Tests whether this base is a start location.<br>
      * - Note: all players start at locations taken from {@link MapData#getStartingLocations()},<br>
      * which doesn't mean all the locations in {@link MapData#getStartingLocations()} are actually
      * used.
      */
-    boolean isStartingLocation();
+    public boolean isStartingLocation() {
+        return this.isStartingLocation;
+    }
 
     /**
      * Returns the area in which this base is located.
      */
-    Area getArea();
+    public Area getArea() {
+        return this.area;
+    }
 
     /**
      * Returns the position (top-left TilePosition) of the location for a resource depot.<br>
      * - Note: If {@link #isStartingLocation()} == true, it is guaranteed that the location
      * corresponds exactly to one of {@link MapData#getStartingLocations()}.
      */
-    TilePosition getLocation();
+    public TilePosition getLocation() {
+        return this.location;
+    }
 
     /**
      * Returns the center position of {@link #getLocation()}.
      */
-    Position getCenter();
+    public Position getCenter() {
+        return this.center;
+    }
 
     /**
      * Returns the available minerals.<br>
@@ -61,7 +108,9 @@ public interface Base {
      * <br>
      * - Note: The size of the returned list may decrease, as some of the minerals may get destroyed.
      */
-    List<Mineral> getMinerals();
+    public List<Mineral> getMinerals() {
+        return this.minerals;
+    }
 
     /**
      * Returns the available geysers.<br>
@@ -69,7 +118,9 @@ public interface Base {
      * <br>
      * - Note: The size of the returned list will NOT decrease, as geysers never get destroyed.
      */
-    List<Geyser> getGeysers();
+    public List<Geyser> getGeysers() {
+        return this.geysers;
+    }
 
     /**
      * Returns the blocking minerals.<br>
@@ -83,5 +134,43 @@ public interface Base {
      * ChokePoint#getBlockingNeutral()} and {@link Neutral#isBlocking()}:<br>
      * The last two refer to a Neutral blocking a ChokePoint, not a Base.
      */
-    List<Mineral> getBlockingMinerals();
+    public List<Mineral> getBlockingMinerals() {
+        return this.blockingMinerals;
+    }
+
+    public void assignStartingLocation(final TilePosition actualLocation) {
+        this.isStartingLocation = true;
+        this.location = actualLocation;
+        this.center =
+                BwemExt.centerOfBuilding(actualLocation, UnitType.Terran_Command_Center.tileSize());
+    }
+
+    public void onMineralDestroyed(final Mineral mineral) {
+        //    	bwem_assert(pMineral);
+        if (mineral == null) {
+            throw new IllegalArgumentException();
+        }
+
+        this.minerals.remove(mineral);
+        this.blockingMinerals.remove(mineral);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        } else if (!(object instanceof Base)) {
+            return false;
+        } else {
+            final Base that = (Base) object;
+            return (getArea().equals(that.getArea())
+                    && getLocation().equals(that.getLocation())
+                    && getCenter().equals(that.getCenter()));
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.area, this.location, this.center);
+    }
 }

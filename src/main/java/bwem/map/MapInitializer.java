@@ -15,7 +15,6 @@ package bwem.map;
 import bwapi.*;
 import bwem.CheckMode;
 import bwem.ChokePoint;
-import bwem.ChokePointImpl;
 import bwem.area.Area;
 import bwem.area.TempAreaInfo;
 import bwem.area.typedef.AreaId;
@@ -633,11 +632,11 @@ public class MapInitializer extends Map {
 
         for (Area pArea : pBlocking.getBlockedAreas())
             for (ChokePoint cp : pArea.getChokePoints()) {
-                ((ChokePointImpl) cp).onBlockingNeutralDestroyed(pBlocking);
+                cp.onBlockingNeutralDestroyed(pBlocking);
             }
 
-        if (getData().getTile(pBlocking.getTopLeft()).getNeutral()
-                != null) { // there remains some blocking Neutrals at the same location
+        // there remains some blocking Neutrals at the same location
+        if (getData().getTile(pBlocking.getTopLeft()).getNeutral() != null) {
             return;
         }
 

@@ -150,16 +150,16 @@ public final class Graph {
     // Returns the ground distance in pixels between cpA->center() and cpB>center()
     public int distance(ChokePoint cpA, ChokePoint cpB) {
         return chokePointDistanceMatrix
-                .get(((ChokePointImpl) cpA).getIndex())
-                .get(((ChokePointImpl) cpB).getIndex());
+                .get(cpA.getIndex())
+                .get(cpB.getIndex());
     }
 
     // Returns a list of getChokePoints, which is intended to be the shortest walking path from cpA to
     // cpB.
     public CPPath getPath(ChokePoint cpA, ChokePoint cpB) {
         return pathsBetweenChokePoints
-                .get(((ChokePointImpl) cpA).getIndex())
-                .get(((ChokePointImpl) cpB).getIndex());
+                .get(cpA.getIndex())
+                .get(cpB.getIndex());
     }
 
     public CPPath getPath(final Position a, final Position b, final MutableInt pLength) {
@@ -414,7 +414,7 @@ public final class Graph {
             final AreaId b = rawleft.getRight();
             for (final List<WalkPosition> cluster : clusters) {
                 getChokePoints(a, b)
-                        .add(new ChokePointImpl(this, newIndex, getArea(a), getArea(b), cluster));
+                        .add(new ChokePoint(this, newIndex, getArea(a), getArea(b), cluster));
                 newIndex++;
             }
         }
@@ -442,7 +442,7 @@ public final class Graph {
                         list.add(center);
                         getChokePoints(blockedAreaA, blockedAreaB)
                                 .add(
-                                        new ChokePointImpl(
+                                        new ChokePoint(
                                                 this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
                         newIndex++;
                     }
@@ -620,9 +620,9 @@ public final class Graph {
                 //                if ((void *)(pContext) == (void *)(this))	// tests (Context == Graph)
                 // without warning about constant condition
                 if (collectIntermediateChokePoints) {
-                    for (ChokePoint pPrev = ((ChokePointImpl) target).getPathBackTrace();
+                    for (ChokePoint pPrev = target.getPathBackTrace();
                          !pPrev.equals(pStart);
-                         pPrev = ((ChokePointImpl) pPrev).getPathBackTrace()) {
+                         pPrev = pPrev.getPathBackTrace()) {
                         path.add(1, pPrev);
                     }
                 }
@@ -696,12 +696,12 @@ public final class Graph {
                                         throw new IllegalStateException();
                                     }
                                     ((TileImpl) nextTile).setInternalData(newNextDist);
-                                    ((ChokePointImpl) next).setPathBackTrace(current);
+                                    next.setPathBackTrace(current);
                                     toVisit.offer(new Pair<>(newNextDist, next));
                                 }
                             } else {
                                 ((TileImpl) nextTile).setInternalData(newNextDist);
-                                ((ChokePointImpl) next).setPathBackTrace(current);
+                                next.setPathBackTrace(current);
                                 toVisit.offer(new Pair<>(newNextDist, next));
                             }
                         }
@@ -755,15 +755,15 @@ public final class Graph {
     }
 
     private void setDistance(final ChokePoint cpA, final ChokePoint cpB, final int value) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex();
-        final int indexB = ((ChokePointImpl) cpB).getIndex();
+        final int indexA = cpA.getIndex();
+        final int indexB = cpB.getIndex();
         this.chokePointDistanceMatrix.get(indexA).set(indexB, value);
         this.chokePointDistanceMatrix.get(indexB).set(indexA, value);
     }
 
     private void setPath(final ChokePoint cpA, final ChokePoint cpB, final CPPath pathAB) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex();
-        final int indexB = ((ChokePointImpl) cpB).getIndex();
+        final int indexA = cpA.getIndex();
+        final int indexB = cpB.getIndex();
 
         this.pathsBetweenChokePoints.get(indexA).set(indexB, pathAB);
 

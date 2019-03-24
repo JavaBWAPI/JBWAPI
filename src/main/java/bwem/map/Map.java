@@ -91,7 +91,7 @@ public abstract class Map {
             for (final Base base : getBases()) {
                 if (BwemExt.queenWiseDist(base.getLocation(), startingLocation)
                         <= BwemExt.MAX_TILES_BETWEEN_STARTING_LOCATION_AND_ITS_ASSIGNED_BASE) {
-                    ((BaseImpl) base).assignStartingLocation(startingLocation);
+                    base.assignStartingLocation(startingLocation);
                     isAssigned = true;
                 }
             }
