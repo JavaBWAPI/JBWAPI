@@ -25,7 +25,7 @@ import java.util.List;
 public class CPPath implements Iterable<ChokePoint> {
     private final List<ChokePoint> chokepoints;
 
-    public CPPath() {
+    CPPath() {
         this.chokepoints = new ArrayList<>();
     }
 
@@ -37,15 +37,15 @@ public class CPPath implements Iterable<ChokePoint> {
         return this.chokepoints.get(index);
     }
 
-    public void add(final ChokePoint chokepoint) {
+    void add(final ChokePoint chokepoint) {
         this.chokepoints.add(chokepoint);
     }
 
-    public void add(final int index, final ChokePoint chokepoint) {
+    void add(final int index, final ChokePoint chokepoint) {
         this.chokepoints.add(index, chokepoint);
     }
 
-    public void clear() {
+    void clear() {
         this.chokepoints.clear();
     }
 
