@@ -142,15 +142,7 @@ public abstract class Map {
         if (u.getType().isMineralField()) {
             onMineralDestroyed(u);
         } else {
-            try {
-                onStaticBuildingDestroyed(u);
-            } catch (Exception ex) {
-                // TODO: Handle this exception appropriately.
-                /**
-                 * An exception WILL be thrown if the unit is not in the "Map.StaticBuildings" list. Just
-                 * ignore the exception.
-                 */
-            }
+            onStaticBuildingDestroyed(u);
         }
     }
 
@@ -187,7 +179,6 @@ public abstract class Map {
                 return;
             }
         }
-        throw new IllegalArgumentException("unit is not a StaticBuilding");
     }
 
     public List<Area> getAreas() {
