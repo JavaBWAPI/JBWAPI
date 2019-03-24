@@ -112,7 +112,7 @@ public interface Tile {
             this.val = val;
         }
 
-        public static GroundHeight parseGroundHeight(final int height) {
+        static GroundHeight parseGroundHeight(final int height) {
             for (final GroundHeight val : GroundHeight.values()) {
                 if (val.intValue() == height) {
                     return val;
@@ -121,7 +121,7 @@ public interface Tile {
             throw new IllegalArgumentException("Unrecognized height: " + height);
         }
 
-        public int intValue() {
+        int intValue() {
             return this.val;
         }
     }

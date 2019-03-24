@@ -29,8 +29,8 @@ public final class Markable {
         return this.staticMarkable;
     }
 
-    public boolean isMarked() {
-        return (this.lastMark == getStaticMarkable().getCurrentMark());
+    public boolean isUnmarked() {
+        return (this.lastMark != getStaticMarkable().getCurrentMark());
     }
 
     public void setMarked() {

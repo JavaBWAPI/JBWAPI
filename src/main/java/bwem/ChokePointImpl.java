@@ -12,6 +12,7 @@
 
 package bwem;
 
+import bwapi.Pair;
 import bwapi.WalkPosition;
 import bwem.area.Area;
 import bwem.map.Map;
@@ -20,8 +21,6 @@ import bwem.tile.MiniTileImpl;
 import bwem.typedef.CPPath;
 import bwem.typedef.Index;
 import bwem.unit.Neutral;
-import bwapi.Pair;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,13 +37,13 @@ public class ChokePointImpl implements ChokePoint {
     private Neutral blockingNeutral;
     private ChokePoint pathBackTrace = null;
 
-    public ChokePointImpl(
-            final Graph graph,
-            final Index index,
-            final Area area1,
-            final Area area2,
-            final List<WalkPosition> geometry,
-            final Neutral blockingNeutral) {
+    ChokePointImpl(
+        final Graph graph,
+        final Index index,
+        final Area area1,
+        final Area area2,
+        final List<WalkPosition> geometry,
+        final Neutral blockingNeutral) {
         if (geometry.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -86,55 +85,30 @@ public class ChokePointImpl implements ChokePoint {
         }
         this.nodes[Node.MIDDLE.ordinal()] = geometry.get(i);
 
+        Map map = getMap();
         for (int n = 0; n < Node.NODE_COUNT.ordinal(); ++n) {
             for (final Area area : new Area[]{area1, area2}) {
                 final WalkPosition nodeInArea =
-                        getGraph()
-                                .getMap()
-                                .breadthFirstSearch(
-                                        this.nodes[n],
-                                        // findCond
-                                        args -> {
-                                            final Object ttile = args[0];
-                                            final Object tpos = args[1];
-                                            final Object tmap = args[args.length - 1];
-                                            if (ttile instanceof MiniTile
-                                                    && tpos instanceof WalkPosition
-                                                    && tmap instanceof Map) {
-                                                final MiniTile miniTile = (MiniTile) ttile;
-                                                final WalkPosition w = (WalkPosition) tpos;
-                                                final Map map = (Map) tmap;
-                                                return (miniTile.getAreaId().equals(area.getId())
-                                                        && map.getData()
-                                                        .getTile(w.toTilePosition(), CheckMode.NO_CHECK)
-                                                        .getNeutral()
-                                                        == null);
-                                            } else {
-                                                throw new IllegalArgumentException();
-                                            }
-                                        },
-                                        // visitCond
-                                        args -> {
-                                            final Object ttile = args[0];
-                                            final Object tpos = args[1];
-                                            final Object tmap = args[args.length - 1];
-                                            if (ttile instanceof MiniTile && tpos instanceof WalkPosition) {
-                                                final MiniTile miniTile = (MiniTile) ttile;
-                                                final WalkPosition w = (WalkPosition) tpos;
-                                                final Map map = (Map) tmap;
-                                                return (miniTile.getAreaId().equals(area.getId())
-                                                        || (isBlocked()
-                                                        && (((MiniTileImpl) miniTile).isBlocked()
-                                                        || map.getData()
-                                                        .getTile(w.toTilePosition(), CheckMode.NO_CHECK)
-                                                        .getNeutral()
-                                                        != null)));
-                                            } else {
-                                                throw new IllegalArgumentException("Invalid argument list.");
-                                            }
-                                        });
+                    getGraph()
+                        .getMap()
+                        .breadthFirstSearch(
+                            this.nodes[n],
+                            // findCond
+                            (MiniTile miniTile, WalkPosition w) -> (
+                                miniTile.getAreaId().equals(area.getId())
+                                    && map.getData()
+                                    .getTile(w.toTilePosition(), CheckMode.NO_CHECK)
+                                    .getNeutral() == null),
+                            // visitCond
+                            (MiniTile miniTile, WalkPosition w) -> (
+                                miniTile.getAreaId().equals(area.getId())
+                                    || (isBlocked()
+                                    && (((MiniTileImpl) miniTile).isBlocked()
+                                    || map.getData()
+                                    .getTile(w.toTilePosition(), CheckMode.NO_CHECK)
+                                    .getNeutral() != null))));
 
-                /**
+                /*
                  * Note: In the original C++ code, "nodeInArea" is a reference to a "WalkPosition" in
                  * "nodesInArea" which changes! Change that object here (after the call to
                  * "breadthFirstSearch")...
@@ -153,12 +127,12 @@ public class ChokePointImpl implements ChokePoint {
         }
     }
 
-    public ChokePointImpl(
-            final Graph graph,
-            final Index index,
-            final Area area1,
-            final Area area2,
-            final List<WalkPosition> geometry) {
+    ChokePointImpl(
+        final Graph graph,
+        final Index index,
+        final Area area1,
+        final Area area2,
+        final List<WalkPosition> geometry) {
         this(graph, index, area1, area2, geometry, null);
     }
 
@@ -187,7 +161,6 @@ public class ChokePointImpl implements ChokePoint {
 
     @Override
     public WalkPosition getNodePosition(final Node node) {
-        //        bwem_assert(n < NODE_COUNT);
         if (!(node.ordinal() < Node.NODE_COUNT.ordinal())) {
             throw new IllegalArgumentException();
         }
@@ -196,7 +169,6 @@ public class ChokePointImpl implements ChokePoint {
 
     @Override
     public WalkPosition getNodePositionInArea(final Node node, final Area area) {
-        //        bwem_assert((pArea == areas.getLeft()) || (pArea == areas.getRight()));
         if (!(area.equals(this.areas.getLeft()) || area.equals(this.areas.getRight()))) {
             throw new IllegalArgumentException();
         }
@@ -236,7 +208,6 @@ public class ChokePointImpl implements ChokePoint {
     }
 
     public void onBlockingNeutralDestroyed(final Neutral pBlocking) {
-        //        bwem_assert(pBlocking && pBlocking->blocking());
         if (!(pBlocking != null && pBlocking.isBlocking())) {
             throw new IllegalStateException();
         }
@@ -247,23 +218,21 @@ public class ChokePointImpl implements ChokePoint {
             this.blockingNeutral =
                     getMap().getData().getTile(this.blockingNeutral.getTopLeft()).getNeutral();
 
-            if (this.blockingNeutral == null) {
-                if (getGraph().getMap().automaticPathUpdate()) {
-                    this.isBlocked = false;
-                }
+            if (this.blockingNeutral == null && getGraph().getMap().automaticPathUpdate()) {
+                this.isBlocked = false;
             }
         }
     }
 
-    public Index getIndex() {
+    Index getIndex() {
         return this.index;
     }
 
-    public ChokePoint getPathBackTrace() {
+    ChokePoint getPathBackTrace() {
         return this.pathBackTrace;
     }
 
-    public void setPathBackTrace(final ChokePoint pathBackTrace) {
+    void setPathBackTrace(final ChokePoint pathBackTrace) {
         this.pathBackTrace = pathBackTrace;
     }
 
@@ -279,8 +248,8 @@ public class ChokePointImpl implements ChokePoint {
             final boolean ler = this.areas.getLeft().equals(that.areas.getRight());
             final boolean rer = this.areas.getRight().equals(that.areas.getRight());
             final boolean rel = this.areas.getRight().equals(that.areas.getLeft());
-            return (((lel && rer)
-                    || (ler && rel))); /* true if area pairs are an exact match or if one pair is reversed. */
+            return lel && rer
+                    || ler && rel; /* true if area pairs are an exact match or if one pair is reversed. */
         }
     }
 

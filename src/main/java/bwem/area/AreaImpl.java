@@ -28,26 +28,26 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class AreaImpl implements Area {
-    protected final java.util.Map<Area, List<ChokePoint>> chokePointsByArea = new HashMap<>();
-    protected final List<Area> accessibleNeighbors = new ArrayList<>();
-    protected final List<ChokePoint> chokePoints = new ArrayList<>();
-    protected final List<Mineral> minerals = new ArrayList<>();
-    protected final List<Geyser> geysers = new ArrayList<>();
-    protected final List<Base> bases = new ArrayList<>();
+    final java.util.Map<Area, List<ChokePoint>> chokePointsByArea = new HashMap<>();
+    final List<Area> accessibleNeighbors = new ArrayList<>();
+    final List<ChokePoint> chokePoints = new ArrayList<>();
+    final List<Mineral> minerals = new ArrayList<>();
+    final List<Geyser> geysers = new ArrayList<>();
+    final List<Base> bases = new ArrayList<>();
     private final AreaId id;
     private final WalkPosition walkPositionWithHighestAltitude;
     private final int miniTileCount;
-    protected GroupId groupId = GroupId.ZERO;
-    protected Altitude highestAltitude;
-    protected TilePosition topLeft = new TilePosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    protected TilePosition bottomRight = new TilePosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
-    protected int tileCount = 0;
-    protected int buildableTileCount =
+    GroupId groupId = GroupId.ZERO;
+    Altitude highestAltitude;
+    TilePosition topLeft = new TilePosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    TilePosition bottomRight = new TilePosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    int tileCount = 0;
+    int buildableTileCount =
             0; /* Set and later incremented but not used in original C++ BWEM 1.4.1. Remains for portability consistency. */
-    protected int highGroundTileCount = 0;
-    protected int veryHighGroundTileCount = 0;
+    int highGroundTileCount = 0;
+    int veryHighGroundTileCount = 0;
 
-    protected AreaImpl(final AreaId areaId, final WalkPosition top, final int miniTileCount) {
+    AreaImpl(final AreaId areaId, final WalkPosition top, final int miniTileCount) {
         this.id = areaId;
         this.walkPositionWithHighestAltitude = top;
         this.miniTileCount = miniTileCount;
@@ -123,7 +123,6 @@ public abstract class AreaImpl implements Area {
     @Override
     public List<ChokePoint> getChokePoints(final Area area) {
         final List<ChokePoint> ret = this.chokePointsByArea.get(area);
-        //        bwem_assert(it != getChokePointsByArea.end());
         if (ret == null) {
             throw new IllegalArgumentException();
         }
@@ -161,7 +160,6 @@ public abstract class AreaImpl implements Area {
     }
 
     public void onMineralDestroyed(final Mineral mineral) {
-        //        bwem_assert(mineral);
         if (mineral == null) {
             throw new IllegalArgumentException();
         }

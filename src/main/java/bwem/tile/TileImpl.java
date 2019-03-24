@@ -30,7 +30,7 @@ public class TileImpl implements Tile {
     private boolean isBuildable;
     private boolean isDoodad;
 
-    public TileImpl() {
+    TileImpl() {
         this.markable = new Markable(TileImpl.staticMarkable);
         this.neutral = null;
         this.lowestAltitude = Altitude.ZERO;
@@ -60,7 +60,6 @@ public class TileImpl implements Tile {
     }
 
     public void setAreaId(final AreaId areaId) {
-        //        { bwem_assert((id == -1) || !areaId && id); areaId = id; }
         if (!(areaId.intValue() == -1 || getAreaId().intValue() == 0 && areaId.intValue() != 0)) {
             throw new IllegalStateException();
         }
@@ -73,7 +72,6 @@ public class TileImpl implements Tile {
     }
 
     public void setLowestAltitude(final Altitude lowestAltitude) {
-        //        { bwem_assert(a >= 0); this.lowestAltitude = a; }
         if (!(lowestAltitude.intValue() >= 0)) {
             throw new IllegalArgumentException();
         }
@@ -133,7 +131,6 @@ public class TileImpl implements Tile {
     }
 
     public void addNeutral(final Neutral neutral) {
-        //        { bwem_assert(!pNeutral && pNeutral); neutral = pNeutral; }
         if (!(getNeutral() == null && neutral != null)) {
             throw new IllegalStateException();
         }
@@ -145,9 +142,7 @@ public class TileImpl implements Tile {
     }
 
     public void removeNeutral(final Neutral neutral) {
-        //        { bwem_assert(pNeutral &&  (pNeutral == pNeutral));
-        //          utils::unused(pNeutral); pNeutral = nullptr; }
-        if (!(neutral != null && getNeutral().equals(neutral))) {
+        if (!getNeutral().equals(neutral)) {
             throw new IllegalStateException();
         }
         this.neutral = null;

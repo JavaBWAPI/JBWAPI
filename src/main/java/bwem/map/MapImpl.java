@@ -36,21 +36,21 @@ import static bwem.area.typedef.AreaId.UNINITIALIZED;
 
 public abstract class MapImpl implements Map {
 
-    protected final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
+    final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
             new ArrayList<>();
-    protected final Game game;
-    protected final List<Unit> mineralPatches;
-    protected final List<Player> players;
-    protected final List<Unit> vespeneGeysers;
-    protected final List<Unit> units;
+    final Game game;
+    final List<Unit> mineralPatches;
+    final List<Player> players;
+    final List<Unit> vespeneGeysers;
+    final List<Unit> units;
     private boolean automaticPathUpdate = false;
     private final Graph graph;
     private final NeighboringAreaChooser neighboringAreaChooser;
-    protected TerrainData terrainData = null;
-    protected NeutralData neutralData = null;
-    protected Altitude highestAltitude;
+    TerrainData terrainData = null;
+    NeutralData neutralData = null;
+    Altitude highestAltitude;
 
-    public MapImpl(final Game game) {
+    MapImpl(final Game game) {
         this.game = game;
         this.players = game.getPlayers();
         this.mineralPatches = game.getMinerals();
@@ -71,7 +71,7 @@ public abstract class MapImpl implements Map {
         return (this.terrainData != null);
     }
 
-    public Graph getGraph() {
+    Graph getGraph() {
         return graph;
     }
 
@@ -174,13 +174,11 @@ public abstract class MapImpl implements Map {
             Mineral mineral = getNeutralData().getMinerals().get(i);
             if (mineral.getUnit().equals(u)) {
                 onMineralDestroyed(mineral);
-                mineral
-                        .simulateCPPObjectDestructor(); /* IMPORTANT! These actions are performed in the "~Neutral" dtor in BWEM 1.4.1 C++. */
+                mineral.simulateCPPObjectDestructor(); /* IMPORTANT! These actions are performed in the "~Neutral" dtor in BWEM 1.4.1 C++. */
                 getNeutralData().getMinerals().remove(i);
                 return;
             }
         }
-        //        bwem_assert(iMineral != minerals.end());
         throw new IllegalArgumentException("unit is not a Mineral");
     }
 
@@ -205,12 +203,10 @@ public abstract class MapImpl implements Map {
                 return;
             }
         }
-        //        bwem_assert(iStaticBuilding != StaticBuildings.end());
         throw new IllegalArgumentException("unit is not a StaticBuilding");
     }
 
     public void onBlockingNeutralDestroyed(Neutral pBlocking) {
-        //        bwem_assert(pBlocking && pBlocking->blocking());
         if (!(pBlocking != null && pBlocking.isBlocking())) {
             throw new IllegalArgumentException();
         }
@@ -230,9 +226,7 @@ public abstract class MapImpl implements Map {
         WalkPosition pBlockingW = pBlocking.getSize().toWalkPosition();
         for (int dy = 0; dy < pBlockingW.getY(); ++dy)
             for (int dx = 0; dx < pBlockingW.getX(); ++dx) {
-                MiniTile miniTile =
-                        ((TerrainDataInitializer) getData())
-                                .getMiniTile_(
+                MiniTile miniTile = getData().getMiniTile(
                                         pBlocking.getTopLeft().toWalkPosition().add(new WalkPosition(dx, dy)));
                 if (miniTile.isWalkable()) {
                     ((MiniTileImpl) miniTile).replaceBlockedAreaId(newId);
@@ -242,9 +236,8 @@ public abstract class MapImpl implements Map {
         // Unblock the Tiles of pBlocking:
         for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy)
             for (int dx = 0; dx < pBlocking.getSize().getX(); ++dx) {
-                ((TileImpl)
-                        ((TerrainDataInitializer) getData())
-                                .getTile_(pBlocking.getTopLeft().add(new TilePosition(dx, dy))))
+                ((TileImpl) getData()
+                                .getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy))))
                         .resetAreaId();
                 setAreaIdInTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)));
             }
@@ -355,8 +348,8 @@ public abstract class MapImpl implements Map {
     }
 
     public TilePosition breadthFirstSearch(
-            TilePosition start, Pred findCond, Pred visitCond, boolean connect8) {
-        if (findCond.isTrue(getData().getTile(start), start, this)) {
+        TilePosition start, Pred<Tile, TilePosition> findCond, Pred<Tile, TilePosition> visitCond, boolean connect8) {
+        if (findCond.test(getData().getTile(start), start)) {
             return start;
         }
 
@@ -398,10 +391,10 @@ public abstract class MapImpl implements Map {
                 TilePosition next = current.add(delta);
                 if (getData().getMapData().isValid(next)) {
                     Tile nextTile = getData().getTile(next, CheckMode.NO_CHECK);
-                    if (findCond.isTrue(nextTile, next, this)) {
+                    if (findCond.test(nextTile, next)) {
                         return next;
                     }
-                    if (visitCond.isTrue(nextTile, next, this) && !visited.contains(next)) {
+                    if (visitCond.test(nextTile, next) && !visited.contains(next)) {
                         toVisit.add(next);
                         visited.add(next);
                     }
@@ -410,18 +403,18 @@ public abstract class MapImpl implements Map {
         }
 
         // TODO: Are we supposed to return start or not?
-        //        bwem_assert(false);
         throw new IllegalStateException();
         //        return start;
     }
 
-    public TilePosition breadthFirstSearch(TilePosition start, Pred findCond, Pred visitCond) {
+    public TilePosition breadthFirstSearch(TilePosition start, Pred<Tile, TilePosition> findCond, Pred<Tile, TilePosition> visitCond) {
         return breadthFirstSearch(start, findCond, visitCond, true);
     }
 
+    @Override
     public WalkPosition breadthFirstSearch(
-            final WalkPosition start, final Pred findCond, final Pred visitCond, final boolean connect8) {
-        if (findCond.isTrue(getData().getMiniTile(start), start, this)) {
+        WalkPosition start, Pred<MiniTile, WalkPosition> findCond, Pred<MiniTile, WalkPosition> visitCond, boolean connect8) {
+        if (findCond.test(getData().getMiniTile(start), start)) {
             return start;
         }
 
@@ -463,10 +456,10 @@ public abstract class MapImpl implements Map {
                 final WalkPosition next = current.add(delta);
                 if (getData().getMapData().isValid(next)) {
                     final MiniTile miniTile = getData().getMiniTile(next, CheckMode.NO_CHECK);
-                    if (findCond.isTrue(miniTile, next, this)) {
+                    if (findCond.test(miniTile, next)) {
                         return next;
                     }
-                    if (visitCond.isTrue(miniTile, next, this) && !visited.contains(next)) {
+                    if (visitCond.test(miniTile, next) && !visited.contains(next)) {
                         toVisit.add(next);
                         visited.add(next);
                     }
@@ -475,34 +468,32 @@ public abstract class MapImpl implements Map {
         }
 
         // TODO: Are we supposed to return start or not?
-        //        bwem_assert(false);
         throw new IllegalStateException();
         //        return start;
     }
 
     public WalkPosition breadthFirstSearch(
-            final WalkPosition start, final Pred findCond, final Pred visitCond) {
+            final WalkPosition start, Pred<MiniTile, WalkPosition> findCond, Pred<MiniTile, WalkPosition> visitCond) {
         return breadthFirstSearch(start, findCond, visitCond, true);
     }
 
-    protected List<Unit> filterPlayerUnits(final Collection<Unit> units,
-                                          final Player player) {
+    private List<Unit> filterPlayerUnits(final Collection<Unit> units,
+        final Player player) {
         //        return this.units.stream().filter(u -> u instanceof PlayerUnit
         //                && ((PlayerUnit)u).getPlayer().equals(player)).map(u ->
         // (PlayerUnit)u).collect(Collectors.toList());
         final List<Unit> ret = new ArrayList<>();
         for (final Unit u : units) {
-            if (!(u.getType().isMineralField() || u.getType().equals(UnitType.Resource_Vespene_Geyser))) {
-                if (u.getPlayer().equals(player)) {
-                    ret.add(u);
-                }
+            if (!(u.getType().isMineralField() || u.getType()
+                .equals(UnitType.Resource_Vespene_Geyser)) && u.getPlayer().equals(player)) {
+                ret.add(u);
             }
         }
         return ret;
     }
 
-    protected List<Unit> filterNeutralPlayerUnits(
-            final Collection<Unit> units, final Collection<Player> players) {
+    List<Unit> filterNeutralPlayerUnits(
+        final Collection<Unit> units, final Collection<Player> players) {
         final List<Unit> ret = new ArrayList<>();
         for (final Player player : players) {
             if (player.isNeutral()) {
@@ -512,9 +503,8 @@ public abstract class MapImpl implements Map {
         return ret;
     }
 
-    public void setAreaIdInTile(final TilePosition t) {
-        final Tile tile = ((TerrainDataInitializer) getData()).getTile_(t);
-        //        bwem_assert(tile.AreaId() == 0);	// initialized to 0
+    void setAreaIdInTile(final TilePosition t) {
+        final Tile tile = getData().getTile(t);
         if (!(tile.getAreaId().intValue() == 0)) { // initialized to 0
             throw new IllegalStateException();
         }
@@ -537,7 +527,7 @@ public abstract class MapImpl implements Map {
         }
     }
 
-    public Pair<AreaId, AreaId> findNeighboringAreas(final WalkPosition p) {
+    Pair<AreaId, AreaId> findNeighboringAreas(final WalkPosition p) {
         final Pair<AreaId, AreaId> result = new Pair<>(null, null);
 
         final WalkPosition[] deltas = {
@@ -553,7 +543,8 @@ public abstract class MapImpl implements Map {
                     if (result.getLeft() == null) {
                         result.setLeft(areaId);
                     } else if (!result.getLeft().equals(areaId)) {
-                        if (result.getRight() == null || ((areaId.intValue() < result.getRight().intValue()))) {
+                        if (result.getRight() == null ||
+                            areaId.intValue() < result.getRight().intValue()) {
                             result.setRight(areaId);
                         }
                     }
@@ -564,7 +555,7 @@ public abstract class MapImpl implements Map {
         return result;
     }
 
-    public AreaId chooseNeighboringArea(final AreaId a, final AreaId b) {
+    AreaId chooseNeighboringArea(final AreaId a, final AreaId b) {
         return this.neighboringAreaChooser.chooseNeighboringArea(a, b);
     }
 

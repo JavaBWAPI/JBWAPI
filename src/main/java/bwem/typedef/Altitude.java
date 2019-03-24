@@ -12,15 +12,13 @@
 
 package bwem.typedef;
 
-import bwem.util.IWrappedInteger;
-
 /**
  * Immutable wrapper of the integer primitive to satisfy the original C++ definition:
  * defs.h:54:typedef int16_t altitude_t;
  *
  * <p>Type of the altitudes in pixels.
  */
-public final class Altitude implements IWrappedInteger<Altitude>, Comparable<Altitude> {
+public final class Altitude implements Comparable<Altitude> {
     public static final Altitude UNINITIALIZED = new Altitude(-1);
     public static final Altitude ZERO = new Altitude(0);
     private final int val;
@@ -29,7 +27,6 @@ public final class Altitude implements IWrappedInteger<Altitude>, Comparable<Alt
         this.val = val;
     }
 
-    @Override
     public int intValue() {
         return this.val;
     }

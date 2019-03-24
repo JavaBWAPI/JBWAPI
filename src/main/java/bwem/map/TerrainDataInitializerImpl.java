@@ -21,37 +21,16 @@ import bwem.tile.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TerrainDataInitializerImpl extends TerrainDataImpl implements TerrainDataInitializer {
-    public TerrainDataInitializerImpl(final MapData mapData, final TileData tileData) {
+class TerrainDataInitializerImpl extends TerrainDataImpl {
+    TerrainDataInitializerImpl(final MapData mapData, final TileData tileData) {
         super(mapData, tileData);
     }
 
-    @Override
-    public Tile getTile_(final TilePosition tilePosition, final CheckMode checkMode) {
-        return getTile(tilePosition, checkMode);
-    }
-
-    @Override
-    public Tile getTile_(final TilePosition tilePosition) {
-        return getTile_(tilePosition, CheckMode.CHECK);
-    }
-
-    @Override
-    public MiniTile getMiniTile_(final WalkPosition walkPosition, final CheckMode checkMode) {
-        return getMiniTile(walkPosition, checkMode);
-    }
-
-    @Override
-    public MiniTile getMiniTile_(final WalkPosition walkPosition) {
-        return getMiniTile_(walkPosition, CheckMode.CHECK);
-    }
-
-    ////////////////////////////////////////////////////////////////////////
+     ////////////////////////////////////////////////////////////////////////
     // MapImpl::LoadData
     ////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void markUnwalkableMiniTiles(final Game game) {
+    void markUnwalkableMiniTiles(final Game game) {
         // Mark unwalkable minitiles (minitiles are walkable by default).
         for (int y = 0; y < getMapData().getWalkSize().getY(); ++y)
             for (int x = 0; x < getMapData().getWalkSize().getX(); ++x) {
@@ -63,21 +42,20 @@ public class TerrainDataInitializerImpl extends TerrainDataImpl implements Terra
                         for (int dx = -1; dx <= 1; ++dx) {
                             final WalkPosition walkPosition = new WalkPosition(x + dx, y + dy);
                             if (getMapData().isValid(walkPosition)) {
-                                ((MiniTileImpl) getMiniTile_(walkPosition, CheckMode.NO_CHECK)).setWalkable(false);
+                                ((MiniTileImpl) getMiniTile(walkPosition, CheckMode.NO_CHECK)).setWalkable(false);
                             }
                         }
                 }
             }
     }
 
-    @Override
-    public void markBuildableTilesAndGroundHeight(final Game game) {
+    void markBuildableTilesAndGroundHeight(final Game game) {
         // Mark buildable tiles (tiles are unbuildable by default).
         for (int y = 0; y < getMapData().getTileSize().getY(); ++y)
             for (int x = 0; x < getMapData().getTileSize().getX(); ++x) {
                 final TilePosition tilePosition = new TilePosition(x, y);
                 final WalkPosition walkPosition = tilePosition.toWalkPosition();
-                final TileImpl tile = (TileImpl) getTile_(tilePosition);
+                final TileImpl tile = (TileImpl) getTile(tilePosition);
 
                 if (game.isBuildable(tilePosition, false)) {
                     tile.setBuildable();
@@ -86,7 +64,7 @@ public class TerrainDataInitializerImpl extends TerrainDataImpl implements Terra
                     for (int dy = 0; dy < 4; ++dy)
                         for (int dx = 0; dx < 4; ++dx) {
                             ((MiniTileImpl)
-                                    getMiniTile_(walkPosition.add(new WalkPosition(dx, dy)), CheckMode.NO_CHECK))
+                                    getMiniTile(walkPosition.add(new WalkPosition(dx, dy)), CheckMode.NO_CHECK))
                                     .setWalkable(true);
                         }
                 }
@@ -106,12 +84,11 @@ public class TerrainDataInitializerImpl extends TerrainDataImpl implements Terra
     // MapImpl::DecideSeasOrLakes
     ////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void decideSeasOrLakes(final int lakeMaxMiniTiles, final int lakeMaxWidthInMiniTiles) {
+    void decideSeasOrLakes(final int lakeMaxMiniTiles, final int lakeMaxWidthInMiniTiles) {
         for (int y = 0; y < getMapData().getWalkSize().getY(); ++y)
             for (int x = 0; x < getMapData().getWalkSize().getX(); ++x) {
                 final WalkPosition originWalkPosition = new WalkPosition(x, y);
-                final MiniTile originMiniTile = getMiniTile_(originWalkPosition, CheckMode.NO_CHECK);
+                final MiniTile originMiniTile = getMiniTile(originWalkPosition, CheckMode.NO_CHECK);
 
                 if (((MiniTileImpl) originMiniTile).isSeaOrLake()) {
                     final List<WalkPosition> toSearch = new ArrayList<>();
@@ -142,7 +119,7 @@ public class TerrainDataInitializerImpl extends TerrainDataImpl implements Terra
                         for (final WalkPosition delta : deltas) {
                             final WalkPosition nextWalkPosition = current.add(delta);
                             if (getMapData().isValid(nextWalkPosition)) {
-                                final MiniTile nextMiniTile = getMiniTile_(nextWalkPosition, CheckMode.NO_CHECK);
+                                final MiniTile nextMiniTile = getMiniTile(nextWalkPosition, CheckMode.NO_CHECK);
                                 if (((MiniTileImpl) nextMiniTile).isSeaOrLake()) {
                                     toSearch.add(nextWalkPosition);
                                     if (seaExtent.size() <= lakeMaxMiniTiles) {

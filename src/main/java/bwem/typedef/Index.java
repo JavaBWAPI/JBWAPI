@@ -12,13 +12,11 @@
 
 package bwem.typedef;
 
-import bwem.util.IWrappedInteger;
-
 /**
  * Immutable wrapper of the integer primitive to satisfy the original C++ definition:
  * cp.h:143:typedef int index;
  */
-public final class Index implements IWrappedInteger<Index>, Comparable<Index> {
+public final class Index implements Comparable<Index> {
     private final int val;
 
     public Index(final int val) {
@@ -29,7 +27,6 @@ public final class Index implements IWrappedInteger<Index>, Comparable<Index> {
         return new Index(this.val + val);
     }
 
-    @Override
     public int intValue() {
         return this.val;
     }

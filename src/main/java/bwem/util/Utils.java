@@ -14,10 +14,8 @@ package bwem.util;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.SplittableRandom;
 
 public final class Utils {
-    private static final SplittableRandom randomGenerator = new SplittableRandom();
 
     private Utils() {
     }
@@ -45,15 +43,15 @@ public final class Utils {
      * <p>From
      * http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
      */
-    public static boolean getLineIntersection(
-            double p0X,
-            double p0Y,
-            double p1X,
-            double p1Y,
-            double p2X,
-            double p2Y,
-            double p3X,
-            double p3Y) {
+    private static boolean getLineIntersection(
+        double p0X,
+        double p0Y,
+        double p1X,
+        double p1Y,
+        double p2X,
+        double p2Y,
+        double p3X,
+        double p3Y) {
         double s1X, s1Y;
         double s2X, s2Y;
         s1X = p1X - p0X;
@@ -65,12 +63,9 @@ public final class Utils {
         s = (-s1Y * (p0X - p2X) + s1X * (p0Y - p2Y)) / (-s2X * s1Y + s1X * s2Y);
         t = (s2X * (p0Y - p2Y) - s2Y * (p0X - p2X)) / (-s2X * s1Y + s1X * s2Y);
 
-        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-            // Collision detected
-            return true;
-        }
+        // Collision detected
+        return s >= 0 && s <= 1 && t >= 0 && t <= 1;
 
-        return false; // No collision
     }
 
     // Returns whether the line segments [a, b] and [c, d] intersect.
@@ -78,19 +73,7 @@ public final class Utils {
         return getLineIntersection(ax, ay, bx, by, cx, cy, dx, dy);
     }
 
-    /**
-     * Returns a random element from the specified container. There is nothing special about this
-     * function other than to provide a function similar to the one provided in the original C++ BWEM.
-     *
-     * @param list the specified list
-     */
-    public static <T> T getRandomElement(final List<T> list) {
-        final int randomIndex = randomGenerator.nextInt(list.size());
-        return list.get(randomIndex);
-    }
-
     public static <T> void fastErase(final List<T> list, final int index) {
-        //        bwem_assert((0 <= i) && (i < (int)Vector.size()));
         if (!((0 <= index) && (index < list.size()))) {
             throw new IllegalArgumentException("index: " + index);
         }

@@ -12,13 +12,11 @@
 
 package bwem.area.typedef;
 
-import bwem.util.IWrappedInteger;
-
 /**
  * Immutable wrapper of the integer primitive to satisfy the original C++ definition:
  * area.h:54:typedef int16_t id;
  */
-public final class AreaId implements IWrappedInteger<AreaId>, Comparable<AreaId> {
+public final class AreaId implements Comparable<AreaId> {
     public static final AreaId UNINITIALIZED = new AreaId(-1);
     public static final AreaId ZERO = new AreaId(0);
     private final int val;
@@ -27,7 +25,6 @@ public final class AreaId implements IWrappedInteger<AreaId>, Comparable<AreaId>
         this.val = val;
     }
 
-    @Override
     public int intValue() {
         return this.val;
     }

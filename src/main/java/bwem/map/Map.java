@@ -20,6 +20,8 @@ import bwem.Base;
 import bwem.ChokePoint;
 import bwem.area.Area;
 import bwem.area.typedef.AreaId;
+import bwem.tile.MiniTile;
+import bwem.tile.Tile;
 import bwem.typedef.Altitude;
 import bwem.typedef.CPPath;
 import bwem.typedef.Pred;
@@ -156,16 +158,15 @@ public interface Map {
     // Generic algorithm for breadth first search in the Map.
     // See the several use cases in BWEM source files.
     TilePosition breadthFirstSearch(
-            TilePosition start, Pred findCond, Pred visitCond, boolean connect8);
+            TilePosition start, Pred<Tile, TilePosition> findCond, Pred<Tile, TilePosition> visitCond, boolean connect8);
 
-    TilePosition breadthFirstSearch(TilePosition start, Pred findCond, Pred visitCond);
+    TilePosition breadthFirstSearch(TilePosition start, Pred<Tile, TilePosition> findCond, Pred<Tile, TilePosition> visitCond);
 
     WalkPosition breadthFirstSearch(
-            WalkPosition start, Pred findCond, Pred visitCond, boolean connect8);
+            WalkPosition start, Pred<MiniTile, WalkPosition> findCond, Pred<MiniTile, WalkPosition> visitCond, boolean connect8);
 
-    WalkPosition breadthFirstSearch(WalkPosition start, Pred findCond, Pred visitCond);
+    WalkPosition breadthFirstSearch(WalkPosition start, Pred<MiniTile, WalkPosition> findCond, Pred<MiniTile, WalkPosition> visitCond);
 
     // Returns the union of the geometry of all the ChokePoints. Cf. ChokePoint::Geometry()
     List<Pair<Pair<AreaId, AreaId>, WalkPosition>> getRawFrontier();
-
 }

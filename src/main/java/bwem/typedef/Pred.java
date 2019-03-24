@@ -13,6 +13,6 @@
 package bwem.typedef;
 
 @FunctionalInterface
-public interface Pred {
-    boolean isTrue(final Object... args);
+public interface Pred<T, P> {
+    boolean test(T tile, P position);
 }

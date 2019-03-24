@@ -19,7 +19,7 @@ import bwem.map.Map;
  * A Resource is either a Mineral or a Geyser.
  */
 public abstract class Resource extends NeutralImpl {
-    protected Resource(final Unit unit, final Map map) {
+    Resource(final Unit unit, final Map map) {
         super(unit, map);
     }
 

@@ -23,7 +23,7 @@ public abstract class TerrainDataImpl implements TerrainData {
     private final MapData mapData;
     private final TileData tileData;
 
-    protected TerrainDataImpl(final MapData mapData, final TileData tileData) {
+    TerrainDataImpl(final MapData mapData, final TileData tileData) {
         this.mapData = mapData;
         this.tileData = tileData;
     }
@@ -40,8 +40,6 @@ public abstract class TerrainDataImpl implements TerrainData {
 
     @Override
     public Tile getTile(final TilePosition tilePosition, final CheckMode checkMode) {
-        //        bwem_assert((checkMode == utils::Check::no_check) || Valid(p));
-        // utils::unused(checkMode);
         if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(tilePosition))) {
             throw new IllegalArgumentException();
         }
@@ -57,7 +55,6 @@ public abstract class TerrainDataImpl implements TerrainData {
 
     @Override
     public MiniTile getMiniTile(final WalkPosition walkPosition, final CheckMode checkMode) {
-        //        bwem_assert((checkMode == utils::Check::no_check) || Valid(p));
         if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(walkPosition))) {
             throw new IllegalArgumentException();
         }
@@ -85,10 +82,9 @@ public abstract class TerrainDataImpl implements TerrainData {
         };
         for (final WalkPosition delta : deltas) {
             final WalkPosition walkPositionDelta = walkPosition.add(delta);
-            if (getMapData().isValid(walkPositionDelta)) {
-                if (!getMiniTile(walkPositionDelta, CheckMode.NO_CHECK).isSea()) {
-                    return true;
-                }
+            if (getMapData().isValid(walkPositionDelta) && !getMiniTile(walkPositionDelta,
+                CheckMode.NO_CHECK).isSea()) {
+                return true;
             }
         }
 
