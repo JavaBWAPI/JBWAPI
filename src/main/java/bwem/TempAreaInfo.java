@@ -10,13 +10,9 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.area;
+package bwem;
 
 import bwapi.WalkPosition;
-import bwem.area.typedef.AreaId;
-import bwem.tile.MiniTile;
-import bwem.tile.MiniTileImpl;
-import bwem.typedef.Altitude;
 
 // Helper class for void Map::ComputeAreas()
 // Maintains some information about an area being computed
@@ -28,14 +24,14 @@ import bwem.typedef.Altitude;
 /**
  * Helper class for void Map::ComputeAreas()
  */
-public class TempAreaInfo {
+class TempAreaInfo {
     private final AreaId id;
     private final WalkPosition walkPositionWithHighestAltitude;
     private final Altitude highestAltitude;
     private boolean isValid;
     private int size;
 
-    public TempAreaInfo() {
+    TempAreaInfo() {
         this.isValid = false;
         this.id = AreaId.ZERO;
         this.walkPositionWithHighestAltitude = new WalkPosition(0, 0);
@@ -47,7 +43,7 @@ public class TempAreaInfo {
         }
     }
 
-    public TempAreaInfo(
+    TempAreaInfo(
             final AreaId id,
             final MiniTile miniTile,
             final WalkPosition walkPositionWithHighestAltitude) {
@@ -65,11 +61,11 @@ public class TempAreaInfo {
         }
     }
 
-    public boolean isValid() {
+    boolean isValid() {
         return this.isValid;
     }
 
-    public AreaId getId() {
+    AreaId getId() {
         //        bwem_assert(valid());
         if (!isValid()) {
             throw new IllegalStateException();
@@ -77,7 +73,7 @@ public class TempAreaInfo {
         return this.id;
     }
 
-    public WalkPosition getWalkPositionWithHighestAltitude() {
+    WalkPosition getWalkPositionWithHighestAltitude() {
         //        { bwem_assert(valid());
         if (!isValid()) {
             throw new IllegalStateException();
@@ -93,7 +89,7 @@ public class TempAreaInfo {
         return this.size;
     }
 
-    public Altitude getHighestAltitude() {
+    Altitude getHighestAltitude() {
         //        bwem_assert(valid());
         if (!isValid()) {
             throw new IllegalStateException();
@@ -107,11 +103,11 @@ public class TempAreaInfo {
             throw new IllegalStateException();
         }
         ++this.size;
-        ((MiniTileImpl) miniTile).setAreaId(id);
+        miniTile.setAreaId(id);
     }
 
     // Left to caller : m.SetAreaId(this->id()) for each MiniTile m in absorbed
-    public void merge(final TempAreaInfo absorbed) {
+    void merge(final TempAreaInfo absorbed) {
         if (!(isValid() && absorbed.isValid())) {
             //            bwem_assert(valid() && absorbed.isValid());
             throw new IllegalStateException();

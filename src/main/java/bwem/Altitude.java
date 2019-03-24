@@ -10,18 +10,20 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.area.typedef;
+package bwem;
 
 /**
  * Immutable wrapper of the integer primitive to satisfy the original C++ definition:
- * area.h:54:typedef int16_t id;
+ * defs.h:54:typedef int16_t altitude_t;
+ *
+ * <p>Type of the altitudes in pixels.
  */
-public final class AreaId implements Comparable<AreaId> {
-    public static final AreaId UNINITIALIZED = new AreaId(-1);
-    public static final AreaId ZERO = new AreaId(0);
+public final class Altitude implements Comparable<Altitude> {
+    public static final Altitude UNINITIALIZED = new Altitude(-1);
+    public static final Altitude ZERO = new Altitude(0);
     private final int val;
 
-    public AreaId(final int val) {
+    public Altitude(final int val) {
         this.val = val;
     }
 
@@ -30,7 +32,7 @@ public final class AreaId implements Comparable<AreaId> {
     }
 
     @Override
-    public int compareTo(final AreaId that) {
+    public int compareTo(final Altitude that) {
         return Integer.compare(this.val, that.val);
     }
 
@@ -38,10 +40,10 @@ public final class AreaId implements Comparable<AreaId> {
     public boolean equals(final Object object) {
         if (this == object) {
             return true;
-        } else if (!(object instanceof AreaId)) {
+        } else if (!(object instanceof Altitude)) {
             return false;
         } else {
-            final AreaId that = (AreaId) object;
+            final Altitude that = (Altitude) object;
             return (this.val == that.val);
         }
     }
@@ -49,5 +51,10 @@ public final class AreaId implements Comparable<AreaId> {
     @Override
     public int hashCode() {
         return this.val;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.val);
     }
 }

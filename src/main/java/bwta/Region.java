@@ -2,7 +2,7 @@ package bwta;
 
 import bwapi.Position;
 
-import bwem.area.Area;
+import bwem.Area;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -13,8 +13,6 @@
 package bwem;
 
 import bwapi.Game;
-import bwem.map.Map;
-import bwem.map.MapInitializer;
 
 public final class BWEM {
     private final Map map;

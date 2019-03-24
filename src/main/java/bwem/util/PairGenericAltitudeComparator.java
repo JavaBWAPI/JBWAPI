@@ -12,8 +12,8 @@
 
 package bwem.util;
 
-import bwem.typedef.Altitude;
 import bwapi.Pair;
+import bwem.Altitude;
 
 import java.util.Comparator;
 

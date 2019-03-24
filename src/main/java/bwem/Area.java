@@ -10,16 +10,10 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.area;
+package bwem;
 
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.Base;
-import bwem.ChokePoint;
-import bwem.area.typedef.AreaId;
-import bwem.typedef.Altitude;
-import bwem.unit.Geyser;
-import bwem.unit.Mineral;
 
 import java.util.ArrayList;
 import java.util.HashMap;

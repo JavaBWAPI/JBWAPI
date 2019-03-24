@@ -10,27 +10,21 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.map;
+package bwem;
 
 import bwapi.*;
-import bwem.CheckMode;
-import bwem.ChokePoint;
-import bwem.area.Area;
-import bwem.area.TempAreaInfo;
-import bwem.area.typedef.AreaId;
-import bwem.tile.*;
-import bwem.typedef.Altitude;
-import bwem.unit.*;
 import bwem.util.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class MapInitializer extends Map {
-    public MapInitializer(final Game game) {
+class MapInitializer extends Map {
+    MapInitializer(final Game game) {
         super(game);
     }
 
-    public void initialize() {
+    void initialize() {
         initializeTerrainData(
                 game.mapWidth(), game.mapHeight(), game.getStartLocations());
 
@@ -216,14 +210,14 @@ public class MapInitializer extends Map {
                         final WalkPosition w = current.getLeft().add(delta);
                         if (terrainData.getMapData().isValid(w)) {
                             final MiniTile miniTile = terrainData.getMiniTile(w, CheckMode.NO_CHECK);
-                            if (((MiniTileImpl) miniTile).isAltitudeMissing()) {
+                            if (miniTile.isAltitudeMissing()) {
                                 if (updatedHighestAltitude != null
                                         && updatedHighestAltitude.intValue() > altitude.intValue()) {
                                     throw new IllegalStateException();
                                 }
                                 updatedHighestAltitude = altitude;
                                 current.setRight(altitude);
-                                ((MiniTileImpl) miniTile).setAltitude(altitude);
+                                miniTile.setAltitude(altitude);
                             }
                         }
                     }
@@ -395,7 +389,7 @@ public class MapInitializer extends Map {
             for (Neutral pNeutral = getData().getTile(pCandidate.getTopLeft()).getNeutral();
                  pNeutral != null;
                  pNeutral = pNeutral.getNextStacked()) {
-                ((NeutralImpl) pNeutral).setBlocking(trueDoors);
+                pNeutral.setBlocking(trueDoors);
             }
 
             // Marks all the miniTiles of pCandidate as blocked.
@@ -409,7 +403,7 @@ public class MapInitializer extends Map {
                                             ((pCandidate.getTopLeft().toPosition()).toWalkPosition())
                                                     .add(new WalkPosition(dx, dy)));
                     if (miniTile.isWalkable()) {
-                        ((MiniTileImpl) miniTile).setBlocked();
+                        miniTile.setBlocked();
                     }
                 }
             }
@@ -442,7 +436,7 @@ public class MapInitializer extends Map {
             for (int x = 0; x < getData().getMapData().getWalkSize().getX(); ++x) {
                 final WalkPosition w = new WalkPosition(x, y);
                 final MiniTile miniTile = getData().getMiniTile(w, CheckMode.NO_CHECK);
-                if (((MiniTileImpl) miniTile).isAreaIdMissing()) {
+                if (miniTile.isAreaIdMissing()) {
                     miniTilesByDescendingAltitude.add(new Pair<>(w, miniTile));
                 }
             }
@@ -527,7 +521,7 @@ public class MapInitializer extends Map {
     private void replaceAreaIds(final WalkPosition p, final AreaId newAreaId) {
         final MiniTile origin = getData().getMiniTile(p, CheckMode.NO_CHECK);
         final AreaId oldAreaId = origin.getAreaId();
-        ((MiniTileImpl) origin).replaceAreaId(newAreaId);
+        origin.replaceAreaId(newAreaId);
 
         List<WalkPosition> toSearch = new ArrayList<>();
         toSearch.add(p);
@@ -546,7 +540,7 @@ public class MapInitializer extends Map {
                     final MiniTile miniTile = getData().getMiniTile(next, CheckMode.NO_CHECK);
                     if (miniTile.getAreaId().equals(oldAreaId)) {
                         toSearch.add(next);
-                        ((MiniTileImpl) miniTile).replaceAreaId(newAreaId);
+                        miniTile.replaceAreaId(newAreaId);
                     }
                 }
             }
@@ -612,7 +606,7 @@ public class MapInitializer extends Map {
                 }
             }
 
-        ((TileImpl) getData().getTile(t)).setLowestAltitude(lowestAltitude);
+        getData().getTile(t).setLowestAltitude(lowestAltitude);
     }
 
     // Renamed from "Map::SetAreaIdInTiles"
@@ -648,15 +642,15 @@ public class MapInitializer extends Map {
                 MiniTile miniTile = getData().getMiniTile(
                                         pBlocking.getTopLeft().toWalkPosition().add(new WalkPosition(dx, dy)));
                 if (miniTile.isWalkable()) {
-                    ((MiniTileImpl) miniTile).replaceBlockedAreaId(newId);
+                    miniTile.replaceBlockedAreaId(newId);
                 }
             }
 
         // Unblock the Tiles of pBlocking:
         for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy)
             for (int dx = 0; dx < pBlocking.getSize().getX(); ++dx) {
-                ((TileImpl) getData()
-                                .getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy))))
+                getData()
+                                .getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)))
                         .resetAreaId();
                 setAreaIdInTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)));
             }

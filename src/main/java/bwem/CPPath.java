@@ -10,9 +10,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.typedef;
-
-import bwem.ChokePoint;
+package bwem;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -14,12 +14,8 @@ package bwem;
 
 import bwapi.Pair;
 import bwapi.WalkPosition;
-import bwem.area.Area;
-import bwem.map.Map;
-import bwem.tile.MiniTile;
-import bwem.tile.MiniTileImpl;
-import bwem.typedef.CPPath;
-import bwem.unit.Neutral;
+import bwem.util.CheckMode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -121,7 +117,7 @@ public class ChokePoint {
                             (MiniTile miniTile, WalkPosition w) -> (
                                 miniTile.getAreaId().equals(area.getId())
                                     || (isBlocked()
-                                    && (((MiniTileImpl) miniTile).isBlocked()
+                                    && (miniTile.isBlocked()
                                     || map.getData()
                                     .getTile(w.toTilePosition(), CheckMode.NO_CHECK)
                                     .getNeutral() != null))));
@@ -277,7 +273,7 @@ public class ChokePoint {
         return getGraph().getPath(this, cp);
     }
 
-    public void onBlockingNeutralDestroyed(final Neutral pBlocking) {
+    void onBlockingNeutralDestroyed(final Neutral pBlocking) {
         if (!(pBlocking != null && pBlocking.isBlocking())) {
             throw new IllegalStateException();
         }

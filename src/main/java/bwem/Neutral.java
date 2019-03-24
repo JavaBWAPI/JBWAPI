@@ -10,22 +10,22 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.unit;
+package bwem;
 
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.WalkPosition;
-import bwem.area.Area;
-import bwem.map.Map;
-import bwem.map.MapInitializer;
-import bwem.tile.Tile;
-import bwem.tile.TileImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class NeutralImpl implements Neutral {
+/**
+ * Neutral is the abstract base class for a small hierarchy of wrappers around some BWAPI::Units<br>
+ * The units concerned are the Resources (Minerals and Geysers) and the static Buildings.<br>
+ * Stacked Neutrals are supported, provided they share the same type at the same location.
+ */
+public abstract class Neutral {
     private final Unit bwapiUnit;
     private final Position pos;
     private final TilePosition topLeft;
@@ -34,7 +34,7 @@ public abstract class NeutralImpl implements Neutral {
     private Neutral nextStacked = null;
     private List<WalkPosition> blockedAreas = new ArrayList<>();
 
-    NeutralImpl(final Unit unit, final Map map) {
+    Neutral(final Unit unit, final Map map) {
         this.bwapiUnit = unit;
         this.map = map;
         this.pos = unit.getInitialPosition();
@@ -44,7 +44,7 @@ public abstract class NeutralImpl implements Neutral {
         putOnTiles();
     }
 
-    public void simulateCPPObjectDestructor() {
+    void simulateCPPObjectDestructor() {
         removeFromTiles();
 
         if (isBlocking()) {
@@ -53,44 +53,64 @@ public abstract class NeutralImpl implements Neutral {
         }
     }
 
-    @Override
+    /**
+     * Returns the BWAPI::Unit this Neutral is wrapping around.
+     */
     public Unit getUnit() {
         return this.bwapiUnit;
     }
 
-    @Override
+    /**
+     * Returns the center of this Neutral, in pixels (same as unit()->getInitialPosition()).
+     */
     public Position getCenter() {
         return this.pos;
     }
 
-    @Override
+    /**
+     * Returns the top left Tile position of this Neutral (same as unit()->getInitialTilePosition()).
+     */
     public TilePosition getTopLeft() {
         return this.topLeft;
     }
 
-    @Override
+    /**
+     * Returns the bottom right Tile position of this Neutral
+     */
     public TilePosition getBottomRight() {
         return this.topLeft.add(this.tileSize).subtract(new TilePosition(1, 1));
     }
 
-    @Override
+    /**
+     * Returns the size of this Neutral, in Tiles (same as Type()->tileSize())
+     */
     public TilePosition getSize() {
         return this.tileSize;
     }
 
-    @Override
+    /**
+     * Tells whether this Neutral is blocking some ChokePoint.<br>
+     * - This applies to minerals and StaticBuildings only.<br>
+     * - For each blocking Neutral, a pseudo ChokePoint (which is blocked()) is created on top of it,
+     * with the exception of stacked blocking Neutrals for which only one pseudo ChokePoint is
+     * created.<br>
+     * - Cf. definition of pseudo getChokePoints in class ChokePoint comment.<br>
+     * - Cf. ChokePoint::blockingNeutral and ChokePoint::blocked.
+     */
     public boolean isBlocking() {
         return !this.blockedAreas.isEmpty();
     }
 
-    public void setBlocking(final List<WalkPosition> blockedAreas) {
+    void setBlocking(final List<WalkPosition> blockedAreas) {
         if (!(this.blockedAreas.isEmpty() && !blockedAreas.isEmpty())) {
             throw new IllegalStateException();
         }
         this.blockedAreas = blockedAreas;
     }
 
-    @Override
+    /**
+     * If blocking() == true, returns the set of areas blocked by this Neutral.
+     */
     public List<Area> getBlockedAreas() {
         final List<Area> blockedAreas = new ArrayList<>();
         for (final WalkPosition w : this.blockedAreas) {
@@ -101,12 +121,19 @@ public abstract class NeutralImpl implements Neutral {
         return blockedAreas;
     }
 
-    @Override
+    /**
+     * Returns the next Neutral stacked over this Neutral, if ever.<br>
+     * - To iterate through the whole stack, one can use the following:<br>
+     * <code>for (const Neutral * n = Map::GetTile(topLeft()).GetNeutral() ; n ; n = n->nextStacked())
+     * </code>
+     */
     public Neutral getNextStacked() {
         return this.nextStacked;
     }
 
-    // Returns the last Neutral stacked over this Neutral, if ever.
+    /**
+     * Returns the last Neutral stacked over this Neutral, if ever.
+     */
     public Neutral getLastStacked() {
         Neutral topNeutral = this;
         while (topNeutral.getNextStacked() != null) {
@@ -129,7 +156,7 @@ public abstract class NeutralImpl implements Neutral {
                 final Tile deltaTile = getMap().getData()
                                 .getTile(getTopLeft().add(new TilePosition(dx, dy)));
                 if (deltaTile.getNeutral() == null) {
-                    ((TileImpl) deltaTile).addNeutral(this);
+                    deltaTile.addNeutral(this);
                 } else {
                     final Neutral topNeutral = deltaTile.getNeutral().getLastStacked();
                     if (this.equals(deltaTile.getNeutral())) {
@@ -138,7 +165,7 @@ public abstract class NeutralImpl implements Neutral {
                         throw new IllegalStateException();
                     } else if (topNeutral.getClass().getName().equals(Geyser.class.getName())) {
                         throw new IllegalStateException();
-                    } else if (!((NeutralImpl) topNeutral).isSameUnitTypeAs(this)) {
+                    } else if (!topNeutral.isSameUnitTypeAs(this)) {
                         //                    bwem_assert_plus(pTop->Type() == Type(), "stacked neutrals have
                         throw new IllegalStateException(
                                 "Stacked Neutral objects have different types: top="
@@ -155,7 +182,7 @@ public abstract class NeutralImpl implements Neutral {
                     } else if (!(dx == 0 && dy == 0)) {
                         throw new IllegalStateException();
                     } else {
-                        ((NeutralImpl) topNeutral).nextStacked = this;
+                        topNeutral.nextStacked = this;
                         return;
                     }
                 }
@@ -176,9 +203,9 @@ public abstract class NeutralImpl implements Neutral {
                 }
 
                 if (tile.getNeutral().equals(this)) {
-                    ((TileImpl) tile).removeNeutral(this);
+                    tile.removeNeutral(this);
                     if (this.nextStacked != null) {
-                        ((TileImpl) tile).addNeutral(this.nextStacked);
+                        tile.addNeutral(this.nextStacked);
                     }
                 } else {
                     Neutral prevStacked = tile.getNeutral();
@@ -189,11 +216,11 @@ public abstract class NeutralImpl implements Neutral {
                         throw new IllegalStateException();
                     }
                     if (prevStacked != null) {
-                        if (!((NeutralImpl) prevStacked).isSameUnitTypeAs(this) || !(prevStacked
+                        if (!prevStacked.isSameUnitTypeAs(this) || !(prevStacked
                             .getTopLeft().equals(getTopLeft()))) {
                             throw new IllegalStateException();
                         }
-                        ((NeutralImpl) prevStacked).nextStacked = nextStacked;
+                        prevStacked.nextStacked = nextStacked;
                     }
                     this.nextStacked = null;
                     return;

@@ -12,13 +12,12 @@
 
 package bwem.util;
 
+import bwapi.Pair;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.CheckMode;
-import bwapi.Pair;
+import bwem.Map;
 
-import bwem.map.Map;
 import java.util.ArrayList;
 import java.util.List;
 

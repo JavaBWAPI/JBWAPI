@@ -10,14 +10,25 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.tile;
+package bwem;
 
-import bwem.area.typedef.AreaId;
-import bwem.typedef.Altitude;
+import bwapi.WalkPosition;
 
-import static bwem.area.typedef.AreaId.UNINITIALIZED;
+import static bwem.AreaId.UNINITIALIZED;
 
-public class MiniTileImpl implements MiniTile {
+/**
+ * Corresponds to BWAPI/Starcraft's concept of walk tile (8x8 pixels).<br>
+ * - MiniTiles are accessed using WalkPositions {@link TerrainData#getMiniTile(WalkPosition)}<br>
+ * - A Map holds Map::WalkSize().x * Map::WalkSize().y MiniTiles as its "MiniTile map".<br>
+ * - A MiniTile contains essentialy 3 pieces of information:<br>
+ * i) its Walkability<br>
+ * ii) its altitude (distance from the nearest non walkable MiniTile, except those which are part of
+ * small enough zones (lakes))<br>
+ * iii) the id of the Area it is part of, if ever.<br>
+ * - The whole process of analysis of a Map relies on the walkability information<br>
+ * from which are derived successively: altitudes, Areas, ChokePoints.
+ */
+public class MiniTile {
     private static final AreaId blockingCP = new AreaId(Integer.MIN_VALUE);
 
     private Altitude
@@ -27,27 +38,43 @@ public class MiniTileImpl implements MiniTile {
             areaId; // 0 -> unwalkable  ;  > 0 -> index of some Area  ;  < 0 -> some walkable terrain, but
     // too small to be part of an Area
 
-    public MiniTileImpl() {
+    public MiniTile() {
         this.altitude = Altitude.UNINITIALIZED;
         this.areaId = UNINITIALIZED;
     }
 
-    @Override
+    /**
+     * Corresponds approximatively to BWAPI::isWalkable<br>
+     * The differences are:<br>
+     * - For each BWAPI's unwalkable MiniTile, we also mark its 8 neighbors as not walkable.<br>
+     * According to some tests, this prevents from wrongly pretending one small unit can go by some
+     * thin path.<br>
+     * - The relation buildable ==> walkable is enforced, by marking as walkable any MiniTile part of
+     * a buildable Tile (Cf. {@link Tile#isBuildable()})<br>
+     * Among the miniTiles having Altitude() > 0, the walkable ones are considered Terrain-miniTiles,
+     * and the other ones Lake-miniTiles.
+     */
     public boolean isWalkable() {
         return (this.areaId.intValue() != 0);
     }
 
-    public void setWalkable(boolean walkable) {
+    void setWalkable(boolean walkable) {
         this.areaId = new AreaId(walkable ? -1 : 0);
         this.altitude = new Altitude(walkable ? -1 : 1);
     }
 
-    @Override
+    /**
+     * Distance in pixels between the center of this MiniTile and the center of the nearest
+     * Sea-MiniTile<br>
+     * - Sea-miniTiles all have their Altitude() equal to 0.<br>
+     * - miniTiles having Altitude() > 0 are not Sea-miniTiles. They can be either Terrain-miniTiles
+     * or Lake-miniTiles.
+     */
     public Altitude getAltitude() {
         return this.altitude;
     }
 
-    public void setAltitude(final Altitude altitude) {
+    void setAltitude(final Altitude altitude) {
         //        { bwem_assert_debug_only(AltitudeMissing() && (a > 0)); this.altitude = a; }
         if (!(isAltitudeMissing() && altitude.intValue() > 0)) {
             throw new IllegalStateException();
@@ -55,27 +82,46 @@ public class MiniTileImpl implements MiniTile {
         this.altitude = altitude;
     }
 
-    @Override
+    /**
+     * Sea-miniTiles are unwalkable miniTiles that have their altitude equal to 0.
+     */
     public boolean isSea() {
         return (this.altitude.intValue() == 0);
     }
 
-    @Override
+    /**
+     * Lake-miniTiles are unwalkable miniTiles that have their Altitude() > 0.<br>
+     * - They form small zones (inside Terrain-zones) that can be eaysily walked around (e.g.
+     * Starcraft's doodads)<br>
+     * - The intent is to preserve the continuity of altitudes inside areas.
+     */
     public boolean isLake() {
         return (this.altitude.intValue() != 0 && !isWalkable());
     }
 
-    @Override
+    /**
+     * Terrain miniTiles are just walkable miniTiles
+     */
     public boolean isTerrain() {
         return isWalkable();
     }
 
-    @Override
+    /**
+     * For Sea and Lake miniTiles, returns 0<br>
+     * For Terrain miniTiles, returns a non zero id:<br>
+     * - if (id > 0), id uniquely identifies the Area A that contains this MiniTile.<br>
+     * Moreover we have: A.id() == id and Map::getArea(id) == A<br>
+     * - For more information about positive Area::ids, see Area::id()<br>
+     * - if (id < 0), then this MiniTile is part of a Terrain-zone that was considered too small to
+     * create an Area for it.<br>
+     * - Note: negative Area::ids start from -2<br>
+     * - Note: because of the lakes, Map::getNearestArea should be prefered over Map::getArea.
+     */
     public AreaId getAreaId() {
         return this.areaId;
     }
 
-    public void setAreaId(final AreaId areaId) {
+    void setAreaId(final AreaId areaId) {
         //        { bwem_assert(AreaIdMissing() && (id >= 1)); this.areaId = id; }
         if (!(isAreaIdMissing() && areaId.intValue() >= 1)) {
             throw new IllegalStateException();
@@ -83,11 +129,11 @@ public class MiniTileImpl implements MiniTile {
         this.areaId = areaId;
     }
 
-    public boolean isSeaOrLake() {
+    boolean isSeaOrLake() {
         return (this.altitude.intValue() == 1);
     }
 
-    public void setSea() {
+    void setSea() {
         //        { bwem_assert(!Walkable() && SeaOrLake()); this.altitude = 0; }
         if (!(!isWalkable() && isSeaOrLake())) {
             throw new IllegalStateException();
@@ -95,7 +141,7 @@ public class MiniTileImpl implements MiniTile {
         this.altitude = Altitude.ZERO;
     }
 
-    public void setLake() {
+    void setLake() {
         //        { bwem_assert(!Walkable() && Sea()); this.altitude = -1; }
         if (!(!isWalkable() && isSea())) {
             throw new IllegalStateException();
@@ -103,15 +149,15 @@ public class MiniTileImpl implements MiniTile {
         this.altitude = Altitude.UNINITIALIZED;
     }
 
-    public boolean isAltitudeMissing() {
+    boolean isAltitudeMissing() {
         return (altitude.intValue() == -1);
     }
 
-    public boolean isAreaIdMissing() {
+    boolean isAreaIdMissing() {
         return (this.areaId.intValue() == -1);
     }
 
-    public void replaceAreaId(final AreaId areaId) {
+    void replaceAreaId(final AreaId areaId) {
         //        { bwem_assert( (areaId > 0) && ((id >= 1) || (id <= -2)) && (id != this.areaId));
         // this.areaId = id; }
         //        if (!( (areaId.intValue() > 0) && ((id.intValue() >= 1) || (id.intValue() <= -2)) &&
@@ -133,21 +179,21 @@ public class MiniTileImpl implements MiniTile {
         }
     }
 
-    public void setBlocked() {
+    void setBlocked() {
         //        { bwem_assert(AreaIdMissing()); this.areaId = blockingCP; }
         if (!isAreaIdMissing()) {
             throw new IllegalStateException();
         }
-        this.areaId = MiniTileImpl.blockingCP;
+        this.areaId = MiniTile.blockingCP;
     }
 
-    public boolean isBlocked() {
-        return this.areaId.equals(MiniTileImpl.blockingCP);
+    boolean isBlocked() {
+        return this.areaId.equals(MiniTile.blockingCP);
     }
 
-    public void replaceBlockedAreaId(final AreaId areaId) {
+    void replaceBlockedAreaId(final AreaId areaId) {
         //        { bwem_assert( (areaId == blockingCP) && (id >= 1)); this.areaId = id; }
-        if (!(this.areaId.equals(MiniTileImpl.blockingCP) && areaId.intValue() >= 1)) {
+        if (!(this.areaId.equals(MiniTile.blockingCP) && areaId.intValue() >= 1)) {
             throw new IllegalStateException();
         }
         this.areaId = areaId;

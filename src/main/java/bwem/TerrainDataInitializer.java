@@ -10,13 +10,12 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.map;
+package bwem;
 
 import bwapi.Game;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.CheckMode;
-import bwem.tile.*;
+import bwem.util.CheckMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ class TerrainDataInitializer extends TerrainData {
                         for (int dx = -1; dx <= 1; ++dx) {
                             final WalkPosition walkPosition = new WalkPosition(x + dx, y + dy);
                             if (getMapData().isValid(walkPosition)) {
-                                ((MiniTileImpl) getMiniTile(walkPosition, CheckMode.NO_CHECK)).setWalkable(false);
+                                getMiniTile(walkPosition, CheckMode.NO_CHECK).setWalkable(false);
                             }
                         }
                 }
@@ -55,7 +54,7 @@ class TerrainDataInitializer extends TerrainData {
             for (int x = 0; x < getMapData().getTileSize().getX(); ++x) {
                 final TilePosition tilePosition = new TilePosition(x, y);
                 final WalkPosition walkPosition = tilePosition.toWalkPosition();
-                final TileImpl tile = (TileImpl) getTile(tilePosition);
+                final Tile tile = getTile(tilePosition);
 
                 if (game.isBuildable(tilePosition, false)) {
                     tile.setBuildable();
@@ -63,8 +62,7 @@ class TerrainDataInitializer extends TerrainData {
                     // Ensures buildable ==> walkable.
                     for (int dy = 0; dy < 4; ++dy)
                         for (int dx = 0; dx < 4; ++dx) {
-                            ((MiniTileImpl)
-                                    getMiniTile(walkPosition.add(new WalkPosition(dx, dy)), CheckMode.NO_CHECK))
+                            getMiniTile(walkPosition.add(new WalkPosition(dx, dy)), CheckMode.NO_CHECK)
                                     .setWalkable(true);
                         }
                 }
@@ -90,12 +88,12 @@ class TerrainDataInitializer extends TerrainData {
                 final WalkPosition originWalkPosition = new WalkPosition(x, y);
                 final MiniTile originMiniTile = getMiniTile(originWalkPosition, CheckMode.NO_CHECK);
 
-                if (((MiniTileImpl) originMiniTile).isSeaOrLake()) {
+                if (originMiniTile.isSeaOrLake()) {
                     final List<WalkPosition> toSearch = new ArrayList<>();
                     toSearch.add(originWalkPosition);
 
                     final List<MiniTile> seaExtent = new ArrayList<>();
-                    ((MiniTileImpl) originMiniTile).setSea();
+                    originMiniTile.setSea();
                     seaExtent.add(originMiniTile);
 
                     int topLeftX = originWalkPosition.getX();
@@ -120,12 +118,12 @@ class TerrainDataInitializer extends TerrainData {
                             final WalkPosition nextWalkPosition = current.add(delta);
                             if (getMapData().isValid(nextWalkPosition)) {
                                 final MiniTile nextMiniTile = getMiniTile(nextWalkPosition, CheckMode.NO_CHECK);
-                                if (((MiniTileImpl) nextMiniTile).isSeaOrLake()) {
+                                if (nextMiniTile.isSeaOrLake()) {
                                     toSearch.add(nextWalkPosition);
                                     if (seaExtent.size() <= lakeMaxMiniTiles) {
                                         seaExtent.add(nextMiniTile);
                                     }
-                                    ((MiniTileImpl) nextMiniTile).setSea();
+                                    nextMiniTile.setSea();
                                 }
                             }
                         }
@@ -139,7 +137,7 @@ class TerrainDataInitializer extends TerrainData {
                             && (bottomRightX < getMapData().getWalkSize().getX() - 2)
                             && (bottomRightY < getMapData().getWalkSize().getY() - 2)) {
                         for (final MiniTile miniTile : seaExtent) {
-                            ((MiniTileImpl) miniTile).setLake();
+                            miniTile.setLake();
                         }
                     }
                 }

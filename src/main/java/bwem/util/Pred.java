@@ -10,7 +10,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.typedef;
+package bwem.util;
 
 @FunctionalInterface
 public interface Pred<T, P> {

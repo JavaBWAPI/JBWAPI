@@ -10,34 +10,33 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.unit;
+package bwem;
 
 import bwapi.Unit;
-import bwem.map.Map;
 
 /**
- * StaticBuildings Correspond to the units in BWAPI::getStaticNeutralUnits() for which
- * getType().isSpecialBuilding. StaticBuilding also wrappers some special units like
- * Special_Pit_Door.
+ * Minerals Correspond to the units in BWAPI::getStaticNeutralUnits() for which
+ * getType().isMineralField().
  */
-public class StaticBuilding extends NeutralImpl {
-    public StaticBuilding(final Unit unit, final Map map) {
+public final class Mineral extends Resource {
+    Mineral(final Unit unit, final Map map) {
         super(unit, map);
 
-        // TODO
-        //        bwem_assert(Type().isSpecialBuilding() ||
-        //                    (Type() == Special_Pit_Door) ||
-        //                    Type() == Special_Right_Pit_Door);
+        //        bwem_assert(Type().isMineralField());
+        if (!unit.getType().isMineralField()) {
+            throw new IllegalArgumentException(
+                    "Unit is not a MineralPatch: " + unit.getClass().getName());
+        }
     }
 
     @Override
     public boolean equals(final Object object) {
         if (this == object) {
             return true;
-        } else if (!(object instanceof StaticBuilding)) {
+        } else if (!(object instanceof Mineral)) {
             return false;
         } else {
-            final StaticBuilding that = (StaticBuilding) object;
+            final Mineral that = (Mineral) object;
             return (this.getUnit().getID() == that.getUnit().getID());
         }
     }

@@ -10,14 +10,11 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.map;
+package bwem;
 
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.CheckMode;
-import bwem.tile.MiniTile;
-import bwem.tile.Tile;
-import bwem.tile.TileData;
+import bwem.util.CheckMode;
 
 public abstract class TerrainData {
     private final MapData mapData;

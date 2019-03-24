@@ -10,13 +10,11 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.tile;
+package bwem;
 
 import bwapi.TilePosition;
-import bwem.area.typedef.AreaId;
-import bwem.map.TerrainData;
-import bwem.typedef.Altitude;
-import bwem.unit.Neutral;
+import bwem.util.Markable;
+import bwem.util.StaticMarkable;
 
 /**
  * Corresponds to BWAPI/Starcraft's concept of tile (32x32 pixels).<br>
@@ -31,11 +29,43 @@ import bwem.unit.Neutral;
  * Tile::LowestAltitude<br>
  * which somewhat aggregate the MiniTile's corresponding information
  */
-public interface Tile {
+public class Tile {
+    private static final StaticMarkable staticMarkable = new StaticMarkable();
+    private final Markable markable;
+
+    private Neutral neutral;
+    private Altitude lowestAltitude;
+    private AreaId areaId;
+    private int internalData;
+    private Tile.GroundHeight groundHeight;
+    private boolean isBuildable;
+    private boolean isDoodad;
+
+    Tile() {
+        this.markable = new Markable(Tile.staticMarkable);
+        this.neutral = null;
+        this.lowestAltitude = Altitude.ZERO;
+        this.areaId = AreaId.ZERO;
+        this.internalData = 0;
+        this.groundHeight = GroundHeight.LOW_GROUND;
+        this.isBuildable = false;
+        this.isDoodad = false;
+    }
+
+    static StaticMarkable getStaticMarkable() {
+        return Tile.staticMarkable;
+    }
+
+    Markable getMarkable() {
+        return this.markable;
+    }
+
     /**
      * BWEM enforces the relation buildable ==> walkable (Cf. {@link MiniTile#isWalkable()})<br>
      */
-    boolean isBuildable();
+    public boolean isBuildable() {
+        return this.isBuildable;
+    }
 
     /**
      * This function somewhat aggregates the MiniTile::getAreaId() values of the 4 x 4 sub-miniTiles.
@@ -46,34 +76,68 @@ public interface Tile {
      * - If S = {a}, returns a (whether positive or negative).<br>
      * - If size(S) > 1 returns -1 (note that -1 is never returned by MiniTile::AreaId()).
      */
-    AreaId getAreaId();
+    public AreaId getAreaId() {
+        return this.areaId;
+    }
+
+    void setAreaId(final AreaId areaId) {
+        if (!(areaId.intValue() == -1 || getAreaId().intValue() == 0 && areaId.intValue() != 0)) {
+            throw new IllegalStateException();
+        }
+        this.areaId = areaId;
+    }
 
     /**
      * Tile::LowestAltitude() somewhat aggregates the MiniTile::Altitude() values of the 4 x 4
      * sub-miniTiles.<br>
      * - Returns the minimum value.
      */
-    Altitude getLowestAltitude();
+    public Altitude getLowestAltitude() {
+        return this.lowestAltitude;
+    }
+
+    void setLowestAltitude(final Altitude lowestAltitude) {
+        if (!(lowestAltitude.intValue() >= 0)) {
+            throw new IllegalArgumentException();
+        }
+        this.lowestAltitude = lowestAltitude;
+    }
 
     /**
      * Tells if at least one of the sub-miniTiles is Walkable.
      */
-    boolean isWalkable();
+    public boolean isWalkable() {
+        return (getAreaId().intValue() != 0);
+    }
 
     /**
      * Tells if at least one of the sub-miniTiles is a Terrain-MiniTile.
      */
-    boolean isTerrain();
+    public boolean isTerrain() {
+        return isWalkable();
+    }
 
     /**
      * Corresponds to BWAPI::getGroundHeight / 2
      */
-    GroundHeight getGroundHeight();
+    public GroundHeight getGroundHeight() {
+        return this.groundHeight;
+    }
+
+    void setGroundHeight(final int groundHeight) {
+        //        { bwem_assert((0 <= h) && (h <= 2)); bits.groundHeight = h; }
+        //        if (!((0 <= h) && (h <= 2))) {
+        //            throw new IllegalArgumentException();
+        //        }
+        this.groundHeight = GroundHeight.parseGroundHeight(groundHeight);
+    }
 
     /**
      * Tells if this Tile is part of a doodad. Corresponds to BWAPI::getGroundHeight % 2
      */
-    boolean isDoodad();
+    public boolean isDoodad() {
+        return this.isDoodad;
+    }
 
     /**
      * If any Neutral occupies this Tile, returns it (note that all the Tiles it occupies will then
@@ -91,17 +155,61 @@ public interface Tile {
      * reference to it such as the one<br>
      * returned by Tile::GetNeutral(). In case of stacked Neutrals, the next one is then returned.
      */
-    Neutral getNeutral();
+    public Neutral getNeutral() {
+        return this.neutral;
+    }
 
     /**
      * Returns the number of Neutrals that occupy this Tile (Cf. {@link #getNeutral()}).
      */
-    int getStackedNeutralCount();
+    public int getStackedNeutralCount() {
+        int stackSize = 0;
+        for (Neutral stackedNeutral = getNeutral();
+             stackedNeutral != null;
+             stackedNeutral = stackedNeutral.getNextStacked()) {
+            ++stackSize;
+        }
+        return stackSize;
+    }
+
+    void setBuildable() {
+        this.isBuildable = true;
+    }
+
+    void setDoodad() {
+        this.isDoodad = true;
+    }
+
+    void addNeutral(final Neutral neutral) {
+        if (!(getNeutral() == null && neutral != null)) {
+            throw new IllegalStateException();
+        }
+        this.neutral = neutral;
+    }
+
+    void resetAreaId() {
+        this.areaId = AreaId.ZERO;
+    }
+
+    void removeNeutral(final Neutral neutral) {
+        if (!getNeutral().equals(neutral)) {
+            throw new IllegalStateException();
+        }
+        this.neutral = null;
+    }
+
+    int getInternalData() {
+        return this.internalData;
+    }
+
+    void setInternalData(int internalData) {
+        this.internalData = internalData;
+    }
 
     /**
      * Corresponds to BWAPI::getGroundHeight divided by 2.
      */
-    enum GroundHeight {
+    public enum GroundHeight {
         LOW_GROUND(0),
         HIGH_GROUND(1),
         VERY_HIGH_GROUND(2);

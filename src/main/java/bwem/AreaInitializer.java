@@ -10,45 +10,29 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.area;
-
-import static bwem.area.typedef.AreaId.UNINITIALIZED;
+package bwem;
 
 import bwapi.Pair;
 import bwapi.TilePosition;
 import bwapi.UnitType;
 import bwapi.WalkPosition;
-import bwem.Base;
-import bwem.CheckMode;
-import bwem.ChokePoint;
+import bwem.util.BwemExt;
+import bwem.util.CheckMode;
 import bwem.util.Markable;
 import bwem.util.StaticMarkable;
-import bwem.area.typedef.AreaId;
-import bwem.map.Map;
-import bwem.map.TerrainData;
-import bwem.tile.MiniTile;
-import bwem.tile.Tile;
-import bwem.tile.TileImpl;
-import bwem.unit.Geyser;
-import bwem.unit.Mineral;
-import bwem.unit.Neutral;
-import bwem.unit.Resource;
-import bwem.unit.StaticBuilding;
-import bwem.util.BwemExt;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
-public class AreaInitializer extends Area {
+import java.util.*;
+
+import static bwem.AreaId.UNINITIALIZED;
+
+class AreaInitializer extends Area {
 
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;
 
     private final Map map;
 
-    public AreaInitializer(
+    AreaInitializer(
         final Map map, final AreaId areaId, final WalkPosition top, final int miniTileCount) {
         super(areaId, top, miniTileCount);
 
@@ -72,15 +56,15 @@ public class AreaInitializer extends Area {
         super.highestAltitude = topMiniTile.getAltitude();
     }
 
-    public static StaticMarkable getStaticMarkable() {
+    static StaticMarkable getStaticMarkable() {
         return staticMarkable;
     }
 
-    public Markable getMarkable() {
+    Markable getMarkable() {
         return this.markable;
     }
 
-    public void addChokePoints(final Area area, final List<ChokePoint> chokePoints) {
+    void addChokePoints(final Area area, final List<ChokePoint> chokePoints) {
         if (!(super.chokePointsByArea.get(area) == null && chokePoints != null)) {
             throw new IllegalArgumentException();
         }
@@ -90,21 +74,21 @@ public class AreaInitializer extends Area {
         super.chokePoints.addAll(chokePoints);
     }
 
-    public void addMineral(final Mineral mineral) {
+    void addMineral(final Mineral mineral) {
         if (!(mineral != null && !super.minerals.contains(mineral))) {
             throw new IllegalStateException();
         }
         super.minerals.add(mineral);
     }
 
-    public void addGeyser(final Geyser geyser) {
+    void addGeyser(final Geyser geyser) {
         if (!(geyser != null && !super.geysers.contains(geyser))) {
             throw new IllegalStateException();
         }
         super.geysers.add(geyser);
     }
 
-    public void addTileInformation(final TilePosition tilePosition, final Tile tile) {
+    void addTileInformation(final TilePosition tilePosition, final Tile tile) {
         ++super.tileCount;
 
         if (tile.isBuildable()) {
@@ -131,11 +115,11 @@ public class AreaInitializer extends Area {
         }
     }
 
-    public void setGroupId(int gid) {
+    void setGroupId(int gid) {
         super.groupId = gid;
     }
 
-    public int[] computeDistances(final ChokePoint startCP, final List<ChokePoint> targetCPs) {
+    int[] computeDistances(final ChokePoint startCP, final List<ChokePoint> targetCPs) {
         if (targetCPs.contains(startCP)) {
             throw new IllegalStateException();
         }
@@ -168,7 +152,7 @@ public class AreaInitializer extends Area {
     private int[] computeDistances(final TilePosition start, final List<TilePosition> targets) {
         final int[] distances = new int[targets.size()];
 
-        TileImpl.getStaticMarkable().unmarkAll();
+        Tile.getStaticMarkable().unmarkAll();
 
         final Queue<Pair<Integer, TilePosition>> toVisit =
             new PriorityQueue<>(
@@ -183,16 +167,16 @@ public class AreaInitializer extends Area {
             final int currentDist = distanceAndTilePosition.getLeft();
             final TilePosition current = distanceAndTilePosition.getRight();
             final Tile currentTile = this.map.getData().getTile(current, CheckMode.NO_CHECK);
-            if (!(((TileImpl) currentTile).getInternalData() == currentDist)) {
+            if (!(currentTile.getInternalData() == currentDist)) {
                 throw new IllegalStateException(
                     "currentTile.InternalData().intValue()="
-                        + ((TileImpl) currentTile).getInternalData()
+                        + currentTile.getInternalData()
                         + ", currentDist="
                         + currentDist);
             }
-            ((TileImpl) currentTile)
+            currentTile
                 .setInternalData(0); // resets Tile::m_internalData for future usage
-            ((TileImpl) currentTile).getMarkable().setMarked();
+            currentTile.getMarkable().setMarked();
 
             for (int i = 0; i < targets.size(); ++i) {
                 if (current.equals(targets.get(i))) {
@@ -221,25 +205,25 @@ public class AreaInitializer extends Area {
                 final TilePosition next = current.add(delta);
                 if (this.map.getData().getMapData().isValid(next)) {
                     final Tile nextTile = this.map.getData().getTile(next, CheckMode.NO_CHECK);
-                    if (((TileImpl) nextTile).getMarkable().isUnmarked()) {
-                        if (((TileImpl) nextTile).getInternalData()
+                    if (nextTile.getMarkable().isUnmarked()) {
+                        if (nextTile.getInternalData()
                             != 0) { // next already in toVisit
                             if (newNextDist
-                                < ((TileImpl) nextTile)
+                                < nextTile
                                 .getInternalData()) { // nextNewDist < nextOldDist
                                 // To update next's distance, we need to remove-insert it from toVisit:
                                 final boolean removed =
                                     toVisit.remove(
-                                        new Pair<>(((TileImpl) nextTile).getInternalData(), next));
+                                        new Pair<>(nextTile.getInternalData(), next));
                                 if (!removed) {
                                     throw new IllegalStateException();
                                 }
-                                ((TileImpl) nextTile).setInternalData(newNextDist);
+                                nextTile.setInternalData(newNextDist);
                                 toVisit.offer(new Pair<>(newNextDist, next));
                             }
                         } else if ((nextTile.getAreaId().equals(getId()))
                             || (nextTile.getAreaId().equals(UNINITIALIZED))) {
-                            ((TileImpl) nextTile).setInternalData(newNextDist);
+                            nextTile.setInternalData(newNextDist);
                             toVisit.offer(new Pair<>(newNextDist, next));
                         }
                     }
@@ -252,17 +236,16 @@ public class AreaInitializer extends Area {
         }
 
         for (final Pair<Integer, TilePosition> distanceAndTilePosition : toVisit) {
-            final TileImpl tileToUpdate =
-                ((TileImpl)
+            final Tile tileToUpdate =
                     this.map.getData()
-                        .getTile(distanceAndTilePosition.getRight(), CheckMode.NO_CHECK));
+                        .getTile(distanceAndTilePosition.getRight(), CheckMode.NO_CHECK);
             tileToUpdate.setInternalData(0);
         }
 
         return distances;
     }
 
-    public void updateAccessibleNeighbors() {
+    void updateAccessibleNeighbors() {
         super.accessibleNeighbors.clear();
         for (final Area area : getChokePointsByArea().keySet()) {
             for (final ChokePoint cp : getChokePointsByArea().get(area)) {
@@ -274,7 +257,7 @@ public class AreaInitializer extends Area {
         }
     }
 
-    public void createBases(final TerrainData terrainData) {
+    void createBases(final TerrainData terrainData) {
         final TilePosition resourceDepotDimensions = UnitType.Terran_Command_Center.tileSize();
 
         final List<Resource> remainingResources = new ArrayList<>();
@@ -373,8 +356,8 @@ public class AreaInitializer extends Area {
                             }
                             if (tile.getAreaId().equals(getId())) {
                                 // note the additive effect (assume tile.InternalData() is 0 at the beginning)
-                                ((TileImpl) tile)
-                                    .setInternalData(((TileImpl) tile).getInternalData() + score);
+                                tile
+                                    .setInternalData(tile.getInternalData() + score);
                             }
                         }
                     }
@@ -390,7 +373,7 @@ public class AreaInitializer extends Area {
                         if (terrainData.getMapData().isValid(deltaTilePosition)) {
                             final Tile tileToUpdate = terrainData
                                 .getTile(deltaTilePosition, CheckMode.NO_CHECK);
-                            ((TileImpl) tileToUpdate).setInternalData(-1);
+                            tileToUpdate.setInternalData(-1);
                         }
                     }
                 }
@@ -440,7 +423,7 @@ public class AreaInitializer extends Area {
                         if (terrainData.getMapData().isValid(deltaTilePosition)) {
                             final Tile tileToUpdate = terrainData
                                 .getTile(deltaTilePosition, CheckMode.NO_CHECK);
-                            ((TileImpl) tileToUpdate).setInternalData(0);
+                            tileToUpdate.setInternalData(0);
                         }
                     }
                 }
@@ -485,7 +468,7 @@ public class AreaInitializer extends Area {
                 if (!tile.isBuildable()) {
                     return -1;
                 }
-                if (((TileImpl) tile).getInternalData() == -1) {
+                if (tile.getInternalData() == -1) {
                     // The special value InternalData() == -1 means there is some resource at maximum 3 tiles,
                     // which Starcraft rules forbid.
                     // Unfortunately, this is guaranteed only for the resources in this Area, which is the
@@ -499,7 +482,7 @@ public class AreaInitializer extends Area {
                     return -1;
                 }
 
-                sumScore += ((TileImpl) tile).getInternalData();
+                sumScore += tile.getInternalData();
             }
         }
 

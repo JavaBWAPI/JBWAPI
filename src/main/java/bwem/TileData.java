@@ -10,32 +10,32 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.tile;
+package bwem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileData {
+class TileData {
     private final List<Tile> tiles;
     private final List<MiniTile> miniTiles;
 
-    public TileData(final int tileCount, final int miniTileCount) {
+    TileData(final int tileCount, final int miniTileCount) {
         this.tiles = new ArrayList<>(tileCount);
         for (int i = 0; i < tileCount; ++i) {
-            this.tiles.add(new TileImpl());
+            this.tiles.add(new Tile());
         }
 
         this.miniTiles = new ArrayList<>(miniTileCount);
         for (int i = 0; i < miniTileCount; ++i) {
-            this.miniTiles.add(new MiniTileImpl());
+            this.miniTiles.add(new MiniTile());
         }
     }
 
-    public List<Tile> getTiles() {
+    List<Tile> getTiles() {
         return this.tiles;
     }
 
-    public List<MiniTile> getMiniTiles() {
+    List<MiniTile> getMiniTiles() {
         return this.miniTiles;
     }
 }

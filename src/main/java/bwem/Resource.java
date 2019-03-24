@@ -10,34 +10,41 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.unit;
+package bwem;
 
 import bwapi.Unit;
-import bwapi.UnitType;
-import bwem.map.Map;
 
 /**
- * Geysers Correspond to the units in BWAPI::getStaticNeutralUnits() for which getType() ==
- * Resource_Vespene_Geyser.
+ * A Resource is either a Mineral or a Geyser.
  */
-public final class Geyser extends Resource {
-    public Geyser(final Unit unit, final Map map) {
+public abstract class Resource extends Neutral {
+    Resource(final Unit unit, final Map map) {
         super(unit, map);
+    }
 
-        if (!unit.getType().equals(UnitType.Resource_Vespene_Geyser)) {
-            throw new IllegalArgumentException(
-                    "Unit is not a VespeneGeyser: " + unit.getClass().getName());
-        }
+    /**
+     * Returns the initial amount of resources for this Resource (same as
+     * unit()->getInitialResources).
+     */
+    public int getInitialAmount() {
+        return getUnit().getInitialResources();
+    }
+
+    /**
+     * Returns the current amount of resources for this Resource (same as unit()->getResources).
+     */
+    public int getAmount() {
+        return getUnit().getResources();
     }
 
     @Override
     public boolean equals(final Object object) {
         if (this == object) {
             return true;
-        } else if (!(object instanceof Geyser)) {
+        } else if (!(object instanceof Resource)) {
             return false;
         } else {
-            final Geyser that = (Geyser) object;
+            final Resource that = (Resource) object;
             return (this.getUnit().getID() == that.getUnit().getID());
         }
     }

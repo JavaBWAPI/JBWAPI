@@ -10,28 +10,17 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.map;
+package bwem;
 
 import bwapi.*;
-import bwem.*;
-import bwem.area.Area;
-import bwem.area.AreaInitializer;
-import bwem.area.typedef.AreaId;
-import bwem.tile.MiniTile;
-import bwem.tile.Tile;
-import bwem.tile.TileImpl;
-import bwem.typedef.Altitude;
-import bwem.typedef.CPPath;
-import bwem.typedef.Pred;
-import bwem.unit.Mineral;
-import bwem.unit.NeutralData;
-import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
+import bwem.util.CheckMode;
 import bwem.util.MutableInt;
+import bwem.util.Pred;
 
 import java.util.*;
 
-import static bwem.area.typedef.AreaId.UNINITIALIZED;
+import static bwem.AreaId.UNINITIALIZED;
 
 public abstract class Map {
 
@@ -442,9 +431,9 @@ public abstract class Map {
                                 .getAreaId();
                 if (id.intValue() != 0) {
                     if (tile.getAreaId().intValue() == 0) {
-                        ((TileImpl) tile).setAreaId(id);
+                        tile.setAreaId(id);
                     } else if (!tile.getAreaId().equals(id)) {
-                        ((TileImpl) tile).setAreaId(UNINITIALIZED);
+                        tile.setAreaId(UNINITIALIZED);
                         return;
                     }
                 }

@@ -10,11 +10,10 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-package bwem.unit;
+package bwem;
 
 import bwapi.Unit;
 
-import bwem.map.Map;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -16,29 +16,12 @@ import bwapi.Pair;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.area.Area;
-import bwem.area.AreaInitializer;
-import bwem.area.typedef.AreaId;
-import bwem.map.Map;
-import bwem.map.TerrainData;
-import bwem.tile.MiniTile;
-import bwem.tile.Tile;
-import bwem.tile.TileImpl;
-import bwem.typedef.Altitude;
-import bwem.typedef.CPPath;
-import bwem.unit.Geyser;
-import bwem.unit.Mineral;
-import bwem.unit.Neutral;
-import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
+import bwem.util.CheckMode;
 import bwem.util.MutableInt;
 import bwem.util.Utils;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+
+import java.util.*;
 
 public final class Graph {
     private final Map map;
@@ -259,7 +242,7 @@ public final class Graph {
 
     // Creates a new Area for each pair (top, miniTiles) in areasList (See Area::top() and
     // Area::miniTiles())
-    public void createAreas(final List<Pair<WalkPosition, Integer>> areasList) {
+    void createAreas(final List<Pair<WalkPosition, Integer>> areasList) {
         for (int id = 1; id <= areasList.size(); ++id) {
             final WalkPosition top = areasList.get(id - 1).getLeft();
             final int miniTileCount = areasList.get(id - 1).getRight();
@@ -442,9 +425,7 @@ public final class Graph {
                         final List<WalkPosition> list = new ArrayList<>();
                         list.add(center);
                         getChokePoints(blockedAreaA, blockedAreaB)
-                                .add(
-                                        new ChokePoint(
-                                                this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
+                                .add(new ChokePoint(this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
                         newIndex++;
                     }
             }
@@ -646,7 +627,7 @@ public final class Graph {
     private int[] computeDistances(final ChokePoint start, final List<ChokePoint> targets) {
         final int[] distances = new int[targets.size()];
 
-        TileImpl.getStaticMarkable().unmarkAll();
+        Tile.getStaticMarkable().unmarkAll();
 
         final Queue<Pair<Integer, ChokePoint>> toVisit =
                 new PriorityQueue<>(Comparator.comparingInt(Pair::getLeft));
@@ -659,11 +640,11 @@ public final class Graph {
             final ChokePoint current = distanceAndChokePoint.getRight();
             final Tile currentTile =
                     getMap().getData().getTile(current.getCenter().toTilePosition(), CheckMode.NO_CHECK);
-            if (!(((TileImpl) currentTile).getInternalData() == currentDist)) {
+            if (!(currentTile.getInternalData() == currentDist)) {
                 throw new IllegalStateException();
             }
-            ((TileImpl) currentTile).setInternalData(0); // resets Tile::m_internalData for future usage
-            ((TileImpl) currentTile).getMarkable().setMarked();
+            currentTile.setInternalData(0); // resets Tile::m_internalData for future usage
+            currentTile.getMarkable().setMarked();
 
             for (int i = 0; i < targets.size(); ++i) {
                 if (current == targets.get(i)) {
@@ -686,22 +667,22 @@ public final class Graph {
                         final int newNextDist = currentDist + distance(current, next);
                         final Tile nextTile =
                                 getMap().getData().getTile(next.getCenter().toTilePosition(), CheckMode.NO_CHECK);
-                        if (((TileImpl) nextTile).getMarkable().isUnmarked()) {
-                            if (((TileImpl) nextTile).getInternalData() != 0) { // next already in toVisit
+                        if (nextTile.getMarkable().isUnmarked()) {
+                            if (nextTile.getInternalData() != 0) { // next already in toVisit
                                 if (newNextDist
-                                        < ((TileImpl) nextTile).getInternalData()) { // nextNewDist < nextOldDist
+                                        < nextTile.getInternalData()) { // nextNewDist < nextOldDist
                                     // To update next's distance, we need to remove-insert it from toVisit:
                                     final boolean removed =
-                                            toVisit.remove(new Pair<>(((TileImpl) nextTile).getInternalData(), next));
+                                            toVisit.remove(new Pair<>(nextTile.getInternalData(), next));
                                     if (!removed) {
                                         throw new IllegalStateException();
                                     }
-                                    ((TileImpl) nextTile).setInternalData(newNextDist);
+                                    nextTile.setInternalData(newNextDist);
                                     next.setPathBackTrace(current);
                                     toVisit.offer(new Pair<>(newNextDist, next));
                                 }
                             } else {
-                                ((TileImpl) nextTile).setInternalData(newNextDist);
+                                nextTile.setInternalData(newNextDist);
                                 next.setPathBackTrace(current);
                                 toVisit.offer(new Pair<>(newNextDist, next));
                             }
@@ -718,12 +699,11 @@ public final class Graph {
 
         // reset Tile::m_internalData for future usage
         for (Pair<Integer, ChokePoint> distanceToChokePoint : toVisit) {
-            ((TileImpl)
-                    getMap()
-                            .getData()
-                            .getTile(
-                                    distanceToChokePoint.getRight().getCenter().toTilePosition(),
-                                    CheckMode.NO_CHECK))
+            getMap()
+                    .getData()
+                    .getTile(
+                            distanceToChokePoint.getRight().getCenter().toTilePosition(),
+                            CheckMode.NO_CHECK)
                     .setInternalData(0);
         }
 

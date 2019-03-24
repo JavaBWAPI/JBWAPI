@@ -12,8 +12,8 @@
 
 package bwem.util;
 
-import bwem.tile.MiniTile;
 import bwapi.Pair;
+import bwem.MiniTile;
 
 import java.util.Comparator;
 

@@ -15,12 +15,6 @@ package bwem;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.UnitType;
-import bwem.area.Area;
-import bwem.map.MapData;
-import bwem.unit.Geyser;
-import bwem.unit.Mineral;
-import bwem.unit.Neutral;
-import bwem.unit.Resource;
 import bwem.util.BwemExt;
 
 import java.util.ArrayList;
@@ -43,7 +37,7 @@ public class Base {
     private Position center;
     private boolean isStartingLocation = false;
 
-    public Base(
+    Base(
             final Area area,
             final TilePosition location,
             final List<Resource> assignedResources,
@@ -130,19 +124,18 @@ public class Base {
      * - Fortunately, these are guaranteed to have their initialAmount() <= 8.<br>
      * - As an example of blocking minerals, see the two islands in Andromeda.scx.<br>
      * - Note: if {@link #isStartingLocation()} == true, an empty list is returned.<br>
-     * - Note: {@link #getBlockingMinerals()} should not be confused with {@link
-     * ChokePoint#getBlockingNeutral()} and {@link Neutral#isBlocking()}:<br>
+     * - Note: should not be confused with {@link ChokePoint#getBlockingNeutral()}
+     * and {@link Neutral#isBlocking()}:<br>
      * The last two refer to a Neutral blocking a ChokePoint, not a Base.
      */
     public List<Mineral> getBlockingMinerals() {
         return this.blockingMinerals;
     }
 
-    public void assignStartingLocation(final TilePosition actualLocation) {
+    void assignStartingLocation(final TilePosition actualLocation) {
         this.isStartingLocation = true;
         this.location = actualLocation;
-        this.center =
-                BwemExt.centerOfBuilding(actualLocation, UnitType.Terran_Command_Center.tileSize());
+        this.center = BwemExt.centerOfBuilding(actualLocation, UnitType.Terran_Command_Center.tileSize());
     }
 
     public void onMineralDestroyed(final Mineral mineral) {
