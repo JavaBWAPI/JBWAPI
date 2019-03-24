@@ -24,7 +24,7 @@ import bwem.util.Utils;
 import java.util.*;
 
 public final class Graph {
-    private final Map map;
+    private final BWEMMap map;
     private final List<Area> areas = new ArrayList<>();
     private final List<ChokePoint> chokePoints = new ArrayList<>();
     private final List<List<List<ChokePoint>>> chokePointsMatrix =
@@ -35,11 +35,11 @@ public final class Graph {
             new ArrayList<>(); // index == ChokePoint::index x ChokePoint::index
     private final List<Base> bases = new ArrayList<>();
 
-    public Graph(Map map) {
+    public Graph(BWEMMap map) {
         this.map = map;
     }
 
-    public Map getMap() {
+    public BWEMMap getMap() {
         return map;
     }
 
@@ -104,7 +104,7 @@ public final class Graph {
         return getArea(t);
     }
 
-    // Returns the list of all the getChokePoints in the Map.
+    // Returns the list of all the getChokePoints in the BWEMMap.
     public List<ChokePoint> getChokePoints() {
         return chokePoints;
     }
@@ -345,8 +345,8 @@ public final class Graph {
             final List<WalkPosition> rawFrontierAB = entry.getValue();
 
             // Because our dispatching preserved order,
-            // and because Map::m_RawFrontier was populated in descending order of the altitude (see
-            // Map::computeAreas),
+            // and because BWEMMap::m_RawFrontier was populated in descending order of the altitude (see
+            // BWEMMap::computeAreas),
             // we know that rawFrontierAB is also ordered the same way, but let's check it:
             {
                 final List<Altitude> altitudes = new ArrayList<>();
@@ -498,7 +498,7 @@ public final class Graph {
     }
 
     public void collectInformation() {
-        // 1) Process the whole Map:
+        // 1) Process the whole BWEMMap:
 
         for (final Mineral mineral : getMap().getNeutralData().getMinerals()) {
             final Area area = getMap().getMainArea(mineral.getTopLeft(), mineral.getSize());

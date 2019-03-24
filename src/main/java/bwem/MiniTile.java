@@ -19,13 +19,13 @@ import static bwem.AreaId.UNINITIALIZED;
 /**
  * Corresponds to BWAPI/Starcraft's concept of walk tile (8x8 pixels).<br>
  * - MiniTiles are accessed using WalkPositions {@link TerrainData#getMiniTile(WalkPosition)}<br>
- * - A Map holds Map::WalkSize().x * Map::WalkSize().y MiniTiles as its "MiniTile map".<br>
+ * - A BWEMMap holds BWEMMap::WalkSize().x * BWEMMap::WalkSize().y MiniTiles as its "MiniTile map".<br>
  * - A MiniTile contains essentialy 3 pieces of information:<br>
  * i) its Walkability<br>
  * ii) its altitude (distance from the nearest non walkable MiniTile, except those which are part of
  * small enough zones (lakes))<br>
  * iii) the id of the Area it is part of, if ever.<br>
- * - The whole process of analysis of a Map relies on the walkability information<br>
+ * - The whole process of analysis of a BWEMMap relies on the walkability information<br>
  * from which are derived successively: altitudes, Areas, ChokePoints.
  */
 public class MiniTile {
@@ -110,12 +110,12 @@ public class MiniTile {
      * For Sea and Lake miniTiles, returns 0<br>
      * For Terrain miniTiles, returns a non zero id:<br>
      * - if (id > 0), id uniquely identifies the Area A that contains this MiniTile.<br>
-     * Moreover we have: A.id() == id and Map::getArea(id) == A<br>
+     * Moreover we have: A.id() == id and BWEMMap::getArea(id) == A<br>
      * - For more information about positive Area::ids, see Area::id()<br>
      * - if (id < 0), then this MiniTile is part of a Terrain-zone that was considered too small to
      * create an Area for it.<br>
      * - Note: negative Area::ids start from -2<br>
-     * - Note: because of the lakes, Map::getNearestArea should be prefered over Map::getArea.
+     * - Note: because of the lakes, BWEMMap::getNearestArea should be prefered over BWEMMap::getArea.
      */
     public AreaId getAreaId() {
         return this.areaId;

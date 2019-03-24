@@ -679,7 +679,7 @@ public class Game {
                 position;
         final TilePosition rb = lt.add(type.tileSize());
 
-        // Map limit check
+        // BWEMMap limit check
         if (!lt.isValid(this) || !(rb.toPosition().subtract(new Position(1, 1)).isValid(this))) {
             return false;
         }

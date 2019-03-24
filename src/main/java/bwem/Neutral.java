@@ -30,11 +30,11 @@ public abstract class Neutral {
     private final Position pos;
     private final TilePosition topLeft;
     private final TilePosition tileSize;
-    private final Map map;
+    private final BWEMMap map;
     private Neutral nextStacked = null;
     private List<WalkPosition> blockedAreas = new ArrayList<>();
 
-    Neutral(final Unit unit, final Map map) {
+    Neutral(final Unit unit, final BWEMMap map) {
         this.bwapiUnit = unit;
         this.map = map;
         this.pos = unit.getInitialPosition();
@@ -48,7 +48,7 @@ public abstract class Neutral {
         removeFromTiles();
 
         if (isBlocking()) {
-            MapInitializer map = (MapInitializer) getMap();
+            BWEMMapInitializer map = (BWEMMapInitializer) getMap();
             map.onBlockingNeutralDestroyed(this);
         }
     }
@@ -124,7 +124,7 @@ public abstract class Neutral {
     /**
      * Returns the next Neutral stacked over this Neutral, if ever.<br>
      * - To iterate through the whole stack, one can use the following:<br>
-     * <code>for (const Neutral * n = Map::GetTile(topLeft()).GetNeutral() ; n ; n = n->nextStacked())
+     * <code>for (const Neutral * n = BWEMMap::GetTile(topLeft()).GetNeutral() ; n ; n = n->nextStacked())
      * </code>
      */
     public Neutral getNextStacked() {
@@ -230,7 +230,7 @@ public abstract class Neutral {
         this.nextStacked = null;
     }
 
-    private Map getMap() {
+    private BWEMMap getMap() {
         return this.map;
     }
 
