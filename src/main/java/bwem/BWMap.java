@@ -23,7 +23,6 @@ import java.util.*;
 import static bwem.AreaId.UNINITIALIZED;
 
 public abstract class BWMap {
-
     final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
             new ArrayList<>();
     final Game game;
@@ -51,7 +50,6 @@ public abstract class BWMap {
     public TerrainData getData() {
         return this.terrainData;
     }
-
 
     public boolean isInitialized() {
         return (this.terrainData != null);

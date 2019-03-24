@@ -59,7 +59,7 @@ public abstract class TerrainData {
         return getMiniTile(walkPosition, CheckMode.CHECK);
     }
 
-    public boolean isSeaWithNonSeaNeighbors(final WalkPosition walkPosition) {
+    boolean isSeaWithNonSeaNeighbors(final WalkPosition walkPosition) {
         if (!getMiniTile(walkPosition).isSea()) {
             return false;
         }
