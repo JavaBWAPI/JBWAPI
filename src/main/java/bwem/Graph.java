@@ -257,15 +257,16 @@ public final class Graph {
     // ----------------------------------------------------------------------
     // 1) size the matrix
     // ----------------------------------------------------------------------
-    private void initializeChokePointsMatrix(
-            final List<List<List<ChokePoint>>> chokePointsMatrix, final int areasCount) {
+    private void initializeChokePointsMatrix() {
+        int areasCount = getAreaCount();
         chokePointsMatrix.clear();
-        for (int i = 0; i < areasCount + 1; ++i) {
-            chokePointsMatrix.add(new ArrayList<>());
-        }
+        // Unused due to ids starting at 1
+        chokePointsMatrix.add(null);
         for (int id = 1; id <= areasCount; ++id) { // triangular matrix
+            ArrayList<List<ChokePoint>> subList = new ArrayList<>();
+            chokePointsMatrix.add(subList);
             for (int n = 0; n < id; ++n) {
-                chokePointsMatrix.get(id).add(new ArrayList<>());
+                subList.add(new ArrayList<>());
             }
         }
     }
@@ -332,7 +333,7 @@ public final class Graph {
         //        }
 
         // 1) size the matrix
-        initializeChokePointsMatrix(this.chokePointsMatrix, getAreaCount());
+        initializeChokePointsMatrix();
 
         // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
         final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
