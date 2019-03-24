@@ -20,7 +20,7 @@ import bwapi.Unit;
  * Special_Pit_Door.
  */
 public class StaticBuilding extends Neutral {
-    public StaticBuilding(final Unit unit, final BWEMMap map) {
+    public StaticBuilding(final Unit unit, final BWMap map) {
         super(unit, map);
 
         // TODO

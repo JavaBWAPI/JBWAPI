@@ -15,16 +15,16 @@ package bwem;
 import bwapi.Game;
 
 public final class BWEM {
-    private final BWEMMap map;
+    private final BWMap map;
 
     public BWEM(final Game game) {
-        this.map = new BWEMMapInitializer(game);
+        this.map = new BWMapInitializer(game);
     }
 
     /**
      * Returns the root internal data container.
      */
-    public BWEMMap getMap() {
+    public BWMap getMap() {
         return this.map;
     }
 
@@ -33,10 +33,10 @@ public final class BWEM {
      * Initializes and pre-computes all of the internal data.
      */
     public void initialize() {
-        if (!(this.map instanceof BWEMMapInitializer)) {
+        if (!(this.map instanceof BWMapInitializer)) {
             throw new IllegalStateException("BWEM was not instantiated properly.");
         }
-        ((BWEMMapInitializer) this.map).initialize();
+        ((BWMapInitializer) this.map).initialize();
         this.map.assignStartingLocationsToSuitableBases();
     }
 }

@@ -19,7 +19,7 @@ import bwapi.Unit;
  * getType().isMineralField().
  */
 public final class Mineral extends Resource {
-    Mineral(final Unit unit, final BWEMMap map) {
+    Mineral(final Unit unit, final BWMap map) {
         super(unit, map);
 
         //        bwem_assert(Type().isMineralField());

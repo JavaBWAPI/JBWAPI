@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Type of all the Paths used in BWEM (Cf. BWEMMap::GetPath).
+ * Type of all the Paths used in BWEM (Cf. BWMap::GetPath).
  *
  * <p>cp.h:68:typedef std::vector<const ChokePoint *> Path; cp.h:168:typedef ChokePoint::Path
  * CPPath;

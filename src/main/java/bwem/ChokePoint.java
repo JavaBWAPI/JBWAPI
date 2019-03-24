@@ -30,7 +30,7 @@ import java.util.Objects;
  * Pos(middle), Pos(end1) and Pos(end2).<br>
  * ChokePoints play an important role in BWEM:<br>
  * - they define accessibility between Areas.<br>
- * - the Paths provided by BWEMMap::GetPath are made of ChokePoints.<br>
+ * - the Paths provided by BWMap::GetPath are made of ChokePoints.<br>
  * Like Areas and Bases, the number and the addresses of ChokePoint instances remain unchanged.<br>
  * <br>
  * Pseudo ChokePoints:<br>
@@ -99,7 +99,7 @@ public class ChokePoint {
         }
         this.nodes[Node.MIDDLE.ordinal()] = geometry.get(i);
 
-        BWEMMap map = getMap();
+        BWMap map = getMap();
         for (int n = 0; n < Node.NODE_COUNT.ordinal(); ++n) {
             for (final Area area : new Area[]{area1, area2}) {
                 final WalkPosition nodeInArea =
@@ -150,7 +150,7 @@ public class ChokePoint {
         this(graph, index, area1, area2, geometry, null);
     }
 
-    private BWEMMap getMap() {
+    private BWMap getMap() {
         return this.graph.getMap();
     }
 
@@ -193,7 +193,7 @@ public class ChokePoint {
 
     /**
      * Pretty much the same as pos(n), except that the returned MiniTile position is guaranteed to be
-     * part of pArea. That is: BWEMMap::getArea(positionOfNodeInArea(n, pArea)) == pArea.
+     * part of pArea. That is: BWMap::getArea(positionOfNodeInArea(n, pArea)) == pArea.
      */
     public WalkPosition getNodePositionInArea(final Node node, final Area area) {
         if (!(area.equals(this.areas.getLeft()) || area.equals(this.areas.getRight()))) {
@@ -219,7 +219,7 @@ public class ChokePoint {
      * If !isPseudo(), returns false. Otherwise, returns whether this ChokePoint is considered
      * blocked. Normally, a pseudo ChokePoint either remains blocked, or switches to not isBlocked
      * when blockingNeutral() is destroyed and there is no remaining Neutral stacked with it. However,
-     * in the case where BWEMMap::automaticPathUpdate() == false, blocked() will always return true
+     * in the case where BWMap::automaticPathUpdate() == false, blocked() will always return true
      * whatever blockingNeutral() returns. Cf. Area::AccessibleNeighbors().
      */
     public boolean isBlocked() {
@@ -265,7 +265,7 @@ public class ChokePoint {
      * - Note: if this == cp, returns [cp].<br>
      * Time complexity: O(1)<br>
      * To get the length of the path returned in pixels, use distanceFrom(cp).<br>
-     * - Note: all the possible Paths are precomputed during BWEMMap::initialize().<br>
+     * - Note: all the possible Paths are precomputed during BWMap::initialize().<br>
      * The best one is then stored for each pair of getChokePoints. However, only the center of the
      * getChokePoints is considered. As a consequence, the returned path may not be the shortest one.
      */

@@ -19,7 +19,7 @@ import bwem.util.StaticMarkable;
 /**
  * Corresponds to BWAPI/Starcraft's concept of tile (32x32 pixels).<br>
  * - Tiles are accessed using TilePositions (Cf. {@link TerrainData#getTile(TilePosition)}).<br>
- * - A BWEMMap holds BWEMMap::Size().x * BWEMMap::Size().y Tiles as its "Tile map".<br>
+ * - A BWMap holds BWMap::Size().x * BWMap::Size().y Tiles as its "Tile map".<br>
  * <br>
  * - It should be noted that a Tile exactly overlaps 4 x 4 MiniTiles.<br>
  * - As there are 16 times as many MiniTiles as Tiles, we allow a Tiles to contain more data than
@@ -147,9 +147,9 @@ public class Tile {
      * - In some maps (e.g. Benzene.scx), several Neutrals are stacked at the same location.<br>
      * In this case, only the "bottom" one is returned, while the other ones can be accessed using
      * Neutral::nextStacked().<br>
-     * - Because Neutrals never move on the BWEMMap, the returned value is guaranteed to remain the same,
+     * - Because Neutrals never move on the BWMap, the returned value is guaranteed to remain the same,
      * unless some Neutral<br>
-     * is destroyed and BWEM is informed of that by a call of BWEMMap::onMineralDestroyed(BWAPI::unit u)
+     * is destroyed and BWEM is informed of that by a call of BWMap::onMineralDestroyed(BWAPI::unit u)
      * for exemple. In such a case,<br>
      * - BWEM automatically updates the data by deleting the Neutral instance and clearing any
      * reference to it such as the one<br>

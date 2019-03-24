@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class BWEMMapInitializer extends BWEMMap {
-    BWEMMapInitializer(final Game game) {
+class BWMapInitializer extends BWMap {
+    BWMapInitializer(final Game game) {
         super(game);
     }
 
@@ -83,7 +83,7 @@ class BWEMMapInitializer extends BWEMMap {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // BWEMMap::InitializeNeutrals
+    // BWMap::InitializeNeutrals
     ////////////////////////////////////////////////////////////////////////
 
     private void initializeNeutralData(
@@ -96,7 +96,7 @@ class BWEMMapInitializer extends BWEMMap {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // BWEMMap::ComputeAltitude
+    // BWMap::ComputeAltitude
     ////////////////////////////////////////////////////////////////////////
 
     // Assigns MiniTile::m_altitude foar each miniTile having AltitudeMissing()
@@ -233,7 +233,7 @@ class BWEMMapInitializer extends BWEMMap {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // BWEMMap::processBlockingNeutrals
+    // BWMap::processBlockingNeutrals
     ////////////////////////////////////////////////////////////////////////
 
     private void processBlockingNeutrals(final List<Neutral> candidates) {
@@ -413,7 +413,7 @@ class BWEMMapInitializer extends BWEMMap {
     ////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////
-    // BWEMMap::ComputeAreas
+    // BWMap::ComputeAreas
     ////////////////////////////////////////////////////////////////////////
 
     // Assigns MiniTile::m_areaId for each miniTile having AreaIdMissing()
@@ -589,7 +589,7 @@ class BWEMMapInitializer extends BWEMMap {
         getGraph().createAreas(areasList);
     }
 
-    // Renamed from "BWEMMap::SetAltitudeInTile"
+    // Renamed from "BWMap::SetAltitudeInTile"
     private void setLowestAltitudeInTile(final TilePosition t) {
         Altitude lowestAltitude = new Altitude(Integer.MAX_VALUE);
 
@@ -609,7 +609,7 @@ class BWEMMapInitializer extends BWEMMap {
         getData().getTile(t).setLowestAltitude(lowestAltitude);
     }
 
-    // Renamed from "BWEMMap::SetAreaIdInTiles"
+    // Renamed from "BWMap::SetAreaIdInTiles"
     private void setAreaIdAndLowestAltitudeInTiles() {
         for (int y = 0; y < getData().getMapData().getTileSize().getY(); ++y)
             for (int x = 0; x < getData().getMapData().getTileSize().getX(); ++x) {

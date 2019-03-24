@@ -14,7 +14,7 @@ package bwem;
 
 import bwapi.WalkPosition;
 
-// Helper class for void BWEMMap::ComputeAreas()
+// Helper class for void BWMap::ComputeAreas()
 // Maintains some information about an area being computed
 // A TempAreaInfo is not Valid() in two cases:
 //   - a default-constructed TempAreaInfo instance is never Valid (used as a dummy value to simplify
@@ -22,7 +22,7 @@ import bwapi.WalkPosition;
 //   - any other instance becomes invalid when absorbed (see Merge)
 
 /**
- * Helper class for void BWEMMap::ComputeAreas()
+ * Helper class for void BWMap::ComputeAreas()
  */
 class TempAreaInfo {
     private final AreaId id;

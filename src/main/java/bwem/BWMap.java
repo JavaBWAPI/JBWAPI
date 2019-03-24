@@ -22,7 +22,7 @@ import java.util.*;
 
 import static bwem.AreaId.UNINITIALIZED;
 
-public abstract class BWEMMap {
+public abstract class BWMap {
 
     final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier =
             new ArrayList<>();
@@ -38,7 +38,7 @@ public abstract class BWEMMap {
     NeutralData neutralData = null;
     Altitude highestAltitude;
 
-    BWEMMap(final Game game) {
+    BWMap(final Game game) {
         this.game = game;
         this.players = game.getPlayers();
         this.mineralPatches = game.getMinerals();
@@ -204,7 +204,7 @@ public abstract class BWEMMap {
         //        //----------------------------------------------------------------------
         //        // Area with the highest frequency.
         //        //----------------------------------------------------------------------
-        //        final java.util.BWEMMap<Area, Integer> areaFrequency = new HashMap<>();
+        //        final java.util.BWMap<Area, Integer> areaFrequency = new HashMap<>();
         //        for (int dy = 0; dy < size.getY(); ++dy)
         //        for (int dx = 0; dx < size.getX(); ++dx) {
         //            final Area area = getArea(topLeft.add(new TilePosition(dx, dy)));
@@ -218,8 +218,8 @@ public abstract class BWEMMap {
         //        }
         //
         //        if (!areaFrequency.isEmpty()) {
-        //            java.util.BWEMMap.Entry<Area, Integer> highestFreqEntry = null;
-        //            for (final java.util.BWEMMap.Entry<Area, Integer> currentEntry :
+        //            java.util.BWMap.Entry<Area, Integer> highestFreqEntry = null;
+        //            for (final java.util.BWMap.Entry<Area, Integer> currentEntry :
         // areaFrequency.entrySet()) {
         //                if (highestFreqEntry == null || (currentEntry.getValue() >
         // highestFreqEntry.getValue())) {

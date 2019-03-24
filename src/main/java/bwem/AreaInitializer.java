@@ -30,10 +30,10 @@ class AreaInitializer extends Area {
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;
 
-    private final BWEMMap map;
+    private final BWMap map;
 
     AreaInitializer(
-            final BWEMMap map, final AreaId areaId, final WalkPosition top, final int miniTileCount) {
+            final BWMap map, final AreaId areaId, final WalkPosition top, final int miniTileCount) {
         super(areaId, top, miniTileCount);
 
         this.map = map;

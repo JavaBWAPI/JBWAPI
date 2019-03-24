@@ -23,12 +23,12 @@ public class NeutralData {
     private final List<StaticBuilding> staticBuildings;
 
     public NeutralData(
-            final BWEMMap map,
+            final BWMap map,
             final List<Unit> mineralPatches,
             final List<Unit> vespeneGeysers,
             final List<Unit> neutralUnits) {
         ////////////////////////////////////////////////////////////////////////
-        // BWEMMap::InitializeNeutrals
+        // BWMap::InitializeNeutrals
         ////////////////////////////////////////////////////////////////////////
 
         this.minerals = new ArrayList<>();

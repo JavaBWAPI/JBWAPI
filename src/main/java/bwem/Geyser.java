@@ -20,7 +20,7 @@ import bwapi.UnitType;
  * Resource_Vespene_Geyser.
  */
 public final class Geyser extends Resource {
-    Geyser(final Unit unit, final BWEMMap map) {
+    Geyser(final Unit unit, final BWMap map) {
         super(unit, map);
 
         if (!unit.getType().equals(UnitType.Resource_Vespene_Geyser)) {

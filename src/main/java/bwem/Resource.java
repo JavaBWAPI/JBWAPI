@@ -18,7 +18,7 @@ import bwapi.Unit;
  * A Resource is either a Mineral or a Geyser.
  */
 public abstract class Resource extends Neutral {
-    Resource(final Unit unit, final BWEMMap map) {
+    Resource(final Unit unit, final BWMap map) {
         super(unit, map);
     }
 

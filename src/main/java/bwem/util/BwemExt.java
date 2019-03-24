@@ -16,7 +16,7 @@ import bwapi.Pair;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.BWEMMap;
+import bwem.BWMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -272,7 +272,7 @@ public final class BwemExt {
         return innerMiniTileBorder(topLeft, size, false);
     }
 
-    public static boolean adjoins8SomeLakeOrNeutral(final WalkPosition p, final BWEMMap pMap) {
+    public static boolean adjoins8SomeLakeOrNeutral(final WalkPosition p, final BWMap pMap) {
         final WalkPosition[] deltas = {
                 new WalkPosition(-1, -1),
                 new WalkPosition(0, -1),
