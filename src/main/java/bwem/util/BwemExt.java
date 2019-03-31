@@ -28,7 +28,7 @@ public final class BwemExt {
     // At least AREA_MIN_MINI_TILES connected MiniTiles are necessary for an Area to be created.
     public static final int AREA_MIN_MINI_TILES = 64;
     public static final int MAX_TILES_BETWEEN_COMMAND_CENTER_AND_RESOURCES = 10;
-    public static final int min_tiles_between_Bases = 10;
+    public static final int MIN_TILES_BETWEEN_BASES = 10;
     public static final int MAX_TILES_BETWEEN_STARTING_LOCATION_AND_ITS_ASSIGNED_BASE = 3;
     private static final int TILE_POSITION_CENTER_OFFSET_IN_PIXELS = TilePosition.SIZE_IN_PIXELS / 2;
     private static final Position TILE_POSITION_CENTER_IN_PIXELS =

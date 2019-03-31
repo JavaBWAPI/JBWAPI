@@ -38,8 +38,7 @@ public abstract class TerrainData {
             throw new IllegalArgumentException();
         }
         return getTileData()
-                .getTiles()
-                .get(getMapData().getTileSize().getX() * tilePosition.getY() + tilePosition.getX());
+                .getTile(getMapData().getTileSize().getX() * tilePosition.getY() + tilePosition.getX());
     }
 
     public Tile getTile(final TilePosition tilePosition) {
@@ -51,8 +50,7 @@ public abstract class TerrainData {
             throw new IllegalArgumentException();
         }
         return getTileData()
-                .getMiniTiles()
-                .get(getMapData().getWalkSize().getX() * walkPosition.getY() + walkPosition.getX());
+                .getMiniTile(getMapData().getWalkSize().getX() * walkPosition.getY() + walkPosition.getX());
     }
 
     public MiniTile getMiniTile(final WalkPosition walkPosition) {

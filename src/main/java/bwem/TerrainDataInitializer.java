@@ -82,7 +82,7 @@ class TerrainDataInitializer extends TerrainData {
     // BWMap::DecideSeasOrLakes
     ////////////////////////////////////////////////////////////////////////
 
-    void decideSeasOrLakes(final int lakeMaxMiniTiles, final int lakeMaxWidthInMiniTiles) {
+    void decideSeasOrLakes() {
         for (int y = 0; y < getMapData().getWalkSize().getY(); ++y)
             for (int x = 0; x < getMapData().getWalkSize().getX(); ++x) {
                 final WalkPosition originWalkPosition = new WalkPosition(x, y);
@@ -120,7 +120,7 @@ class TerrainDataInitializer extends TerrainData {
                                 final MiniTile nextMiniTile = getMiniTile(nextWalkPosition, CheckMode.NO_CHECK);
                                 if (nextMiniTile.isSeaOrLake()) {
                                     toSearch.add(nextWalkPosition);
-                                    if (seaExtent.size() <= lakeMaxMiniTiles) {
+                                    if (seaExtent.size() <= bwem.util.BwemExt.LAKE_MAX_MINI_TILES) {
                                         seaExtent.add(nextMiniTile);
                                     }
                                     nextMiniTile.setSea();
@@ -129,9 +129,9 @@ class TerrainDataInitializer extends TerrainData {
                         }
                     }
 
-                    if ((seaExtent.size() <= lakeMaxMiniTiles)
-                            && (bottomRightX - topLeftX <= lakeMaxWidthInMiniTiles)
-                            && (bottomRightY - topLeftY <= lakeMaxWidthInMiniTiles)
+                    if ((seaExtent.size() <= bwem.util.BwemExt.LAKE_MAX_MINI_TILES)
+                            && (bottomRightX - topLeftX <= bwem.util.BwemExt.LAKE_MAX_WIDTH_IN_MINI_TILES)
+                            && (bottomRightY - topLeftY <= bwem.util.BwemExt.LAKE_MAX_WIDTH_IN_MINI_TILES)
                             && (topLeftX >= 2)
                             && (topLeftY >= 2)
                             && (bottomRightX < getMapData().getWalkSize().getX() - 2)

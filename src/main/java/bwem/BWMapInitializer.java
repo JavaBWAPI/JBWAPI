@@ -31,12 +31,12 @@ class BWMapInitializer extends BWMap {
 
         // Computes walkability, buildability and groundHeight and doodad information, using BWAPI
         // corresponding functions
-        ((TerrainDataInitializer) getData()).markUnwalkableMiniTiles(game);
-        ((TerrainDataInitializer) getData()).markBuildableTilesAndGroundHeight(game);
+        TerrainDataInitializer initializer = (TerrainDataInitializer) getData();
+        initializer.markUnwalkableMiniTiles(game);
+        initializer.markBuildableTilesAndGroundHeight(game);
 
         //
-        ((TerrainDataInitializer) getData())
-                .decideSeasOrLakes(BwemExt.LAKE_MAX_MINI_TILES, BwemExt.LAKE_MAX_WIDTH_IN_MINI_TILES);
+        initializer.decideSeasOrLakes();
 
 
         initializeNeutralData(
@@ -53,7 +53,7 @@ class BWMapInitializer extends BWMap {
 
 
         computeAreas(
-                computeTempAreas(getSortedMiniTilesByDescendingAltitude()), BwemExt.AREA_MIN_MINI_TILES);
+                computeTempAreas(getSortedMiniTilesByDescendingAltitude()));
 
 
         getGraph()
@@ -422,8 +422,8 @@ class BWMapInitializer extends BWMap {
     //   - involves the creation of a new area.
     //   - is added to some existing neighboring area.
     //   - makes two neighboring areas merge together.
-    private void computeAreas(final List<TempAreaInfo> tempAreaList, final int areaMinMiniTiles) {
-        createAreas(tempAreaList, areaMinMiniTiles);
+    private void computeAreas(final List<TempAreaInfo> tempAreaList) {
+        createAreas(tempAreaList, BwemExt.AREA_MIN_MINI_TILES);
         setAreaIdAndLowestAltitudeInTiles();
     }
 

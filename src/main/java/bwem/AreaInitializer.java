@@ -522,7 +522,7 @@ class AreaInitializer extends Area {
         // checks the distance to the bases already created:
         for (final Base base : getBases()) {
             if (BwemExt.roundedDist(base.getLocation(), location)
-                < BwemExt.min_tiles_between_Bases) {
+                < BwemExt.MIN_TILES_BETWEEN_BASES) {
                 return false;
             }
         }
