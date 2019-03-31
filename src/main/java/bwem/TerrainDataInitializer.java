@@ -20,7 +20,7 @@ import bwem.util.CheckMode;
 import java.util.ArrayList;
 import java.util.List;
 
-class TerrainDataInitializer extends TerrainData {
+final class TerrainDataInitializer extends TerrainData {
     TerrainDataInitializer(final MapData mapData, final TileData tileData) {
         super(mapData, tileData);
     }

@@ -28,7 +28,7 @@ import static bwem.AreaId.UNINITIALIZED;
  * - The whole process of analysis of a BWMap relies on the walkability information<br>
  * from which are derived successively: altitudes, Areas, ChokePoints.
  */
-public class MiniTile {
+public final class MiniTile {
     private static final AreaId blockingCP = new AreaId(Integer.MIN_VALUE);
 
     private Altitude
@@ -38,7 +38,7 @@ public class MiniTile {
             areaId; // 0 -> unwalkable  ;  > 0 -> index of some Area  ;  < 0 -> some walkable terrain, but
     // too small to be part of an Area
 
-    public MiniTile() {
+    MiniTile() {
         this.altitude = Altitude.UNINITIALIZED;
         this.areaId = UNINITIALIZED;
     }

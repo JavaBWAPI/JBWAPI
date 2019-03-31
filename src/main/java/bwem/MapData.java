@@ -19,14 +19,14 @@ import bwapi.WalkPosition;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapData {
+public final class MapData {
     private final TilePosition tileSize;
     private final WalkPosition walkSize;
     private final Position pixelSize;
     private final Position center;
     private final List<TilePosition> startingLocations;
 
-    public MapData(
+    MapData(
             final int tileWidth, final int tileHeight, final List<TilePosition> startingLocations) {
 
         this.tileSize = new TilePosition(tileWidth, tileHeight);

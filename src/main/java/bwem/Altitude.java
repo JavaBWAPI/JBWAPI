@@ -23,7 +23,7 @@ public final class Altitude implements Comparable<Altitude> {
     public static final Altitude ZERO = new Altitude(0);
     private final int val;
 
-    public Altitude(final int val) {
+    Altitude(final int val) {
         this.val = val;
     }
 

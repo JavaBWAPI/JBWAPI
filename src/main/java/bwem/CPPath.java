@@ -22,7 +22,7 @@ import java.util.List;
  * <p>cp.h:68:typedef std::vector<const ChokePoint *> Path; cp.h:168:typedef ChokePoint::Path
  * CPPath;
  */
-public class CPPath implements Iterable<ChokePoint> {
+public final class CPPath implements Iterable<ChokePoint> {
 
     static final CPPath EMPTY_PATH = new CPPath();
     private final List<ChokePoint> chokepoints;

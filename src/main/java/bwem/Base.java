@@ -28,7 +28,7 @@ import java.util.Objects;
  * Base always belongs to some Area. An Area may contain zero, one or several Bases. Like Areas and
  * ChokePoints, the number and the addresses of Base instances remain unchanged.
  */
-public class Base {
+public final class Base {
     private final Area area;
     private final List<Mineral> minerals = new ArrayList<>();
     private final List<Geyser> geysers = new ArrayList<>();

@@ -35,7 +35,7 @@ public final class Graph {
             new ArrayList<>(); // index == ChokePoint::index x ChokePoint::index
     private final List<Base> bases = new ArrayList<>();
 
-    public Graph(BWMap map) {
+    Graph(BWMap map) {
         this.map = map;
     }
 

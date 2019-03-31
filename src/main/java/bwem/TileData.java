@@ -12,7 +12,7 @@
 
 package bwem;
 
-class TileData {
+final class TileData {
 
     private final Tile[] tiles;
     private final MiniTile[] miniTiles;

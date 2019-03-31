@@ -21,7 +21,7 @@ public final class AreaId implements Comparable<AreaId> {
     public static final AreaId ZERO = new AreaId(0);
     private final int val;
 
-    public AreaId(final int val) {
+    AreaId(final int val) {
         this.val = val;
     }
 

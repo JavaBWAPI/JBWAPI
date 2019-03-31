@@ -25,7 +25,7 @@ import java.util.*;
 
 import static bwem.AreaId.UNINITIALIZED;
 
-class AreaInitializer extends Area {
+final class AreaInitializer extends Area {
 
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;

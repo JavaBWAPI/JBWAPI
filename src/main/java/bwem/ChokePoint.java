@@ -39,7 +39,7 @@ import java.util.Objects;
  * ChokePoint for each blocking Neutral (only one in the case of stacked blocking Neutral).<br>
  * Such ChokePoints are called pseudo ChokePoints and they behave differently in several ways.
  */
-public class ChokePoint {
+public final class ChokePoint {
     private final Graph graph;
     private final boolean isPseudo;
     private final int index;

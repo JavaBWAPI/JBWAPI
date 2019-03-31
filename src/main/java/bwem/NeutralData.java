@@ -17,16 +17,16 @@ import bwapi.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeutralData {
+public final class NeutralData {
     private final List<Mineral> minerals;
     private final List<Geyser> geysers;
     private final List<StaticBuilding> staticBuildings;
 
-    public NeutralData(
-            final BWMap map,
-            final List<Unit> mineralPatches,
-            final List<Unit> vespeneGeysers,
-            final List<Unit> neutralUnits) {
+    NeutralData(
+        final BWMap map,
+        final List<Unit> mineralPatches,
+        final List<Unit> vespeneGeysers,
+        final List<Unit> neutralUnits) {
         ////////////////////////////////////////////////////////////////////////
         // BWMap::InitializeNeutrals
         ////////////////////////////////////////////////////////////////////////

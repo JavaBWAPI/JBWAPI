@@ -29,7 +29,7 @@ import bwem.util.StaticMarkable;
  * Tile::LowestAltitude<br>
  * which somewhat aggregate the MiniTile's corresponding information
  */
-public class Tile {
+public final class Tile {
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;
 
