@@ -201,7 +201,7 @@ public class Game {
         battleNet = gameData.isBattleNet();
         startLocations = IntStream.range(0, gameData.getStartLocationCount())
                 .mapToObj(i -> new TilePosition(gameData.getStartLocations(i)))
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         mapWidth = gameData.getMapWidth();
         mapHeight = gameData.getMapHeight();
         mapFileName = gameData.getMapFileName();
@@ -264,9 +264,9 @@ public class Game {
 
     void onFrame(final int frame) {
         if (frame > 0) {
-            allUnits = Collections.unmodifiableList(visibleUnits.stream()
+            allUnits = visibleUnits.stream()
                 .map(i -> units[i])
-                .collect(Collectors.toList()));
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
     }
@@ -1010,7 +1010,7 @@ public class Game {
     }
 
     public List<TilePosition> getStartLocations() {
-        return new ArrayList<>(startLocations);
+        return startLocations;
     }
 
     public void printf(final String cstr_format) {

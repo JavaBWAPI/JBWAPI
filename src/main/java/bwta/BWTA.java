@@ -33,31 +33,31 @@ public class BWTA {
         for (final Area a : bwem.getMap().getAreas()) {
             regionMap.put(a, new Region(a));
         }
-        regions = new ArrayList<>(regionMap.values());
+        regions = Collections.unmodifiableList(new ArrayList<>(regionMap.values()));
 
         chokeMap = new HashMap<>();
         for (final ChokePoint c : bwem.getMap().getChokePoints()) {
             chokeMap.put(c, new Chokepoint(c));
         }
-        chokepoints = new ArrayList<>(chokeMap.values());
+        chokepoints = Collections.unmodifiableList(new ArrayList<>(chokeMap.values()));
 
         baseMap = new HashMap<>();
         for (final Base b : bwem.getMap().getBases()) {
             baseMap.put(b, new BaseLocation(b));
         }
-        baseLocations = new ArrayList<>(baseMap.values());
+        baseLocations = Collections.unmodifiableList(new ArrayList<>(baseMap.values()));
     }
 
     public static List<Region> getRegions() {
-        return new ArrayList<>(regions);
+        return regions;
     }
 
     public static List<Chokepoint> getChokepoints() {
-        return new ArrayList<>(chokepoints);
+        return chokepoints;
     }
 
     public static List<BaseLocation> getBaseLocations() {
-        return new ArrayList<>(baseLocations);
+        return baseLocations;
     }
 
     public static List<BaseLocation> getStartLocations() {

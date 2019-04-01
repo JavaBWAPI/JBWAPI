@@ -437,7 +437,7 @@ public class Unit implements Comparable<Unit>{
 
     public List<Unit> getLoadedUnits() {
         if (getType().spaceProvided() < 1) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getTransport()))
@@ -460,7 +460,7 @@ public class Unit implements Comparable<Unit>{
 
     public List<Unit> getInterceptors() {
         if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getCarrier()))
@@ -473,7 +473,7 @@ public class Unit implements Comparable<Unit>{
 
     public List<Unit> getLarva() {
         if (!getType().producesLarva()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return game.getAllUnits().stream()
                 .filter(u -> equals(u.getHatchery()))
@@ -482,7 +482,7 @@ public class Unit implements Comparable<Unit>{
 
     public List<Unit> getUnitsInRadius(final int radius) {
         if (!exists()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return game.getUnitsInRectangle(
                 getLeft() - radius,
@@ -495,7 +495,7 @@ public class Unit implements Comparable<Unit>{
     public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
         // Return if this unit does not exist
         if (!exists()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         final int max = getPlayer().weaponMaxRange(weapon);
