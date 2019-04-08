@@ -7,8 +7,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwem.Base;
 
-import bwem.unit.NeutralImpl;
-import java.util.ArrayList;
+import bwem.Neutral;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +31,9 @@ public class BaseLocation {
         this.tilePosition = base.getLocation();
         this.minerals = 1;
         this.gas = 1;
-        this.mineralSet = base.getMinerals().stream().map(NeutralImpl::getUnit).collect(
+        this.mineralSet = base.getMinerals().stream().map(Neutral::getUnit).collect(
             collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        this.geyserSet =  base.getGeysers().stream().map(NeutralImpl::getUnit).collect(
+        this.geyserSet =  base.getGeysers().stream().map(Neutral::getUnit).collect(
             collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         this.island = base.getArea().getAccessibleNeighbors().isEmpty();
         this.mineralOnly = !mineralSet.isEmpty() && geyserSet.isEmpty();
