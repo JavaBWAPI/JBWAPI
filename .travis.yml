@@ -15,12 +15,11 @@ before_script:
   - pushd sc-docker
   - python3 setup.py bdist_wheel
   - pip3 install dist/scbw*.whl
-  - mkdir -p /tmp/sc-docker
   - if [ -e /tmp/sc-docker/starcraft.zip ]; then cp /tmp/sc-docker/starcraft.zip scbw/local_docker; fi
   - cd docker
   - ./build_images.sh
   - popd
-  - if [ ! -e /tmp/sc-docker/starcraft.zip ]; then cp scbw/local_docker/starcraft.zip /tmp/sc-docker/starcraft.zip; fi
+  - if [ ! -e /tmp/sc-docker/starcraft.zip ]; then cp sc-docker/scbw/local_docker/starcraft.zip /tmp/sc-docker/starcraft.zip; fi
   - scbw.play --install
 script:
   - sh mvnw clean install
