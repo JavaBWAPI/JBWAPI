@@ -12,17 +12,11 @@
 
 package bwem.util;
 
-import bwapi.Pair;
-import bwem.MiniTile;
+@FunctionalInterface
+public interface Pred<T, P> {
+    boolean test(T tile, P position);
 
-import java.util.Comparator;
-
-public final class PairGenericMiniTileAltitudeComparator<T>
-        implements Comparator<Pair<T, MiniTile>> {
-    @Override
-    public int compare(Pair<T, MiniTile> o1, Pair<T, MiniTile> o2) {
-        int a1 = o1.getRight().getAltitude().intValue();
-        int a2 = o2.getRight().getAltitude().intValue();
-        return Integer.compare(a1, a2);
+    static <T, P> Pred<T, P> accept() {
+        return (tile, position) -> true;
     }
 }

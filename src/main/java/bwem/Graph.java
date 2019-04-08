@@ -12,34 +12,19 @@
 
 package bwem;
 
+import bwapi.Pair;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
-import bwem.area.Area;
-import bwem.area.AreaInitializer;
-import bwem.area.AreaInitializerImpl;
-import bwem.area.typedef.AreaId;
-import bwem.area.typedef.GroupId;
-import bwem.map.Map;
-import bwem.map.TerrainData;
-import bwem.tile.MiniTile;
-import bwem.tile.Tile;
-import bwem.tile.TileImpl;
-import bwem.typedef.Altitude;
-import bwem.typedef.CPPath;
-import bwem.typedef.Index;
-import bwem.unit.Geyser;
-import bwem.unit.Mineral;
-import bwem.unit.Neutral;
-import bwem.unit.StaticBuilding;
 import bwem.util.BwemExt;
+import bwem.util.CheckMode;
+import bwem.util.Pred;
 import bwem.util.Utils;
-import bwapi.Pair;
 
 import java.util.*;
 
 public final class Graph {
-    private final Map map;
+    private final BWMap map;
     private final List<Area> areas = new ArrayList<>();
     private final List<ChokePoint> chokePoints = new ArrayList<>();
     private final List<List<List<ChokePoint>>> chokePointsMatrix =
@@ -50,11 +35,11 @@ public final class Graph {
             new ArrayList<>(); // index == ChokePoint::index x ChokePoint::index
     private final List<Base> bases = new ArrayList<>();
 
-    public Graph(Map map) {
+    Graph(BWMap map) {
         this.map = map;
     }
 
-    public Map getMap() {
+    public BWMap getMap() {
         return map;
     }
 
@@ -67,7 +52,6 @@ public final class Graph {
     }
 
     public Area getArea(final AreaId id) {
-        //        bwem_assert(valid(id));
         if (!isValid(id)) {
             throw new IllegalArgumentException();
         }
@@ -95,17 +79,9 @@ public final class Graph {
                         .breadthFirstSearch(
                                 walkPosition,
                                 // findCond
-                                args -> {
-                                    final Object ttile = args[0];
-                                    if (ttile instanceof MiniTile) {
-                                        final MiniTile miniTile = (MiniTile) ttile;
-                                        return (miniTile.getAreaId().intValue() > 0);
-                                    } else {
-                                        throw new IllegalArgumentException();
-                                    }
-                                },
+                            (MiniTile miniTile, WalkPosition unused) -> (miniTile.getAreaId().intValue() > 0),
                                 // visitCond
-                                args -> true);
+                            Pred.accept());
 
         return getArea(w);
     }
@@ -117,40 +93,25 @@ public final class Graph {
         }
 
         final TilePosition t =
-                getMap()
-                        .breadthFirstSearch(
-                                tilePosition,
-                                // findCond
-                                args -> {
-                                    Object ttile = args[0];
-                                    if (ttile instanceof Tile) {
-                                        Tile tile = (Tile) ttile;
-                                        return (tile.getAreaId().intValue() > 0);
-                                    } else {
-                                        throw new IllegalArgumentException();
-                                    }
-                                },
-                                // visitCond
-                                args -> true);
+            getMap()
+                .breadthFirstSearch(
+                    tilePosition,
+                    // findCond
+                    (Tile tile, TilePosition unused) -> tile.getAreaId().intValue() > 0,
+                    // visitCond
+                    (Tile tile, TilePosition unused) -> true);
 
         return getArea(t);
     }
 
-    // Returns the list of all the getChokePoints in the Map.
+    // Returns the list of all the getChokePoints in the BWMap.
     public List<ChokePoint> getChokePoints() {
         return chokePoints;
     }
 
     // Returns the getChokePoints between two areas.
-    public List<ChokePoint> getChokePoints(final AreaId a, final AreaId b) {
-        if (!isValid(a)) {
-            //            bwem_assert(valid(a));
-            throw new IllegalArgumentException();
-        } else if (!isValid(b)) {
-            //            bwem_assert(valid(b));
-            throw new IllegalArgumentException();
-        } else if (a.intValue() == b.intValue()) {
-            //            bwem_assert(a != b);
+    private List<ChokePoint> getChokePoints(final AreaId a, final AreaId b) {
+        if (!isValid(a) || !isValid(b) || a.intValue() == b.intValue()) {
             throw new IllegalArgumentException();
         }
 
@@ -166,116 +127,31 @@ public final class Graph {
     }
 
     // Returns the getChokePoints between two areas.
-    public List<ChokePoint> getChokePoints(final Area a, final Area b) {
+    private List<ChokePoint> getChokePoints(final Area a, final Area b) {
         return getChokePoints(a.getId(), b.getId());
     }
 
     // Returns the ground distance in pixels between cpA->center() and cpB>center()
     public int distance(ChokePoint cpA, ChokePoint cpB) {
         return chokePointDistanceMatrix
-                .get(((ChokePointImpl) cpA).getIndex().intValue())
-                .get(((ChokePointImpl) cpB).getIndex().intValue());
+                .get(cpA.getIndex())
+                .get(cpB.getIndex());
     }
 
     // Returns a list of getChokePoints, which is intended to be the shortest walking path from cpA to
     // cpB.
     public CPPath getPath(ChokePoint cpA, ChokePoint cpB) {
         return pathsBetweenChokePoints
-                .get(((ChokePointImpl) cpA).getIndex().intValue())
-                .get(((ChokePointImpl) cpB).getIndex().intValue());
+                .get(cpA.getIndex())
+                .get(cpB.getIndex());
     }
 
-    public CPPath getPath(final Position a, final Position b, final MutableInt pLength) {
-        final Area areaA = getNearestArea(a.toWalkPosition());
-        final Area areaB = getNearestArea(b.toWalkPosition());
-
-        if (areaA.equals(areaB)) {
-            if (pLength != null) {
-                pLength.setValue(BwemExt.getApproxDistance(a, b));
-            }
-            return new CPPath();
-        }
-
-        if (!areaA.isAccessibleFrom(areaB)) {
-            if (pLength != null) {
-                pLength.setValue(-1);
-            }
-            return new CPPath();
-        }
-
-        int minDistAB = Integer.MAX_VALUE;
-
-        ChokePoint pBestCpA = null;
-        ChokePoint pBestCpB = null;
-
-        for (final ChokePoint cpA : areaA.getChokePoints()) {
-            if (!cpA.isBlocked()) {
-                final int distACpA = BwemExt.getApproxDistance(a, cpA.getCenter().toPosition());
-                for (final ChokePoint cpB : areaB.getChokePoints()) {
-                    if (!cpB.isBlocked()) {
-                        final int distBToCPB = BwemExt.getApproxDistance(b, cpB.getCenter().toPosition());
-                        final int distAToB = distACpA + distBToCPB + distance(cpA, cpB);
-                        if (distAToB < minDistAB) {
-                            minDistAB = distAToB;
-                            pBestCpA = cpA;
-                            pBestCpB = cpB;
-                        }
-                    }
-                }
-            }
-        }
-
-        //        bwem_assert(minDistAB != numeric_limits<int>::max());
-        if (minDistAB == Integer.MAX_VALUE) {
-            throw new IllegalStateException();
-        }
-
-        final CPPath path = getPath(pBestCpA, pBestCpB);
-
-        if (pLength != null) {
-            //            bwem_assert(Path.size() >= 1);
-            if (!(path.size() >= 1)) {
-                throw new IllegalStateException();
-            }
-
-            pLength.setValue(minDistAB);
-
-            if (path.size() == 1) {
-                //                bwem_assert(pBestCpA == pBestCpB);
-                if (!pBestCpA.equals(pBestCpB)) {
-                    throw new IllegalStateException();
-                }
-
-                final Position cpEnd1 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END1));
-                final Position cpEnd2 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END2));
-                if (Utils.intersect(
-                        a.getX(),
-                        a.getY(),
-                        b.getX(),
-                        b.getY(),
-                        cpEnd1.getX(),
-                        cpEnd1.getY(),
-                        cpEnd2.getX(),
-                        cpEnd2.getY())) {
-                    pLength.setValue(BwemExt.getApproxDistance(a, b));
-                } else {
-                    for (final ChokePoint.Node node :
-                            new ChokePoint.Node[]{ChokePoint.Node.END1, ChokePoint.Node.END2}) {
-                        final Position c = BwemExt.center(pBestCpA.getNodePosition(node));
-                        final int distAToB = BwemExt.getApproxDistance(a, c) + BwemExt.getApproxDistance(b, c);
-                        if (distAToB < pLength.intValue()) {
-                            pLength.setValue(distAToB);
-                        }
-                    }
-                }
-            }
-        }
-
-        return getPath(pBestCpA, pBestCpB);
+    public Optional<PathingResult> getPathingResult(Position a, Position b) {
+        return new Pathing(a, b).getPathWithLength();
     }
 
-    public CPPath getPath(Position a, Position b) {
-        return getPath(a, b, null);
+    public Optional<CPPath> getPath(final Position a, final Position b) {
+        return new Pathing(a, b).getPath();
     }
 
     public List<Base> getBases() {
@@ -284,11 +160,11 @@ public final class Graph {
 
     // Creates a new Area for each pair (top, miniTiles) in areasList (See Area::top() and
     // Area::miniTiles())
-    public void createAreas(final List<Pair<WalkPosition, Integer>> areasList) {
+    void createAreas(final List<Pair<WalkPosition, Integer>> areasList) {
         for (int id = 1; id <= areasList.size(); ++id) {
             final WalkPosition top = areasList.get(id - 1).getLeft();
             final int miniTileCount = areasList.get(id - 1).getRight();
-            this.areas.add(new AreaInitializerImpl(getMap(), new AreaId(id), top, miniTileCount));
+            this.areas.add(new AreaInitializer(getMap(), new AreaId(id), top, miniTileCount));
         }
     }
 
@@ -299,18 +175,16 @@ public final class Graph {
     // ----------------------------------------------------------------------
     // 1) size the matrix
     // ----------------------------------------------------------------------
-    private void initializeChokePointsMatrix(
-            final List<List<List<ChokePoint>>> chokePointsMatrix, final int areasCount) {
-        //      ChokePointsMatrix.resize(areasCount() + 1);
+    private void initializeChokePointsMatrix() {
+        int areasCount = getAreaCount();
         chokePointsMatrix.clear();
-        for (int i = 0; i < areasCount + 1; ++i) {
-            chokePointsMatrix.add(new ArrayList<>());
-        }
-        //    	for (Area::id id = 1 ; id <= areasCount() ; ++id)
-        //    		m_ChokePointsMatrix[id].resize(id);			// triangular matrix
+        // Unused due to ids starting at 1
+        chokePointsMatrix.add(null);
         for (int id = 1; id <= areasCount; ++id) { // triangular matrix
+            ArrayList<List<ChokePoint>> subList = new ArrayList<>();
+            chokePointsMatrix.add(subList);
             for (int n = 0; n < id; ++n) {
-                chokePointsMatrix.get(id).add(new ArrayList<>());
+                subList.add(new ArrayList<>());
             }
         }
     }
@@ -333,11 +207,6 @@ public final class Graph {
                 a = b;
                 b = a_tmp;
             }
-            //    		bwem_assert(a <= b);
-            if (!(a <= b)) {
-                throw new IllegalStateException();
-            }
-            //    		bwem_assert((a >= 1) && (b <= areasCount()));
             if (!((a >= 1) && (b <= getAreaCount()))) {
                 throw new IllegalStateException();
             }
@@ -358,8 +227,7 @@ public final class Graph {
             final List<StaticBuilding> staticBuildings,
             final List<Mineral> minerals,
             final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
-        Index newIndex = new Index(0);
-
+        int newIndex = 0;
         final List<Neutral> blockingNeutrals = new ArrayList<>();
         for (final StaticBuilding s : staticBuildings) {
             if (s.isBlocking()) {
@@ -383,7 +251,7 @@ public final class Graph {
         //        }
 
         // 1) size the matrix
-        initializeChokePointsMatrix(this.chokePointsMatrix, getAreaCount());
+        initializeChokePointsMatrix();
 
         // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
         final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
@@ -396,8 +264,8 @@ public final class Graph {
             final List<WalkPosition> rawFrontierAB = entry.getValue();
 
             // Because our dispatching preserved order,
-            // and because Map::m_RawFrontier was populated in descending order of the altitude (see
-            // Map::computeAreas),
+            // and because BWMap::m_RawFrontier was populated in descending order of the altitude (see
+            // BWMap::computeAreas),
             // we know that rawFrontierAB is also ordered the same way, but let's check it:
             {
                 final List<Altitude> altitudes = new ArrayList<>();
@@ -406,7 +274,6 @@ public final class Graph {
                 }
 
                 // Check if the altitudes array is sorted in descending order.
-                //    			bwem_assert(is_sorted(altitudes.rbegin(), altitudes.rend()));
                 for (int i = 1; i < altitudes.size(); ++i) {
                     final int prev = altitudes.get(i - 1).intValue();
                     final int curr = altitudes.get(i).intValue();
@@ -420,7 +287,7 @@ public final class Graph {
             // chokepoints.
             //    Each cluster will be populated starting with the center of a chokepoint (max altitude)
             //    and finishing with the ends (min altitude).
-            final int clusterMinDist = (int) Math.sqrt(BwemExt.lake_max_miniTiles);
+            final int clusterMinDist = (int) Math.sqrt(BwemExt.LAKE_MAX_MINI_TILES);
             final List<List<WalkPosition>> clusters = new ArrayList<>();
             for (final WalkPosition w : rawFrontierAB) {
                 boolean added = false;
@@ -448,11 +315,10 @@ public final class Graph {
             // 3.2) Create one Chokepoint for each cluster:
             final AreaId a = rawleft.getLeft();
             final AreaId b = rawleft.getRight();
-            //            getChokePoints(a, b).reserve(clusters.size() + pseudoChokePointsToCreate);
             for (final List<WalkPosition> cluster : clusters) {
                 getChokePoints(a, b)
-                        .add(new ChokePointImpl(this, newIndex, getArea(a), getArea(b), cluster));
-                newIndex = newIndex.add(1);
+                        .add(new ChokePoint(this, newIndex, getArea(a), getArea(b), cluster));
+                newIndex++;
             }
         }
 
@@ -468,28 +334,18 @@ public final class Graph {
                         }
 
                         final WalkPosition center =
-                                getMap()
-                                        .breadthFirstSearch(
-                                                blockingNeutral.getCenter().toWalkPosition(),
-                                                // findCond
-                                                args -> {
-                                                    Object ttile = args[0];
-                                                    if (!(ttile instanceof MiniTile)) {
-                                                        throw new IllegalArgumentException();
-                                                    }
-                                                    MiniTile miniTile = (MiniTile) ttile;
-                                                    return miniTile.isWalkable();
-                                                },
-                                                // visitCond
-                                                args -> true);
+                            getMap().breadthFirstSearch(
+                                blockingNeutral.getCenter().toWalkPosition(),
+                                // findCond
+                                (MiniTile miniTile, WalkPosition unused) -> miniTile.isWalkable(),
+                                // visitCond
+                                Pred.accept());
 
                         final List<WalkPosition> list = new ArrayList<>();
                         list.add(center);
                         getChokePoints(blockedAreaA, blockedAreaB)
-                                .add(
-                                        new ChokePointImpl(
-                                                this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
-                        newIndex = newIndex.add(1);
+                                .add(new ChokePoint(this, newIndex, blockedAreaA, blockedAreaB, list, blockingNeutral));
+                        newIndex++;
                     }
             }
         }
@@ -519,25 +375,19 @@ public final class Graph {
     public void computeChokePointDistanceMatrix() {
         // 1) size the matrix
         chokePointDistanceMatrix.clear();
-        //    	m_ChokePointDistanceMatrix.resize (chokePoints.size());
         for (int i = 0; i < chokePoints.size(); ++i) {
             chokePointDistanceMatrix.add(new ArrayList<>());
         }
-        //    	for (auto & line : chokePointDistanceMatrix)
-        //    		line.resize (chokePoints.size(), -1);
         for (List<Integer> chokePointDistanceMatrix1 : chokePointDistanceMatrix) {
             for (int n = 0; n < chokePoints.size(); ++n) {
                 chokePointDistanceMatrix1.add(-1);
             }
         }
 
-        //    	m_PathsBetweenChokePoints.resize (chokePoints.size());
         pathsBetweenChokePoints.clear();
         for (int i = 0; i < chokePoints.size(); ++i) {
             pathsBetweenChokePoints.add(new ArrayList<>());
         }
-        //    	for (auto & line : pathsBetweenChokePoints)
-        //    		line.resize (chokePoints.size());
         for (List<CPPath> pathsBetweenChokePoint : pathsBetweenChokePoints) {
             for (int n = 0; n < chokePoints.size(); ++n) {
                 pathsBetweenChokePoint.add(new CPPath());
@@ -567,7 +417,7 @@ public final class Graph {
     }
 
     public void collectInformation() {
-        // 1) Process the whole Map:
+        // 1) Process the whole BWMap:
 
         for (final Mineral mineral : getMap().getNeutralData().getMinerals()) {
             final Area area = getMap().getMainArea(mineral.getTopLeft(), mineral.getSize());
@@ -591,12 +441,6 @@ public final class Graph {
                             .addTileInformation(new TilePosition(x, y), tile);
                 }
             }
-
-        // 2) Post-process each Area separately:
-
-        for (final Area area : this.areas) {
-            ((AreaInitializer) area).postCollectInformation();
-        }
     }
 
     public void createBases(final TerrainData terrainData) {
@@ -677,9 +521,9 @@ public final class Graph {
                 //                if ((void *)(pContext) == (void *)(this))	// tests (Context == Graph)
                 // without warning about constant condition
                 if (collectIntermediateChokePoints) {
-                    for (ChokePoint pPrev = ((ChokePointImpl) target).getPathBackTrace();
+                    for (ChokePoint pPrev = target.getPathBackTrace();
                          !pPrev.equals(pStart);
-                         pPrev = ((ChokePointImpl) pPrev).getPathBackTrace()) {
+                         pPrev = pPrev.getPathBackTrace()) {
                         path.add(1, pPrev);
                     }
                 }
@@ -702,10 +546,10 @@ public final class Graph {
     private int[] computeDistances(final ChokePoint start, final List<ChokePoint> targets) {
         final int[] distances = new int[targets.size()];
 
-        TileImpl.getStaticMarkable().unmarkAll();
+        Tile.getStaticMarkable().unmarkAll();
 
         final Queue<Pair<Integer, ChokePoint>> toVisit =
-                new PriorityQueue<>(Comparator.comparingInt(a -> a.getLeft()));
+                new PriorityQueue<>(Comparator.comparingInt(Pair::getLeft));
         toVisit.offer(new Pair<>(0, start));
 
         int remainingTargets = targets.size();
@@ -715,12 +559,11 @@ public final class Graph {
             final ChokePoint current = distanceAndChokePoint.getRight();
             final Tile currentTile =
                     getMap().getData().getTile(current.getCenter().toTilePosition(), CheckMode.NO_CHECK);
-            //            bwem_assert(currentTile.InternalData() == currentDist);
-            if (!(((TileImpl) currentTile).getInternalData() == currentDist)) {
+            if (!(currentTile.getInternalData() == currentDist)) {
                 throw new IllegalStateException();
             }
-            ((TileImpl) currentTile).setInternalData(0); // resets Tile::m_internalData for future usage
-            ((TileImpl) currentTile).getMarkable().setMarked();
+            currentTile.setInternalData(0); // resets Tile::m_internalData for future usage
+            currentTile.getMarkable().setMarked();
 
             for (int i = 0; i < targets.size(); ++i) {
                 if (current == targets.get(i)) {
@@ -737,30 +580,29 @@ public final class Graph {
             }
 
             for (final Area pArea :
-                    new Area[]{current.getAreas().getLeft(), current.getAreas().getRight()}) {
+                new Area[]{current.getAreas().getLeft(), current.getAreas().getRight()}) {
                 for (final ChokePoint next : pArea.getChokePoints()) {
                     if (!next.equals(current)) {
                         final int newNextDist = currentDist + distance(current, next);
                         final Tile nextTile =
                                 getMap().getData().getTile(next.getCenter().toTilePosition(), CheckMode.NO_CHECK);
-                        if (!((TileImpl) nextTile).getMarkable().isMarked()) {
-                            if (((TileImpl) nextTile).getInternalData() != 0) { // next already in toVisit
+                        if (nextTile.getMarkable().isUnmarked()) {
+                            if (nextTile.getInternalData() != 0) { // next already in toVisit
                                 if (newNextDist
-                                        < ((TileImpl) nextTile).getInternalData()) { // nextNewDist < nextOldDist
+                                        < nextTile.getInternalData()) { // nextNewDist < nextOldDist
                                     // To update next's distance, we need to remove-insert it from toVisit:
-                                    //                                    bwem_assert(iNext != range.second);
                                     final boolean removed =
-                                            toVisit.remove(new Pair<>(((TileImpl) nextTile).getInternalData(), next));
+                                            toVisit.remove(new Pair<>(nextTile.getInternalData(), next));
                                     if (!removed) {
                                         throw new IllegalStateException();
                                     }
-                                    ((TileImpl) nextTile).setInternalData(newNextDist);
-                                    ((ChokePointImpl) next).setPathBackTrace(current);
+                                    nextTile.setInternalData(newNextDist);
+                                    next.setPathBackTrace(current);
                                     toVisit.offer(new Pair<>(newNextDist, next));
                                 }
                             } else {
-                                ((TileImpl) nextTile).setInternalData(newNextDist);
-                                ((ChokePointImpl) next).setPathBackTrace(current);
+                                nextTile.setInternalData(newNextDist);
+                                next.setPathBackTrace(current);
                                 toVisit.offer(new Pair<>(newNextDist, next));
                             }
                         }
@@ -776,12 +618,11 @@ public final class Graph {
 
         // reset Tile::m_internalData for future usage
         for (Pair<Integer, ChokePoint> distanceToChokePoint : toVisit) {
-            ((TileImpl)
-                    getMap()
-                            .getData()
-                            .getTile(
-                                    distanceToChokePoint.getRight().getCenter().toTilePosition(),
-                                    CheckMode.NO_CHECK))
+            getMap()
+                    .getData()
+                    .getTile(
+                            distanceToChokePoint.getRight().getCenter().toTilePosition(),
+                            CheckMode.NO_CHECK)
                     .setInternalData(0);
         }
 
@@ -791,18 +632,18 @@ public final class Graph {
     private void updateGroupIds() {
         int nextGroupId = 1;
 
-        AreaInitializerImpl.getStaticMarkable().unmarkAll();
+        AreaInitializer.getStaticMarkable().unmarkAll();
 
         for (final Area start : getAreas()) {
-            if (!((AreaInitializer) start).getMarkable().isMarked()) {
+            if (((AreaInitializer) start).getMarkable().isUnmarked()) {
                 final List<Area> toVisit = new ArrayList<>();
                 toVisit.add(start);
                 while (!toVisit.isEmpty()) {
                     final Area current = toVisit.remove(toVisit.size() - 1);
-                    ((AreaInitializer) current).setGroupId(new GroupId(nextGroupId));
+                    ((AreaInitializer) current).setGroupId(nextGroupId);
 
                     for (final Area next : current.getAccessibleNeighbors()) {
-                        if (!((AreaInitializer) next).getMarkable().isMarked()) {
+                        if (((AreaInitializer) next).getMarkable().isUnmarked()) {
                             ((AreaInitializer) next).getMarkable().setMarked();
                             toVisit.add(next);
                         }
@@ -814,15 +655,15 @@ public final class Graph {
     }
 
     private void setDistance(final ChokePoint cpA, final ChokePoint cpB, final int value) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex().intValue();
-        final int indexB = ((ChokePointImpl) cpB).getIndex().intValue();
+        final int indexA = cpA.getIndex();
+        final int indexB = cpB.getIndex();
         this.chokePointDistanceMatrix.get(indexA).set(indexB, value);
         this.chokePointDistanceMatrix.get(indexB).set(indexA, value);
     }
 
     private void setPath(final ChokePoint cpA, final ChokePoint cpB, final CPPath pathAB) {
-        final int indexA = ((ChokePointImpl) cpA).getIndex().intValue();
-        final int indexB = ((ChokePointImpl) cpB).getIndex().intValue();
+        final int indexA = cpA.getIndex();
+        final int indexB = cpB.getIndex();
 
         this.pathsBetweenChokePoints.get(indexA).set(indexB, pathAB);
 
@@ -838,5 +679,101 @@ public final class Graph {
 
     private boolean isValid(AreaId id) {
         return (1 <= id.intValue() && id.intValue() <= getAreaCount());
+    }
+
+    private class Pathing {
+        private final Position a;
+        private final Position b;
+        private final Area areaA;
+        private final Area areaB;
+        private final CPPath path;
+        private ChokePoint pBestCpA;
+        private ChokePoint pBestCpB;
+        private int minDistAB;
+
+        Pathing(Position a, Position b) {
+            this.a = a;
+            this.b = b;
+            areaA = getNearestArea(a.toWalkPosition());
+            areaB = getNearestArea(b.toWalkPosition());
+
+            if (areaA.equals(areaB)) {
+                path = CPPath.EMPTY_PATH;
+                return;
+            }
+
+            if (!areaA.isAccessibleFrom(areaB)) {
+                path = null;
+                return;
+            }
+
+            minDistAB = Integer.MAX_VALUE;
+
+            for (final ChokePoint cpA : areaA.getChokePoints()) {
+                if (!cpA.isBlocked()) {
+                    final int distACpA = BwemExt.getApproxDistance(a, cpA.getCenter().toPosition());
+                    for (final ChokePoint cpB : areaB.getChokePoints()) {
+                        if (!cpB.isBlocked()) {
+                            final int distBToCPB = BwemExt.getApproxDistance(b, cpB.getCenter().toPosition());
+                            final int distAToB = distACpA + distBToCPB + distance(cpA, cpB);
+                            if (distAToB < minDistAB) {
+                                minDistAB = distAToB;
+                                pBestCpA = cpA;
+                                pBestCpB = cpB;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (minDistAB == Integer.MAX_VALUE) {
+                throw new IllegalStateException();
+            }
+
+            path = Graph.this.getPath(pBestCpA, pBestCpB);
+        }
+
+        Optional<PathingResult> getPathWithLength() {
+            if (path == null) {
+                return Optional.empty();
+            }
+            if (areaA.equals(areaB)) {
+                return Optional.of(new PathingResult(path, BwemExt.getApproxDistance(a, b)));
+            }
+
+            if (path.size() == 1) {
+                if (!pBestCpA.equals(pBestCpB)) {
+                    throw new IllegalStateException();
+                }
+
+                final Position cpEnd1 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END1));
+                final Position cpEnd2 = BwemExt.center(pBestCpA.getNodePosition(ChokePoint.Node.END2));
+                if (Utils.intersect(
+                    a.getX(),
+                    a.getY(),
+                    b.getX(),
+                    b.getY(),
+                    cpEnd1.getX(),
+                    cpEnd1.getY(),
+                    cpEnd2.getX(),
+                    cpEnd2.getY())) {
+                    return Optional.of(new PathingResult(path, BwemExt.getApproxDistance(a, b)));
+                } else {
+                    int pLength = minDistAB;
+                    for (final ChokePoint.Node node :
+                        new ChokePoint.Node[]{ChokePoint.Node.END1, ChokePoint.Node.END2}) {
+                        Position c = BwemExt.center(pBestCpA.getNodePosition(node));
+                        int distAToB = BwemExt.getApproxDistance(a, c) + BwemExt.getApproxDistance(b, c);
+                        pLength = Math.min(pLength, distAToB);
+                    }
+                    return Optional.of(new PathingResult(path, pLength));
+                }
+            }
+            return Optional.of(new PathingResult(path, minDistAB));
+        }
+
+        Optional<CPPath> getPath() {
+            return Optional.ofNullable(path);
+        }
     }
 }

@@ -7,8 +7,8 @@ import bwapi.TilePosition;
 import bwem.BWEM;
 import bwem.Base;
 import bwem.ChokePoint;
-import bwem.area.Area;
 
+import bwem.Area;
 import java.util.*;
 import java.util.stream.Collectors;
 

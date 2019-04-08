@@ -12,17 +12,18 @@
 
 package bwem.util;
 
-import bwapi.Pair;
-import bwem.MiniTile;
+/**
+ * See original C++ BWEM for an explanation of this code. Do NOT mimic BWEM's C++ inheritance for
+ * this code. See "src/test/util/OldMarkable.java" for what NOT to do.
+ */
+public final class StaticMarkable {
+    private int currentMark;
 
-import java.util.Comparator;
+    int getCurrentMark() {
+        return this.currentMark;
+    }
 
-public final class PairGenericMiniTileAltitudeComparator<T>
-        implements Comparator<Pair<T, MiniTile>> {
-    @Override
-    public int compare(Pair<T, MiniTile> o1, Pair<T, MiniTile> o2) {
-        int a1 = o1.getRight().getAltitude().intValue();
-        int a2 = o2.getRight().getAltitude().intValue();
-        return Integer.compare(a1, a2);
+    public void unmarkAll() {
+        ++this.currentMark;
     }
 }
