@@ -479,7 +479,7 @@ class UnitTypeContainer {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    static Race[] unitRace = {
+    static final Race[] unitRace = {
             Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
             Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran, Terran,
             Terran, Terran, Terran, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg, Zerg,
@@ -495,7 +495,7 @@ class UnitTypeContainer {
             Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None,
             Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
     };
-    static UpgradeType[] armorUpgrade = {
+    static final UpgradeType[] armorUpgrade = {
             Terran_Infantry_Armor, Terran_Infantry_Armor, Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Vehicle_Plating,
             Terran_Vehicle_Plating, Terran_Vehicle_Plating, Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating,
             Terran_Infantry_Armor, Terran_Ship_Plating, Terran_Ship_Plating, Upgrade_60, Upgrade_60, Terran_Infantry_Armor,
@@ -528,7 +528,7 @@ class UnitTypeContainer {
             Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60, Upgrade_60,
             UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.None, UpgradeType.Unknown
     };
-    static UnitType[] whatBuilds = {
+    static final UnitType[] whatBuilds = {
             Terran_Barracks, Terran_Barracks, Terran_Factory, Terran_Factory, UnitType.None, Terran_Factory, UnitType.None, Terran_Command_Center, Terran_Starport,
             Terran_Starport, UnitType.None, Terran_Starport, Terran_Starport, UnitType.None, Terran_Nuclear_Silo, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, Terran_Factory, UnitType.None, Terran_Barracks, UnitType.None, Terran_Barracks, Zerg_Hatchery, Zerg_Larva,
@@ -548,7 +548,7 @@ class UnitTypeContainer {
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.Unknown
     };
-    static UnitType[][] buildsWhat = {
+    static final UnitType[][] buildsWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
@@ -785,7 +785,7 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-    static WeaponType[] groundWeapon = {
+    static final WeaponType[] groundWeapon = {
             Gauss_Rifle, C_10_Canister_Rifle, Fragmentation_Grenade, Twin_Autocannons, Twin_Autocannons, Arclite_Cannon, Arclite_Cannon,
             Fusion_Cutter, Burst_Lasers, WeaponType.None, Flame_Thrower_Gui_Montag, WeaponType.None, ATS_Laser_Battery, WeaponType.Spider_Mines, WeaponType.None, WeaponType.None,
             C_10_Canister_Rifle_Sarah_Kerrigan, Twin_Autocannons_Alan_Schezar, Twin_Autocannons_Alan_Schezar, Fragmentation_Grenade_Jim_Raynor,
@@ -809,7 +809,7 @@ class UnitTypeContainer {
             Flame_Thrower_Wall_Trap, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None,
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Unknown
     };
-    static WeaponType airWeapon[] = {
+    static final WeaponType[] airWeapon = {
             Gauss_Rifle, C_10_Canister_Rifle, WeaponType.None, Hellfire_Missile_Pack, Hellfire_Missile_Pack, WeaponType.None, WeaponType.None, WeaponType.None, Gemini_Missiles, WeaponType.None, WeaponType.None, WeaponType.None,
             ATA_Laser_Battery, WeaponType.None, WeaponType.None, WeaponType.None, C_10_Canister_Rifle_Sarah_Kerrigan, Hellfire_Missile_Pack_Alan_Schezar, Hellfire_Missile_Pack_Alan_Schezar, WeaponType.None,
             Gauss_Rifle_Jim_Raynor, Gemini_Missiles_Tom_Kazansky, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, ATA_Laser_Battery_Hero,
@@ -828,7 +828,7 @@ class UnitTypeContainer {
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None,
             WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.None, WeaponType.Unknown
     };
-    static UnitSizeType unitSize[] = {
+    static final UnitSizeType[] unitSize = {
             UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Medium, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Independent,
             UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Medium, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Large, UnitSizeType.Large, UnitSizeType.Large,
             UnitSizeType.Large, UnitSizeType.Independent, UnitSizeType.Small, UnitSizeType.Independent, UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Medium, UnitSizeType.Small, UnitSizeType.Medium, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Small, UnitSizeType.Large, UnitSizeType.Medium,
@@ -846,7 +846,7 @@ class UnitTypeContainer {
             UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.Independent,
             UnitSizeType.Independent, UnitSizeType.Independent, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.None, UnitSizeType.Unknown
     };
-    static double unitTopSpeeds[] = {
+    static final double[] unitTopSpeeds = {
             4.0, 4.0, 6.4, 4.57, 0.0, 4.0, 0.0, 4.92, 6.67, 5.0, 4.0, 5.47, 2.5, 16.0, 33.33, 4.0, 4.0, 4.57, 0.0, 6.4, 4.0, 6.67,
             5.0, 4.0, 0.0, 0.0, 0.0, 2.5, 2.5, 2.5, 0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 0.0, 5.49, 3.66, 5.12, 6.0, 4.92, 0.83, 6.67, 2.5,
             6.67, 4.0, 6.67, 5.12, 6.67, 5.82, 4.0, 4.0, 3.66, 5.49, 6.67, 2.5, 0.83, 6.6, 0.0, 6.67, 4.92, 5.0, 4.92, 4.92, 4.0, 5.0,
@@ -858,50 +858,50 @@ class UnitTypeContainer {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
-    static UpgradeType[] infantry_no_wpnUpgrade = {Terran_Infantry_Armor};
-    static UpgradeType[] infantryUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons};
-    static UpgradeType[] marineUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells};
-    static UpgradeType[] ghostUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor};
-    static UpgradeType[] mechUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons};
-    static UpgradeType[] vultureUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters};
-    static UpgradeType[] goliathUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters};
-    static UpgradeType[] terran_air_no_wpnUpgrade = {Terran_Ship_Plating};
-    static UpgradeType[] terran_airUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons};
-    static UpgradeType[] science_vesselUpgrade = {Terran_Ship_Plating, Titan_Reactor};
-    static UpgradeType[] wraithUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor};
-    static UpgradeType[] battlecruiserUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor};
-    static UpgradeType[] medicUpgrade = {Terran_Infantry_Armor, Caduceus_Reactor};
-    static UpgradeType[] carapaceUpgrade = {Zerg_Carapace};
-    static UpgradeType[] zerg_meleeUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks};
-    static UpgradeType[] zerg_rangeUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks};
-    static UpgradeType[] zerglingUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands};
-    static UpgradeType[] hydraliskUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines};
-    static UpgradeType[] defilerUpgrade = {Zerg_Carapace, Metasynaptic_Node};
-    static UpgradeType[] ultraliskUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis};
-    static UpgradeType[] zerg_air_no_wpnUpgrade = {Zerg_Flyer_Carapace};
-    static UpgradeType[] zerg_airUpgrade = {Zerg_Flyer_Carapace, Zerg_Flyer_Attacks};
-    static UpgradeType[] overlordUpgrade = {Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace};
-    static UpgradeType[] queenUpgrade = {Zerg_Flyer_Carapace, Gamete_Meiosis};
-    static UpgradeType[] shieldsUpgrade = {Protoss_Plasma_Shields};
-    static UpgradeType[] protoss_ground_no_wpnUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor};
-    static UpgradeType[] protoss_groundUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons};
-    static UpgradeType[] zealotUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements};
-    static UpgradeType[] dragoonUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge};
-    static UpgradeType[] reaverUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity};
-    static UpgradeType[] templarUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet};
+    static final UpgradeType[] infantry_no_wpnUpgrade = {Terran_Infantry_Armor};
+    static final UpgradeType[] infantryUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons};
+    static final UpgradeType[] marineUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, U_238_Shells};
+    static final UpgradeType[] ghostUpgrade = {Terran_Infantry_Armor, Terran_Infantry_Weapons, Ocular_Implants, Moebius_Reactor};
+    static final UpgradeType[] mechUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons};
+    static final UpgradeType[] vultureUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Ion_Thrusters};
+    static final UpgradeType[] goliathUpgrade = {Terran_Vehicle_Plating, Terran_Vehicle_Weapons, Charon_Boosters};
+    static final UpgradeType[] terran_air_no_wpnUpgrade = {Terran_Ship_Plating};
+    static final UpgradeType[] terran_airUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons};
+    static final UpgradeType[] science_vesselUpgrade = {Terran_Ship_Plating, Titan_Reactor};
+    static final UpgradeType[] wraithUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Apollo_Reactor};
+    static final UpgradeType[] battlecruiserUpgrade = {Terran_Ship_Plating, Terran_Ship_Weapons, Colossus_Reactor};
+    static final UpgradeType[] medicUpgrade = {Terran_Infantry_Armor, Caduceus_Reactor};
+    static final UpgradeType[] carapaceUpgrade = {Zerg_Carapace};
+    static final UpgradeType[] zerg_meleeUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks};
+    static final UpgradeType[] zerg_rangeUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks};
+    static final UpgradeType[] zerglingUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Metabolic_Boost, Adrenal_Glands};
+    static final UpgradeType[] hydraliskUpgrade = {Zerg_Carapace, Zerg_Missile_Attacks, Muscular_Augments, Grooved_Spines};
+    static final UpgradeType[] defilerUpgrade = {Zerg_Carapace, Metasynaptic_Node};
+    static final UpgradeType[] ultraliskUpgrade = {Zerg_Carapace, Zerg_Melee_Attacks, Chitinous_Plating, Anabolic_Synthesis};
+    static final UpgradeType[] zerg_air_no_wpnUpgrade = {Zerg_Flyer_Carapace};
+    static final UpgradeType[] zerg_airUpgrade = {Zerg_Flyer_Carapace, Zerg_Flyer_Attacks};
+    static final UpgradeType[] overlordUpgrade = {Zerg_Flyer_Carapace, Ventral_Sacs, Antennae, Pneumatized_Carapace};
+    static final UpgradeType[] queenUpgrade = {Zerg_Flyer_Carapace, Gamete_Meiosis};
+    static final UpgradeType[] shieldsUpgrade = {Protoss_Plasma_Shields};
+    static final UpgradeType[] protoss_ground_no_wpnUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor};
+    static final UpgradeType[] protoss_groundUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons};
+    static final UpgradeType[] zealotUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Leg_Enhancements};
+    static final UpgradeType[] dragoonUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Singularity_Charge};
+    static final UpgradeType[] reaverUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Protoss_Ground_Weapons, Scarab_Damage, Reaver_Capacity};
+    static final UpgradeType[] templarUpgrade = {Protoss_Plasma_Shields, Protoss_Ground_Armor, Khaydarin_Amulet};
     static UpgradeType[] protoss_air_no_wpnUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor};
-    static UpgradeType[] protoss_airUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons};
-    static UpgradeType[] shuttleUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive};
-    static UpgradeType[] observerUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters};
-    static UpgradeType[] scoutUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters};
-    static UpgradeType[] carrierUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity};
-    static UpgradeType[] arbiterUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core};
-    static UpgradeType[] corsairUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel};
-    static UpgradeType[] dark_archonUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman};
-    static UpgradeType[] infested_duranUpgrade = {Zerg_Carapace, Terran_Infantry_Weapons};
-    static UpgradeType[] trapUpgrade = {Terran_Vehicle_Weapons};
-    static UpgradeType[] flame_trapUpgrade = {Terran_Infantry_Weapons};
-    static UpgradeType[][] upgrades = {
+    static final UpgradeType[] protoss_airUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons};
+    static final UpgradeType[] shuttleUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Gravitic_Drive};
+    static final UpgradeType[] observerUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Sensor_Array, Gravitic_Boosters};
+    static final UpgradeType[] scoutUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Apial_Sensors, Gravitic_Thrusters};
+    static final UpgradeType[] carrierUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Carrier_Capacity};
+    static final UpgradeType[] arbiterUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Khaydarin_Core};
+    static final UpgradeType[] corsairUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Jewel};
+    static final UpgradeType[] dark_archonUpgrade = {Protoss_Plasma_Shields, Protoss_Air_Armor, Protoss_Air_Weapons, Argus_Talisman};
+    static final UpgradeType[] infested_duranUpgrade = {Zerg_Carapace, Terran_Infantry_Weapons};
+    static final UpgradeType[] trapUpgrade = {Terran_Vehicle_Weapons};
+    static final UpgradeType[] flame_trapUpgrade = {Terran_Infantry_Weapons};
+    static final UpgradeType[][] upgrades = {
             marineUpgrade, ghostUpgrade, vultureUpgrade, goliathUpgrade, goliathUpgrade, mechUpgrade, mechUpgrade, infantry_no_wpnUpgrade,
             wraithUpgrade, science_vesselUpgrade, infantryUpgrade, terran_air_no_wpnUpgrade, battlecruiserUpgrade, {}, {},
             infantry_no_wpnUpgrade, infantryUpgrade, mechUpgrade, mechUpgrade, mechUpgrade, infantryUpgrade, terran_airUpgrade,
@@ -930,7 +930,7 @@ class UnitTypeContainer {
             trapUpgrade, flame_trapUpgrade, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-    static UpgradeType[][] upgradesWhat = {
+    static final UpgradeType[][] upgradesWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
@@ -1167,28 +1167,28 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-    static TechType[] stimTech = {Stim_Packs};
-    static TechType[] ghost_fullTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike};
-    static TechType[] vultureTech = {TechType.Spider_Mines};
-    static TechType[] siegeTech = {Tank_Siege_Mode};
-    static TechType[] wraithTech = {Cloaking_Field};
-    static TechType[] vesselTech = {TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate};
-    static TechType[] cruiserTech = {TechType.Yamato_Gun};
-    static TechType[] ghost_heroTech = {TechType.Lockdown, Personnel_Cloaking};
-    static TechType[] medicTech = {TechType.Restoration, TechType.Optical_Flare, Healing};
-    static TechType[] burrowTech = {Burrowing};
-    static TechType[] queenTech = {Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite};
-    static TechType[] defilerTech = {Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume};
-    static TechType[] ikerriganTech = {Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume};
-    static TechType[] corsairTech = {TechType.Disruption_Web};
-    static TechType[] dtTech = {Dark_Archon_Meld};
-    static TechType[] darchonTech = {TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom};
-    static TechType[] templar_fullTech = {TechType.Psionic_Storm, Hallucination, Archon_Warp};
-    static TechType[] arbiterTech = {Recall, TechType.Stasis_Field};
-    static TechType[] templar_heroTech = {TechType.Psionic_Storm, Hallucination};
-    static TechType[] iduranTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Consume};
-    static TechType[] comsatTech = {Scanner_Sweep};
-    static TechType[][] unitTechs = {
+    static final TechType[] stimTech = {Stim_Packs};
+    static final TechType[] ghost_fullTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Nuclear_Strike};
+    static final TechType[] vultureTech = {TechType.Spider_Mines};
+    static final TechType[] siegeTech = {Tank_Siege_Mode};
+    static final TechType[] wraithTech = {Cloaking_Field};
+    static final TechType[] vesselTech = {TechType.EMP_Shockwave, Defensive_Matrix, TechType.Irradiate};
+    static final TechType[] cruiserTech = {TechType.Yamato_Gun};
+    static final TechType[] ghost_heroTech = {TechType.Lockdown, Personnel_Cloaking};
+    static final TechType[] medicTech = {TechType.Restoration, TechType.Optical_Flare, Healing};
+    static final TechType[] burrowTech = {Burrowing};
+    static final TechType[] queenTech = {Infestation, TechType.Spawn_Broodlings, TechType.Ensnare, TechType.Parasite};
+    static final TechType[] defilerTech = {Burrowing, TechType.Dark_Swarm, TechType.Plague, TechType.Consume};
+    static final TechType[] ikerriganTech = {Personnel_Cloaking, TechType.Ensnare, TechType.Psionic_Storm, TechType.Consume};
+    static final TechType[] corsairTech = {TechType.Disruption_Web};
+    static final TechType[] dtTech = {Dark_Archon_Meld};
+    static final TechType[] darchonTech = {TechType.Mind_Control, TechType.Feedback, TechType.Maelstrom};
+    static final TechType[] templar_fullTech = {TechType.Psionic_Storm, Hallucination, Archon_Warp};
+    static final TechType[] arbiterTech = {Recall, TechType.Stasis_Field};
+    static final TechType[] templar_heroTech = {TechType.Psionic_Storm, Hallucination};
+    static final TechType[] iduranTech = {TechType.Lockdown, Personnel_Cloaking, TechType.Consume};
+    static final TechType[] comsatTech = {Scanner_Sweep};
+    static final TechType[][] unitTechs = {
             stimTech, ghost_fullTech, vultureTech, {}, {}, siegeTech, {}, {}, wraithTech, vesselTech,
             stimTech, {}, cruiserTech, {}, {}, {}, ghost_heroTech, {}, {}, vultureTech,
             stimTech, wraithTech, vesselTech, siegeTech, {}, siegeTech, {}, {}, cruiserTech, cruiserTech,
@@ -1211,7 +1211,7 @@ class UnitTypeContainer {
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
     };
-    static TechType[][] researchesWhat = {
+    static final TechType[][] researchesWhat = {
             {},// Terran_Marine = 0,
             {},// Terran_Ghost,
             {},// Terran_Vulture,
@@ -1448,7 +1448,7 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
-    static List<Map<UnitType, Integer>> reqUnitsMap = reqUnitsInit();
+    static final List<Map<UnitType, Integer>> reqUnitsMap = reqUnitsInit();
 
     private static List<Map<UnitType, Integer>> reqUnitsInit() {
         final List<Map<UnitType, Integer>> req = new ArrayList<>(UnitType.values().length);

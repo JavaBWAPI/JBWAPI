@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
- * If not available it will fall back on using the ByteBuffer itself.
  */
 class WrappedBuffer {
     private static final Charset charSet = StandardCharsets.ISO_8859_1;
@@ -40,39 +39,39 @@ class WrappedBuffer {
         }
     }
 
-    public byte getByte(final int offset) {
+    byte getByte(final int offset) {
         return unsafe.getByte(address + offset);
     }
 
-    public void putByte(final int offset, final byte value) {
+    void putByte(final int offset, final byte value) {
         unsafe.putByte(address + offset, value);
     }
 
-    public short getShort(final int offset) {
+    short getShort(final int offset) {
         return unsafe.getShort(address + offset);
     }
 
-    public void putShort(final int offset, final short value) {
+    void putShort(final int offset, final short value) {
         unsafe.putShort(address + offset, value);
     }
 
-    public int getInt(final int offset) {
+    int getInt(final int offset) {
         return unsafe.getInt(address + offset);
     }
 
-    public void putInt(final int offset, final int value) {
+    void putInt(final int offset, final int value) {
         unsafe.putInt(address + offset, value);
     }
 
-    public double getDouble(final int offset) {
+    double getDouble(final int offset) {
         return unsafe.getDouble(address + offset);
     }
 
-    public void putDouble(final int offset, final double value) {
+    void putDouble(final int offset, final double value) {
         unsafe.putDouble(address + offset, value);
     }
 
-    public String getString(final int offset, final int maxLen) {
+    String getString(final int offset, final int maxLen) {
         final byte[] buf = new byte[maxLen];
 
         unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
@@ -84,7 +83,7 @@ class WrappedBuffer {
         return new String(buf, 0, len, charSet);
     }
 
-    public void putString(final int offset, final int maxLen, final String string) {
+    void putString(final int offset, final int maxLen, final String string) {
         if (string.length() + 1 >= maxLen) {
             throw new StringIndexOutOfBoundsException();
         }

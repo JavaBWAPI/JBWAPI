@@ -2,7 +2,7 @@ package bwapi;
 
 class BuildingPlacer {
     private static final int MAX_RANGE = 64;
-    private static TilePosition[] gDirections = {
+    private static final TilePosition[] gDirections = {
             new TilePosition(1, 1),
             new TilePosition(0, 1),
             new TilePosition(-1, 1),
@@ -12,7 +12,7 @@ class BuildingPlacer {
             new TilePosition(0, -1),
             new TilePosition(-1, -1)
     };
-    private static BuildTemplate[] buildTemplates = // [13 + 1]
+    private static final BuildTemplate[] buildTemplates = // [13 + 1]
             {
                     new BuildTemplate(32, 0, 0, 1),
                     new BuildTemplate(0, 32, 1, 0),
@@ -362,7 +362,7 @@ class BuildingPlacer {
     }
 
     static class PlacementReserve {
-        public final int maxSearch;
+        final int maxSearch;
         byte[][] data;
         byte[][] save;
 

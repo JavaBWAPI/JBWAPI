@@ -13,9 +13,9 @@ import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 public class Unit implements Comparable<Unit>{
-    private static Set<Order> gatheringGasOrders = EnumSet.of(
+    private static final Set<Order> gatheringGasOrders = EnumSet.of(
             Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision);
-    private static Set<Order> gatheringMineralOrders = EnumSet.of(
+    private static final Set<Order> gatheringMineralOrders = EnumSet.of(
             Harvest1, Harvest2, MoveToMinerals, WaitForMinerals, MiningMinerals, ReturnMinerals, ResetCollision);
     private final UnitData unitData;
     private final Game game;
@@ -3159,9 +3159,7 @@ public class Unit implements Comparable<Unit>{
         if (getType() != Terran_Bunker) {
             if (!new WalkPosition(targDropPos.x / 8, targDropPos.y / 8).isValid(game)) {
                 return false;
-            } else if (!game.isWalkable(targDropPos.x / 8, targDropPos.y / 8)) {
-                return false;
-            }
+            } else return game.isWalkable(targDropPos.x / 8, targDropPos.y / 8);
         }
 
         return true;

@@ -117,39 +117,39 @@ public enum WeaponType {
     None(130),
     Unknown(131);
 
-    private static int[] defaultWpnDamageAmt = {
+    private static final int[] defaultWpnDamageAmt = {
             6, 18, 10, 30, 20, 30, 125, 12, 10, 24, 20, 30, 70, 5, 0, 20, 8, 40, 16, 25, 25, 50, 50, 30, 30, 8, 16, 70,
             150, 20, 260, 600, 0, 0, 250, 5, 10, 50, 10, 20, 20, 50, 4, 5, 0, 30, 20, 40, 9, 18, 5, 10, 15, 40, 500, 110,
             0, 0, 0, 0, 300, 0, 5, 0, 8, 20, 20, 45, 5, 20, 30, 60, 4, 8, 14, 20, 28, 10, 20, 6, 20, 20, 100, 0, 14, 100,
             45, 7, 7, 7, 7, 7, 7, 7, 4, 30, 10, 10, 8, 10, 5, 0, 20, 6, 25, 8, 8, 8, 0, 20, 6, 40, 25, 25, 20, 28, 30, 6,
             6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 0, 0
     };
-    private static int[] defaultWpnDamageBonus = {
+    private static final int[] defaultWpnDamageBonus = {
             1, 1, 1, 1, 2, 2, 0, 1, 2, 1, 1, 3, 3, 1, 0, 2, 1, 2, 1, 3, 3, 3, 3, 3, 3, 1, 1, 5, 5, 0, 0, 0, 0, 0, 0,
             1, 1, 1, 1, 1, 3, 3, 1, 0, 0, 1, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 1, 1,
             3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2,
             1, 1, 1, 1, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
     };
-    private static int[] wpnDamageCooldowns = {
+    private static final int[] wpnDamageCooldowns = {
             15, 15, 22, 22, 30, 22, 22, 22, 22, 22, 22, 37, 37, 15, 15, 22, 30, 22, 30, 30, 30, 30, 30, 22, 22, 22, 22,
             75, 75, 15, 15, 1, 1, 1, 75, 8, 8, 15, 15, 15, 15, 15, 15, 22, 22, 22, 30, 30, 30, 30, 22, 22, 15, 32, 1, 1,
             1, 1, 1, 1, 1, 1, 22, 22, 22, 22, 30, 22, 30, 22, 20, 20, 22, 30, 22, 30, 22, 45, 45, 1, 22, 22, 1, 1, 45, 22,
             30, 22, 22, 22, 22, 22, 22, 22, 9, 22, 22, 22, 22, 22, 8, 22, 22, 64, 100, 22, 22, 22, 1, 37, 15, 30, 22, 22,
             30, 22, 22, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 0, 0
     };
-    private static int[] wpnDamageFactor = {
+    private static final int[] wpnDamageFactor = {
             1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
     };
-    private static int[] wpnMinRange = {
+    private static final int[] wpnMinRange = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    private static int[] wpnMaxRange = {
+    private static final int[] wpnMaxRange = {
             128, 160, 224, 192, 160, 160, 10, 192, 160, 160, 160, 224, 224, 10, 10, 160, 160, 160, 160, 192, 192, 192, 192,
             192, 192, 32, 32, 384, 384, 224, 320, 3, 256, 256, 288, 15, 15, 15, 128, 160, 25, 25, 2, 32, 128, 64, 256, 256,
             96, 96, 128, 128, 224, 224, 3, 3, 384, 288, 288, 288, 288, 16, 32, 10, 15, 15, 128, 128, 96, 96, 64, 64, 32,
@@ -157,34 +157,34 @@ public enum WeaponType {
             160, 160, 64, 160, 160, 288, 192, 192, 192, 256, 320, 288, 320, 192, 128, 15, 192, 192, 128, 128, 192, 128, 128,
             128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0
     };
-    private static int[] wpnSplashRangeInner = {
+    private static final int[] wpnSplashRangeInner = {
             0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 10, 10, 0, 0, 128, 0, 64, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0,
             20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    private static int[] wpnSplashRangeMid = {
+    private static final int[] wpnSplashRangeMid = {
             0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 20, 25, 25, 0, 0, 192, 0, 64, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 20, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 50, 0, 0, 50, 0, 0, 0, 0, 0, 20,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    private static int[] wpnSplashRangeOuter = {
+    private static final int[] wpnSplashRangeOuter = {
             0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 25, 40, 40, 0, 0, 256, 0, 64, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30, 0, 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 60, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 100, 0, 0, 100, 0, 0, 0, 0, 0, 20, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
-    private static int TARG_AIR = 0x01;
-    private static int TARG_GROUND = 0x02;
-    private static int TARG_MECH = 0x04;
-    private static int TARG_ORGANIC = 0x08;
-    private static int TARG_NOBUILD = 0x10;
-    private static int TARG_NOROBOT = 0x20;
-    private static int TARG_TERRAIN = 0x40;
-    private static int TARG_ORGMECH = 0x80;
-    private static int TARG_OWN = 0x100;
-    private static int[] wpnFlags = {
+    private static final int TARG_AIR = 0x01;
+    private static final int TARG_GROUND = 0x02;
+    private static final int TARG_MECH = 0x04;
+    private static final int TARG_ORGANIC = 0x08;
+    private static final int TARG_NOBUILD = 0x10;
+    private static final int TARG_NOROBOT = 0x20;
+    private static final int TARG_TERRAIN = 0x40;
+    private static final int TARG_ORGMECH = 0x80;
+    private static final int TARG_OWN = 0x100;
+    private static final int[] wpnFlags = {
             TARG_AIR | TARG_GROUND,
             TARG_AIR | TARG_GROUND,
             TARG_AIR | TARG_GROUND,
@@ -317,7 +317,7 @@ public enum WeaponType {
             TARG_AIR | TARG_GROUND,
             0, 0
     };
-    private static UpgradeType[] upgrade = {
+    private static final UpgradeType[] upgrade = {
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Vehicle_Weapons,
             UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Upgrade_60, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons,
             UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Terran_Vehicle_Weapons, UpgradeType.Upgrade_60, UpgradeType.Upgrade_60, UpgradeType.Terran_Ship_Weapons, UpgradeType.Terran_Ship_Weapons, UpgradeType.Terran_Ship_Weapons,
@@ -339,7 +339,7 @@ public enum WeaponType {
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons,
             UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.Terran_Infantry_Weapons, UpgradeType.None, UpgradeType.Unknown
     };
-    private static DamageType[] damageType = {
+    private static final DamageType[] damageType = {
             DamageType.Normal, DamageType.Normal, DamageType.Concussive, DamageType.Concussive, DamageType.Concussive, DamageType.Concussive, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Explosive,
             DamageType.Explosive, DamageType.Normal, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Explosive, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Concussive,
             DamageType.Concussive, DamageType.Explosive, DamageType.Explosive, DamageType.Explosive, DamageType.Explosive, DamageType.Explosive, DamageType.Concussive, DamageType.Concussive, DamageType.Ignore_Armor, DamageType.Normal, DamageType.Normal, DamageType.Normal,
@@ -351,7 +351,7 @@ public enum WeaponType {
             DamageType.Explosive, DamageType.Normal, DamageType.Ignore_Armor, DamageType.Independent, DamageType.Independent, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Concussive, DamageType.Concussive, DamageType.Normal, DamageType.Explosive,
             DamageType.Concussive, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.Normal, DamageType.None, DamageType.Unknown
     };
-    private static ExplosionType[] explosionType = {
+    private static final ExplosionType[] explosionType = {
             ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Radial_Splash, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.None,
             ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Enemy_Splash, ExplosionType.Enemy_Splash, ExplosionType.Radial_Splash,
             ExplosionType.Radial_Splash, ExplosionType.Normal, ExplosionType.Yamato_Gun, ExplosionType.Nuclear_Missile, ExplosionType.Lockdown, ExplosionType.EMP_Shockwave, ExplosionType.Irradiate, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal,
@@ -363,7 +363,7 @@ public enum WeaponType {
             ExplosionType.Feedback, ExplosionType.Optical_Flare, ExplosionType.Maelstrom, ExplosionType.Enemy_Splash, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal,
             ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.Normal, ExplosionType.None, ExplosionType.Unknown
     };
-    private static UnitType[] whatUses = {
+    private static final UnitType[] whatUses = {
             UnitType.Terran_Marine, UnitType.Hero_Jim_Raynor_Marine, UnitType.Terran_Ghost, UnitType.Hero_Sarah_Kerrigan, UnitType.Terran_Vulture, UnitType.Hero_Jim_Raynor_Vulture,
             UnitType.Terran_Vulture_Spider_Mine, UnitType.Terran_Goliath, UnitType.Terran_Goliath, UnitType.Hero_Alan_Schezar, UnitType.Hero_Alan_Schezar, UnitType.Terran_Siege_Tank_Tank_Mode,
             UnitType.Hero_Edmund_Duke_Tank_Mode, UnitType.Terran_SCV, UnitType.Terran_SCV, UnitType.Terran_Wraith, UnitType.Terran_Wraith, UnitType.Hero_Tom_Kazansky, UnitType.Hero_Tom_Kazansky,
@@ -382,7 +382,7 @@ public enum WeaponType {
             UnitType.Hero_Artanis, UnitType.Hero_Artanis, UnitType.Hero_Alexei_Stukov, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None, UnitType.None,
             UnitType.None, UnitType.Unknown
     };
-    private static TechType attachedTech[] = {
+    private static final TechType[] attachedTech = {
             // Terran
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.Spider_Mines, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None,
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.Yamato_Gun, TechType.Nuclear_Strike, TechType.Lockdown, TechType.EMP_Shockwave, TechType.Irradiate,

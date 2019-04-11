@@ -55,7 +55,7 @@ public class Color {
     };
 
     private static boolean rgbInitialized;
-    private static byte[][][] closestColor = new byte[64][64][64];
+    private static final byte[][][] closestColor = new byte[64][64][64];
     public final int id;
 
     public Color(final int r, final int g, final int b) {

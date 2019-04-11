@@ -574,7 +574,7 @@ public class Game {
         if (!position.isValid(this)) {
             return false;
         }
-        return buildable[position.x][position.y] && (includeBuildings ? !gameData.isOccupied(position.x, position.y) : true);
+        return buildable[position.x][position.y] && (!includeBuildings || !gameData.isOccupied(position.x, position.y));
     }
 
     public boolean isVisible(final int tileX, final int tileY) {
@@ -949,11 +949,8 @@ public class Game {
             return false;
         }
 
-        if (!self.hasUnitTypeRequirement(type.requiredUnit())) {
-            return false;
-        }
+        return self.hasUnitTypeRequirement(type.requiredUnit());
 
-        return true;
     }
 
     public boolean canUpgrade(final UpgradeType type, final Unit unit) {
@@ -1488,9 +1485,7 @@ public class Game {
         if (source.isValid(this) && destination.isValid(this)) {
             final Region rgnA = getRegionAt(source);
             final Region rgnB = getRegionAt(destination);
-            if (rgnA != null && rgnB != null && rgnA.getRegionGroupID() == rgnB.getRegionGroupID()) {
-                return true;
-            }
+            return rgnA != null && rgnB != null && rgnA.getRegionGroupID() == rgnB.getRegionGroupID();
         }
         return false;
     }

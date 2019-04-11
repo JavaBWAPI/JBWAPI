@@ -240,7 +240,7 @@ public enum UnitType {
     Factories(232),
     Unknown(233);
 
-    static UnitType[] idToEnum = new UnitType[233 + 1];
+    static final UnitType[] idToEnum = new UnitType[233 + 1];
 
     static {
         Arrays.stream(UnitType.values()).forEach(v -> idToEnum[v.id] = v);

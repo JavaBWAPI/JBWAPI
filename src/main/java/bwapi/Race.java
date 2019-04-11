@@ -16,28 +16,28 @@ public enum Race {
     None(7),
     Unknown(8);
 
-    public static Race[] races = new Race[8 + 1];
-    static UnitType[] workerTypes = {
+    public static final Race[] races = new Race[8 + 1];
+    static final UnitType[] workerTypes = {
             Zerg_Drone, Terran_SCV, Protoss_Probe,
             UnitType.None, UnitType.None, UnitType.None, // unused
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
-    static UnitType[] baseTypes = {
+    static final UnitType[] baseTypes = {
             Zerg_Hatchery, Terran_Command_Center, Protoss_Nexus,
             UnitType.None, UnitType.None, UnitType.None, // unused
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
-    static UnitType[] refineryTypes = {
+    static final UnitType[] refineryTypes = {
             Zerg_Extractor, Terran_Refinery, Protoss_Assimilator,
             UnitType.None, UnitType.None, UnitType.None, // unused
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
-    static UnitType[] transportTypes = {
+    static final UnitType[] transportTypes = {
             Zerg_Overlord, Terran_Dropship, Protoss_Shuttle,
             UnitType.None, UnitType.None, UnitType.None, // unused
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
-    static UnitType[] supplyTypes = {
+    static final UnitType[] supplyTypes = {
             Zerg_Overlord, Terran_Supply_Depot, Protoss_Pylon,
             UnitType.None, UnitType.None, UnitType.None, // unused
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk

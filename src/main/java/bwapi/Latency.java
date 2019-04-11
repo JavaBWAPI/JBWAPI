@@ -18,7 +18,7 @@ public enum Latency {
         this.id = id;
     }
 
-    static Latency[] idToEnum = new Latency[24 + 1];
+    static final Latency[] idToEnum = new Latency[24 + 1];
 
     static {
         Arrays.stream(Latency.values()).forEach(v -> idToEnum[v.id] = v);
