@@ -12,7 +12,10 @@
 
 package bwem;
 
+import bwapi.Pair;
 import bwapi.WalkPosition;
+
+import java.util.Comparator;
 
 import static bwem.AreaId.UNINITIALIZED;
 
@@ -30,6 +33,7 @@ import static bwem.AreaId.UNINITIALIZED;
  */
 public final class MiniTile {
     private static final AreaId blockingCP = new AreaId(Integer.MIN_VALUE);
+    public static final Comparator<Pair<?, MiniTile>> BY_ALTITUDE_ORDER = Comparator.comparing(p -> p.getRight().getAltitude().intValue());
 
     private Altitude
             altitude; // 0 for seas  ;  != 0 for terrain and lakes (-1 = not computed yet)  ;  1 =

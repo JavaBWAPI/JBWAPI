@@ -12,6 +12,10 @@
 
 package bwem;
 
+import bwapi.Pair;
+
+import java.util.Comparator;
+
 /**
  * Immutable wrapper of the integer primitive to satisfy the original C++ definition:
  * defs.h:54:typedef int16_t altitude_t;
@@ -21,6 +25,7 @@ package bwem;
 public final class Altitude implements Comparable<Altitude> {
     public static final Altitude UNINITIALIZED = new Altitude(-1);
     public static final Altitude ZERO = new Altitude(0);
+    public static final Comparator<Pair<?, Altitude>> BY_ALTITUDE_ORDER = Comparator.comparing(p -> p.getRight().intValue());
     private final int val;
 
     Altitude(final int val) {

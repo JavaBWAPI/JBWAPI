@@ -149,7 +149,7 @@ class BWMapInitializer extends BWMap {
             }
         }
 
-        deltasByAscendingAltitude.sort(new PairGenericAltitudeComparator<>());
+        deltasByAscendingAltitude.sort(Altitude.BY_ALTITUDE_ORDER);
 
         return deltasByAscendingAltitude;
     }
@@ -440,7 +440,7 @@ class BWMapInitializer extends BWMap {
                 }
             }
 
-        miniTilesByDescendingAltitude.sort(new PairGenericMiniTileAltitudeComparator<>());
+        miniTilesByDescendingAltitude.sort(MiniTile.BY_ALTITUDE_ORDER);
         Collections.reverse(miniTilesByDescendingAltitude);
 
         return miniTilesByDescendingAltitude;
