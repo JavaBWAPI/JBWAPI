@@ -31,7 +31,7 @@ class BWMapInitializer extends BWMap {
 
         // Computes walkability, buildability and groundHeight and doodad information, using BWAPI
         // corresponding functions
-        TerrainDataInitializer initializer = (TerrainDataInitializer) getData();
+        TerrainData initializer = getData();
         initializer.markUnwalkableMiniTiles(game);
         initializer.markBuildableTilesAndGroundHeight(game);
 
@@ -78,7 +78,7 @@ class BWMapInitializer extends BWMap {
                 new TileData(
                         mapData.getTileSize().getX() * mapData.getTileSize().getY(),
                         mapData.getWalkSize().getX() * mapData.getWalkSize().getY());
-        super.terrainData = new TerrainDataInitializer(mapData, tileData);
+        super.terrainData = new TerrainData(mapData, tileData);
     }
 
     ////////////////////////////////////////////////////////////////////////
