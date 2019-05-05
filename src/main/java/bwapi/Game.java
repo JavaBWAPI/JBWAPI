@@ -56,6 +56,11 @@ public class Game {
     private List<Force> forceSet;
     private List<Player> playerSet;
     private List<Region> regionSet;
+
+    private List<Player> allies;
+    private List<Player> enemies;
+    private List<Player> observers;
+
     // CHANGING
     private Unit[] units;
 
@@ -189,6 +194,8 @@ public class Game {
         this.staticNeutralUnits = Collections.unmodifiableList(staticNeutralUnits);
         this.allUnits = Collections.unmodifiableList(allUnits);
 
+
+
         randomSeed = gameData.getRandomSeed();
 
         revision = gameData.getRevision();
@@ -237,6 +244,15 @@ public class Game {
 
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
+
+
+        enemies = playerSet.stream().filter(p -> !p.equals(self) && self.isEnemy(p))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        allies = playerSet.stream().filter(p -> !p.equals(self) && self.isAlly(p))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+        observers = playerSet.stream().filter(p -> !p.equals(self) && p.isObserver())
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     void unitCreate(final int id) {
@@ -1088,25 +1104,15 @@ public class Game {
     }
 
     public List<Player> allies() {
-        final Player self = self();
-        return getPlayers().stream()
-                .filter(self::isAlly)
-                .collect(Collectors.toList());
+        return allies;
     }
 
-    //TODO FIX in 4.3.0
     public List<Player> enemies() {
-        final Player self = self();
-        return getPlayers().stream()
-                .filter(p -> !(p.isNeutral() || self.isAlly(p)))
-                .collect(Collectors.toList());
+        return enemies;
     }
 
-    //TODO FIX in 4.3.0
     public List<Player> observers() {
-        return getPlayers().stream()
-                .filter(Player::isObserver)
-                .collect(Collectors.toList());
+        return observers;
     }
 
     public void drawText(final CoordinateType ctype, final int x, final int y, final String cstr_format) {

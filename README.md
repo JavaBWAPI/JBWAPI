@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/JavaBWAPI/JBWAPI.svg?branch=develop)](https://travis-ci.org/JavaBWAPI/JBWAPI)[![Total alerts](https://img.shields.io/lgtm/alerts/g/JavaBWAPI/JBWAPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/JavaBWAPI/JBWAPI/alerts/)[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/JavaBWAPI/JBWAPI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/JavaBWAPI/JBWAPI/context:java)
 # JBWAPI
-Pure Java [bwapi](https://github.com/bwapi/bwapi) client (4.2.0 & 4.4.0) implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
+Pure Java [bwapi](https://github.com/bwapi/bwapi) 4.4.0 client implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
 
 Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.com/OpenBW/BWAPI4J).
 
@@ -36,7 +36,7 @@ Add JBWAPI as a dependecy
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>0.6</version>
+    <version>0.7</version>
 </dependency>
 ```
 
@@ -54,7 +54,7 @@ allprojects {
 Add JBWAPI as a dependecy
 ```
 dependencies {
-    implementation 'com.github.JavaBWAPI:JBWAPI:0.6'
+    implementation 'com.github.JavaBWAPI:JBWAPI:0.7'
 }
 ```
 

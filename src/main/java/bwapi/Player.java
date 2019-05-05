@@ -57,15 +57,17 @@ public class Player {
     }
 
     public boolean isAlly(final Player player) {
+        if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
+            return false;
+        }
         return playerData.isAlly(player.getID());
     }
 
-    //TODO FIX OBSERVERS in 4.3.0
     public boolean isEnemy(final Player player) {
-        if (player.isNeutral()) {
+        if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
             return false;
         }
-        return !isAlly(player);
+        return !playerData.isAlly(player.getID());
     }
 
     public boolean isNeutral() {

@@ -44,7 +44,7 @@ class Client {
             + 4 // IsConnected
             + 4 // LastKeepAliveTime
             ;
-    private static final List<Integer> SUPPORTED_BWAPI_VERSIONS = Arrays.asList(10002, 10003);
+    private static final List<Integer> SUPPORTED_BWAPI_VERSIONS = Arrays.asList(10003);
     private static final int MAX_COUNT = 19999;
 
     private static final int maxNumGames = 8;
