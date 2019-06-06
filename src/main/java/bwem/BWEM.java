@@ -37,6 +37,5 @@ public final class BWEM {
             throw new IllegalStateException("BWEM was not instantiated properly.");
         }
         ((BWMapInitializer) this.map).initialize();
-        this.map.assignStartingLocationsToSuitableBases();
     }
 }

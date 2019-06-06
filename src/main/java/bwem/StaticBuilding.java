@@ -12,7 +12,10 @@
 
 package bwem;
 
+import bwapi.TilePosition;
 import bwapi.Unit;
+
+import static bwapi.UnitType.Special_Right_Pit_Door;
 
 /**
  * StaticBuildings Correspond to the units in BWAPI::getStaticNeutralUnits() for which
@@ -27,6 +30,10 @@ public class StaticBuilding extends Neutral {
         //        bwem_assert(Type().isSpecialBuilding() ||
         //                    (Type() == Special_Pit_Door) ||
         //                    Type() == Special_Right_Pit_Door);
+        // https://github.com/N00byEdge/BWEM-community/blob/cf377c14a6fbad91d6bb4ce6c232a77cb22b500c/BWEM/src/neutral.cpp#L36
+        if (unit.getType() == Special_Right_Pit_Door) {
+            topLeft = topLeft.add(new TilePosition(1, 0));
+        }
     }
 
     @Override

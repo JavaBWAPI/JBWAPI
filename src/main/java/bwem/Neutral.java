@@ -28,7 +28,7 @@ import java.util.List;
 public abstract class Neutral {
     private final Unit bwapiUnit;
     private final Position pos;
-    private final TilePosition topLeft;
+    protected TilePosition topLeft;
     private final TilePosition tileSize;
     private final BWMap map;
     private Neutral nextStacked = null;
@@ -143,7 +143,7 @@ public abstract class Neutral {
     }
 
     private boolean isSameUnitTypeAs(Neutral neutral) {
-        return this.getUnit().getClass().getName().equals(neutral.getUnit().getClass().getName());
+        return this.getUnit().getType().equals(neutral.getUnit().getType());
     }
 
     private void putOnTiles() {
@@ -159,6 +159,12 @@ public abstract class Neutral {
                     deltaTile.addNeutral(this);
                 } else {
                     final Neutral topNeutral = deltaTile.getNeutral().getLastStacked();
+
+                    // https://github.com/N00byEdge/BWEM-community/issues/30#issuecomment-400840140
+                    if (!topNeutral.getTopLeft().equals(getTopLeft()) || !topNeutral.getBottomRight().equals(getBottomRight())) {
+                        continue;
+                    }
+
                     if (this.equals(deltaTile.getNeutral())) {
                         throw new IllegalStateException();
                     } else if (this.equals(topNeutral)) {
@@ -176,7 +182,7 @@ public abstract class Neutral {
                         //                    bwem_assert_plus(pTop->topLeft() == topLeft(), "stacked neutrals
                         throw new IllegalStateException(
                                 "Stacked Neutral objects not aligned: top="
-                                        + topNeutral.toString()
+                                        + topNeutral.getTopLeft().toString()
                                         + ", this="
                                         + getTopLeft().toString());
                     } else if (!(dx == 0 && dy == 0)) {

@@ -28,6 +28,7 @@ public class BWTA {
 
     public static void analyze() {
         bwem.initialize();
+        bwem.getMap().assignStartingLocationsToSuitableBases();
 
         regionMap = new HashMap<>();
         for (final Area a : bwem.getMap().getAreas()) {
