@@ -42,6 +42,12 @@ class MapKnowledge {
                 new MapData("\u0003S\u0004parkle \u00051.1", 4, 18, 16, 10)
         );
 
+        // (3)NeoAztec2.1.scx
+        put(
+                "19f00ba3a407e3f13fb60bdd2845d8ca2765cf10",
+                new MapData("\u0003N\u0004eo \u0006Aztec\u00052.1", 3, 26, 15, 25)
+        );
+
 
         // SPECIAL MAPS
     }};
