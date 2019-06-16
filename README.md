@@ -2,7 +2,7 @@
 # JBWAPI
 Pure Java [bwapi](https://github.com/bwapi/bwapi) 4.4.0 client implementation backed by [N00byEdge](https://github.com/N00byEdge)'s [JavaBWAPIBackend](https://github.com/N00byEdge/JavaBWAPIBackend) idea and automated by [Bytekeeper](https://github.com/Bytekeeper).
 
-Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.com/OpenBW/BWAPI4J).
+Also contains a modified version of the pure Java BWEM implementation from [BWAPI4J](https://github.com/OpenBW/BWAPI4J).
 
 ## goals
  - Have a similar (Java) interface to BWMirror to make porting BWMirror bots easy without all the DLL and JNI hassle and overhead.
@@ -10,8 +10,7 @@ Also contains the pure Java BWEM implementation from [BWAPI4J](https://github.co
 
 ## advantages
  - no dependency on external DLL's
- - no type marshalling
- - fast (citation needed)
+ - at least [5x](https://github.com/JavaBWAPI/JBWAPI/issues/17) faster compared to bwmirror for primitives as it directly reads the memory mapped client file. Even faster for bwapi objects as it also avoids type marshalling
  - supports both 32 and 64 bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64 bit Java which bwmirror doesn't support)
  - BWEM instead of BWTA as map analyser
 
