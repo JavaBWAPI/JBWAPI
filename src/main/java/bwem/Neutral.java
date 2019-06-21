@@ -103,7 +103,7 @@ public abstract class Neutral {
 
     void setBlocking(final List<WalkPosition> blockedAreas) {
         if (!(this.blockedAreas.isEmpty() && !blockedAreas.isEmpty())) {
-            throw new IllegalStateException();
+            return;
         }
         this.blockedAreas = blockedAreas;
     }

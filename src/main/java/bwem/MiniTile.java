@@ -186,7 +186,7 @@ public final class MiniTile {
     void setBlocked() {
         //        { bwem_assert(AreaIdMissing()); this.areaId = blockingCP; }
         if (!isAreaIdMissing()) {
-            throw new IllegalStateException();
+            return;
         }
         this.areaId = MiniTile.blockingCP;
     }
