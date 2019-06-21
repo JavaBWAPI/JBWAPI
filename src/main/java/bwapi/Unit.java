@@ -28,12 +28,8 @@ public class Unit implements Comparable<Unit>{
     private final int id;
     private final int replayID;
     // variable
-    private Player player;
-    private UnitType unitType;
     private Position position;
     private int lastPositionUpdate = -1;
-    private int lastTypeUpdate = -1;
-    private int lastPlayerUpdate = -1;
     private int lastCommandFrame;
     private UnitCommand lastCommand;
 
@@ -42,8 +38,6 @@ public class Unit implements Comparable<Unit>{
         this.unitData = unitData;
         this.game = game;
 
-        updateType(0);
-        updatePlayer(0);
         updatePosition(0);
 
         initialType = getType();
@@ -79,11 +73,11 @@ public class Unit implements Comparable<Unit>{
     }
 
     public Player getPlayer() {
-        return player;
+        return game.getPlayer(unitData.getPlayer());
     }
 
     public UnitType getType() {
-        return unitType;
+        return UnitType.idToEnum[unitData.getType()];
     }
 
     public Position getPosition() {
@@ -4118,20 +4112,6 @@ public class Unit implements Comparable<Unit>{
 
     public int compareTo(final Unit other) {
         return getID() - other.getID();
-    }
-
-    void updateType(final int frame) {
-        if (frame > lastTypeUpdate) {
-            lastTypeUpdate = frame;
-            unitType = UnitType.idToEnum[unitData.getType()];
-        }
-    }
-
-    void updatePlayer(final int frame) {
-        if (frame > lastPlayerUpdate) {
-            lastPlayerUpdate = frame;
-            player = game.getPlayer(unitData.getPlayer());
-        }
     }
 
     void updatePosition(final int frame) {
