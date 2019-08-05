@@ -3,6 +3,7 @@ package bwapi;
 import bwapi.ClientData.PlayerData;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static bwapi.UnitType.*;
@@ -24,7 +25,7 @@ public class Player {
         this.game = game;
         this.id = id;
         this.name = playerData.getName();
-        this.race = Race.races[playerData.getRace()];
+        this.race = Race.idToEnum[playerData.getRace()];
         this.playerType = PlayerType.idToEnum[playerData.getType()];
         this.force = game.getForce(playerData.getForce());
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
@@ -396,14 +397,16 @@ public class Player {
         }
     }
 
-    public boolean equals(final Object that) {
-        if (!(that instanceof Player)) {
-            return false;
-        }
-        return getID() == ((Player) that).getID();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return id == player.id;
     }
 
+    @Override
     public int hashCode() {
-        return getID();
+        return Objects.hash(id);
     }
 }

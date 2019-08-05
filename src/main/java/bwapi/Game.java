@@ -420,11 +420,11 @@ public class Game {
     }
 
     public boolean getMouseState(final MouseButton button) {
-        return gameData.getMouseState(button.value);
+        return gameData.getMouseState(button.id);
     }
 
     public boolean getKeyState(final Key key) {
-        return gameData.getKeyState(key.value);
+        return gameData.getKeyState(key.id);
     }
 
     public Position getScreenPosition() {

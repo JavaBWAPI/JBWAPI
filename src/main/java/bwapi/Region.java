@@ -121,14 +121,16 @@ public class Region {
                 u -> equals(u.getRegion()));
     }
 
-    public boolean equals(final Object that) {
-        if (!(that instanceof Region)) {
-            return false;
-        }
-        return getID() == ((Region) that).getID();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Region region = (Region) o;
+        return id == region.id;
     }
 
+    @Override
     public int hashCode() {
-        return getID();
+        return Objects.hash(id);
     }
 }

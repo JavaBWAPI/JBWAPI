@@ -2,6 +2,7 @@ package bwapi;
 
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static bwapi.UnitCommandType.*;
@@ -322,26 +323,20 @@ public class UnitCommand {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof UnitCommand)) {
-            return false;
-        }
-
-        final UnitCommand that = (UnitCommand) o;
-
-        return extra == that.extra && x == that.x && y == that.y && target.equals(that.target) && unit.equals(that.unit)
-                && type == that.type;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnitCommand that = (UnitCommand) o;
+        return x == that.x &&
+                y == that.y &&
+                extra == that.extra &&
+                type == that.type &&
+                Objects.equals(target, that.target) &&
+                Objects.equals(unit, that.unit);
     }
 
     @Override
     public int hashCode() {
-        int result = unit.hashCode();
-        result = 31 * result + type.hashCode();
-        result = 31 * result + target.hashCode();
-        result = 31 * result + x;
-        result = 31 * result + y;
-        result = 31 * result + extra;
-        return result;
+        return Objects.hash(type, target, x, y, extra, unit);
     }
-
 }

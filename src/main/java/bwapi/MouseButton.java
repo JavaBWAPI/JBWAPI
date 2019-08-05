@@ -6,10 +6,10 @@ public enum MouseButton {
     M_MIDDLE(2),
     M_MAX(3);
 
-    final int value;
+    final int id;
 
-    MouseButton(final int value) {
-        this.value = value;
+    MouseButton(final int id) {
+        this.id = id;
     }
 
 }

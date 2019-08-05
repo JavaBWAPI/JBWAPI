@@ -16,7 +16,6 @@ public enum Race {
     None(7),
     Unknown(8);
 
-    public static final Race[] races = new Race[8 + 1];
     static final UnitType[] workerTypes = {
             Zerg_Drone, Terran_SCV, Protoss_Probe,
             UnitType.None, UnitType.None, UnitType.None, // unused
@@ -43,8 +42,10 @@ public enum Race {
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
 
+    static final Race[] idToEnum = new Race[8 + 1];
+
     static {
-        Arrays.stream(Race.values()).forEach(v -> races[v.id] = v);
+        Arrays.stream(Race.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
     final int id;

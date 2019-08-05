@@ -2,6 +2,8 @@ package bwapi;
 
 import bwapi.ClientData.BulletData;
 
+import java.util.Objects;
+
 public class Bullet {
     private final BulletData bulletData;
     private final int id;
@@ -69,15 +71,16 @@ public class Bullet {
         return bulletData.isVisible(player.getID());
     }
 
-    public boolean equals(final Object that) {
-        if (!(that instanceof Bullet)) {
-            return false;
-        }
-        return getID() == ((Bullet) that).getID();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Bullet bullet = (Bullet) o;
+        return id == bullet.id;
     }
 
+    @Override
     public int hashCode() {
-        return getID();
+        return Objects.hash(id);
     }
-
 }

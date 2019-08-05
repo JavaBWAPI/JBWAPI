@@ -8,8 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static bwapi.Order.*;
-import static bwapi.Race.Terran;
-import static bwapi.Race.Zerg;
+import static bwapi.Race.*;
 import static bwapi.UnitType.*;
 
 public class Unit implements Comparable<Unit>{
@@ -390,11 +389,11 @@ public class Unit implements Comparable<Unit>{
     }
 
     public Order getOrder() {
-        return Order.orders[unitData.getOrder()];
+        return Order.idToEnum[unitData.getOrder()];
     }
 
     public Order getSecondaryOrder() {
-        return Order.orders[unitData.getSecondaryOrder()];
+        return Order.idToEnum[unitData.getSecondaryOrder()];
     }
 
     public Unit getOrderTarget() {
@@ -4099,19 +4098,21 @@ public class Unit implements Comparable<Unit>{
     }
 
 
-    public boolean equals(final Object other) {
-        if (!(other instanceof Unit)) {
-            return false;
-        }
-        return getID() == ((Unit) other).getID();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Unit unit = (Unit) o;
+        return id == unit.id;
     }
 
+    @Override
     public int hashCode() {
-        return getID();
+        return Objects.hash(id);
     }
 
     public int compareTo(final Unit other) {
-        return getID() - other.getID();
+        return id - other.id;
     }
 
     void updatePosition(final int frame) {

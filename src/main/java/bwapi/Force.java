@@ -3,6 +3,7 @@ package bwapi;
 import bwapi.ClientData.ForceData;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Force {
@@ -31,14 +32,16 @@ public class Force {
                 .collect(Collectors.toList());
     }
 
-    public boolean equals(final Object that) {
-        if (!(that instanceof Force)) {
-            return false;
-        }
-        return getID() == ((Force) that).getID();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Force force = (Force) o;
+        return id == force.id;
     }
 
+    @Override
     public int hashCode() {
-        return getID();
+        return Objects.hash(id);
     }
 }
