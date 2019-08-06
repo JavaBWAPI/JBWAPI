@@ -35,6 +35,28 @@ class Point {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
+        int max = Math.abs(x1 - x2);
+        int min = Math.abs(y1 - y2);
+        if (max < min) {
+            final int temp = min;
+            min = max;
+            max = temp;
+        }
+
+        if (min <= (max >> 2)) {
+            return max;
+        }
+
+        final int minCalc = (3 * min) >> 3;
+        return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
+    }
+
+    public int getApproxDistance(final Point point) {
+        return getApproxDistance(x, y, point.x, point.y);
+    }
+
+
     public boolean equals(final Object o) {
         if (o != null && this.getClass().equals(o.getClass())) {
             final Point point = (Point) o;
