@@ -124,7 +124,7 @@ class Client {
 
     int addString(final String s) {
         int stringCount = data.getStringCount();
-        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
+        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many strings!");
         data.setStringCount(stringCount + 1);
         data.setStrings(stringCount, s);
         return stringCount;

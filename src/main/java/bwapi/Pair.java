@@ -52,12 +52,12 @@ public class Pair<K,V> {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (o instanceof Pair) {
-            final Pair op = (Pair)o;
-            return first.equals(op.first) && second.equals(op.second);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pair pair = (Pair) o;
+        return Objects.equals(first, pair.first) &&
+                Objects.equals(second, pair.second);
     }
 
     @Override

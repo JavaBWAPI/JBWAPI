@@ -57,13 +57,13 @@ class Point {
     }
 
 
-    public boolean equals(final Object o) {
-        if (o != null && this.getClass().equals(o.getClass())) {
-            final Point point = (Point) o;
-            return x == point.x && y == point.y;
-        }
-        return false;
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point point = (Point) o;
+        return x == point.x &&
+                y == point.y;
     }
 
     /**
@@ -75,6 +75,7 @@ class Point {
                 scalar * y < game.mapPixelHeight();
     }
 
+    @Override
     public int hashCode() {
         return (x << 16) ^ y;
     }
