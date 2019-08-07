@@ -13,6 +13,12 @@ import static bwapi.Point.TILE_WALK_FACTOR;
 import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
+/**
+ * The abstract Game class is implemented by BWAPI and is the primary means of obtaining all
+ * game state information from Starcraft Broodwar. Game state information includes all units,
+ * resources, players, forces, bullets, terrain, fog of war, regions, etc.
+ *
+ */
 public class Game {
     private static final int[][] damageRatio = {
             // Ind, Sml, Med, Lrg, Non, Unk
@@ -318,68 +324,165 @@ public class Game {
         shape.setIsSolid(isSolid);
     }
 
+    /**
+     * Retrieves the set of all teams/forces. Forces are commonly seen in @UMS
+     * game types and some others such as @TvB and the team versions of game types.
+     *
+     * @return List<Force> containing all forces in the game.
+     */
     public List<Force> getForces() {
         return forceSet;
     }
 
+    /**
+     * Retrieves the set of all players in the match. This includes the neutral
+     * player, which owns all the resources and critters by default.
+     *
+     * @return List<Player> containing all players in the game.
+     */
     public List<Player> getPlayers() {
         return playerSet;
     }
 
+    /**
+     * Retrieves the set of all accessible units. If
+     * Flag#CompleteMapInformation is enabled, then the set also includes units that are not
+     * visible to the player.
+     *
+     * @note Units that are inside refineries are not included in this set.
+     *
+     * @return List<Unit> containing all known units in the game.
+     */
     public List<Unit> getAllUnits() {
         return allUnits;
     }
 
+    /**
+     * Retrieves the set of all accessible @minerals in the game.
+     *
+     * @return List<Unit> containing @minerals
+     */
     public List<Unit> getMinerals() {
         return getAllUnits().stream()
                 .filter(u -> u.getType().isMineralField())
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the set of all accessible @geysers in the game.
+     *
+     * @return List<Unit> containing @geysers
+     */
     public List<Unit> getGeysers() {
         return getAllUnits().stream()
                 .filter(u -> u.getType() == Resource_Vespene_Geyser)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the set of all accessible neutral units in the game. This
+     * includes @minerals, @geysers, and @critters.
+     *
+     * @return List<Unit> containing all neutral units.
+     */
     public List<Unit> getNeutralUnits() {
         return getAllUnits().stream()
                 .filter(u -> u.getPlayer().equals(neutral()))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the set of all @minerals that were available at the beginning of the
+     * game.
+     *
+     * @note This set includes resources that have been mined out or are inaccessible.
+     *
+     * @return List<Unit> containing static @minerals
+     */
     public List<Unit> getStaticMinerals() {
         return staticMinerals;
     }
 
+    /**
+     * Retrieves the set of all @geysers that were available at the beginning of the
+     * game.
+     *
+     * @note This set includes resources that are inaccessible.
+     *
+     * @return List<Unit> containing static @geysers
+     */
     public List<Unit> getStaticGeysers() {
         return staticGeysers;
     }
 
+    /**
+     * Retrieves the set of all units owned by the neutral player (resources, critters,
+     * etc.) that were available at the beginning of the game.
+     *
+     * @note This set includes units that are inaccessible.
+     *
+     * @return List<Unit> containing static neutral units
+     */
     public List<Unit> getStaticNeutralUnits() {
         return staticNeutralUnits;
     }
 
+    /**
+     * Retrieves the set of all accessible bullets.
+     *
+     * @return List<Bullet> containing all accessible Bullet objects.
+     */
     public List<Bullet> getBullets() {
         return Arrays.stream(bullets)
                 .filter(Bullet::exists)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the set of all accessible @Nuke dots.
+     *
+     * @note Nuke dots are the red dots painted by a @Ghost when using the nuclear strike ability.
+     *
+     * @return Set of Positions giving the coordinates of nuke locations.
+     */
     public List<Position> getNukeDots() {
         return IntStream.range(0, gameData.getNukeDotCount())
                 .mapToObj(id -> new Position(gameData.getNukeDots(id)))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the Force object associated with a given identifier.
+     *
+     * @param forceID The identifier for the Force object.
+     *
+     * @return Force object mapped to the given \p forceID.
+     * @retval null if the given identifier is invalid.
+     */
     public Force getForce(final int forceID) {
         return forces[forceID];
     }
 
+    /**
+     * Retrieves the Player object associated with a given identifier.
+     *
+     * @param playerID The identifier for the Player object.
+     *
+     * @return Player object mapped to the given \p playerID.
+     * @retval null if the given identifier is invalid.
+     */
     public Player getPlayer(final int playerID) {
         return players[playerID];
     }
 
+    /**
+     * Retrieves the Unit object associated with a given identifier.
+     *
+     * @param unitID The identifier for the Unit object.
+     *
+     * @return Unit object mapped to the given \p unitID.
+     * @retval null if the given identifier is invalid.
+     */
     public Unit getUnit(final int unitID) {
         if (unitID < 0 || unitID >= units.length) {
             return null;
@@ -387,46 +490,131 @@ public class Game {
         return units[unitID];
     }
 
+    /**
+     * Retrieves the Region object associated with a given identifier.
+     *
+     * @param regionID The identifier for the Region object.
+     *
+     * @return Region object mapped to the given \p regionID.
+     * @retval null if the given ID is invalid.
+     */
     public Region getRegion(final int regionID) {
         return regions[regionID];
     }
 
+    /**
+     * Retrieves the GameType of the current game.
+     *
+     * @return GameType indicating the rules of the match.
+     * @see GameType
+     */
     public GameType getGameType() {
         return GameType.idToEnum[gameData.getGameType()];
     }
 
+    /**
+     * Retrieves the current latency setting that the game is set to. Latency
+     * indicates the delay between issuing a command and having it processed.
+     *
+     * @return The latency setting of the game, which is of Latency.
+     * @see Latency
+     *
+     * @todo Change return type to Latency without breaking everything.
+     */
     public Latency getLatency() {
         return Latency.idToEnum[gameData.getLatency()];
     }
 
+    /**
+     * Retrieves the number of logical frames since the beginning of the match.
+     * If the game is paused, then getFrameCount will not increase.
+     *
+     * @return Number of logical frames that have elapsed since the game started as an integer.
+     */
     public int getFrameCount() {
         return gameData.getFrameCount();
     }
 
+    /**
+     * Retrieves the maximum number of logical frames that have been recorded in a
+     * replay. If the game is not a replay, then the value returned is undefined.
+     *
+     * @return The number of logical frames that the replay contains.
+     */
     public int getReplayFrameCount() {
         return gameData.getReplayFrameCount();
     }
 
+    /**
+     * Retrieves the logical frame rate of the game in frames per second (FPS).
+     *
+     * Example:
+     * @return Logical frames per second that the game is currently running at as an integer.
+     * @see getAverageFPS
+     */
     public int getFPS() {
         return gameData.getFps();
     }
 
+    /**
+     * Retrieves the average logical frame rate of the game in frames per second (FPS).
+     *
+     * @return Average logical frames per second that the game is currently running at as a
+     * double.
+     * @see getFPS
+     */
     public double getAverageFPS() {
         return gameData.getAverageFPS();
     }
 
+    /**
+     * Retrieves the position of the user's mouse on the screen, in Position coordinates.
+     *
+     * @return Position indicating the location of the mouse.
+     * @retval Position.Unknown if Flag#UserInput is disabled.
+     */
     public Position getMousePosition() {
         return new Position(gameData.getMouseX(), gameData.getMouseY());
     }
 
+    /**
+     * Retrieves the state of the given mouse button.
+     *
+     * @param button A MouseButton enum member indicating which button on the mouse to check.
+     *
+     * @return A boolean indicating the state of the given \p button. true if the button was pressed
+     * and false if it was not.
+     * @retval false always if Flag#UserInput is disabled.
+     *
+     * @see MouseButton
+     */
     public boolean getMouseState(final MouseButton button) {
         return gameData.getMouseState(button.id);
     }
 
+    /**
+     * Retrieves the state of the given keyboard key.
+     *
+     * @param key A Key enum member indicating which key on the keyboard to check.
+     *
+     * @return A boolean indicating the state of the given \p key. true if the key was pressed
+     * and false if it was not.
+     * @retval false always if Flag#UserInput is disabled.
+     *
+     * @see Key
+     */
     public boolean getKeyState(final Key key) {
         return gameData.getKeyState(key.id);
     }
 
+    /**
+     * Retrieves the top left position of the viewport from the top left corner of the
+     * map, in pixels.
+     *
+     * @return Position containing the coordinates of the top left corner of the game's viewport.
+     * @retval Position.Unknown always if Flag#UserInput is disabled.
+     * @see setScreenPosition
+     */
     public Position getScreenPosition() {
         return new Position(gameData.getScreenX(), gameData.getScreenY());
     }
@@ -435,10 +623,25 @@ public class Game {
         setScreenPosition(p.x, p.y);
     }
 
+    /**
+     * Moves the top left corner of the viewport to the provided position relative to
+     * the map's origin (top left (0,0)).
+     *
+     * @param x The x coordinate to move the screen to, in pixels.
+     * @param y The y coordinate to move the screen to, in pixels.
+     * @see getScreenPosition
+     */
     public void setScreenPosition(final int x, final int y) {
         addCommand(SetScreenPosition, x, y);
     }
 
+    /**
+     * Pings the minimap at the given position. Minimap pings are visible to
+     * allied players.
+     *
+     * @param x The x coordinate to ping at, in pixels, from the map's origin (left).
+     * @param y The y coordinate to ping at, in pixels, from the map's origin (top).
+     */
     public void pingMinimap(final int x, final int y) {
         addCommand(PingMinimap, x, y);
     }
@@ -447,10 +650,36 @@ public class Game {
         pingMinimap(p.x, p.y);
     }
 
+    /**
+     * Checks if the state of the given flag is enabled or not.
+     *
+     * @note Flags may only be enabled at the start of the match during the AIModule#onStart
+     * callback.
+     *
+     * @param flag The Flag entry describing the flag's effects on BWAPI.
+     *
+     * @return true if the given \p flag is enabled, false if the flag is disabled.
+     *
+     * @see Flag
+     *
+     * @todo Take Flag as parameter instead of int
+     */
     public boolean isFlagEnabled(final Flag flag) {
         return gameData.getFlags(flag.id);
     }
 
+    /**
+     * Enables the state of a given flag.
+     *
+     * @note Flags may only be enabled at the start of the match during the AIModule#onStart
+     * callback.
+     *
+     * @param flag The Flag entry describing the flag's effects on BWAPI.
+     *
+     * @see Flag
+     *
+     * @todo Take Flag as parameter instead of int
+     */
     public void enableFlag(final Flag flag) {
         addCommand(EnableFlag, flag.id, 1);
     }
@@ -463,6 +692,16 @@ public class Game {
         return getUnitsOnTile(tileX, tileY, u -> true);
     }
 
+    /**
+     * Retrieves the set of accessible units that are on a given build tile.
+     *
+     * @param tileX The X position, in tiles.
+     * @param tileY The Y position, in tiles.
+     * @param pred A function predicate that indicates which units are included in the returned set.
+     *
+     * @return A List<Unit> object consisting of all the units that have any part of them on the
+     * given build tile.
+     */
     public List<Unit> getUnitsOnTile(final int tileX, final int tileY, final UnitFilter pred) {
         return getAllUnits().stream().filter(u -> {
             final TilePosition tp = u.getTilePosition();
@@ -474,6 +713,18 @@ public class Game {
         return getUnitsInRectangle(left, top, right, bottom, u -> true);
     }
 
+    /**
+     * Retrieves the set of accessible units that are in a given rectangle.
+     *
+     * @param left The X coordinate of the left position of the bounding box, in pixels.
+     * @param top The Y coordinate of the top position of the bounding box, in pixels.
+     * @param right The X coordinate of the right position of the bounding box, in pixels.
+     * @param bottom The Y coordinate of the bottom position of the bounding box, in pixels.
+     * @param pred A function predicate that indicates which units are included in the returned set.
+     *
+     * @return A List<Unit> object consisting of all the units that have any part of them within the
+     * given rectangle bounds.
+     */
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getAllUnits().stream().filter(u ->
             left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.operation(u))
@@ -492,6 +743,18 @@ public class Game {
         return getUnitsInRadius(x, y, radius, u -> true);
     }
 
+    /**
+     * Retrieves the set of accessible units that are within a given radius of a
+     * position.
+     *
+     * @param x The x coordinate of the center, in pixels.
+     * @param y The y coordinate of the center, in pixels.
+     * @param radius The radius from the center, in pixels, to include units.
+     * @param pred A function predicate that indicates which units are included in the returned set.
+     *
+     * @return A List<Unit> object consisting of all the units that have any part of them within the
+     * given radius from the center position.
+     */
     public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter pred) {
         return getUnitsInRadius(new Position(x, y), radius, pred);
     }
@@ -510,6 +773,19 @@ public class Game {
         return getClosestUnitInRectangle(center, left, top, right, bottom, u -> true);
     }
 
+    /**
+     * Retrieves the closest unit to center that matches the criteria of the callback
+     * pred within an optional rectangle.
+     *
+     * @param center The position to start searching for the closest unit.
+     * @param pred The UnitFilter predicate to determine which units should be included. This includes all units by default.
+     * @param left The left position of the rectangle. This value is 0 by default.
+     * @param top The top position of the rectangle. This value is 0 by default.
+     * @param right The right position of the rectangle. This value includes the entire map width by default.
+     * @param bottom The bottom position of the rectangle. This value includes the entire map height by default.
+     *
+     * @see UnitFilter
+     */
     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getUnitsInRectangle(left, top, right, bottom, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
@@ -527,15 +803,40 @@ public class Game {
         return getClosestUnit(center, radius, u -> true);
     }
 
+    /**
+     * Retrieves the closest unit to center that matches the criteria of the callback
+     * pred within an optional radius.
+     *
+     * @param center The position to start searching for the closest unit.
+     * @param pred The UnitFilter predicate to determine which units should be included. This includes all units by default.
+     * @param radius The radius to search in. If omitted, the entire map will be searched.
+     *
+     * @return The desired unit that is closest to center.
+     * @retval null If a suitable unit was not found.
+     *
+     * @see getBestUnit, UnitFilter
+     */
     public Unit getClosestUnit(final Position center, final int radius, final UnitFilter pred) {
         return getUnitsInRadius(center, radius, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
+    /**
+     * Retrieves the width of the map in build tile units.
+     *
+     * @return Width of the map in tiles.
+     * @see mapHeight
+     */
     public int mapWidth() {
         return mapWidth;
     }
 
+    /**
+     * Retrieves the height of the map in build tile units.
+     *
+     * @return Height of the map in tiles.
+     * @see mapHeight
+     */
     public int mapHeight() {
         return mapHeight;
     }
@@ -548,22 +849,69 @@ public class Game {
         return mapPixelHeight;
     }
 
+    /**
+     * Retrieves the file name of the currently loaded map.
+     *
+     * @return Map file name as String object.
+     *
+     * @see mapPathName, mapName
+     *
+     * @TODO: Note on campaign files.
+     */
     public String mapFileName() {
         return mapFileName;
     }
 
+    /**
+     * Retrieves the full path name of the currently loaded map.
+     *
+     * @return Map file name as String object.
+     *
+     * @see mapFileName, mapName
+     *
+     * @TODO: Note on campaign files.
+     */
     public String mapPathName() {
         return mapPathName;
     }
 
+    /**
+     * Retrieves the title of the currently loaded map.
+     *
+     * @return Map title as String object.
+     *
+     * @see mapFileName, mapPathName
+     */
     public String mapName() {
         return mapName;
     }
 
+    /**
+     * Calculates the SHA-1 hash of the currently loaded map file.
+     *
+     * @return String object containing SHA-1 hash.
+     *
+     * @note Campaign maps will return a hash of their internal map chunk components(.chk), while
+     * standard maps will return a hash of their entire map archive (.scm,.scx).
+     *
+     * @TODO: Note on replays.
+     */
     public String mapHash() {
         return mapHash;
     }
 
+    /**
+     * Checks if the given mini-tile position is walkable.
+     *
+     * @note This function only checks if the static terrain is walkable. Its current occupied
+     * state is excluded from this check. To see if the space is currently occupied or not, then
+     * see #getUnitsInRectangle .
+     *
+     * @param walkX The x coordinate of the mini-tile, in mini-tile units (8 pixels).
+     * @param walkY The y coordinate of the mini-tile, in mini-tile units (8 pixels).
+     *
+     * @return true if the mini-tile is walkable and false if it is impassable for ground units.
+     */
     public boolean isWalkable(final int walkX, final int walkY) {
         return isWalkable(new WalkPosition(walkX, walkY));
     }
@@ -575,6 +923,21 @@ public class Game {
         return walkable[position.x][position.y];
     }
 
+    /**
+     * Returns the ground height at the given tile position.
+     *
+     * @param tileX X position to query, in tiles
+     * @param tileY Y position to query, in tiles
+     *
+     * @return The tile height as an integer. Possible values are:
+     *     - 0: Low ground
+     *     - 1: Low ground doodad
+     *     - 2: High ground
+     *     - 3: High ground doodad
+     *     - 4: Very high ground
+     *     - 5: Very high ground doodad
+     *     .
+     */
     public int getGroundHeight(final int tileX, final int tileY) {
         return getGroundHeight(new TilePosition(tileX, tileY));
     }
@@ -590,6 +953,19 @@ public class Game {
         return isBuildable(tileX, tileY, false);
     }
 
+    /**
+     * Checks if a given tile position is buildable. This means that, if all
+     * other requirements are met, a structure can be placed on this tile. This function uses
+     * static map data.
+     *
+     * @param tileX The x value of the tile to check.
+     * @param tileY The y value of the tile to check.
+     * @param includeBuildings If this is true, then this function will also check if any visible structures are occupying the space. If this value is false, then it only checks the static map data for tile buildability. This value is false by default.
+     *
+     * @return boolean identifying if the given tile position is buildable (true) or not (false).
+     * If \p includeBuildings was provided, then it will return false if a structure is currently
+     * occupying the tile.
+     */
     public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
         return isBuildable(new TilePosition(tileX, tileY), includeBuildings);
     }
@@ -605,6 +981,16 @@ public class Game {
         return buildable[position.x][position.y] && (!includeBuildings || !gameData.isOccupied(position.x, position.y));
     }
 
+    /**
+     * Checks if a given tile position is visible to the current player.
+     *
+     * @param tileX The x value of the tile to check.
+     * @param tileY The y value of the tile to check.
+     *
+     * @return boolean identifying the visibility of the tile. If the given tile is visible, then
+     * the value is true. If the given tile is concealed by the fog of war, then this value will
+     * be false.
+     */
     public boolean isVisible(final int tileX, final int tileY) {
         return isVisible(new TilePosition(tileX, tileY));
     }
@@ -616,6 +1002,19 @@ public class Game {
         return gameData.isVisible(position.x, position.y);
     }
 
+    /**
+     * Checks if a given tile position has been explored by the player. An
+     * explored tile position indicates that the player has seen the location at some point in the
+     * match, partially revealing the fog of war for the remainder of the match.
+     *
+     * @param tileX The x tile coordinate to check.
+     * @param tileY The y tile coordinate to check.
+     *
+     * @retval true If the player has explored the given tile position (partially revealed fog).
+     * @retval false If the tile position was never explored (completely black fog).
+     *
+     * @see isVisible
+     */
     public boolean isExplored(final int tileX, final int tileY) {
         return isExplored(new TilePosition(tileX, tileY));
     }
@@ -627,6 +1026,15 @@ public class Game {
         return gameData.isExplored(position.x, position.y);
     }
 
+    /**
+     * Checks if the given tile position has @Zerg creep on it.
+     *
+     * @param tileX The x tile coordinate to check.
+     * @param tileY The y tile coordinate to check.
+     *
+     * @retval true If the given tile has creep on it.
+     * @retval false If the given tile does not have creep, or if it is concealed by the fog of war.
+     */
     public boolean hasCreep(final int tileX, final int tileY) {
         return hasCreep(new TilePosition(tileX, tileY));
     }
@@ -642,6 +1050,17 @@ public class Game {
         return hasPowerPrecise(new Position(x, y));
     }
 
+    /**
+     * Checks if the given pixel position is powered by an owned @Protoss_Pylon for an
+     * optional unit type.
+     *
+     * @param x The x pixel coordinate to check.
+     * @param y The y pixel coordinate to check.
+     * @param unitType Checks if the given UnitType requires power or not. If ommitted, then it will assume that the position requires power for any unit type.
+     *
+     * @retval true if the type at the given position will have power.
+     * @retval false if the type at the given position will be unpowered.
+     */
     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
         return hasPowerPrecise(new Position(x, y), unitType);
     }
@@ -680,6 +1099,17 @@ public class Game {
         return hasPower(tileX, tileY, tileWidth, tileHeight, UnitType.Unknown);
     }
 
+    /**
+     * Checks if the given tile position if powered by an owned @Protoss_Pylon for an
+     * optional unit type.
+     *
+     * @param tileX The x tile coordinate to check.
+     * @param tileY The y tile coordinate to check.
+     * @param unitType Checks if the given UnitType will be powered if placed at the given tile position. If omitted, then only the immediate tile position is checked for power, and the function will assume that the location requires power for any unit type.
+     *
+     * @retval true if the type at the given tile position will receive power.
+     * @retval false if the type will be unpowered at the given tile position.
+     */
     public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
         return hasPowerPrecise(tileX * 32 + tileWidth * 16, tileY * 32 + tileHeight * 16, unitType);
     }
@@ -700,6 +1130,27 @@ public class Game {
         return canBuildHere(position, type, null);
     }
 
+    /**
+     * Checks if the given unit type can be built at the given build tile position.
+     * This function checks for creep, power, and resource distance requirements in addition to
+     * the tiles' buildability and possible units obstructing the build location.
+     *
+     * @note If the type is an addon and a builer is provided, then the location of the addon will
+     * be placed 4 tiles to the right and 1 tile down from the given \p position. If the builder
+     * is not given, then the check for the addon will be conducted at position.
+     *
+     * @note If \p type is UnitType.Special_Start_Location, then the area for a resource depot
+     * (@Command_Center, @Hatchery, @Nexus) is checked as normal, but any potential obstructions
+     * (existing structures, creep, units, etc.) are ignored.
+     *
+     * @param position Indicates the tile position that the top left corner of the structure is intended to go.
+     * @param type The UnitType to check for.
+     * @param builder The intended unit that will build the structure. If specified, then this function will also check if there is a path to the build site and exclude the builder from the set of units that may be blocking the build site.
+     * @param checkExplored If this parameter is true, it will also check if the target position has been explored by the current player. This value is false by default, ignoring the explored state of the build site.
+     *
+     * @return true indicating that the structure can be placed at the given tile position, and
+     * false if something may be obstructing the build location.
+     */
     public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
         // lt = left top, rb = right bottom
         final TilePosition lt = builder != null && type.isAddon() ?
@@ -819,6 +1270,18 @@ public class Game {
         return canMake(type, null);
     }
 
+    /**
+     * Checks all the requirements in order to make a given unit type for the current
+     * player. These include resources, supply, technology tree, availability, and
+     * required units.
+     *
+     * @param type The UnitType to check.
+     * @param builder The Unit that will be used to build/train the provided unit \p type. If this value is null or excluded, then the builder will be excluded in the check.
+     *
+     * @return true indicating that the type can be made. If \p builder is provided, then it is
+     * only true if \p builder can make the \p type. Otherwise it will return false, indicating
+     * that the unit type can not be made.
+     */
     public boolean canMake(final UnitType type, final Unit builder) {
         final Player pSelf = self();
         // Error checking
@@ -937,6 +1400,19 @@ public class Game {
         return canResearch(type, null);
     }
 
+    /**
+     * Checks all the requirements in order to research a given technology type for the
+     * current player. These include resources, technology tree, availability, and
+     * required units.
+     *
+     * @param type The TechType to check.
+     * @param unit The Unit that will be used to research the provided technology \p type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param checkCanIssueCommandType TODO fill this in
+     *
+     * @return true indicating that the type can be researched. If \p unit is provided, then it is
+     * only true if \p unit can research the \p type. Otherwise it will return false, indicating
+     * that the technology can not be researched.
+     */
     public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
         final Player self = self();
         // Error checking
@@ -989,6 +1465,19 @@ public class Game {
         return canUpgrade(type, null);
     }
 
+    /**
+     * Checks all the requirements in order to upgrade a given upgrade type for the
+     * current player. These include resources, technology tree, availability, and
+     * required units.
+     *
+     * @param type The UpgradeType to check.
+     * @param unit The Unit that will be used to upgrade the provided upgrade \p type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param checkCanIssueCommandType TODO fill this in
+     *
+     * @return true indicating that the type can be upgraded. If \p unit is provided, then it is
+     * only true if \p unit can upgrade the \p type. Otherwise it will return false, indicating
+     * that the upgrade can not be upgraded.
+     */
     public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
         final Player self = self();
         if (self == null) {
@@ -1034,62 +1523,181 @@ public class Game {
         return self.gas() >= type.gasPrice(nextLvl);
     }
 
+    /**
+     * Retrieves the set of all starting locations for the current map. A
+     * starting location is essentially a candidate for a player's spawn point.
+     *
+     * @return A TilePosition#list containing all the TilePosition objects that indicate a start
+     * location.
+     * @see Player#getStartLocation
+     */
     public List<TilePosition> getStartLocations() {
         return startLocations;
     }
 
+    /**
+     * Prints text to the screen as a notification. This function allows text
+     * formatting using Text members. The behaviour of this function is the same as printf,
+     * located in header cstdio.
+     *
+     * @note That text printed through this function is not seen by other players or in replays.
+     *
+     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
+     * @param ... The arguments that will be formatted using the given text formatting.
+     *
+     * @see Text, std#printf
+     */
     public void printf(final String string) {
         addCommand(Printf, client.addString(string), 0);
     }
 
+    /**
+     * Sends a text message to all other players in the game. The behaviour of
+     * this function is the same as std#printf, located in header cstdio.
+     *
+     * @note In a single player game this function can be used to execute cheat codes.
+     *
+     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
+     *
+     * @see sendTextEx, std#printf
+     */
     public void sendText(final String string) {
         addCommand(SendText, client.addString(string), 0);
     }
 
+    /**
+     * An extended version of Game#sendText which allows messages to be forwarded to
+     * allies. The behaviour of this function is the same as std#printf, located in
+     * header cstdio.
+     *
+     * @param toAllies If this parameter is set to true, then the message is only sent to allied players, otherwise it will be sent to all players.
+     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
+     *
+     * @see sendText, std#printf
+     */
     public void sendTextEx(final boolean toAllies, final String string) {
         addCommand(SendText, client.addString(string), toAllies ? 1 : 0);
     }
 
+    /**
+     * Checks if the current client is inside a game.
+     *
+     * @return true if the client is in a game, and false if it is not.
+     */
     public boolean isInGame() {
         return gameData.isInGame();
     }
 
+    /**
+     * Checks if the current client is inside a multiplayer game.
+     *
+     * @return true if the client is in a multiplayer game, and false if it is a single player
+     * game, a replay, or some other state.
+     */
     public boolean isMultiplayer() {
         return multiplayer;
     }
 
+    /**
+     * Checks if the client is in a game that was created through the Battle.net
+     * multiplayer gaming service.
+     *
+     * @return true if the client is in a multiplayer Battle.net game and false if it is not.
+     */
     public boolean isBattleNet() {
         return battleNet;
     }
 
+    /**
+     * Checks if the current game is paused. While paused, AIModule#onFrame
+     * will still be called.
+     *
+     * @return true if the game is paused and false otherwise
+     * @see pauseGame, resumeGame
+     */
     public boolean isPaused() {
         return gameData.isPaused();
     }
 
+    /**
+     * Checks if the client is watching a replay.
+     *
+     * @return true if the client is watching a replay and false otherwise
+     */
     public boolean isReplay() {
         return replay;
     }
 
+    /**
+     * Pauses the game. While paused, AIModule#onFrame will still be called.
+     * @see resumeGame
+     */
     public void pauseGame() {
         addCommand(PauseGame, 0, 0);
     }
 
+    /**
+     * Resumes the game from a paused state.
+     * @see pauseGame
+     */
     public void resumeGame() {
         addCommand(ResumeGame, 0, 0);
     }
 
+    /**
+     * Leaves the current game by surrendering and enters the post-game statistics/score
+     * screen.
+     */
     public void leaveGame() {
         addCommand(LeaveGame, 0, 0);
     }
 
+    /**
+     * Restarts the match. Works the same as if the match was restarted from
+     * the in-game menu (F10). This option is only available in single player games.
+     *
+     * @todo return a boolean indicating success, document error code for invalid state
+     */
     public void restartGame() {
         addCommand(RestartGame, 0, 0);
     }
 
+    /**
+     * Sets the number of milliseconds Broodwar spends in each frame. The
+     * default values are as follows:
+     *   - Fastest: 42ms/frame
+     *   - Faster: 48ms/frame
+     *   - Fast: 56ms/frame
+     *   - Normal: 67ms/frame
+     *   - Slow: 83ms/frame
+     *   - Slower: 111ms/frame
+     *   - Slowest: 167ms/frame
+     *
+     * @note Specifying a value of 0 will not guarantee that logical frames are executed as fast
+     * as possible. If that is the intention, use this in combination with #setFrameSkip.
+     *
+     * @bug Changing this value will cause the execution of @UMS scenario triggers to glitch.
+     * This will only happen in campaign maps and custom scenarios (non-melee).
+     *
+     * @param speed The time spent per frame, in milliseconds. A value of 0 indicates that frames are executed immediately with no delay. Negative values will restore the default value as listed above.
+     *
+     * @see setFrameSkip, getFPS
+     */
     public void setLocalSpeed(final int speed) {
         addCommand(SetLocalSpeed, speed, 0);
     }
 
+    /**
+     * Issues a given command to a set of units. This function automatically
+     * splits the set into groups of 12 and issues the same command to each of them. If a unit
+     * is not capable of executing the command, then it is simply ignored.
+     *
+     * @param units A List<Unit> containing all the units to issue the command for.
+     * @param command A UnitCommand object containing relevant information about the command to be issued. The Unit object associated with the command will be ignored.
+     *
+     * @return true if any one of the units in the List<Unit> were capable of executing the
+     * command, and false if none of the units were capable of executing the command.
+     */
     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
         return !units.stream()
                 .map(u -> u.issueCommand(command))
@@ -1097,41 +1705,97 @@ public class Game {
                 .contains(false);
     }
 
+    /**
+     * Retrieves the set of units that are currently selected by the user outside of
+     * BWAPI. This function requires that Flag#UserInput be enabled.
+     *
+     * @return A List<Unit> containing the user's selected units. If Flag#UserInput is disabled,
+     * then this set is always empty.
+     *
+     * @see enableFlag
+     */
     public List<Unit> getSelectedUnits() {
         return IntStream.range(0, gameData.getSelectedUnitCount())
                 .mapToObj(i -> units[gameData.getSelectedUnits(i)])
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the player object that BWAPI is controlling.
+     *
+     * @return Player object representing the current player.
+     * @retval null if the current game is a replay.
+     *
+     */
     public Player self() {
         return self;
     }
 
+    /**
+     * Retrieves the Player interface that represents the enemy player. If
+     * there is more than one enemy, and that enemy is destroyed, then this function will still
+     * retrieve the same, defeated enemy. If you wish to handle multiple opponents, see the
+     * Game#enemies function.
+     *
+     * @return Player interface representing an enemy player.
+     * @retval null If there is no enemy or the current game is a replay.
+     * @see enemies
+     */
     public Player enemy() {
         return enemy;
     }
 
+    /**
+     * Retrieves the Player object representing the neutral player.
+     * The neutral player owns all the resources and critters on the map by default.
+     *
+     * @return Player interface indicating the neutral player.
+     */
     public Player neutral() {
         return neutral;
     }
 
+    /**
+     * Retrieves a set of all the current player's remaining allies.
+     *
+     * @return List<Player> containing all allied players.
+     */
     public List<Player> allies() {
         return allies;
     }
 
+    /**
+     * Retrieves a set of all the current player's remaining enemies.
+     *
+     * @return List<Player> containing all enemy players.
+     */
     public List<Player> enemies() {
         return enemies;
     }
 
+    /**
+     * Retrieves a set of all players currently observing the game. An observer
+     * is defined typically in a @UMS game type as not having any impact on the game. This means
+     * an observer cannot start with any units, and cannot have any active trigger actions that
+     * create units for it.
+     *
+     * @return List<Player> containing all currently active observer players
+     */
     public List<Player> observers() {
         return observers;
     }
 
+    /**
+     * @overload
+     */
     public void drawText(final CoordinateType ctype, final int x, final int y, final String string) {
         final int stringId = client.addString(string);
         addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
     }
 
+    /**
+     * @overload
+     */
     public void drawTextMap(final int x, final int y, final String string) {
         drawText(CoordinateType.Map, x, y, string);
     }
@@ -1140,6 +1804,9 @@ public class Game {
         drawTextMap(p.x, p.y, string);
     }
 
+    /**
+     * @overload
+     */
     public void drawTextMouse(final int x, final int y, final String string) {
         drawText(CoordinateType.Mouse, x, y, string);
     }
@@ -1149,6 +1816,9 @@ public class Game {
 
     }
 
+    /**
+     * @overload
+     */
     public void drawTextScreen(final int x, final int y, final String string) {
         drawText(CoordinateType.Screen, x, y, string);
     }
@@ -1161,6 +1831,17 @@ public class Game {
         drawBox(ctype, left, top, right, bottom, color, false);
     }
 
+    /**
+     * Draws a rectangle on the screen with the given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param left The x coordinate, in pixels, relative to ctype, of the left edge of the rectangle.
+     * @param top The y coordinate, in pixels, relative to ctype, of the top edge of the rectangle.
+     * @param right The x coordinate, in pixels, relative to ctype, of the right edge of the rectangle.
+     * @param bottom The y coordinate, in pixels, relative to ctype, of the bottom edge of the rectangle.
+     * @param color The color of the rectangle.
+     * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
+     */
     public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
         addShape(ShapeType.Box, ctype, left, top, right, bottom, 0, 0, color.id, isSolid);
     }
@@ -1169,6 +1850,9 @@ public class Game {
         drawBox(CoordinateType.Map, left, top, right, bottom, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawBoxMap(int left, int top, int right, int bottom, Color color, boolean isSolid) {
         drawBox(CoordinateType.Map, left, top, right, bottom, color, isSolid);
     }
@@ -1185,6 +1869,9 @@ public class Game {
         drawBox(CoordinateType.Mouse, left, top, right, bottom, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawBoxMouse(int left, int top, int right, int bottom, Color color, boolean isSolid) {
         drawBox(CoordinateType.Mouse, left, top, right, bottom, color, isSolid);
     }
@@ -1201,6 +1888,9 @@ public class Game {
         drawBox(CoordinateType.Screen, left, top, right, bottom, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawBoxScreen(int left, int top, int right, int bottom, Color color, boolean isSolid) {
         drawBox(CoordinateType.Screen, left, top, right, bottom, color, isSolid);
     }
@@ -1217,6 +1907,19 @@ public class Game {
         drawTriangle(ctype, ax, ay, bx, by, cx, cy, color, false);
     }
 
+    /**
+     * Draws a triangle on the screen with the given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param ax The x coordinate, in pixels, relative to ctype, of the first point.
+     * @param ay The y coordinate, in pixels, relative to ctype, of the first point.
+     * @param bx The x coordinate, in pixels, relative to ctype, of the second point.
+     * @param by The y coordinate, in pixels, relative to ctype, of the second point.
+     * @param cx The x coordinate, in pixels, relative to ctype, of the third point.
+     * @param cy The y coordinate, in pixels, relative to ctype, of the third point.
+     * @param color The color of the triangle.
+     * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
+     */
     public void drawTriangle(CoordinateType ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         addShape(ShapeType.Triangle, ctype, ax, ay, bx, by, cx, cy, color.id, isSolid);
     }
@@ -1225,6 +1928,9 @@ public class Game {
         drawTriangle(CoordinateType.Map, ax, ay, bx, by, cx, cy, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawTriangleMap(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(CoordinateType.Map, ax, ay, bx, by, cx, cy, color, isSolid);
     }
@@ -1241,6 +1947,9 @@ public class Game {
         drawTriangle(CoordinateType.Mouse, ax, ay, bx, by, cx, cy, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawTriangleMouse(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(CoordinateType.Mouse, ax, ay, bx, by, cx, cy, color, isSolid);
     }
@@ -1258,6 +1967,9 @@ public class Game {
         drawTriangle(CoordinateType.Screen, ax, ay, bx, by, cx, cy, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
         drawTriangle(CoordinateType.Screen, ax, ay, bx, by, cx, cy, color, isSolid);
     }
@@ -1274,6 +1986,16 @@ public class Game {
         drawCircle(ctype, x, y, radius, color, false);
     }
 
+    /**
+     * Draws a circle on the screen with the given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param x The x coordinate, in pixels, relative to ctype.
+     * @param y The y coordinate, in pixels, relative to ctype.
+     * @param radius The radius of the circle, in pixels.
+     * @param color The color of the circle.
+     * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
+     */
     public void drawCircle(CoordinateType ctype, int x, int y, int radius, Color color, boolean isSolid) {
         addShape(ShapeType.Circle, ctype, x, y, 0, 0, radius, 0, color.id, isSolid);
     }
@@ -1282,6 +2004,9 @@ public class Game {
         drawCircle(CoordinateType.Map, x, y, radius, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawCircleMap(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(CoordinateType.Map, x, y, radius, color, isSolid);
     }
@@ -1298,6 +2023,9 @@ public class Game {
         drawCircle(CoordinateType.Mouse, x, y, radius, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawCircleMouse(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(CoordinateType.Mouse, x, y, radius, color, isSolid);
     }
@@ -1314,6 +2042,9 @@ public class Game {
         drawCircle(CoordinateType.Screen, x, y, radius, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawCircleScreen(int x, int y, int radius, Color color, boolean isSolid) {
         drawCircle(CoordinateType.Screen, x, y, radius, color, isSolid);
     }
@@ -1330,6 +2061,17 @@ public class Game {
         drawEllipse(ctype, x, y, xrad, yrad, color, false);
     }
 
+    /**
+     * Draws an ellipse on the screen with the given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param x The x coordinate, in pixels, relative to ctype.
+     * @param y The y coordinate, in pixels, relative to ctype.
+     * @param xrad The x radius of the ellipse, in pixels.
+     * @param yrad The y radius of the ellipse, in pixels.
+     * @param color The color of the ellipse.
+     * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
+     */
     public void drawEllipse(CoordinateType ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
         addShape(ShapeType.Ellipse, ctype, x, y, 0, 0, xrad, yrad, color.id, isSolid);
     }
@@ -1338,6 +2080,9 @@ public class Game {
         drawEllipse(CoordinateType.Map, x, y, xrad, yrad, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawEllipseMap(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
         drawEllipse(CoordinateType.Map, x, y, xrad, yrad, color, isSolid);
     }
@@ -1354,6 +2099,9 @@ public class Game {
         drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawEllipseMouse(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
         drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
     }
@@ -1370,6 +2118,9 @@ public class Game {
         drawEllipse(CoordinateType.Screen, x, y, xrad, yrad, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
         drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
     }
@@ -1382,10 +2133,21 @@ public class Game {
         drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
+    /**
+     * Draws a dot on the map or screen with a given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param x The x coordinate, in pixels, relative to ctype.
+     * @param y The y coordinate, in pixels, relative to ctype.
+     * @param color The color of the dot.
+     */
     public void drawDot(CoordinateType ctype, int x, int y, Color color) {
         addShape(ShapeType.Dot, ctype, x, y, 0, 0, 0, 0, color.id, false);
     }
 
+    /**
+     * @overload
+     */
     public void drawDotMap(int x, int y, Color color) {
         drawDot(CoordinateType.Map, x, y, color);
     }
@@ -1394,6 +2156,9 @@ public class Game {
         drawDot(CoordinateType.Map, p.x, p.y, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawDotMouse(int x, int y, Color color) {
         drawDot(CoordinateType.Mouse, x, y, color);
     }
@@ -1402,6 +2167,9 @@ public class Game {
         drawDot(CoordinateType.Mouse, p.x, p.y, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawDotScreen(int x, int y, Color color) {
         drawDot(CoordinateType.Screen, x, y, color);
     }
@@ -1410,10 +2178,23 @@ public class Game {
         drawDot(CoordinateType.Screen, p.x, p.y, color);
     }
 
+    /**
+     * Draws a line on the map or screen with a given color.
+     *
+     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
+     * @param x1 The starting x coordinate, in pixels, relative to ctype.
+     * @param y1 The starting y coordinate, in pixels, relative to ctype.
+     * @param x2 The ending x coordinate, in pixels, relative to ctype.
+     * @param y2 The ending y coordinate, in pixels, relative to ctype.
+     * @param color The color of the line.
+     */
     public void drawLine(CoordinateType ctype, int x1, int y1, int x2, int y2, Color color) {
         addShape(ShapeType.Line, ctype, x1, y1, x2, y2, 0, 0, color.id, false);
     }
 
+    /**
+     * @overload
+     */
     public void drawLineMap(int x1, int y1, int x2, int y2, Color color) {
         drawLine(CoordinateType.Map, x1, y1, x2, y2, color);
     }
@@ -1422,6 +2203,9 @@ public class Game {
         drawLine(CoordinateType.Map, a.x, a.y, b.x, b.y, color);
     }
 
+    /**
+     * @overload
+     */
     public void drawLineMouse(int x1, int y1, int x2, int y2, Color color) {
         drawLine(CoordinateType.Mouse, x1, y1, x2, y2, color);
 
@@ -1432,6 +2216,9 @@ public class Game {
 
     }
 
+    /**
+     * @overload
+     */
     public void drawLineScreen(int x1, int y1, int x2, int y2, Color color) {
         drawLine(CoordinateType.Screen, x1, y1, x2, y2, color);
     }
@@ -1440,38 +2227,110 @@ public class Game {
         drawLine(CoordinateType.Screen, a.x, a.y, b.x, b.y, color);
     }
 
+    /**
+     * Retrieves the maximum delay, in number of frames, between a command being issued
+     * and the command being executed by Broodwar.
+     *
+     * @note In Broodwar, latency is used to keep the game synchronized between players without
+     * introducing lag.
+     *
+     * @return Difference in frames between commands being sent and executed.
+     * @see getLatencyTime, getRemainingLatencyFrames
+     */
     public int getLatencyFrames() {
         return gameData.getLatencyFrames();
     }
 
+    /**
+     * Retrieves the maximum delay, in milliseconds, between a command being issued and
+     * the command being executed by Broodwar.
+     *
+     * @return Difference in milliseconds between commands being sent and executed.
+     * @see getLatencyFrames, getRemainingLatencyTime
+     */
     public int getLatencyTime() {
         return gameData.getLatencyTime();
     }
 
+    /**
+     * Retrieves the number of frames it will take before a command sent in the current
+     * frame will be executed by the game.
+     *
+     * @return Number of frames until a command is executed if it were sent in the current
+     * frame.
+     * @see getRemainingLatencyTime, getLatencyFrames
+     */
     public int getRemainingLatencyFrames() {
         return gameData.getRemainingLatencyFrames();
     }
 
+    /**
+     * Retrieves the number of milliseconds it will take before a command sent in the
+     * current frame will be executed by Broodwar.
+     *
+     * @return Amount of time, in milliseconds, until a command is executed if it were sent in
+     * the current frame.
+     * @see getRemainingLatencyFrames, getLatencyTime
+     */
     public int getRemainingLatencyTime() {
         return gameData.getRemainingLatencyTime();
     }
 
+    /**
+     * Retrieves the current revision of BWAPI.
+     *
+     * @return The revision number of the current BWAPI interface.
+     *
+     * @threadsafe
+     */
     public int getRevision() {
         return revision;
     }
 
+    /**
+     * Retrieves the debug state of the BWAPI build.
+     *
+     * @return true if the BWAPI module is a DEBUG build, and false if it is a RELEASE build.
+     *
+     * @threadsafe
+     */
     public boolean isDebug() {
         return debug;
     }
 
+    /**
+     * Checks the state of latency compensation.
+     *
+     * @return true if latency compensation is enabled, false if it is disabled.
+     * @see setLatCom
+     */
     public boolean isLatComEnabled() {
         return gameData.getHasLatCom();
     }
 
+    /**
+     * Changes the state of latency compensation. Latency compensation
+     * modifies the state of BWAPI's representation of units to reflect the implications of
+     * issuing a command immediately after the command was performed, instead of waiting
+     * consecutive frames for the results. Latency compensation is enabled by default.
+     *
+     * @param isEnabled Set whether the latency compensation feature will be enabled (true) or disabled (false).
+     *
+     * @see isLatComEnabled.
+     */
     public void setLatCom(final boolean isEnabled) {
         addCommand(SetLatCom, isEnabled ? 1 : 0, 0);
     }
 
+    /**
+     * Retrieves the Starcraft instance number recorded by BWAPI to identify which
+     * Starcraft instance an AI module belongs to. The very first instance should
+     * return 0.
+     *
+     * @return  An integer value representing the instance number.
+     *
+     * @threadsafe
+     */
     public int getInstanceNumber() {
         return gameData.getInstanceID();
     }
@@ -1480,10 +2339,26 @@ public class Game {
         return getAPM(false);
     }
 
+    /**
+     * Retrieves the Actions Per Minute (APM) that the bot is producing.
+     *
+     * @param includeSelects If true, the return value will include selections as individual commands, otherwise it will exclude selections. This value is false by default.
+     *
+     * @return The number of actions that the bot has executed per minute, on average.
+     */
     public int getAPM(final boolean includeSelects) {
         return includeSelects ? gameData.getBotAPM_selects() : gameData.getBotAPM_noselects();
     }
 
+    /**
+     * Sets the number of graphical frames for every logical frame. This
+     * allows the game to run more logical frames per graphical frame, increasing the speed at
+     * which the game runs.
+     *
+     * @param frameSkip Number of graphical frames per logical frame. If this value is 0 or less, then it will default to 1.
+     *
+     * @see setLocalSpeed
+     */
     public void setFrameSkip(int frameSkip) {
         addCommand(SetFrameSkip, frameSkip, 0);
     }
@@ -1499,6 +2374,22 @@ public class Game {
     // public boolean setRevealAll();
     // public boolean setRevealAll(boolean reveal);
 
+    /**
+     * Checks if there is a path from source to destination. This only checks
+     * if the source position is connected to the destination position. This function does not
+     * check if all units can actually travel from source to destination. Because of this
+     * limitation, it has an O(1) complexity, and cases where this limitation hinders gameplay is
+     * uncommon at best.
+     *
+     * @note If making queries on a unit, it's better to call Unit#hasPath, since it is
+     * a more lenient version of this function that accounts for some edge cases.
+     *
+     * @param source The source position.
+     * @param destination The destination position.
+     *
+     * @return true if there is a path between the two positions, and false if there is not.
+     * @see Unit#hasPath
+     */
     public boolean hasPath(final Position source, final Position destination) {
         if (source.isValid(this) && destination.isValid(this)) {
             final Region rgnA = getRegionAt(source);
@@ -1512,26 +2403,154 @@ public class Game {
         textSize = TextSize.Default;
     }
 
+    /**
+     * Sets the size of the text for all calls to drawText following this one.
+     *
+     * @param size The size of the text. This value is one of Text#Size. If this value is omitted, then a default value of Text#Size#Default is used.
+     *
+     * @see Text#Size
+     */
     public void setTextSize(final TextSize size) {
         textSize = size;
     }
 
+    /**
+     * Retrieves current amount of time in seconds that the game has elapsed.
+     *
+     * @return Time, in seconds, that the game has elapsed as an integer.
+     */
     public int elapsedTime() {
         return gameData.getElapsedTime();
     }
 
+    /**
+     * Sets the command optimization level. Command optimization is a feature
+     * in BWAPI that tries to reduce the APM of the bot by grouping or eliminating unnecessary
+     * game actions. For example, suppose the bot told 24 @Zerglings to @Burrow. At command
+     * optimization level 0, BWAPI is designed to select each Zergling to burrow individually,
+     * which costs 48 actions. With command optimization level 1, it can perform the same
+     * behaviour using only 4 actions. The command optimizer also reduces the amount of bytes used
+     * for each action if it can express the same action using a different command. For example,
+     * Right_Click uses less bytes than Move.
+     *
+     * @param level An integer representation of the aggressiveness for which commands are optimized. A lower level means less optimization, and a higher level means more optimization.
+     *
+     * The values for \p level are as follows:
+     *     - 0: No optimization.
+     *     - 1: Some optimization.
+     *       - Is not detected as a hack.
+     *       - Does not alter behaviour.
+     *       - Units performing the following actions are grouped and ordered 12 at a time:
+     *         - Attack_Unit
+     *         - Morph (@Larva only)
+     *         - Hold_Position
+     *         - Stop
+     *         - Follow
+     *         - Gather
+     *         - Return_Cargo
+     *         - Repair
+     *         - Burrow
+     *         - Unburrow
+     *         - Cloak
+     *         - Decloak
+     *         - Siege
+     *         - Unsiege
+     *         - Right_Click_Unit
+     *         - Halt_Construction
+     *         - Cancel_Train (@Carrier and @Reaver only)
+     *         - Cancel_Train_Slot (@Carrier and @Reaver only)
+     *         - Cancel_Morph (for non-buildings only)
+     *         - Use_Tech
+     *         - Use_Tech_Unit
+     *         .
+     *       - The following order transformations are applied to allow better grouping:
+     *         - Attack_Unit becomes Right_Click_Unit if the target is an enemy
+     *         - Move becomes Right_Click_Position
+     *         - Gather becomes Right_Click_Unit if the target contains resources
+     *         - Set_Rally_Position becomes Right_Click_Position for buildings
+     *         - Set_Rally_Unit becomes Right_Click_Unit for buildings
+     *         - Use_Tech_Unit with Infestation becomes Right_Click_Unit if the target is valid
+     *         .
+     *       .
+     *     - 2: More optimization by grouping structures.
+     *       - Includes the optimizations made by all previous levels.
+     *       - May be detected as a hack by some replay utilities.
+     *       - Does not alter behaviour.
+     *       - Units performing the following actions are grouped and ordered 12 at a time:
+     *         - Attack_Unit (@Turrets, @Photon_Cannons, @Sunkens, @Spores)
+     *         - Train
+     *         - Morph
+     *         - Set_Rally_Unit
+     *         - Lift
+     *         - Cancel_Construction
+     *         - Cancel_Addon
+     *         - Cancel_Train
+     *         - Cancel_Train_Slot
+     *         - Cancel_Morph
+     *         - Cancel_Research
+     *         - Cancel_Upgrade
+     *         .
+     *       .
+     *     - 3: Extensive optimization
+     *       - Includes the optimizations made by all previous levels.
+     *       - Units may behave or move differently than expected.
+     *       - Units performing the following actions are grouped and ordered 12 at a time:
+     *         - Attack_Move
+     *         - Set_Rally_Position
+     *         - Move
+     *         - Patrol
+     *         - Unload_All
+     *         - Unload_All_Position
+     *         - Right_Click_Position
+     *         - Use_Tech_Position
+     *         .
+     *       .
+     *     - 4: Aggressive optimization
+     *       - Includes the optimizations made by all previous levels.
+     *       - Positions used in commands will be rounded to multiples of 32.
+     *       - @High_Templar and @Dark_Templar that merge into @Archons will be grouped and may
+     *         choose a different target to merge with. It will not merge with a target that
+     *         wasn't included.
+     *       .
+     *     .
+     *
+     */
     public void setCommandOptimizationLevel(final int level) {
         addCommand(SetCommandOptimizerLevel, level, 0);
     }
 
+    /**
+     * Returns the remaining countdown time. The countdown timer is used in
+     * @CTF and @UMS game types.
+     *
+     *
+     * @return Integer containing the time (in game seconds) on the countdown timer.
+     */
     public int countdownTimer() {
         return gameData.getCountdownTimer();
     }
 
+    /**
+     * Retrieves the set of all regions on the map.
+     *
+     * @return List<Region> containing all map regions.
+     */
     public List<Region> getAllRegions() {
         return regionSet;
     }
 
+    /**
+     * Retrieves the region at a given position.
+     *
+     * @param x The x coordinate, in pixels.
+     * @param y The y coordinate, in pixels.
+     *
+     * @return the Region interface at the given position.
+     * @retval null if the provided position is not valid (i.e. not within the map bounds).
+     *
+     * @note If the provided position is invalid, the error Error.Invalid_Parameter is set.
+     * @see getAllRegions, getRegion
+     */
     public Region getRegionAt(final int x, final int y) {
         return getRegionAt(new Position(x, y));
     }
@@ -1566,6 +2585,18 @@ public class Game {
         return getBuildLocation(type, desiredPosition, 64);
     }
 
+    /**
+     * Retrieves a basic build position just as the default Computer AI would.
+     * This allows users to find simple build locations without relying on external libraries.
+     *
+     * @param type A valid UnitType representing the unit type to accomodate space for.
+     * @param desiredPosition A valid TilePosition containing the desired placement position.
+     * @param maxRange The maximum distance (in tiles) to build from \p desiredPosition.
+     * @param creep A special boolean value that changes the behaviour of @Creep_Colony placement.
+     *
+     * @retval TilePosition.Invalid If a build location could not be found within \p maxRange.
+     * @return  A TilePosition containing the location that the structure should be constructed at.
+     */
     public TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep) {
         return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
     }
@@ -1597,6 +2628,19 @@ public class Game {
         return getDamageFrom(fromType, toType, null);
     }
 
+    /**
+     * Calculates the damage received for a given player. It can be understood
+     * as the damage from \p fromType to \p toType. Does not include shields in calculation.
+     * Includes upgrades if players are provided.
+     *
+     * @param fromType The unit type that will be dealing the damage.
+     * @param toType The unit type that will be receiving the damage.
+     * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then no player will be used to calculate the upgrades for \p fromType.
+     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then this parameter will default to game.self().
+     *
+     * @return The amount of damage that fromType would deal to toType.
+     * @see getDamageTo
+     */
     public int getDamageFrom(final UnitType fromType, final UnitType toType, final Player fromPlayer, final Player toPlayer) {
         return getDamageFromImpl(fromType, toType, fromPlayer, toPlayer == null ? self() : toPlayer);
     }
@@ -1609,11 +2653,35 @@ public class Game {
         return getDamageTo(toType, fromType, null);
     }
 
+    /**
+     * Calculates the damage dealt for a given player. It can be understood as
+     * the damage to \p toType from \p fromType. Does not include shields in calculation.
+     * Includes upgrades if players are provided.
+     *
+     * @note This function is nearly the same as #getDamageFrom. The only difference is that
+     * the last parameter is intended to default to game.self().
+     *
+     * @param toType The unit type that will be receiving the damage.
+     * @param fromType The unit type that will be dealing the damage.
+     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then no player will be used to calculate the upgrades for \p toType.
+     * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then this parameter will default to game.self().
+     *
+     * @return The amount of damage that fromType would deal to toType.
+     * @see getDamageFrom
+     */
     public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer, final Player fromPlayer) {
         return getDamageFromImpl(fromType, toType, fromPlayer == null ? self() : fromPlayer, toPlayer);
     }
 
     //Since 4.2.0
+    /**
+     * Retrieves the initial random seed that was used in this game's creation.
+     * This is used to identify the seed that started this game, in case an error occurred, so
+     * that developers can deterministically reproduce the error. Works in both games and replays.
+     *
+     * @return This game's random seed.
+     * @since 4.2.0
+     */
     public int getRandomSeed() {
         return randomSeed;
     }

@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Contains the coordinate type enumeration for relative drawing positions.
+ */
 public enum CoordinateType {
     None(0),
     Screen(1),

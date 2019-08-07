@@ -3,6 +3,14 @@ package bwapi;
 
 import java.util.Objects;
 
+/**
+ * The Color object is used in drawing routines to specify the color to use.
+ *
+ * @note Starcraft uses a 256 color palette for rendering. Thus, the colors available are
+ * limited to this palette.
+ *
+ * @see Colors
+ */
 public class Color {
     public final static Color Red = new Color(111);
     public final static Color Blue = new Color(165);
@@ -58,6 +66,11 @@ public class Color {
     private static final byte[][][] closestColor = new byte[64][64][64];
     public final int id;
 
+    /**
+     * A constructor that uses the color at the specified palette index.
+     *
+     * @param id The index of the color in the 256-color palette.
+     */
     public Color(final int r, final int g, final int b) {
         id = getRGBIndex(r, g, b);
     }

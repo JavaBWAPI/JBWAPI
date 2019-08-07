@@ -1,5 +1,12 @@
 package bwapi;
 
+/**
+ * Namespace containing unit size types.
+ *
+ * @see UnitSizeType
+ *
+ * [View on Starcraft Campendium (Official Website)](http://classic.battle.net/scc/gs/damage.shtml)<br>
+ */
 public enum UnitSizeType {
     Independent(0),
     Small(1),

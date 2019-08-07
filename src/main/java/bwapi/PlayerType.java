@@ -2,6 +2,10 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Namespace containing player types (player controllers).
+ * @see PlayerType
+ */
 public enum PlayerType {
     None(0),
     Computer(1),
@@ -29,10 +33,24 @@ public enum PlayerType {
         this.id = id;
     }
 
+    /**
+     * Identifies whether or not this type is used for the pre-game lobby.
+     * A type such as PlayerType.ComputerLeft would only appear in-game when a computer
+     * player is defeated.
+     *
+     * @return true if this type can appear in the pre-game lobby, false otherwise.
+     */
     public boolean isLobbyType() {
         return this == EitherPreferComputer || this == EitherPreferHuman || isRescueNeutralType();
     }
 
+    /**
+     * Identifies whether or not this type is used in-game. A type such as
+     * PlayerType.Closed would not be a valid in-game type.
+     *
+     * @return true if the type can appear in-game, false otherwise.
+     * @see isLobbyType
+     */
     public boolean isGameType() {
         return this == Player || this == Computer || isRescueNeutralType();
     }

@@ -1,5 +1,9 @@
 package bwapi;
 
+/**
+ * Namespace containing unit command types.
+ * @see UnitCommandType
+ */
 public enum UnitCommandType {
     Attack_Move(0),
     Attack_Unit(1),

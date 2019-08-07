@@ -7,6 +7,10 @@ import java.util.List;
 import static bwapi.Order.*;
 
 
+/**
+ * Namespace containing tech types.
+ * @see TechType
+ */
 public enum TechType {
     Stim_Packs(0),
     Lockdown(1),
@@ -187,50 +191,127 @@ public enum TechType {
         this.id = id;
     }
 
+    /**
+     * Retrieves the race that is required to research or use the TechType.
+     *
+     * @note There is an exception where @Infested_Kerrigan can use @Psi_Storm. This does not
+     * apply to the behavior of this function.
+     *
+     * @return Race object indicating which race is designed to use this technology type.
+     */
     public Race getRace() {
         return techRaces[id];
     }
 
+    /**
+     * Retrieves the mineral cost of researching this technology.
+     *
+     * @return Amount of minerals needed in order to research this technology.
+     */
     public int mineralPrice() {
         return defaultOreCost[id];
     }
 
+    /**
+     * Retrieves the vespene gas cost of researching this technology.
+     *
+     * @return Amount of vespene gas needed in order to research this technology.
+     */
     public int gasPrice() {
         return mineralPrice();
     }
 
+    /**
+     * Retrieves the number of frames needed to research the tech type.
+     *
+     * @return The time, in frames, it will take for the research to complete.
+     * @see Unit#getRemainingResearchTime
+     */
     public int researchTime() {
         return defaultTimeCost[id];
     }
 
+    /**
+     * Retrieves the amount of energy needed to use this TechType as an ability.
+     *
+     * @return Energy cost of the ability.
+     * @see Unit#getEnergy
+     */
     public int energyCost() {
         return defaultEnergyCost[id];
     }
 
+    /**
+     * Retrieves the UnitType that can research this technology.
+     *
+     * @return UnitType that is able to research the technology in the game.
+     * @retval UnitType.None If the technology/ability is either provided for free or never
+     * available.
+     */
     public UnitType whatResearches() {
         return whatResearches[id];
     }
 
+    /**
+     * Retrieves the Weapon that is attached to this tech type.
+     * A technology's WeaponType is used to indicate the range and behaviour of the ability
+     * when used by a Unit.
+     *
+     * @return WeaponType containing information about the ability's behavior.
+     * @retval WeaponType.None If there is no corresponding WeaponType.
+     */
     public WeaponType getWeapon() {
         return techWeapons[id];
     }
 
+    /**
+     * Checks if this ability can be used on other units.
+     *
+     * @return true if the ability can be used on other units, and false if it can not.
+     */
     public boolean targetsUnit() {
         return (techTypeFlags[id] & TARG_UNIT) != 0;
     }
 
+    /**
+     * Checks if this ability can be used on the terrain (ground).
+     *
+     * @return true if the ability can be used on the terrain.
+     */
     public boolean targetsPosition() {
         return (techTypeFlags[id] & TARG_POS) != 0;
     }
 
+    /**
+     * Retrieves the set of all UnitTypes that are capable of using this ability.
+     *
+     * @return Set of UnitTypes that can use this ability when researched.
+     */
     public List<UnitType> whatUses() {
         return Collections.unmodifiableList(Arrays.asList(techWhatUses[id]));
     }
 
+    /**
+     * Retrieves the Order that a Unit uses when using this ability.
+     *
+     * @return Order representing the action a Unit uses to perform this ability
+     */
     public Order getOrder() {
         return techOrders[id];
     }
 
+    /**
+     * Retrieves the UnitType required to research this technology.
+     * The required unit type must be a completed unit owned by the player researching the
+     * technology.
+     *
+     * @return UnitType that is needed to research this tech type.
+     * @retval UnitType.None if no unit is required to research this tech type.
+     *
+     * @see Player#completedUnitCount
+     *
+     * @since 4.1.2
+     */
     public UnitType requiredUnit() {
         return this == Lurker_Aspect ? UnitType.Zerg_Lair : UnitType.None;
     }

@@ -4,6 +4,10 @@ import java.util.*;
 
 import static bwapi.TechType.*;
 
+/**
+ * Namespace containing unit types.
+ * @see UnitType
+ */
 public enum UnitType {
     Terran_Marine(0),
     Terran_Ghost(1),
@@ -252,18 +256,46 @@ public enum UnitType {
         this.id = id;
     }
 
+    /**
+     * Retrieves the maximum unit width from the set of all units. Used
+     * internally to search through unit positions efficiently.
+     *
+     * @return The maximum width of all unit types, in pixels.
+     */
     public static int maxUnitWidth() {
         return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::width)).get().width();
     }
 
+    /**
+     * Retrieves the maximum unit height from the set of all units. Used
+     * internally to search through unit positions efficiently.
+     *
+     * @return The maximum height of all unit types, in pixels.
+     */
     public static int maxUnitHeight() {
         return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::height)).get().height();
     }
 
+    /**
+     * Retrieves the Race that the unit type belongs to.
+     *
+     * @return Race indicating the race that owns this unit type.
+     * @retval Race#None indicating that the unit type does not belong to any particular race (a
+     * critter for example).
+     */
     public Race getRace() {
         return UnitTypeContainer.unitRace[id];
     }
 
+    /**
+     * Obtains the source unit type that is used to build or train this unit type, as well as the
+     * amount of them that are required.
+     *
+     * @return std#pair in which the first value is the UnitType that builds this unit type, and
+     * the second value is the number of those types that are required (this value is 2 for
+     * @Archons, and 1 for all other types).
+     * @retval pair(UnitType.None,0) If this unit type cannot be made by the player.
+     */
     public Pair<UnitType, Integer> whatBuilds() {
         // Retrieve the type
         final UnitType type = UnitTypeContainer.whatBuilds[id];
@@ -278,14 +310,35 @@ public enum UnitType {
         return new Pair<>(type, count);
     }
 
+    /**
+     * Retrieves the immediate technology tree requirements to make this unit type.
+     *
+     * @return std#map containing a UnitType to number mapping of UnitTypes required.
+     */
     public Map<UnitType, Integer> requiredUnits() {
         return UnitTypeContainer.reqUnitsMap.get(id);
     }
 
+    /**
+     * Identifies the required TechType in order to create certain units.
+     *
+     * @note The only unit that requires a technology is the @Lurker, which needs @Lurker_Aspect.
+     * @return TechType indicating the technology that must be researched in order to create this
+     * unit type.
+     * @retval TechType.None If creating this unit type does not require a technology to be
+     * researched.
+     */
     public TechType requiredTech() {
         return this == Zerg_Lurker || this == Zerg_Lurker_Egg ? Lurker_Aspect : TechType.None;
     }
 
+    /**
+     * Retrieves the cloaking technology associated with certain units.
+     *
+     * @return TechType referring to the cloaking technology that this unit type uses as an
+     * ability.
+     * @retval TechType.None If this unit type does not have an active cloak ability.
+     */
     public TechType cloakingTech() {
         switch (this) {
             case Terran_Ghost:
@@ -303,154 +356,413 @@ public enum UnitType {
         }
     }
 
+    /**
+     * Retrieves the set of abilities that this unit can use, provided it is available to you in
+     * the game.
+     *
+     * @return Set of TechTypes containing ability information.
+     */
     public List<TechType> abilities() {
         return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.unitTechs[id]));
     }
 
+    /**
+     * Retrieves the set of upgrades that this unit can use to enhance its fighting ability.
+     *
+     * @return Set of UpgradeTypes containing upgrade types that will impact this unit type.
+     */
     public List<UpgradeType> upgrades() {
         return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgrades[id]));
     }
 
+    /**
+     * Retrieves the upgrade type used to increase the armor of this unit type. For each upgrade,
+     * this unit type gains +1 additional armor.
+     *
+     * @return UpgradeType indicating the upgrade that increases this unit type's armor amount.
+     */
     public UpgradeType armorUpgrade() {
         return UnitTypeContainer.armorUpgrade[id];
     }
 
+    /**
+     * Retrieves the default maximum amount of hit points that this unit type can have.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return Integer indicating the maximum amount of hit points for this unit type.
+     */
     public int maxHitPoints() {
         return UnitTypeContainer.defaultMaxHP[id];
     }
 
+    /**
+     * Retrieves the default maximum amount of shield points that this unit type can have.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return Integer indicating the maximum amount of shield points for this unit type.
+     * @retval 0 If this unit type does not have shields.
+     */
     public int maxShields() {
         return UnitTypeContainer.defaultMaxSP[id];
     }
 
+    /**
+     * Retrieves the maximum amount of energy this unit type can have by default.
+     *
+     * @return Integer indicating the maximum amount of energy for this unit type.
+     * @retval 0 If this unit does not gain energy for abilities.
+     */
     public int maxEnergy() {
         return isSpellcaster() ? isHero() ? 250 : 200 : 0;
     }
 
+    /**
+     * Retrieves the default amount of armor that the unit type starts with, excluding upgrades.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return The amount of armor the unit type has.
+     */
     public int armor() {
         return UnitTypeContainer.defaultArmorAmount[id];
     }
 
+    /**
+     * Retrieves the default mineral price of purchasing the unit.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return Mineral cost of the unit.
+     */
     public int mineralPrice() {
         return UnitTypeContainer.defaultOreCost[id];
     }
 
+    /**
+     * Retrieves the default vespene gas price of purchasing the unit.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return Vespene gas cost of the unit.
+     */
     public int gasPrice() {
         return UnitTypeContainer.defaultGasCost[id];
     }
 
+    /**
+     * Retrieves the default time, in frames, needed to train, morph, or build the unit.
+     *
+     * @note This value may not necessarily match the value seen in the @UMS game type.
+     *
+     * @return Number of frames needed in order to build the unit.
+     * @see Unit#getRemainingBuildTime
+     */
     public int buildTime() {
         return UnitTypeContainer.defaultTimeCost[id];
     }
 
+    /**
+     * Retrieves the amount of supply that this unit type will use when created. It will use the
+     * supply pool that is appropriate for its Race.
+     *
+     * @note In Starcraft programming, the managed supply values are double than what they appear
+     * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
+     *
+     * @return Integer containing the supply required to build this unit.
+     * @see supplyProvided, Player#supplyTotal, Player#supplyUsed
+     */
     public int supplyRequired() {
         return UnitTypeContainer.unitSupplyRequired[id];
     }
 
+    /**
+     * Retrieves the amount of supply that this unit type produces for its appropriate Race's
+     * supply pool.
+     *
+     * @note In Starcraft programming, the managed supply values are double than what they appear
+     * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
+     *
+     * @see supplyRequired, Player#supplyTotal, Player#supplyUsed
+     */
     public int supplyProvided() {
         return UnitTypeContainer.unitSupplyProvided[id];
     }
 
+    /**
+     * Retrieves the amount of space required by this unit type to fit inside a @Bunker or
+     * @Transport.
+     *
+     * @return Amount of space required by this unit type for transport.
+     * @retval 255 If this unit type can not be transported.
+     * @see spaceProvided
+     */
     public int spaceRequired() {
         return UnitTypeContainer.unitSpaceRequired[id];
     }
 
+    /**
+     * Retrieves the amount of space provided by this @Bunker or @Transport for unit
+     * transportation.
+     *
+     * @return The number of slots provided by this unit type.
+     * @see spaceRequired
+     */
     public int spaceProvided() {
         return UnitTypeContainer.unitSpaceProvided[id];
     }
 
+    /**
+     * Retrieves the amount of score points awarded for constructing this unit type. This value is
+     * used for calculating scores in the post-game score screen.
+     *
+     * @return Number of points awarded for constructing this unit type.
+     * @see destroyScore
+     */
     public int buildScore() {
         return UnitTypeContainer.unitBuildScore[id];
     }
 
+    /**
+     * Retrieves the amount of score points awarded for killing this unit type. This value is
+     * used for calculating scores in the post-game score screen.
+     *
+     * @return Number of points awarded for killing this unit type.
+     * @see buildScore
+     */
     public int destroyScore() {
         return UnitTypeContainer.unitDestroyScore[id];
     }
 
+    /**
+     * Retrieves the UnitSizeType of this unit, which is used in calculations along with weapon
+     * damage types to determine the amount of damage that will be dealt to this type.
+     *
+     * @return UnitSizeType indicating the conceptual size of the unit type.
+     * @see WeaponType#damageType
+     */
     public UnitSizeType size() {
         return UnitTypeContainer.unitSize[id];
     }
 
+    /**
+     * Retrieves the width of this unit type, in tiles. Used for determining the tile size of
+     * structures.
+     *
+     * @return Width of this unit type, in tiles.
+     */
     public int tileWidth() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.tileWidth];
     }
 
+    /**
+     * Retrieves the height of this unit type, in tiles. Used for determining the tile size of
+     * structures.
+     *
+     * @return Height of this unit type, in tiles.
+     */
     public int tileHeight() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.tileHeight];
     }
 
+    /**
+     * Retrieves the tile size of this unit type. Used for determining the tile size of
+     * structures.
+     *
+     * @return TilePosition containing the width (x) and height (y) of the unit type, in tiles.
+     */
     public TilePosition tileSize() {
         return new TilePosition(tileWidth(), tileHeight());
     }
 
+    /**
+     * Retrieves the distance from the center of the unit type to its left edge.
+     *
+     * @return Distance to this unit type's left edge from its center, in pixels.
+     */
     public int dimensionLeft() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.left];
     }
 
+    /**
+     * Retrieves the distance from the center of the unit type to its top edge.
+     *
+     * @return Distance to this unit type's top edge from its center, in pixels.
+     */
     public int dimensionUp() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.up];
     }
 
+    /**
+     * Retrieves the distance from the center of the unit type to its right edge.
+     *
+     * @return Distance to this unit type's right edge from its center, in pixels.
+     */
     public int dimensionRight() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.right];
     }
 
+    /**
+     * Retrieves the distance from the center of the unit type to its bottom edge.
+     *
+     * @return Distance to this unit type's bottom edge from its center, in pixels.
+     */
     public int dimensionDown() {
         return UnitTypeContainer.unitDimensions[id][UnitTypeContainer.UnitDimensions.down];
     }
 
+    /**
+     * A macro for retrieving the width of the unit type, which is calculated using
+     * dimensionLeft + dimensionRight + 1.
+     *
+     * @return Width of the unit, in pixels.
+     */
     public int width() {
         return dimensionLeft() + 1 + dimensionRight();
     }
 
+    /**
+     * A macro for retrieving the height of the unit type, which is calculated using
+     * dimensionUp + dimensionDown + 1.
+     *
+     * @return Height of the unit, in pixels.
+     */
     public int height() {
         return dimensionUp() + 1 + dimensionDown();
     }
 
+    /**
+     * Retrieves the range at which this unit type will start targeting enemy units.
+     *
+     * @return Distance at which this unit type begins to seek out enemy units, in pixels.
+     */
     public int seekRange() {
         return UnitTypeContainer.seekRangeTiles[id] * 32;
     }
 
+    /**
+     * Retrieves the sight range of this unit type.
+     *
+     * @return Sight range of this unit type, measured in pixels.
+     */
     public int sightRange() {
         return UnitTypeContainer.sightRangeTiles[id] * 32;
     }
 
+    /**
+     * Retrieves this unit type's weapon type used when attacking targets on the ground.
+     *
+     * @return WeaponType used as this unit type's ground weapon.
+     * @see maxGroundHits, airWeapon
+     */
     public WeaponType groundWeapon() {
         return UnitTypeContainer.groundWeapon[id];
     }
 
+    /**
+     * Retrieves the maximum number of hits this unit can deal to a ground target using its
+     * ground weapon. This value is multiplied by the ground weapon's damage to calculate the
+     * unit type's damage potential.
+     *
+     * @return Maximum number of hits given to ground targets.
+     * @see groundWeapon, maxAirHits
+     */
     public int maxGroundHits() {
         return UnitTypeContainer.groundWeaponHits[id];
     }
 
+    /**
+     * Retrieves this unit type's weapon type used when attacking targets in the air.
+     *
+     * @return WeaponType used as this unit type's air weapon.
+     * @see maxAirHits, groundWeapon
+     */
     public WeaponType airWeapon() {
         return UnitTypeContainer.airWeapon[id];
     }
 
+    /**
+     * Retrieves the maximum number of hits this unit can deal to a flying target using its
+     * air weapon. This value is multiplied by the air weapon's damage to calculate the
+     * unit type's damage potential.
+     *
+     * @return Maximum number of hits given to air targets.
+     * @see airWeapon, maxGroundHits
+     */
     public int maxAirHits() {
         return UnitTypeContainer.airWeaponHits[id];
     }
 
+    /**
+     * Retrieves this unit type's top movement speed with no upgrades.
+     *
+     * @note That some units have inconsistent movement and this value is sometimes an
+     * approximation.
+     *
+     * @return The approximate top speed, in pixels per frame, as a double. For liftable @Terran
+     * structures, this function returns their movement speed while lifted.
+     */
     public double topSpeed() {
         return UnitTypeContainer.unitTopSpeeds[id];
     }
 
+    /**
+     * Retrieves the unit's acceleration amount.
+     *
+     * @return How fast the unit can accelerate to its top speed.
+     *
+     * @todo Figure out the units this quantity is measured in.
+     */
     public int acceleration() {
         return UnitTypeContainer.unitAcceleration[id];
     }
 
+    /**
+     * Retrieves the unit's halting distance. This determines how fast a unit
+     * can stop moving.
+     *
+     * @return A halting distance value.
+     *
+     * @todo Figure out the units this quantity is measured in.
+     */
     public int haltDistance() {
         return UnitTypeContainer.unitHaltDistance[id];
     }
 
+    /**
+     * Retrieves a unit's turning radius. This determines how fast a unit can
+     * turn.
+     *
+     * @return A turn radius value.
+     *
+     * @todo Figure out the units this quantity is measured in.
+     */
     public int turnRadius() {
         return UnitTypeContainer.unitTurnRadius[id];
     }
 
+    /**
+     * Determines if a unit can train other units. For example,
+     * UnitType.Terran_Barracks.canProduce() will return true, while
+     * UnitType.Terran_Marine.canProduce() will return false. This is also true for two
+     * non-structures: @Carrier (can produce interceptors) and @Reaver (can produce scarabs).
+     *
+     * @return true if this unit type can have a production queue, and false otherwise.
+     */
     public boolean canProduce() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.ProducesUnits) != 0;
     }
 
+    /**
+     * Checks if this unit is capable of attacking.
+     *
+     * @note This function returns false for units that can only inflict damage via special
+     * abilities, such as the @High_Templar.
+     *
+     * @return true if this unit type is capable of damaging other units with a standard attack,
+     * and false otherwise.
+     */
     public boolean canAttack() {
         switch (this) {
             case Protoss_Carrier:
@@ -466,54 +778,138 @@ public enum UnitType {
         }
     }
 
+    /**
+     * Checks if this unit type is capable of movement.
+     *
+     * @note Buildings will return false, including @Terran liftable buildings which are capable
+     * of moving when lifted.
+     *
+     * @return true if this unit can use a movement command, and false if they cannot move.
+     */
     public boolean canMove() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.AutoAttackAndMove) != 0;
     }
 
+    /**
+     * Checks if this unit type is a flying unit. Flying units ignore ground pathing and
+     * collisions.
+     *
+     * @return true if this unit type is in the air by default, and false otherwise.
+     */
     public boolean isFlyer() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Flyer) != 0;
     }
 
+    /**
+     * Checks if this unit type can regenerate hit points. This generally applies to @Zerg units.
+     *
+     * @return true if this unit type regenerates its hit points, and false otherwise.
+     */
     public boolean regeneratesHP() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.RegeneratesHP) != 0;
     }
 
+    /**
+     * Checks if this unit type has the capacity to store energy and use it for special abilities.
+     *
+     * @return true if this unit type generates energy, and false if it does not have an energy
+     * pool.
+     */
     public boolean isSpellcaster() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Spellcaster) != 0;
     }
 
+    /**
+     * Checks if this unit type is permanently cloaked. This means the unit type is always
+     * cloaked and requires a detector in order to see it.
+     *
+     * @return true if this unit type is permanently cloaked, and false otherwise.
+     */
     public boolean hasPermanentCloak() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.PermanentCloak) != 0;
     }
 
+    /**
+     * Checks if this unit type is invincible by default. Invincible units
+     * cannot take damage.
+     *
+     * @return true if this unit type is invincible, and false if it is vulnerable to attacks.
+     */
     public boolean isInvincible() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Invincible) != 0;
     }
 
+    /**
+     * Checks if this unit is an organic unit. The organic property is required for some abilities
+     * such as @Heal.
+     *
+     * @return true if this unit type has the organic property, and false otherwise.
+     */
     public boolean isOrganic() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.OrganicUnit) != 0;
     }
 
+    /**
+     * Checks if this unit is mechanical. The mechanical property is required for some actions
+     * such as @Repair.
+     *
+     * @return true if this unit type has the mechanical property, and false otherwise.
+     */
     public boolean isMechanical() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Mechanical) != 0;
     }
 
+    /**
+     * Checks if this unit is robotic. The robotic property is applied
+     * to robotic units such as the @Probe which prevents them from taking damage from
+     * @Irradiate.
+     *
+     * @return true if this unit type has the robotic property, and false otherwise.
+     */
     public boolean isRobotic() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.RoboticUnit) != 0;
     }
 
+    /**
+     * Checks if this unit type is capable of detecting units that are cloaked or burrowed.
+     *
+     * @return true if this unit type is a detector by default, false if it does not have this
+     * property
+     */
     public boolean isDetector() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Detector) != 0;
     }
 
+    /**
+     * Checks if this unit type is capable of storing resources such as @minerals. Resources
+     * are harvested from resource containers.
+     *
+     * @return true if this unit type may contain resources that can be harvested, false
+     * otherwise.
+     */
     public boolean isResourceContainer() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.ResourceContainer) != 0;
     }
 
+    /**
+     * Checks if this unit type is a resource depot. Resource depots must be placed a certain
+     * distance from resources. Resource depots are typically the main building for any
+     * particular race. Workers will return resources to the nearest resource depot.
+     *
+     * Example:
+     * @return true if the unit type is a resource depot, false if it is not.
+     */
     public boolean isResourceDepot() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.ResourceDepot) != 0;
     }
 
+    /**
+     * Checks if this unit type is a refinery. A refinery is a structure that is placed on top of
+     * a @geyser . Refinery types are @refinery , @extractor , and @assimilator.
+     *
+     * Example:
+     * @return true if this unit type is a refinery, and false if it is not.
+     */
     public boolean isRefinery() {
         switch (this) {
             case Terran_Refinery:
@@ -525,83 +921,209 @@ public enum UnitType {
         }
     }
 
+    /**
+     * Checks if this unit type is a worker unit. Worker units can harvest resources and build
+     * structures. Worker unit types include the @SCV , @probe, and @drone.
+     *
+     * @return true if this unit type is a worker, and false if it is not.
+     */
     public boolean isWorker() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Worker) != 0;
     }
 
+    /**
+     * Checks if this structure is powered by a psi field. Structures powered
+     * by psi can only be placed near a @Pylon. If the @Pylon is destroyed, then this unit will
+     * lose power.
+     *
+     * @return true if this unit type can only be placed in a psi field, false otherwise.
+     * @implies isBuilding(), getRace() == Race.Protoss
+     */
     public boolean requiresPsi() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.RequiresPsi) != 0;
     }
 
+    /**
+     * Checks if this structure must be placed on @Zerg creep.
+     *
+     * @return true if this unit type requires creep, false otherwise.
+     * @implies isBuilding(), getRace() == Race.Zerg
+     */
     public boolean requiresCreep() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.CreepBuilding) != 0;
     }
 
+    /**
+     * Checks if this unit type spawns two units when being hatched from an @Egg.
+     * This is only applicable to @Zerglings and @Scourges.
+     *
+     * @return true if morphing this unit type will spawn two of them, and false if only one
+     * is spawned.
+     */
     public boolean isTwoUnitsInOneEgg() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.TwoUnitsIn1Egg) != 0;
     }
 
+    /**
+     * Checks if this unit type has the capability to use the @Burrow technology when it
+     * is researched.
+     *
+     * @note The @Lurker can burrow even without researching the ability.
+     * @see TechType.Burrow
+     * @return true if this unit can use the @Burrow ability, and false otherwise.
+     * @implies getRace() == Race.Zerg, !isBuilding(), canMove()
+     */
     public boolean isBurrowable() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Burrowable) != 0;
     }
 
+    /**
+     * Checks if this unit type has the capability to use a cloaking ability when it
+     * is researched. This applies only to @Wraiths and @Ghosts, and does not include
+     * units which are permanently cloaked.
+     *
+     * @return true if this unit has a cloaking ability, false otherwise.
+     * @see hasPermanentCloak, TechType.Cloaking_Field, TechType.Personnel_Cloaking
+     */
     public boolean isCloakable() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Cloakable) != 0;
     }
 
+    /**
+     * Checks if this unit is a structure. This includes @Mineral_Fields and
+     * @Vespene_Geysers.
+     *
+     * @return true if this unit is a building, and false otherwise.
+     */
     public boolean isBuilding() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Building) != 0;
     }
 
+    /**
+     * Checks if this unit is an add-on. Add-ons are attachments used by some
+     * @Terran structures such as the @Comsat_Station.
+     *
+     * @return true if this unit is an add-on, and false otherwise.
+     * @implies getRace() == Race.Terran, isBuilding()
+     */
     public boolean isAddon() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Addon) != 0;
     }
 
+    /**
+     * Checks if this structure has the capability to use the lift-off command.
+     *
+     * @return true if this unit type is a flyable building, false otherwise.
+     * @implies isBuilding()
+     */
     public boolean isFlyingBuilding() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.FlyingBuilding) != 0;
     }
 
+    /**
+     * Checks if this unit type is a neutral type, such as critters and resources.
+     *
+     * @return true if this unit is intended to be neutral, and false otherwise.
+     */
     public boolean isNeutral() {
         return getRace() == Race.None &&
                 (isCritter() || isResourceContainer() || isSpell());
     }
 
+    /**
+     * Checks if this unit type is a hero. Heroes are types that the player
+     * cannot obtain normally, and are identified by the white border around their icon when
+     * selected with a group.
+     *
+     * @note There are two non-hero units included in this set, the @Civilian and @Dark_Templar_Hero.
+     *
+     * @return true if this unit type is a hero type, and false otherwise.
+     */
     public boolean isHero() {
         return ((UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Hero) != 0) ||
                 this == Hero_Dark_Templar ||
                 this == Terran_Civilian;
     }
 
+    /**
+     * Checks if this unit type is a powerup. Powerups can be picked up and
+     * carried by workers. They are usually only seen in campaign maps and @Capture_the_flag.
+     *
+     * @return true if this unit type is a powerup type, and false otherwise.
+     */
     public boolean isPowerup() {
         return this == Powerup_Uraj_Crystal ||
                 this == Powerup_Khalis_Crystal ||
                 (this.id >= Powerup_Flag.id && this.id < None.id);
     }
 
+    /**
+     * Checks if this unit type is a beacon. Each race has exactly one beacon
+     * each. They are UnitType.Special_Zerg_Beacon, UnitType.Special_Terran_Beacon, and
+     * UnitType.Special_Protoss_Beacon.
+     *
+     * @see isFlagBeacon
+     * @return true if this unit type is one of the three race beacons, and false otherwise.
+     */
     public boolean isBeacon() {
         return this == Special_Zerg_Beacon ||
                 this == Special_Terran_Beacon ||
                 this == Special_Protoss_Beacon;
     }
 
+    /**
+     * Checks if this unit type is a flag beacon. Each race has exactly one
+     * flag beacon each. They are UnitType.Special_Zerg_Flag_Beacon,
+     * UnitType.Special_Terran_Flag_Beacon, and UnitType.Special_Protoss_Flag_Beacon.
+     * Flag beacons spawn a @Flag after some ARBITRARY I FORGOT AMOUNT OF FRAMES.
+     *
+     * @see isBeacon
+     * @return true if this unit type is one of the three race flag beacons, and false otherwise.
+     *
+     * @todo specify number of frames for flag spawner
+     */
     public boolean isFlagBeacon() {
         return this == Special_Zerg_Flag_Beacon ||
                 this == Special_Terran_Flag_Beacon ||
                 this == Special_Protoss_Flag_Beacon;
     }
 
+    /**
+     * Checks if this structure is special and cannot be obtained normally within the
+     * game.
+     *
+     * @return true if this structure is a special building, and false otherwise.
+     * @implies isBuilding()
+     */
     public boolean isSpecialBuilding() {
         return isBuilding() &&
                 whatBuilds().getValue() == 0 &&
                 this != Zerg_Infested_Command_Center;
     }
 
+    /**
+     * Identifies if this unit type is used to complement some @abilities.
+     * These include UnitType.Spell_Dark_Swarm, UnitType.Spell_Disruption_Web, and
+     * UnitType.Spell_Scanner_Sweep, which correspond to TechType.Dark_Swarm,
+     * TechType.Disruption_Web, and TechType.Scanner_Sweep respectively.
+     *
+     * @return true if this unit type is used for an ability, and false otherwise.
+     */
     public boolean isSpell() {
         return this == Spell_Dark_Swarm ||
                 this == Spell_Disruption_Web ||
                 this == Spell_Scanner_Sweep;
     }
 
+    /**
+     * Checks if this structure type produces creep. That is, the unit type
+     * spreads creep over a wide area so that @Zerg structures can be placed on it.
+     *
+     * @return true if this unit type spreads creep.
+     * @implies getRace() == Race.Zerg, isBuilding()
+     *
+     * @since 4.1.2
+     */
     public boolean producesCreep() {
         return producesLarva() ||
                 this == Zerg_Creep_Colony ||
@@ -609,18 +1131,38 @@ public enum UnitType {
                 this == Zerg_Sunken_Colony;
     }
 
+    /**
+     * Checks if this unit type produces larva. This is essentially used to
+     * check if the unit type is a @Hatchery, @Lair, or @Hive.
+     *
+     * @return true if this unit type produces larva.
+     * @implies getRace() == Race.Zerg, isBuilding()
+     */
     public boolean producesLarva() {
         return this == Zerg_Hatchery ||
                 this == Zerg_Lair ||
                 this == Zerg_Hive;
     }
 
+    /**
+     * Checks if this unit type is a mineral field and contains a resource amount.
+     * This indicates that the unit type is either UnitType.Resource_Mineral_Field,
+     * UnitType.Resource_Mineral_Field_Type_2, or UnitType.Resource_Mineral_Field_Type_3.
+     *
+     * @return true if this unit type is a mineral field resource.
+     */
     public boolean isMineralField() {
         return this == Resource_Mineral_Field ||
                 this == Resource_Mineral_Field_Type_2 ||
                 this == Resource_Mineral_Field_Type_3;
     }
 
+    /**
+     * Checks if this unit type is a neutral critter.
+     *
+     * @return true if this unit type is a critter, and false otherwise.
+     *
+     */
     public boolean isCritter() {
         switch (this) {
             case Critter_Bengalaas:
@@ -635,6 +1177,14 @@ public enum UnitType {
         }
     }
 
+    /**
+     * Checks if this unit type is capable of constructing an add-on. An add-on is an extension
+     * or attachment for @Terran structures, specifically the @Command_Center, @Factory,
+     * @Starport, and @Science_Facility.
+     *
+     * @return true if this unit type can construct an add-on, and false if it can not.
+     * @see isAddon
+     */
     public boolean canBuildAddon() {
         return this == Terran_Command_Center ||
                 this == Terran_Factory ||
@@ -642,18 +1192,64 @@ public enum UnitType {
                 this == Terran_Science_Facility;
     }
 
+    /**
+     * Retrieves the set of units that this unit type is capable of creating.
+     * This includes training, constructing, warping, and morphing.
+     *
+     * @note Some maps have special parameters that disable construction of units that are otherwise
+     * normally available. Use Player#isUnitAvailable to determine if a unit type is
+     * actually available in the current game for a specific player.
+     *
+     * @return UnitType#set containing the units it can build.
+     * @see Player#isUnitAvailable
+     *
+     * @since 4.1.2
+     */
     public List<UnitType> buildsWhat() {
         return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.buildsWhat[id]));
     }
 
+    /**
+     * Retrieves the set of technologies that this unit type is capable of researching.
+     *
+     * @note Some maps have special parameters that disable certain technologies. Use
+     * Player#isResearchAvailable to determine if a technology is actually available in the
+     * current game for a specific player.
+     *
+     * @return TechType#set containing the technology types that can be researched.
+     * @see Player#isResearchAvailable
+     *
+     * @since 4.1.2
+     */
     public List<TechType> researchesWhat() {
         return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.researchesWhat[id]));
     }
 
+    /**
+     * Retrieves the set of upgrades that this unit type is capable of upgrading.
+     *
+     * @note Some maps have special upgrade limitations. Use Player#getMaxUpgradeLevel
+     * to check if an upgrade is available.
+     *
+     * @return UpgradeType#set containing the upgrade types that can be upgraded.
+     * @see Player#getMaxUpgradeLevel
+     *
+     * @since 4.1.2
+     */
     public List<UpgradeType> upgradesWhat() {
         return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgradesWhat[id]));
     }
 
+    /**
+     * Checks if the current type is equal to the provided type, or a successor of the
+     * provided type. For example, a Hive is a successor of a Hatchery, since it can
+     * still research the @Burrow technology.
+     *
+     * @param type The unit type to check.
+     *
+     * @see TechType#whatResearches, UpgradeType#whatUpgrades
+     * @since 4.2.0
+     */
     public boolean isSuccessorOf(final UnitType type) {
         if (this == type) {
             return true;

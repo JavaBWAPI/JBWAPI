@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Contains a list of event types supported by BWAPI.
+ */
 public enum EventType {
     MatchStart(0),
     MatchEnd(1),

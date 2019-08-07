@@ -2,6 +2,10 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Namespace containing unit orders.
+ * @see Order
+ */
 public enum Order {
     Die(0),
     Stop(1),

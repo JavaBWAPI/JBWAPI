@@ -1,5 +1,9 @@
 package bwapi;
 
+/**
+ * Namespace containing explosion types.
+ * @see ExplosionType
+ */
 public enum ExplosionType {
     None(0),
     Normal(1),

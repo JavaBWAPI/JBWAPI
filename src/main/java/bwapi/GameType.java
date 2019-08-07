@@ -2,6 +2,10 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Namespace containing game types.
+ * @see GameType
+ */
 public enum GameType {
     None(0),
     Custom(1),          // Warcraft III

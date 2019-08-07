@@ -1,6 +1,10 @@
 package bwapi;
 
 
+/**
+ * namespace containing weapon types.
+ * @see WeaponType
+ */
 public enum WeaponType {
     Gauss_Rifle(0),
     Gauss_Rifle_Jim_Raynor(1),
@@ -405,94 +409,248 @@ public enum WeaponType {
         this.id = id;
     }
 
+    /**
+     * Retrieves the technology type that must be researched before this weapon can
+     * be used.
+     *
+     * @return TechType required by this weapon.
+     * @retval TechType.None if no tech type is required to use this weapon.
+     * @see TechType#getWeapon
+     */
     public TechType getTech() {
         return attachedTech[id];
     }
 
+    /**
+     * Retrieves the unit type that is intended to use this weapon type.
+     *
+     * @note There is a rare case where some hero unit types use the same weapon.
+     *
+     * @todo specify which types use the same weapon
+     *
+     * @return The UnitType that uses this weapon.
+     * @see UnitType#groundWeapon, UnitType#airWeapon
+     */
     public UnitType whatUses() {
         return whatUses[id];
     }
 
+    /**
+     * Retrieves the base amount of damage that this weapon can deal per attack.
+     *
+     * @note That this damage amount must go through a DamageType and UnitSizeType filter
+     * before it is applied to a unit.
+     *
+     * @return Amount of base damage that this weapon deals.
+     */
     public int damageAmount() {
         return defaultWpnDamageAmt[id];
     }
 
+    /**
+     * Determines the bonus amount of damage that this weapon type increases by for every
+     * upgrade to this type.
+     *
+     * @see upgradeType
+     * @return Amount of damage added for every weapon upgrade.
+     */
     public int damageBonus() {
         return defaultWpnDamageBonus[id];
     }
 
+    /**
+     * Retrieves the base amount of cooldown time between each attack, in frames.
+     *
+     * @return The amount of base cooldown applied to the unit after an attack.
+     * @see Unit#getGroundWeaponCooldown, Unit#getAirWeaponCooldown
+     */
     public int damageCooldown() {
         return wpnDamageCooldowns[id];
     }
 
+    /**
+     * Obtains the intended number of missiles/attacks that are used.
+     * This is used to multiply with the damage amount to obtain the full amount of damage
+     * for an attack.
+     *
+     * @return The damage factor multiplied by the amount to obtain the total damage.
+     * @see damageAmount
+     */
     public int damageFactor() {
         return wpnDamageFactor[id];
     }
 
+    /**
+     * Retrieves the upgrade type that increases this weapon's damage output.
+     *
+     * @return The UpgradeType used to upgrade this weapon's damage.
+     * @see damageBonus
+     */
     public UpgradeType upgradeType() {
         return upgrade[id];
     }
 
+    /**
+     * Retrieves the damage type that this weapon applies to a unit type.
+     *
+     * @return DamageType used for damage calculation.
+     * @see DamageType, UnitSizeType
+     */
     public DamageType damageType() {
         return damageType[id];
     }
 
+    /**
+     * Retrieves the explosion type that indicates how the weapon deals damage.
+     *
+     * @return ExplosionType identifying how damage is applied to a target location.
+     */
     public ExplosionType explosionType() {
         return explosionType[id];
     }
 
+    /**
+     * Retrieves the minimum attack range of the weapon, measured in pixels.
+     * This value is 0 for almost all weapon types, except for WeaponType.Arclite_Shock_Cannon
+     * and WeaponType.Arclite_Shock_Cannon_Edmund_Duke.
+     *
+     * @return Minimum attack range, in pixels.
+     */
     public int minRange() {
         return wpnMinRange[id];
     }
 
+    /**
+     * Retrieves the maximum attack range of the weapon, measured in pixels.
+     *
+     * @return Maximum attack range, in pixels.
+     */
     public int maxRange() {
         return wpnMaxRange[id];
     }
 
+    /**
+     * Retrieves the inner radius used for splash damage calculations, in pixels.
+     *
+     * @return Radius of the inner splash area, in pixels.
+     *
+     * @todo Add damage calculation.
+     */
     public int innerSplashRadius() {
         return wpnSplashRangeInner[id];
     }
 
+    /**
+     * Retrieves the middle radius used for splash damage calculations, in pixels.
+     *
+     * @return Radius of the middle splash area, in pixels.
+     *
+     * @todo Add damage calculation.
+     */
     public int medianSplashRadius() {
         return wpnSplashRangeMid[id];
     }
 
+    /**
+     * Retrieves the outer radius used for splash damage calculations, in pixels.
+     *
+     * @return Radius of the outer splash area, in pixels.
+     *
+     * @todo Add damage calculation.
+     */
     public int outerSplashRadius() {
         return wpnSplashRangeOuter[id];
     }
 
+    /**
+     * Checks if this weapon type can target air units.
+     *
+     * @return true if this weapon type can target air units, and false otherwise.
+     * @see Unit#isFlying, UnitType#isFlyer
+     */
     public boolean targetsAir() {
         return (wpnFlags[id] & TARG_AIR) != 0;
     }
 
+    /**
+     * Checks if this weapon type can target ground units.
+     *
+     * @return true if this weapon type can target ground units, and false otherwise.
+     * @see Unit#isFlying, UnitType#isFlyer
+     */
     public boolean targetsGround() {
         return (wpnFlags[id] & TARG_GROUND) != 0;
     }
 
+    /**
+     * Checks if this weapon type can only target mechanical units.
+     *
+     * @return true if this weapon type can only target mechanical units, and false otherwise.
+     * @see targetsOrgOrMech, UnitType#isMechanical
+     */
     public boolean targetsMechanical() {
         return (wpnFlags[id] & TARG_MECH) != 0;
     }
 
+    /**
+     * Checks if this weapon type can only target organic units.
+     *
+     * @return true if this weapon type can only target organic units, and false otherwise.
+     * @see targetsOrgOrMech, UnitType#isOrganic
+     */
     public boolean targetsOrganic() {
         return (wpnFlags[id] & TARG_ORGANIC) != 0;
     }
 
+    /**
+     * Checks if this weapon type cannot target structures.
+     *
+     * @return true if this weapon type cannot target buildings, and false if it can.
+     * @see UnitType#isBuilding
+     */
     public boolean targetsNonBuilding() {
         return (wpnFlags[id] & TARG_NOBUILD) != 0;
     }
 
+    /**
+     * Checks if this weapon type cannot target robotic units.
+     *
+     * @return true if this weapon type cannot target robotic units, and false if it can.
+     * @see UnitType#isRobotic
+     */
     public boolean targetsNonRobotic() {
         return (wpnFlags[id] & TARG_NOROBOT) != 0;
     }
 
+    /**
+     * Checks if this weapon type can target the ground.
+     *
+     * @note This is more for attacks like @Psi_Storm which can target a location, not to be
+     * confused with attack move.
+     *
+     * @return true if this weapon type can target a location, and false otherwise.
+     */
     public boolean targetsTerrain() {
         return (wpnFlags[id] & TARG_TERRAIN) != 0;
     }
 
+    /**
+     * Checks if this weapon type can only target organic or mechanical units.
+     *
+     * @return true if this weapon type can only target organic or mechanical units, and false otherwise.
+     * @see targetsOrganic, targetsMechanical, UnitType#isOrganic, UnitType#isMechanical
+     */
     public boolean targetsOrgOrMech() {
         return (wpnFlags[id] & TARG_ORGMECH) != 0;
     }
 
+    /**
+     * Checks if this weapon type can only target units owned by the same player.
+     * This is used for WeaponType.Consume.
+     *
+     * @return true if this weapon type can only target your own units, and false otherwise.
+     * @see Unit#getPlayer
+     */
     public boolean targetsOwn() {
         return (wpnFlags[id] & TARG_OWN) != 0;
     }
