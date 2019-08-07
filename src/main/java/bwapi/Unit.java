@@ -1171,6 +1171,10 @@ public class Unit implements Comparable<Unit>{
                 .collect(Collectors.toList());
     }
 
+    public List<Unit> getUnitsInRadius(final int radius) {
+        return getUnitsInRadius(radius, u -> true);
+    }
+
     /**
      * Retrieves the set of all units in a given radius of the current unit.
      *
@@ -1185,7 +1189,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @see getClosestUnit, getUnitsInWeaponRange, Game#getUnitsInRadius, Game#getUnitsInRectangle
      */
-    public List<Unit> getUnitsInRadius(final int radius) {
+    public List<Unit> getUnitsInRadius(final int radius, final UnitFilter pred) {
         if (!exists()) {
             return Collections.emptyList();
         }
@@ -1194,7 +1198,11 @@ public class Unit implements Comparable<Unit>{
                 getTop() - radius,
                 getRight() + radius,
                 getBottom() + radius,
-                u -> getDistance(u) <= radius);
+                u -> getDistance(u) <= radius && pred.operation(u));
+    }
+
+    public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
+        return getUnitsInWeaponRange(weapon, u -> true);
     }
 
     /**
@@ -1205,7 +1213,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @see getUnitsInRadius, getClosestUnit, Game#getUnitsInRadius, Game#getUnitsInRectangle
      */
-    public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
+    public List<Unit> getUnitsInWeaponRange(final WeaponType weapon, final UnitFilter pred) {
         // Return if this unit does not exist
         if (!exists()) {
             return Collections.emptyList();
@@ -1219,6 +1227,9 @@ public class Unit implements Comparable<Unit>{
                 getRight() + max,
                 getBottom() + max,
                 u -> {
+                    if (!pred.operation(u)) {
+                        return false;
+                    }
                     // Unit check and unit status
                     if (u == this || u.isInvincible()) {
                         return false;
@@ -2435,6 +2446,19 @@ public class Unit implements Comparable<Unit>{
         return issueCommand(UnitCommand.load(this, target));
     }
 
+    /**
+     * Orders the unit to load the target unit. Only works if this unit is a
+     * @Transport or @Bunker type.
+     *
+     * @param target The target unit to load into this @Transport or @Bunker.
+     * @param shiftQueueCommand If this value is true, then the order will be queued instead of immediately executed. If this value is omitted, then the order will be executed immediately by default.
+     *
+     * @return true if the command was passed to Broodwar, and false if BWAPI determined that
+     * the command would fail.
+     * @note There is a small chance for a command to fail after it has been passed to Broodwar.
+     *
+     * @see unload, unloadAll, getLoadedUnits, isLoaded
+     */
     public boolean load(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.load(this, target, shiftQueueCommand));
     }
@@ -5049,19 +5073,6 @@ public class Unit implements Comparable<Unit>{
         return canUnload(targetUnit, true);
     }
 
-    /**
-     * Orders the unit to load the target unit. Only works if this unit is a
-     * @Transport or @Bunker type.
-     *
-     * @param target The target unit to load into this @Transport or @Bunker.
-     * @param shiftQueueCommand If this value is true, then the order will be queued instead of immediately executed. If this value is omitted, then the order will be executed immediately by default.
-     *
-     * @return true if the command was passed to Broodwar, and false if BWAPI determined that
-     * the command would fail.
-     * @note There is a small chance for a command to fail after it has been passed to Broodwar.
-     *
-     * @see unload, unloadAll, getLoadedUnits, isLoaded
-     */
     /**
      * Cheap checks for whether the unit is able to execute an unload command.
      *
