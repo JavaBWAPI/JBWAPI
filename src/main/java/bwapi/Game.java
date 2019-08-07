@@ -1537,29 +1537,26 @@ public class Game {
 
     /**
      * Prints text to the screen as a notification. This function allows text
-     * formatting using Text members. The behaviour of this function is the same as printf,
-     * located in header cstdio.
+     * formatting using Text members.
      *
      * @note That text printed through this function is not seen by other players or in replays.
      *
-     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
-     * @param ... The arguments that will be formatted using the given text formatting.
+     * @param string String to print.
      *
-     * @see Text, std#printf
+     * @see Text
      */
     public void printf(final String string) {
         addCommand(Printf, client.addString(string), 0);
     }
 
     /**
-     * Sends a text message to all other players in the game. The behaviour of
-     * this function is the same as std#printf, located in header cstdio.
+     * Sends a text message to all other players in the game.
      *
      * @note In a single player game this function can be used to execute cheat codes.
      *
-     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
+     * @param string String to send.
      *
-     * @see sendTextEx, std#printf
+     * @see sendTextEx
      */
     public void sendText(final String string) {
         addCommand(SendText, client.addString(string), 0);
@@ -1567,13 +1564,12 @@ public class Game {
 
     /**
      * An extended version of Game#sendText which allows messages to be forwarded to
-     * allies. The behaviour of this function is the same as std#printf, located in
-     * header cstdio.
+     * allies.
      *
      * @param toAllies If this parameter is set to true, then the message is only sent to allied players, otherwise it will be sent to all players.
-     * @param format Text formatting. See std#printf for more information. Refrain from passing non-constant strings directly in this parameter.
+     * @param string String to send.
      *
-     * @see sendText, std#printf
+     * @see sendText
      */
     public void sendTextEx(final boolean toAllies, final String string) {
         addCommand(SendText, client.addString(string), toAllies ? 1 : 0);

@@ -9,7 +9,7 @@ import java.util.Objects;
  * @note Starcraft uses a 256 color palette for rendering. Thus, the colors available are
  * limited to this palette.
  *
- * @see Colors
+ * @see Color
  */
 public class Color {
     public final static Color Red = new Color(111);
@@ -67,14 +67,24 @@ public class Color {
     public final int id;
 
     /**
+     * A constructor that uses the color index in the palette that is closest to the
+     * given rgb values. On its first call, the colors in the palette will be sorted for fast indexing.
+     *
+     * @note This function computes the distance of the RGB values and may not be accurate.
+     *
+     * @param red The amount of red.
+     * @param green The amount of green.
+     * @param blue The amount of blue.
+     */
+    public Color(final int red, final int green, final int blue) {
+        id = getRGBIndex(red, green, blue);
+    }
+
+    /**
      * A constructor that uses the color at the specified palette index.
      *
      * @param id The index of the color in the 256-color palette.
      */
-    public Color(final int r, final int g, final int b) {
-        id = getRGBIndex(r, g, b);
-    }
-
     public Color(final int id) {
         this.id = id;
     }

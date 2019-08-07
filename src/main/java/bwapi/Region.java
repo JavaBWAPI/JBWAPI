@@ -216,6 +216,10 @@ public class Region implements Comparable<Region> {
         return getCenter().getApproxDistance(other.getCenter());
     }
 
+    public List<Unit> getUnits() {
+        return getUnits(u -> true);
+    }
+
     /**
      * Retrieves a List<Unit> containing all the units that are in this region.
      * Also has the ability to filter the units before the creation of the List<Unit>.
@@ -227,9 +231,9 @@ public class Region implements Comparable<Region> {
      *
      * @see UnitFilter
      */
-    public List<Unit> getUnits() {
+    public List<Unit> getUnits(final UnitFilter pred) {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),
-                u -> equals(u.getRegion()));
+                u -> equals(u.getRegion()) && pred.operation(u));
     }
 
     @Override
