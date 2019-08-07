@@ -4,7 +4,7 @@ import bwapi.ClientData.BulletData;
 
 import java.util.Objects;
 
-public class Bullet {
+public class Bullet implements Comparable<Bullet> {
     private final BulletData bulletData;
     private final int id;
     private final Game game;
@@ -82,5 +82,10 @@ public class Bullet {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(final Bullet other) {
+        return id - other.id;
     }
 }

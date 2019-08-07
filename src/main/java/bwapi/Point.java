@@ -1,6 +1,6 @@
 package bwapi;
 
-class Point {
+class Point implements Comparable<Point>{
     static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;
@@ -78,5 +78,13 @@ class Point {
     @Override
     public int hashCode() {
         return (x << 16) ^ y;
+    }
+
+    @Override
+    public int compareTo(Point o) {
+        if (scalar == o.scalar) {
+            return hashCode() - o.hashCode();
+        }
+        return scalar - o.scalar;
     }
 }

@@ -10,7 +10,7 @@ import static bwapi.UnitType.*;
 import static bwapi.UpgradeType.*;
 import static bwapi.WeaponType.*;
 
-public class Player {
+public class Player implements Comparable<Player>{
     private final PlayerData playerData;
     private final Game game;
     private final int id;
@@ -408,5 +408,10 @@ public class Player {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(final Player other) {
+        return id - other.id;
     }
 }

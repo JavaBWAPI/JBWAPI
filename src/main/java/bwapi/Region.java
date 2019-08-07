@@ -4,7 +4,7 @@ package bwapi;
 import bwapi.ClientData.RegionData;
 import java.util.*;
 
-public class Region {
+public class Region implements Comparable<Region> {
     private final RegionData regionData;
     private final Game game;
 
@@ -132,5 +132,10 @@ public class Region {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(final Region other) {
+        return id - other.id;
     }
 }

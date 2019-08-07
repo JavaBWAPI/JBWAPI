@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Force {
+public class Force implements Comparable<Force>{
     private final Game game;
 
     private final int id;
@@ -43,5 +43,10 @@ public class Force {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(final Force other) {
+        return id - other.id;
     }
 }
