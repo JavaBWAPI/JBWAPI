@@ -93,7 +93,7 @@ public class Game {
     // USER DEFINED
     private TextSize textSize = TextSize.Default;
 
-    public Game(Client client) {
+    Game(Client client) {
         this.client = client;
         this.gameData = client.data();
     }
@@ -455,24 +455,28 @@ public class Game {
         addCommand(EnableFlag, flag.id, 1);
     }
 
-    public List<Unit> getUnitsOnTile(final int tileX, final int tileY) {
-        return getAllUnits().stream().filter(u -> {
-            final TilePosition tp = u.getTilePosition();
-            return tp.x == tileX && tp.y == tileY;
-        }).collect(Collectors.toList());
-    }
-
     public List<Unit> getUnitsOnTile(final TilePosition tile) {
         return getUnitsOnTile(tile.x, tile.y);
+    }
+
+    public List<Unit> getUnitsOnTile(final int tileX, final int tileY) {
+        return getUnitsOnTile(tileX, tileY, u -> true);
+    }
+
+    public List<Unit> getUnitsOnTile(final int tileX, final int tileY, final UnitFilter pred) {
+        return getAllUnits().stream().filter(u -> {
+            final TilePosition tp = u.getTilePosition();
+            return tp.x == tileX && tp.y == tileY && pred.operation(u);
+        }).collect(Collectors.toList());
     }
 
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom) {
         return getUnitsInRectangle(left, top, right, bottom, u -> true);
     }
 
-    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getAllUnits().stream().filter(u ->
-            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && filter.operation(u))
+            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.operation(u))
             .collect(Collectors.toList());
     }
 
@@ -480,25 +484,25 @@ public class Game {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, u -> true);
     }
 
-    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
-        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
+    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter pred) {
+        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, pred);
     }
 
     public List<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
         return getUnitsInRadius(x, y, radius, u -> true);
     }
 
-    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
-        return getUnitsInRadius(new Position(x, y), radius, filter);
+    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter pred) {
+        return getUnitsInRadius(new Position(x, y), radius, pred);
     }
 
     public List<Unit> getUnitsInRadius(final Position center, final int radius) {
         return getUnitsInRadius(center, radius, u -> true);
     }
 
-    public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
+    public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter pred) {
         return getAllUnits().stream()
-                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u))
+                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && pred.operation(u))
                 .collect(Collectors.toList());
     }
 
@@ -506,8 +510,8 @@ public class Game {
         return getClosestUnitInRectangle(center, left, top, right, bottom, u -> true);
     }
 
-    public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-        return getUnitsInRectangle(left, top, right, bottom, filter).stream()
+    public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
+        return getUnitsInRectangle(left, top, right, bottom, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
@@ -515,16 +519,16 @@ public class Game {
         return getClosestUnit(center, 999999);
     }
 
-    public Unit getClosestUnit(final Position center, final UnitFilter filter) {
-        return getClosestUnit(center, 999999, filter);
+    public Unit getClosestUnit(final Position center, final UnitFilter pred) {
+        return getClosestUnit(center, 999999, pred);
     }
 
     public Unit getClosestUnit(final Position center, final int radius) {
         return getClosestUnit(center, radius, u -> true);
     }
 
-    public Unit getClosestUnit(final Position center, final int radius, final UnitFilter filter) {
-        return getUnitsInRadius(center, radius, filter).stream()
+    public Unit getClosestUnit(final Position center, final int radius, final UnitFilter pred) {
+        return getUnitsInRadius(center, radius, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
@@ -1034,16 +1038,16 @@ public class Game {
         return startLocations;
     }
 
-    public void printf(final String cstr_format) {
-        addCommand(Printf, client.addString(cstr_format), 0);
+    public void printf(final String string) {
+        addCommand(Printf, client.addString(string), 0);
     }
 
-    public void sendText(final String cstr_format) {
-        addCommand(SendText, client.addString(cstr_format), 0);
+    public void sendText(final String string) {
+        addCommand(SendText, client.addString(string), 0);
     }
 
-    public void sendTextEx(final boolean toAllies, final String cstr_format) {
-        addCommand(SendText, client.addString(cstr_format), toAllies ? 1 : 0);
+    public void sendTextEx(final boolean toAllies, final String string) {
+        addCommand(SendText, client.addString(string), toAllies ? 1 : 0);
     }
 
     public boolean isInGame() {
@@ -1123,34 +1127,34 @@ public class Game {
         return observers;
     }
 
-    public void drawText(final CoordinateType ctype, final int x, final int y, final String cstr_format) {
-        final int stringId = client.addString(cstr_format);
+    public void drawText(final CoordinateType ctype, final int x, final int y, final String string) {
+        final int stringId = client.addString(string);
         addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
     }
 
-    public void drawTextMap(final int x, final int y, final String cstr_format) {
-        drawText(CoordinateType.Map, x, y, cstr_format);
+    public void drawTextMap(final int x, final int y, final String string) {
+        drawText(CoordinateType.Map, x, y, string);
     }
 
-    public void drawTextMap(final Position p, final String cstr_format) {
-        drawTextMap(p.x, p.y, cstr_format);
+    public void drawTextMap(final Position p, final String string) {
+        drawTextMap(p.x, p.y, string);
     }
 
-    public void drawTextMouse(final int x, final int y, final String cstr_format) {
-        drawText(CoordinateType.Mouse, x, y, cstr_format);
+    public void drawTextMouse(final int x, final int y, final String string) {
+        drawText(CoordinateType.Mouse, x, y, string);
     }
 
-    public void drawTextMouse(final Position p, final String cstr_format) {
-        drawTextMouse(p.x, p.y, cstr_format);
+    public void drawTextMouse(final Position p, final String string) {
+        drawTextMouse(p.x, p.y, string);
 
     }
 
-    public void drawTextScreen(final int x, final int y, final String cstr_format) {
-        drawText(CoordinateType.Screen, x, y, cstr_format);
+    public void drawTextScreen(final int x, final int y, final String string) {
+        drawText(CoordinateType.Screen, x, y, string);
     }
 
-    public void drawTextScreen(final Position p, final String cstr_format) {
-        drawTextScreen(p.x, p.y, cstr_format);
+    public void drawTextScreen(final Position p, final String string) {
+        drawTextScreen(p.x, p.y, string);
     }
 
     public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color) {
