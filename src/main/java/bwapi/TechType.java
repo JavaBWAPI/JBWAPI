@@ -223,7 +223,7 @@ public enum TechType {
         return (techTypeFlags[id] & TARG_POS) != 0;
     }
 
-    public List<UnitType> whatsUses() {
+    public List<UnitType> whatUses() {
         return Collections.unmodifiableList(Arrays.asList(techWhatUses[id]));
     }
 

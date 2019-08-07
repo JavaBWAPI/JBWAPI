@@ -3703,7 +3703,7 @@ public class Unit implements Comparable<Unit>{
             return false;
         }
         // unit check
-        if (tech != TechType.Burrowing && !tech.whatsUses().contains(ut)) {
+        if (tech != TechType.Burrowing && !tech.whatUses().contains(ut)) {
             return false;
         }
 
