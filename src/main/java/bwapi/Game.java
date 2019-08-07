@@ -511,11 +511,19 @@ public class Game {
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
-    public Unit getClosestUnitInRadius(final Position center, final int radius) {
-        return getClosestUnitInRadius(center, radius, u -> true);
+    public Unit getClosestUnit(final Position center) {
+        return getClosestUnit(center, 999999);
     }
 
-    public Unit getClosestUnitInRadius(final Position center, final int radius, final UnitFilter filter) {
+    public Unit getClosestUnit(final Position center, final UnitFilter filter) {
+        return getClosestUnit(center, 999999, filter);
+    }
+
+    public Unit getClosestUnit(final Position center, final int radius) {
+        return getClosestUnit(center, radius, u -> true);
+    }
+
+    public Unit getClosestUnit(final Position center, final int radius, final UnitFilter filter) {
         return getUnitsInRadius(center, radius, filter).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
@@ -528,11 +536,11 @@ public class Game {
         return mapHeight;
     }
 
-    public int mapPixelWidth() {
+    int mapPixelWidth() {
         return mapPixelWidth;
     }
 
-    public int mapPixelHeight() {
+    int mapPixelHeight() {
         return mapPixelHeight;
     }
 

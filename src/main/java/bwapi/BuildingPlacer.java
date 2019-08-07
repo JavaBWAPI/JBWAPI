@@ -43,8 +43,8 @@ class BuildingPlacer {
         Region pTargRegion = null;
         switch (type) {
             case Protoss_Pylon:
-                final Unit pSpecialUnitTarget = game.getClosestUnitInRadius(
-                        desiredPosition.toPosition(), 999999, u -> u.getPlayer().equals(game.self()) && !u.isPowered());
+                final Unit pSpecialUnitTarget = game.getClosestUnit(
+                        desiredPosition.toPosition(), u -> u.getPlayer().equals(game.self()) && !u.isPowered());
                 if (pSpecialUnitTarget != null) {
                     desiredPosition = pSpecialUnitTarget.getPosition().toTilePosition();
                     trimPlacement = false;
