@@ -68,6 +68,11 @@ or if you already have maven installed
 
 `mvn package`
 
+## documentation
+
+The api documentation can be found [here](https://javabwapi.github.io/JBWAPI/).
+
 ## tutorial
 
 If you are a just starting out with bot development, it might be helpful to follow the [tutorial](https://github.com/JavaBWAPI/Java-BWAPI-Tutorial/wiki)!
+
