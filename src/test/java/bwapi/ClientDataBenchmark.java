@@ -56,6 +56,14 @@ public class ClientDataBenchmark {
     }
 
     @Benchmark
+    @Measurement(iterations = 2, time = 2)
+    @Warmup(time = 2)
+    @Fork(2)
+    public void reference(Blackhole blackhole) {
+        blackhole.consume(0);
+    }
+
+    @Benchmark
     @OperationsPerInvocation(Client.MAX_COUNT)
     public int addUnitCommand(EmptyState s) {
         for (int i = 0; i < Client.MAX_COUNT; i++) {
