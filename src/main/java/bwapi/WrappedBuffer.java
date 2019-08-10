@@ -72,15 +72,17 @@ class WrappedBuffer {
     }
 
     String getString(final int offset, final int maxLen) {
-        final byte[] buf = new byte[maxLen];
-
-        unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
-
-        int len = 0;
-        while (len < maxLen && buf[len] != 0) {
-            ++len;
+        buffer.position(offset);
+        ByteBuffer source = buffer.slice();
+        int rem = maxLen - 1;
+        while (source.get() != 0 && rem > 0) {
+            rem--;
         }
-        return new String(buf, 0, len, charSet);
+        if (rem > 0) {
+            source.position(source.position() - 1);
+        }
+        source.flip();
+        return charSet.decode(source).toString();
     }
 
     void putString(final int offset, final int maxLen, final String string) {
