@@ -12,7 +12,7 @@ public class WrappedBufferTest {
     @Test
     public void shouldGetAndSetStrings() {
         // GIVEN
-        String testString = "Test";
+        String testString = "@µöú";
         sut.putString(123, 100, testString);
 
         // WHEN
@@ -25,7 +25,7 @@ public class WrappedBufferTest {
     @Test
     public void shouldCutOffAtMaxLength() {
         // GIVEN
-        String testString = "Test";
+        String testString = "@µöú";
         sut.putString(123, 100, testString);
 
         // WHEN
