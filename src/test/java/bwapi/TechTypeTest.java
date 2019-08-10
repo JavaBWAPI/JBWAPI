@@ -25,4 +25,10 @@ public class TechTypeTest {
             }
         }
     }
+
+    @Test
+    public void ensureSimpleGettersReturnNonNullAndDontFail() throws InvocationTargetException, IllegalAccessException {
+        TypeTester.ensureSimpleGettersReturnNonNullAndDontFail(TechType.class);
+    }
+
 }

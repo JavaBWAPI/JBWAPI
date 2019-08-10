@@ -48,7 +48,7 @@ public enum TextColor {
     }
 
     //SINCE 4.2
-    //C hecks if the given character is a color-changing control code.
+    //C checks if the given character is a color-changing control code.
     boolean isColor() {
         final int c = this.id;
         return (2 <= c && c <= 8) || (14 <= c && c <= 17) || (21 <= c && c <= 31);
