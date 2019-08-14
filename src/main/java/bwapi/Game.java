@@ -470,9 +470,9 @@ public class Game {
         return getUnitsInRectangle(left, top, right, bottom, u -> true);
     }
 
-    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
+    public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getAllUnits().stream().filter(u ->
-            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && filter.operation(u))
+            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.test(u))
             .collect(Collectors.toList());
     }
 
@@ -480,25 +480,25 @@ public class Game {
         return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, u -> true);
     }
 
-    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter filter) {
-        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, filter);
+    public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter pred) {
+        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, pred);
     }
 
     public List<Unit> getUnitsInRadius(final int x, final int y, final int radius) {
         return getUnitsInRadius(x, y, radius, u -> true);
     }
 
-    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter filter) {
-        return getUnitsInRadius(new Position(x, y), radius, filter);
+    public List<Unit> getUnitsInRadius(final int x, final int y, final int radius, final UnitFilter pred) {
+        return getUnitsInRadius(new Position(x, y), radius, pred);
     }
 
     public List<Unit> getUnitsInRadius(final Position center, final int radius) {
         return getUnitsInRadius(center, radius, u -> true);
     }
 
-    public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter filter) {
+    public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter pred) {
         return getAllUnits().stream()
-                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && filter.operation(u))
+                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && pred.test(u))
                 .collect(Collectors.toList());
     }
 
@@ -506,8 +506,8 @@ public class Game {
         return getClosestUnitInRectangle(center, left, top, right, bottom, u -> true);
     }
 
-    public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter filter) {
-        return getUnitsInRectangle(left, top, right, bottom, filter).stream()
+    public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
+        return getUnitsInRectangle(left, top, right, bottom, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
@@ -515,16 +515,16 @@ public class Game {
         return getClosestUnit(center, 999999);
     }
 
-    public Unit getClosestUnit(final Position center, final UnitFilter filter) {
-        return getClosestUnit(center, 999999, filter);
+    public Unit getClosestUnit(final Position center, final UnitFilter pred) {
+        return getClosestUnit(center, 999999, pred);
     }
 
     public Unit getClosestUnit(final Position center, final int radius) {
         return getClosestUnit(center, radius, u -> true);
     }
 
-    public Unit getClosestUnit(final Position center, final int radius, final UnitFilter filter) {
-        return getUnitsInRadius(center, radius, filter).stream()
+    public Unit getClosestUnit(final Position center, final int radius, final UnitFilter pred) {
+        return getUnitsInRadius(center, radius, pred).stream()
                 .min(Comparator.comparingInt(u -> u.getDistance(center))).orElse(null);
     }
 
