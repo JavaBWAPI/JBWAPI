@@ -35,7 +35,7 @@ Add JBWAPI as a dependecy
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
 </dependency>
 ```
 
@@ -53,7 +53,7 @@ allprojects {
 Add JBWAPI as a dependency
 ```
 dependencies {
-    implementation 'com.github.JavaBWAPI:JBWAPI:0.7.1'
+    implementation 'com.github.JavaBWAPI:JBWAPI:0.7.2'
 }
 ```
 
@@ -68,6 +68,11 @@ or if you already have maven installed
 
 `mvn package`
 
+## documentation
+
+The api documentation can be found [here](https://javabwapi.github.io/JBWAPI/).
+
 ## tutorial
 
 If you are a just starting out with bot development, it might be helpful to follow the [tutorial](https://github.com/JavaBWAPI/Java-BWAPI-Tutorial/wiki)!
+
