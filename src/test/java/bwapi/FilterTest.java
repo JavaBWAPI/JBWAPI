@@ -1,35 +1,42 @@
 package bwapi;
 
-import org.junit.Test;
+import org.junit.*;
+import java.util.*;
 
-import java.util.Arrays;
-import java.util.List;
-
+import static bwapi.UnitFilter.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class FilterTest {
 
-    @Test
-    public void someFilterTests() {
+    List<Unit> units;
+
+    @Before
+    public void setup() {
         Unit u = mock(Unit.class);
         when(u.getHitPoints()).thenReturn(20);
         when(u.getType()).thenReturn(UnitType.Resource_Mineral_Field);
 
-        List<Unit> units = Arrays.asList(u);
+        units = Arrays.asList(u);
+    }
 
+    @Test
+    public void testBasicFilters() {
+        assertTrue(units.stream().anyMatch(IsMineralField));
+        assertTrue(units.stream().noneMatch(IsRefinery));
+    }
 
-        UnitFilter validUT = Filter.GetType(t -> t.equals(UnitType.Resource_Mineral_Field));
+    @Test
+    public void testVariableFilters() {
+        assertTrue(units.stream().anyMatch(GetType(t -> t == UnitType.Resource_Mineral_Field)));
+        assertTrue(units.stream().anyMatch(HP(x -> x > 10)));
+        assertTrue(units.stream().noneMatch(HP(x -> x == 10)));
+    }
 
-        assertTrue(units.stream().anyMatch(Filter.IsMineralField::filter));
-        assertTrue(units.stream().noneMatch(Filter.IsRefinery::filter));
-        assertTrue(units.stream().anyMatch(validUT::filter));
-
-        UnitFilter validHP = Filter.HP(x -> x > 10);
-        UnitFilter invalidHP = Filter.HP(x -> x == 10);
-
-        assertTrue(units.stream().anyMatch(validHP::filter));
-        assertTrue(units.stream().noneMatch(invalidHP::filter));
+    @Test
+    public void testFilterCombinations() {
+        assertTrue(units.stream().anyMatch(IsMineralField.or(IsRefinery)));
+        assertTrue(units.stream().noneMatch(IsMineralField.and(IsRefinery)));
+        assertTrue(units.stream().noneMatch(IsMineralField.negate()));
     }
 }

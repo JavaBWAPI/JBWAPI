@@ -472,7 +472,7 @@ public class Game {
 
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getAllUnits().stream().filter(u ->
-            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.filter(u))
+            left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.test(u))
             .collect(Collectors.toList());
     }
 
@@ -498,7 +498,7 @@ public class Game {
 
     public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter pred) {
         return getAllUnits().stream()
-                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && pred.filter(u))
+                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && pred.test(u))
                 .collect(Collectors.toList());
     }
 
