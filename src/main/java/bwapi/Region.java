@@ -233,7 +233,7 @@ public class Region implements Comparable<Region> {
      */
     public List<Unit> getUnits(final UnitFilter pred) {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),
-                u -> equals(u.getRegion()) && pred.operation(u));
+                u -> equals(u.getRegion()) && pred.test(u));
     }
 
     @Override

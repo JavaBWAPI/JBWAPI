@@ -1198,7 +1198,7 @@ public class Unit implements Comparable<Unit>{
                 getTop() - radius,
                 getRight() + radius,
                 getBottom() + radius,
-                u -> getDistance(u) <= radius && pred.operation(u));
+                u -> getDistance(u) <= radius && pred.test(u));
     }
 
     public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
@@ -1227,7 +1227,7 @@ public class Unit implements Comparable<Unit>{
                 getRight() + max,
                 getBottom() + max,
                 u -> {
-                    if (!pred.operation(u)) {
+                    if (!pred.test(u)) {
                         return false;
                     }
                     // Unit check and unit status
