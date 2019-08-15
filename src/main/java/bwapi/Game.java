@@ -550,7 +550,7 @@ public class Game {
      *
      * Example:
      * @return Logical frames per second that the game is currently running at as an integer.
-     * @see getAverageFPS
+     * @see Game#getAverageFPS
      */
     public int getFPS() {
         return gameData.getFps();
@@ -561,7 +561,7 @@ public class Game {
      *
      * @return Average logical frames per second that the game is currently running at as a
      * double.
-     * @see getFPS
+     * @see {@link #getFPS}
      */
     public double getAverageFPS() {
         return gameData.getAverageFPS();
@@ -571,7 +571,7 @@ public class Game {
      * Retrieves the position of the user's mouse on the screen, in Position coordinates.
      *
      * @return Position indicating the location of the mouse.
-     * @retval Position.Unknown if Flag#UserInput is disabled.
+     * @retval Position.Unknown if {@link Flag#UserInput} is disabled.
      */
     public Position getMousePosition() {
         return new Position(gameData.getMouseX(), gameData.getMouseY());
