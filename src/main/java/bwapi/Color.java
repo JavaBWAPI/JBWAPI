@@ -6,10 +6,8 @@ import java.util.Objects;
 /**
  * The Color object is used in drawing routines to specify the color to use.
  *
- * @note Starcraft uses a 256 color palette for rendering. Thus, the colors available are
+ * Starcraft uses a 256 color palette for rendering. Thus, the colors available are
  * limited to this palette.
- *
- * @see Color
  */
 public class Color {
     public final static Color Red = new Color(111);
@@ -78,7 +76,7 @@ public class Color {
      * A constructor that uses the color index in the palette that is closest to the
      * given rgb values. On its first call, the colors in the palette will be sorted for fast indexing.
      *
-     * @note This function computes the distance of the RGB values and may not be accurate.
+     * This function computes the distance of the RGB values and may not be accurate.
      *
      * @param red The amount of red.
      * @param green The amount of green.

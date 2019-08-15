@@ -3,8 +3,7 @@ package bwapi;
 import java.util.Arrays;
 
 /**
- * Namespace containing bullet types.
- * @see BulletType
+ * Enum containing bullet types.
  */
 public enum BulletType {
     Melee(0),

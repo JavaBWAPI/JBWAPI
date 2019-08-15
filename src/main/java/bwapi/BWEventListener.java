@@ -1,6 +1,8 @@
 package bwapi;
 
-
+/**
+ * Interface to extend to be given to a {@link BWClient}.
+ */
 public interface BWEventListener {
 
     void onStart();
