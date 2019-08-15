@@ -2,7 +2,7 @@ package bwapi;
 
 /**
  * Contains flag enumerations for BWAPI.
- * @see Game#enableFlag, Game#isFlagEnabled
+ * @see {@link Game#enableFlag}, {@link Game#isFlagEnabled}
  */
 public enum Flag {
     CompleteMapInformation(0),
