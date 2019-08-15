@@ -1,9 +1,7 @@
 package bwapi;
 
 /**
- * Namespace containing damage types.
- *
- * @see DamageType
+ * Enum containing damage types.
  *
  * [View on Liquipedia](http://wiki.teamliquid.net/starcraft/Damage_Type)<br>
  * [View on Starcraft Campendium (Official Website)](http://classic.battle.net/scc/gs/damage.shtml)<br>
