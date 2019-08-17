@@ -6,8 +6,12 @@ import java.util.Arrays;
 import static bwapi.UnitType.*;
 
 /**
- * Namespace containing all valid races.
- * @see Race
+ * The {@link Race} enum is used to get information about a particular race.
+ *
+ * For example, the default worker and supply provider {@link UnitType}.
+ *
+ * As you should already know, Starcraft has three races: @Terran , @Protoss , and @Zerg .
+ * @see {@link UnitType#getRace}, {@link Player#getRace}
  */
 public enum Race {
     Zerg(0),
@@ -92,6 +96,7 @@ public enum Race {
      * @deprecated As of 4.2.0 due to naming inconsistency. Use #getResourceDepot instead.
      * See https://github.com/bwapi/bwapi/issues/621 for more information.
      */
+    @Deprecated
     public UnitType getCenter() {
         return getResourceDepot();
     }

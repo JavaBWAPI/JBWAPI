@@ -5,8 +5,10 @@ import java.util.*;
 import static bwapi.TechType.*;
 
 /**
- * Namespace containing unit types.
- * @see UnitType
+ * The {@link UnitType} is used to get information about a particular type of unit, such as its cost,
+ * build time, weapon, hit points, abilities, etc.
+ *
+ * @see {@link Unit#getType}
  */
 public enum UnitType {
     Terran_Marine(0),

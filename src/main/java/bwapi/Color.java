@@ -10,17 +10,53 @@ import java.util.Objects;
  * limited to this palette.
  */
 public class Color {
+    /**
+     * The default color for Player 1.
+     */
     public final static Color Red = new Color(111);
+    /**
+     * The default color for Player 2.
+     */
     public final static Color Blue = new Color(165);
+    /**
+     * The default color for Player 3.
+     */
     public final static Color Teal = new Color(159);
+    /**
+     * The default color for Player 4.
+     */
     public final static Color Purple = new Color(164);
+    /**
+     * The default color for Player 5.
+     */
     public final static Color Orange = new Color(156);
+    /**
+     * The default color for Player 6.
+     */
     public final static Color Brown = new Color(19);
+    /**
+     * A bright white. Note that this is lighter than Player 7's white.
+     */
     public final static Color White = new Color(255);
+    /**
+     * The default color for Player 8.
+     */
     public final static Color Yellow = new Color(135);
+    /**
+     * The alternate color for Player 7 on Ice tilesets.
+     */
     public final static Color Green = new Color(117);
+    /**
+     * The default color for Neutral (Player 12).
+     */
     public final static Color Cyan = new Color(128);
+    /**
+     * The color black.
+     */
     public final static Color Black = new Color(0);
+    /**
+     * The color grey.
+     */
     public final static Color Grey = new Color(74);
 
     private static final RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);

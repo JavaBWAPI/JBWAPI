@@ -3,8 +3,7 @@ package bwapi;
 import java.util.Arrays;
 
 /**
- * Namespace containing player types (player controllers).
- * @see PlayerType
+ * Represents the type of controller for the player slot (i.e. human, computer).
  */
 public enum PlayerType {
     None(0),

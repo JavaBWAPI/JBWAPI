@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Namespace of upgrade types.
+ * The upgrade type represents a passive upgrade that can be obtained with {@link Unit#upgrade}.
  */
 public enum UpgradeType {
     Terran_Infantry_Armor(0),

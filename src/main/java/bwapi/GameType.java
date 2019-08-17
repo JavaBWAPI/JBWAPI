@@ -3,8 +3,9 @@ package bwapi;
 import java.util.Arrays;
 
 /**
- * Namespace containing game types.
- * @see GameType
+ * An enum that represents game types in Broodwar.
+ *
+ * A game type is selected when creating a game.
  */
 public enum GameType {
     None(0),

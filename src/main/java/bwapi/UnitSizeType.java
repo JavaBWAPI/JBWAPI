@@ -1,9 +1,13 @@
 package bwapi;
 
 /**
- * Namespace containing unit size types.
+ * Size types are used by unit types in Broodwar to determine how much damage will be
+ * applied.
  *
- * @see UnitSizeType
+ * This corresponds with {@link DamageType} for several different damage reduction
+ * applications.
+ *
+ * @see {@link DamageType}, {@link UnitType}, {@link UnitSizeType}
  *
  * [View on Starcraft Campendium (Official Website)](http://classic.battle.net/scc/gs/damage.shtml)<br>
  */

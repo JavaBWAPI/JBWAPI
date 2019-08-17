@@ -1,7 +1,9 @@
 package bwapi;
 
 /**
- * Enum containing explosion types.
+ * A representation of a weapon's explosion type.
+ *
+ * This indicates how the weapon behaves, such as if it deals splash damage or causes an effect to occur.
  */
 public enum ExplosionType {
     None(0),

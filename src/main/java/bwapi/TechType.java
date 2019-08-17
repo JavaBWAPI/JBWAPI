@@ -8,8 +8,10 @@ import static bwapi.Order.*;
 
 
 /**
- * Namespace containing tech types.
- * @see TechType
+ * The {@link TechType} (or Technology Type, also referred to as an Ability) represents a Unit's ability
+ * which can be researched with {@link Unit#research} or used with {@link Unit#useTech}.
+ *
+ * In order for a {@link Unit} to use its own specialized ability, it must first be available and researched.
  */
 public enum TechType {
     Stim_Packs(0),

@@ -2,8 +2,9 @@ package bwapi;
 
 
 /**
- * namespace containing weapon types.
- * @see WeaponType
+ * This object identifies a weapon type used by a unit to attack and deal damage.
+ *
+ * Some weapon types can be upgraded while others are used for special abilities.
  */
 public enum WeaponType {
     Gauss_Rifle(0),

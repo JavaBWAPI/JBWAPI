@@ -3,7 +3,7 @@ package bwapi;
 import java.util.Arrays;
 
 /**
- * Enum of event types supported by BWAPI.
+ * Enumeration of callback event types.
  */
 public enum EventType {
     MatchStart(0),

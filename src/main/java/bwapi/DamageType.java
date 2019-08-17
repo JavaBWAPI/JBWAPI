@@ -1,7 +1,13 @@
 package bwapi;
 
 /**
- * Enum containing damage types.
+ * Damage types are used in Broodwar to determine the amount of damage that will be
+ * done to a unit.
+ *
+ * This corresponds with UnitSizeType to determine the damage done to
+ * a unit.
+ * 
+ * @see {@link WeaponType}, {@link DamageType}, {@link UnitSizeType}
  *
  * [View on Liquipedia](http://wiki.teamliquid.net/starcraft/Damage_Type)<br>
  * [View on Starcraft Campendium (Official Website)](http://classic.battle.net/scc/gs/damage.shtml)<br>
