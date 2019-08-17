@@ -55,7 +55,7 @@ public class Bullet implements Comparable<Bullet> {
      * If {@link Flag#CompleteMapInformation} is enabled, then this function is accurate for all
      * {@link Bullet} information.
      * 
-     * @return true if the bullet exists or is visible. false if the bullet was destroyed or has gone out of scope.
+     * @return true if the bullet exists or is visible, false if the bullet was destroyed or has gone out of scope.
      * @see {@link #isVisible}, {@link Unit#exists}
      */
     public boolean exists() {
@@ -174,7 +174,7 @@ public class Bullet implements Comparable<Bullet> {
      *
      * @param player If this parameter is specified, then the Bullet's visibility to the given player is checked. If this parameter is omitted, then a default value of null is used, which will check if the BWAPI player has vision of the {@link Bullet}.
      *
-     * @return true if the {@link Bullet} is visible to the specified player. false if the {@link Bullet} is not visible to the specified player.
+     * @return true if the {@link Bullet} is visible to the specified player, false if the {@link Bullet} is not visible to the specified player.
      */
     public boolean isVisible(final Player player) {
         if (player == null) {

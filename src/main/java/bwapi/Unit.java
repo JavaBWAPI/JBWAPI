@@ -104,7 +104,7 @@ public class Unit implements Comparable<Unit>{
      * unit is alive. This function is more general and would be synonymous to an isAlive
      * function if such a function were necessary.
      *
-     * @return true If the unit exists on the map and is visible according to BWAPI. false If the unit is not accessible or the unit is dead.
+     * @return true If the unit exists on the map and is visible according to BWAPI, false If the unit is not accessible or the unit is dead.
      *
      * In the event that this function returns false, there are two cases to consider:
      *   1. You own the unit. This means the unit is dead.
@@ -1691,7 +1691,7 @@ public class Unit implements Comparable<Unit>{
      * structures often have the ability to #morph into different types of units. This function
      * allows you to identify when this process is occurring.
      *
-     * @return true if the unit is currently morphing. false if the unit is not morphing
+     * @return true if the unit is currently morphing, false if the unit is not morphing
      *
      * @see {@link #morph}, {@link #cancelMorph}, {@link #getBuildType}, {@link #getRemainingBuildTime}
      */
@@ -1933,7 +1933,7 @@ public class Unit implements Comparable<Unit>{
      * Performs some cheap checks to attempt to quickly detect whether the unit is
      * unable to be targetted as the target unit of an unspecified command.
      *
-     * @return true if BWAPI was unable to determine whether the unit can be a target. false if an error occurred and the unit can not be a target.
+     * @return true if BWAPI was unable to determine whether the unit can be a target, false if an error occurred and the unit can not be a target.
      *
      * @see {@link Unit#canTargetUnit}
      */
@@ -2742,7 +2742,7 @@ public class Unit implements Comparable<Unit>{
      * @param checkCanIssueCommandType A boolean for whether to perform {@link Unit#canIssueCommandType} as a check. You can set this to false if you know this check has already just been performed.
      * @param checkCommandibility A boolean for whether to perform {@link Unit#canCommand} as a check. You can set this to false if you know this check has already just been performed.
      *
-     * @return true if BWAPI determined that the command is valid. false if an error occurred and the command is invalid.
+     * @return true if BWAPI determined that the command is valid, false if an error occurred and the command is invalid.
      *
      * @see {@link UnitCommandType}, {@link Unit#canCommand}, {@link Unit#canIssueCommandType},
      * {@link Unit#canTargetUnit}
@@ -3014,7 +3014,7 @@ public class Unit implements Comparable<Unit>{
      * Performs some cheap checks to attempt to quickly detect whether the unit is unable to
      * execute any commands (eg the unit is stasised).
      *
-     * @return true if BWAPI was unable to determine whether the unit can be commanded. false if an error occurred and the unit can not be commanded.
+     * @return true if BWAPI was unable to determine whether the unit can be commanded, false if an error occurred and the unit can not be commanded.
      *
      * @see {@link Unit#canIssueCommand}
      */
@@ -3067,7 +3067,7 @@ public class Unit implements Comparable<Unit>{
      * Performs some cheap checks to attempt to quickly detect whether the unit is unable to
      * execute any commands as part of a List<Unit> (eg buildings, critters).
      *
-     * @return true if BWAPI was unable to determine whether the unit can be commanded grouped. false if an error occurred and the unit can not be commanded grouped.
+     * @return true if BWAPI was unable to determine whether the unit can be commanded grouped, false if an error occurred and the unit can not be commanded grouped.
      *
      * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canIssueCommand}
      */
@@ -3091,7 +3091,7 @@ public class Unit implements Comparable<Unit>{
      * @param ct A {@link UnitCommandType}.
      * @param checkCommandibility A boolean for whether to perform {@link Unit#canCommand} as a check. You can set this to false if you know this check has already just been performed.
      *
-     * @return true if BWAPI was unable to determine whether the command type is invalid. false if an error occurred and the command type is invalid.
+     * @return true if BWAPI was unable to determine whether the command type is invalid, false if an error occurred and the command type is invalid.
      *
      * @see {@link UnitCommandType}, {@link Unit#canIssueCommand}
      */
@@ -3208,7 +3208,7 @@ public class Unit implements Comparable<Unit>{
      * @param checkCommandibilityGrouped A boolean for whether to perform {@link Unit#canCommandGrouped} as a check. You can set this to false if you know this check has already just been performed.
      * @param checkCommandibility A boolean for whether to perform {@link Unit#canCommand} as a check. You can set this to false if you know this check has already just been performed.
      *
-     * @return true if BWAPI was unable to determine whether the command type is invalid. false if an error occurred and the command type is invalid.
+     * @return true if BWAPI was unable to determine whether the command type is invalid, false if an error occurred and the command type is invalid.
      *
      * @see {@link UnitCommandType}, {@link Unit#canIssueCommandGrouped}
      */
@@ -3334,7 +3334,7 @@ public class Unit implements Comparable<Unit>{
      * @param targetUnit A target unit for an unspecified command.
      * @param checkCommandibility A boolean for whether to perform {@link Unit#canCommand} as a check. You can set this to false if you know this check has already just been performed.
      *
-     * @return true if BWAPI was unable to determine whether the unit can target the given unit. false if an error occurred and the unit can not target the given unit.
+     * @return true if BWAPI was unable to determine whether the unit can target the given unit, false if an error occurred and the unit can not target the given unit.
      *
      * @see {@link Unit#canIssueCommand}, {@link Unit#isTargetable}
      */

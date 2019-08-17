@@ -997,7 +997,7 @@ public class Game {
      * @param tileX The x tile coordinate to check.
      * @param tileY The y tile coordinate to check.
      *
-     * @return true if the player has explored the given tile position (partially revealed fog). false if the tile position was never explored (completely black fog).
+     * @return true if the player has explored the given tile position (partially revealed fog), false if the tile position was never explored (completely black fog).
      *
      * @see {@link #isVisible}
      */
@@ -1018,7 +1018,7 @@ public class Game {
      * @param tileX The x tile coordinate to check.
      * @param tileY The y tile coordinate to check.
      *
-     * @return true if the given tile has creep on it. false if the given tile does not have creep, or if it is concealed by the fog of war.
+     * @return true if the given tile has creep on it, false if the given tile does not have creep, or if it is concealed by the fog of war.
      */
     public boolean hasCreep(final int tileX, final int tileY) {
         return hasCreep(new TilePosition(tileX, tileY));
@@ -1043,7 +1043,7 @@ public class Game {
      * @param y The y pixel coordinate to check.
      * @param unitType Checks if the given {@link UnitType} requires power or not. If ommitted, then it will assume that the position requires power for any unit type.
      *
-     * @return true if the type at the given position will have power. false if the type at the given position will be unpowered.
+     * @return true if the type at the given position will have power, false if the type at the given position will be unpowered.
      */
     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
         return hasPowerPrecise(new Position(x, y), unitType);
@@ -1091,7 +1091,7 @@ public class Game {
      * @param tileY The y tile coordinate to check.
      * @param unitType Checks if the given UnitType will be powered if placed at the given tile position. If omitted, then only the immediate tile position is checked for power, and the function will assume that the location requires power for any unit type.
      *
-     * @return true if the type at the given tile position will receive power. false if the type will be unpowered at the given tile position.
+     * @return true if the type at the given tile position will receive power, false if the type will be unpowered at the given tile position.
      */
     public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
         return hasPowerPrecise(tileX * 32 + tileWidth * 16, tileY * 32 + tileHeight * 16, unitType);

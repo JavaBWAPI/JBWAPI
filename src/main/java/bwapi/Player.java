@@ -15,7 +15,7 @@ import static bwapi.WeaponType.*;
  * a match will have his or her own player instance. There is also a neutral player which owns
  * all the neutral units (such as mineral patches and vespene geysers).
  *
- * @see List<Player>, PlayerType, Race
+ * @see {@link PlayerType}, {@link Race}
  */
 public class Player implements Comparable<Player>{
     private final PlayerData playerData;
@@ -52,9 +52,6 @@ public class Player implements Comparable<Player>{
      *
      * @return  A String object containing the player's name.
      *
-     * @note Don't forget to use String when passing this parameter to
-     * Game#sendText and other variadic functions.
-     *
      */
     public String getName() {
         return name;
@@ -66,9 +63,7 @@ public class Player implements Comparable<Player>{
      *
      * @return Reference to a List<Unit> containing the units.
      *
-     * @note This does not include units that are loaded into transports, @Bunkers, @Refineries,
-     * @Assimilators, or @Extractors.
-     *
+     * This does not include units that are loaded into transports, @Bunkers, @Refineries, @Assimilators, or @Extractors.
      */
     public List<Unit> getUnits() {
         return game.getAllUnits().stream()
@@ -80,11 +75,9 @@ public class Player implements Comparable<Player>{
      * Retrieves the race of the player. This allows you to change strategies
      * against different races, or generalize some commands for yourself.
      *
-     * @retval Race.Unknown If the player chose Race.Random when the game started and they
-     * have not been seen.
-     *
      * @return  The Race that the player is using.
-     *
+     * Returns {@link Race#Unknown} if the player chose {@link Race#Random} when the game started and they
+     * have not been seen.
      */
     public Race getRace() {
         return race;
@@ -94,10 +87,9 @@ public class Player implements Comparable<Player>{
      * Retrieves the player's controller type. This allows you to distinguish
      * betweeen computer and human players.
      *
-     * @return  The PlayerType that identifies who is controlling a player.
+     * @return  The {@link PlayerType} that identifies who is controlling a player.
      *
-     * @note Other players using BWAPI will be treated as a human player and return
-     * PlayerType.Player.
+     * Other players using BWAPI will be treated as a human player and return {@link PlayerType#Player}.
      *
      */
     public PlayerType getType() {
@@ -108,7 +100,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the player's force. A force is the team that the player is
      * playing on.
      *
-     * @return  The Force object that the player is part of.
+     * @return  The {@link Force} object that the player is part of.
      */
     public Force getForce() {
         return force;
@@ -118,14 +110,12 @@ public class Player implements Comparable<Player>{
      * Checks if this player is allied to the specified player.
      *
      * @param player The player to check alliance with.
+     * Returns true if this player is allied with \p player, false if this player is not allied with \p player.
      *
-     * @retval true if this player is allied with \p player .
-     * @retval false if this player is not allied with \p player.
-     *
-     * @note This function will also return false if this player is neutral or an observer, or
+     * This function will also return false if this player is neutral or an observer, or
      * if \p player is neutral or an observer.
      *
-     * @see isEnemy
+     * @see {@link #isEnemy}
      */
     public boolean isAlly(final Player player) {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
@@ -139,13 +129,12 @@ public class Player implements Comparable<Player>{
      *
      * @param player The player to check alliance with.
      *
-     * @retval true if this player is allied with \p player .
-     * @retval false if this player is not allied with \p player .
+     * @return true if this player is allied with \p player, false if this player is not allied with \p player .
      *
-     * @note This function will also return false if this player is neutral or an observer, or if
+     * This function will also return false if this player is neutral or an observer, or if
      * \p player is neutral or an observer.
      *
-     * @see isAlly
+     * @see {@link #isAlly}
      */
     public boolean isEnemy(final Player player) {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
@@ -157,8 +146,7 @@ public class Player implements Comparable<Player>{
     /**
      * Checks if this player is the neutral player.
      *
-     * @retval true if this player is the neutral player.
-     * @retval false if this player is any other player.
+     * @return  true if this player is the neutral player, false if this player is any other player.
      */
     public boolean isNeutral() {
         return  equals(game.neutral());
@@ -167,13 +155,12 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieve's the player's starting location.
      *
-     * @return  A TilePosition containing the position of the start location.
-     *
-     * @retval TilePosition.None if the player does not have a start location.
-     * @retval TilePosition.Unknown if an error occured while trying to retrieve the start
+     * @return  A {@link TilePosition} containing the position of the start location.
+     * Returns {@link TilePosition#None} if the player does not have a start location.
+     * Returns {@link TilePosition#Unknown} if an error occured while trying to retrieve the start
      * location.
      *
-     * @see Game#getStartLocations, Game#getLastError
+     * @see {@link Game#getStartLocations}
      */
     public TilePosition getStartLocation() {
         return startLocation;
@@ -209,7 +196,7 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the current amount of minerals/ore that this player has.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Amount of minerals that the player currently has for spending.
      */
@@ -220,7 +207,7 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the current amount of vespene gas that this player has.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Amount of gas that the player currently has for spending.
      */
@@ -233,7 +220,7 @@ public class Player implements Comparable<Player>{
      * since the beginning of the game, including the amount that the player starts the game
      * with (if any).
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of minerals that the player has gathered.
      */
@@ -246,7 +233,7 @@ public class Player implements Comparable<Player>{
      * the beginning of the game, including the amount that the player starts the game with (if
      * any).
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of gas that the player has gathered.
      */
@@ -256,10 +243,9 @@ public class Player implements Comparable<Player>{
 
     /**
      * Retrieves the cumulative amount of minerals/ore that this player has spent on
-     * repairing units since the beginning of the game. This function only applies to
-     * @Terran players.
+     * repairing units since the beginning of the game. This function only applies to @Terran players.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of minerals that the player has spent repairing.
      */
@@ -269,10 +255,9 @@ public class Player implements Comparable<Player>{
 
     /**
      * Retrieves the cumulative amount of vespene gas that this player has spent on
-     * repairing units since the beginning of the game. This function only applies to
-     * @Terran players.
+     * repairing units since the beginning of the game. This function only applies to @Terran players.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of gas that the player has spent repairing.
      */
@@ -284,7 +269,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the cumulative amount of minerals/ore that this player has gained from
      * refunding (cancelling) units and structures.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of minerals that the player has received from refunds.
      */
@@ -296,7 +281,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the cumulative amount of vespene gas that this player has gained from
      * refunding (cancelling) units and structures.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of gas that the player has received from refunds.
      */
@@ -308,7 +293,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the cumulative amount of minerals/ore that this player has spent,
      * excluding repairs.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of minerals that the player has spent.
      */
@@ -320,7 +305,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the cumulative amount of vespene gas that this player has spent,
      * excluding repairs.
      *
-     * @note This function will return 0 if the player is inaccessible.
+     * This function will return 0 if the player is inaccessible.
      *
      * @return Cumulative amount of gas that the player has spent.
      */
@@ -335,10 +320,10 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the total amount of supply the player has available for unit control.
      *
-     * @note In Starcraft programming, the managed supply values are double than what they appear
+     * In Starcraft programming, the managed supply values are double than what they appear
      * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
      *
-     * @note In Starcraft, the supply for each race is separate. Having a @Pylon and an @Overlord
+     * In Starcraft, the supply for each race is separate. Having a @Pylon and an @Overlord
      * will not give you 32 supply. It will instead give you 16 @Protoss supply and 16 @Zerg
      * supply.
      *
@@ -346,7 +331,7 @@ public class Player implements Comparable<Player>{
      *
      * @return The total supply available for this player and the given \p race.
      *
-     * @see supplyUsed
+     * @see {@link #supplyUsed}
      */
     public int supplyTotal(final Race race) {
         return playerData.getSupplyTotal(race.id);
@@ -362,7 +347,8 @@ public class Player implements Comparable<Player>{
      * @param race The race to query the used supply for. If this is omitted, then the player's current race will be used.
      *
      * @return The supply that is in use for this player and the given \p race.
-     * @see supplyTotal
+     *
+     * @see {@link #supplyTotal}
      */
     public int supplyUsed(final Race race) {
         return playerData.getSupplyUsed(race.id);
@@ -377,13 +363,14 @@ public class Player implements Comparable<Player>{
      * information about the player is limited, then this function will only return the number
      * of visible units.
      *
-     * @note While in-progress @Protoss and @Terran units will be counted, in-progress @Zerg units
+     * While in-progress @Protoss and @Terran units will be counted, in-progress @Zerg units
      * (i.e. inside of an egg) do not.
      *
      * @param unit The unit type to query. UnitType macros are accepted. If this parameter is omitted, then it will use UnitType.AllUnits by default.
      *
      * @return The total number of units of the given type that the player owns.
-     * @see visibleUnitCount, completedUnitCount, incompleteUnitCount
+     *
+     * @see {@link #visibleUnitCount}, {@link #completedUnitCount}, {@link #incompleteUnitCount}
      */
     public int allUnitCount(final UnitType unit) {
         return playerData.getAllUnitCount(unit.id);
@@ -401,7 +388,8 @@ public class Player implements Comparable<Player>{
      *
      * @return The total number of units of the given type that the player owns, and is visible
      *   to the BWAPI player.
-     * @see allUnitCount, completedUnitCount, incompleteUnitCount
+     *
+     * @see {@link #allUnitCount}, {@link #completedUnitCount}, {@link #incompleteUnitCount}
      */
     public int visibleUnitCount(final UnitType unit) {
         return playerData.getVisibleUnitCount(unit.id);
@@ -420,8 +408,7 @@ public class Player implements Comparable<Player>{
      *
      * @return The number of completed units of the given type that the player owns.
      *
-     *
-     * @see allUnitCount, visibleUnitCount, incompleteUnitCount
+     * @see {@link #allUnitCount}, {@link #visibleUnitCount}, {@link #incompleteUnitCount}
      */
     public int completedUnitCount(final UnitType unit) {
         return playerData.getCompletedUnitCount(unit.id);
@@ -436,14 +423,15 @@ public class Player implements Comparable<Player>{
      * information about the player is limited, then this function will only return the number of
      * visible incomplete units.
      *
-     * @note This function is a macro for allUnitCount() - completedUnitCount().
+     * This function is a macro for allUnitCount() - completedUnitCount().
      *
-     * @note Incomplete @Zerg units inside of eggs are not counted.
+     * Incomplete @Zerg units inside of eggs are not counted.
      *
      * @param unit The unit type to query. UnitType macros are accepted. If this parameter is omitted, then it will use UnitType.AllUnits by default.
      *
      * @return The number of incomplete units of the given type that the player owns.
-     * @see allUnitCount, visibleUnitCount, completedUnitCount
+     *
+     * @see {@link #allUnitCount}, {@link #visibleUnitCount}, {@link #completedUnitCount}
      */
     public int incompleteUnitCount(final UnitType unit) {
         return allUnitCount(unit) - completedUnitCount(unit);
@@ -456,7 +444,7 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the number units that have died for this player.
      *
-     * @param unit The unit type to query. UnitType macros are accepted. If this parameter is omitted, then it will use UnitType.AllUnits by default.
+     * @param unit The unit type to query. {@link UnitType} macros are accepted. If this parameter is omitted, then it will use {@link UnitType#AllUnits} by default.
      *
      * @return The total number of units that have died throughout the game.
      */
@@ -471,7 +459,7 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the number units that the player has killed.
      *
-     * @param unit The unit type to query. UnitType macros are accepted. If this parameter is omitted, then it will use UnitType.AllUnits by default.
+     * @param unit The unit type to query. UnitType macros are accepted. If this parameter is omitted, then it will use {@link UnitType#AllUnits} by default.
      *
      * @return The total number of units that the player has killed throughout the game.
      */
@@ -487,8 +475,7 @@ public class Player implements Comparable<Player>{
      *
      * @return The number of levels that the \p upgrade has been upgraded for this player.
      *
-     *
-     * @see Unit#upgrade, getMaxUpgradeLevel
+     * @see {@link Unit#upgrade}, {@link #getMaxUpgradeLevel}
      */
     public int getUpgradeLevel(final UpgradeType upgrade) {
         return playerData.getUpgradeLevel(upgrade.id);
@@ -497,10 +484,11 @@ public class Player implements Comparable<Player>{
     /**
      * Checks if the player has already researched a given technology.
      *
-     * @param tech The TechType to query.
+     * @param tech The {@link TechType} to query.
      *
      * @return true if the player has obtained the given \p tech, or false if they have not
-     * @see isResearching, Unit#research, isResearchAvailable
+     *
+     * @see {@link #isResearching}, {@link Unit#research}, {@link #isResearchAvailable}
      */
     public boolean hasResearched(final TechType tech) {
         return playerData.getHasResearched(tech.id);
@@ -509,10 +497,11 @@ public class Player implements Comparable<Player>{
     /**
      * Checks if the player is researching a given technology type.
      *
-     * @param tech The TechType to query.
+     * @param tech The {@link TechType} to query.
      *
      * @return true if the player is currently researching the \p tech, or false otherwise
-     * @see Unit#research, hasResearched
+     *
+     * @see {@link Unit#research}, {@link #hasResearched}
      */
     public boolean isResearching(final TechType tech) {
         return playerData.isResearching(tech.id);
@@ -525,8 +514,7 @@ public class Player implements Comparable<Player>{
      *
      * @return true if the player is currently upgrading the given \p upgrade, false otherwise
      *
-     *
-     * @see Unit#upgrade
+     * @see {@link Unit#upgrade}
      */
     public boolean isUpgrading(final UpgradeType upgrade) {
         return playerData.isUpgrading(upgrade.id);
@@ -535,7 +523,7 @@ public class Player implements Comparable<Player>{
     /**
      * Retrieves the color value of the current player.
      *
-     * @return Color object that represents the color of the current player.
+     * @return {@link Color} object that represents the color of the current player.
      */
     public Color getColor() {
         return new Color(playerData.getColor());
@@ -582,7 +570,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the maximum amount of energy that a unit type will have, taking the
      * player's energy upgrades into consideration.
      *
-     * @param unit The UnitType to retrieve the maximum energy for.
+     * @param unit The {@link UnitType} to retrieve the maximum energy for.
      *
      * @return Maximum amount of energy that the given unit type can have.
      */
@@ -608,7 +596,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the top speed of a unit type, taking the player's speed upgrades into
      * consideration.
      *
-     * @param unit The UnitType to retrieve the top speed for.
+     * @param unit The {@link UnitType} to retrieve the top speed for.
      *
      * @return Top speed of the provided unit type for this player.
      */
@@ -641,7 +629,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the maximum weapon range of a weapon type, taking the player's weapon
      * upgrades into consideration.
      *
-     * @param weapon The WeaponType to retrieve the maximum range for.
+     * @param weapon The {@link WeaponType} to retrieve the maximum range for.
      *
      * @return Maximum range of the given weapon type for units owned by this player.
      */
@@ -662,7 +650,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the sight range of a unit type, taking the player's sight range
      * upgrades into consideration.
      *
-     * @param unit The UnitType to retrieve the sight range for.
+     * @param unit The {@link UnitType} to retrieve the sight range for.
      *
      * @return Sight range of the provided unit type for this player.
      */
@@ -681,7 +669,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the weapon cooldown of a unit type, taking the player's attack speed
      * upgrades into consideration.
      *
-     * @param unit The UnitType to retrieve the damage cooldown for.
+     * @param unit The {@link UnitType} to retrieve the damage cooldown for.
      *
      * @return Weapon cooldown of the provided unit type for this player.
      */
@@ -787,7 +775,7 @@ public class Player implements Comparable<Player>{
      * Retrieves the maximum upgrades available specific to the player. This
      * value is only different from UpgradeType#maxRepeats in @UMS games.
      *
-     * @param upgrade The UpgradeType to retrieve the maximum upgrade level for.
+     * @param upgrade The {@link UpgradeType} to retrieve the maximum upgrade level for.
      *
      * @return Maximum upgrade level of the given \p upgrade type.
      *
@@ -800,7 +788,7 @@ public class Player implements Comparable<Player>{
      * Checks if a technology can be researched by the player. Certain
      * technologies may be disabled in @UMS game types.
      *
-     * @param tech The TechType to query.
+     * @param tech The {@link TechType} to query.
      *
      * @return true if the \p tech type is available to the player for research.
      */
@@ -812,7 +800,7 @@ public class Player implements Comparable<Player>{
      * Checks if a unit type can be created by the player. Certain unit types
      * may be disabled in @UMS game types.
      *
-     * @param unit The UnitType to check.
+     * @param unit The {@link UnitType} to check.
      *
      * @return true if the \p unit type is available to the player.
      */
@@ -827,8 +815,8 @@ public class Player implements Comparable<Player>{
     /**
      * Verifies that this player satisfies a unit type requirement.
      * This verifies complex type requirements involving morphable @Zerg structures. For example,
-     * if something requires a @Spire, but the player has (or is in the process of morphing) a
-     * @Greater_Spire, this function will identify the requirement. It is simply a convenience function
+     * if something requires a @Spire, but the player has (or is in the process of morphing) a @Greater_Spire,
+     * this function will identify the requirement. It is simply a convenience function
      * that performs all of the requirement checks.
      *
      * @param unit The UnitType to check.
