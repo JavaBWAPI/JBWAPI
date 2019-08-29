@@ -63,27 +63,24 @@ public enum Race {
     }
 
     /**
-     * Retrieves the default worker type for this Race.
+     * Retrieves the default worker type for this {@link Race}.
      *
-     * @note In Starcraft, workers are the units that are used to construct structures.
+     * In Starcraft, workers are the units that are used to construct structures.
      *
-     * @return UnitType of the worker that this race uses.
+     * @return {@link UnitType} of the worker that this race uses.
      */
     public UnitType getWorker() {
         return workerTypes[id];
     }
 
-    // DATA
-
-    //@since 4.2.0
     /**
-     * Retrieves the default resource depot UnitType that workers of this race can
+     * Retrieves the default resource depot {@link UnitType} that workers of this race can
      * construct and return resources to.
      *
-     * @note In Starcraft, the center is the very first structure of the Race's technology
+     * In Starcraft, the center is the very first structure of the Race's technology
      * tree. Also known as its base of operations or resource depot.
      *
-     * @return UnitType of the center that this race uses.
+     * @return {@link UnitType} of the center that this race uses.
      *
      * @since 4.2.0
      */
@@ -102,39 +99,38 @@ public enum Race {
     }
 
     /**
-     * Retrieves the default structure UnitType for this Race that is used to harvest gas from
-     * @Geysers.
+     * Retrieves the default structure UnitType for this Race that is used to harvest gas from @Geysers.
      *
-     * @note In Starcraft, you must first construct a structure over a @Geyser in order to
+     * In Starcraft, you must first construct a structure over a @Geyser in order to
      * begin harvesting Vespene Gas.
      *
-     * @return UnitType of the structure used to harvest gas.
+     * @return {@link UnitType} of the structure used to harvest gas.
      */
     public UnitType getRefinery() {
         return refineryTypes[id];
     }
 
     /**
-     * Retrieves the default transport UnitType for this race that is used to transport ground
+     * Retrieves the default transport {@link UnitType} for this race that is used to transport ground
      * units across the map.
      *
-     * @note In Starcraft, transports will allow you to carry ground units over unpassable
+     * In Starcraft, transports will allow you to carry ground units over unpassable
      * terrain.
      *
-     * @return UnitType for transportation.
+     * @return {@link UnitType} for transportation.
      */
     public UnitType getTransport() {
         return transportTypes[id];
     }
 
     /**
-     * Retrieves the default supply provider UnitType for this race that is used to  construct
+     * Retrieves the default supply provider {@link UnitType} for this race that is used to  construct
      * units.
      *
-     * @note In Starcraft, training, morphing, or warping in units requires that the player
+     * In Starcraft, training, morphing, or warping in units requires that the player
      * has sufficient supply available for their Race.
      *
-     * @return UnitType that provides the player with supply.
+     * @return {@link UnitType} that provides the player with supply.
      */
     public UnitType getSupplyProvider() {
         return supplyTypes[id];

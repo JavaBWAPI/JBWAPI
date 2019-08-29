@@ -414,9 +414,9 @@ public enum WeaponType {
      * Retrieves the technology type that must be researched before this weapon can
      * be used.
      *
-     * @return TechType required by this weapon.
-     * @retval TechType.None if no tech type is required to use this weapon.
-     * @see TechType#getWeapon
+     * @return {@link TechType} required by this weapon.
+     * Returns {@link TechType#None} if no tech type is required to use this weapon.
+     * @see {@link TechType#getWeapon}
      */
     public TechType getTech() {
         return attachedTech[id];
@@ -425,12 +425,10 @@ public enum WeaponType {
     /**
      * Retrieves the unit type that is intended to use this weapon type.
      *
-     * @note There is a rare case where some hero unit types use the same weapon.
+     * There is a rare case where some hero unit types use the same weapon.
      *
-     * @todo specify which types use the same weapon
-     *
-     * @return The UnitType that uses this weapon.
-     * @see UnitType#groundWeapon, UnitType#airWeapon
+     * @return The {@link UnitType} that uses this weapon.
+     * @see {@link UnitType#groundWeapon}, {@link UnitType#airWeapon}
      */
     public UnitType whatUses() {
         return whatUses[id];
@@ -439,7 +437,7 @@ public enum WeaponType {
     /**
      * Retrieves the base amount of damage that this weapon can deal per attack.
      *
-     * @note That this damage amount must go through a DamageType and UnitSizeType filter
+     * That this damage amount must go through a {@link DamageType} and {@link UnitSizeType} filter
      * before it is applied to a unit.
      *
      * @return Amount of base damage that this weapon deals.
@@ -452,7 +450,7 @@ public enum WeaponType {
      * Determines the bonus amount of damage that this weapon type increases by for every
      * upgrade to this type.
      *
-     * @see upgradeType
+     * @see {@link #upgradeType}
      * @return Amount of damage added for every weapon upgrade.
      */
     public int damageBonus() {
@@ -463,7 +461,7 @@ public enum WeaponType {
      * Retrieves the base amount of cooldown time between each attack, in frames.
      *
      * @return The amount of base cooldown applied to the unit after an attack.
-     * @see Unit#getGroundWeaponCooldown, Unit#getAirWeaponCooldown
+     * @see {@link Unit#getGroundWeaponCooldown}, {@link Unit#getAirWeaponCooldown}
      */
     public int damageCooldown() {
         return wpnDamageCooldowns[id];
@@ -475,7 +473,7 @@ public enum WeaponType {
      * for an attack.
      *
      * @return The damage factor multiplied by the amount to obtain the total damage.
-     * @see damageAmount
+     * @see {@link #damageAmount}
      */
     public int damageFactor() {
         return wpnDamageFactor[id];
@@ -484,8 +482,8 @@ public enum WeaponType {
     /**
      * Retrieves the upgrade type that increases this weapon's damage output.
      *
-     * @return The UpgradeType used to upgrade this weapon's damage.
-     * @see damageBonus
+     * @return The {@link UpgradeType} used to upgrade this weapon's damage.
+     * @see {@link #damageBonus}
      */
     public UpgradeType upgradeType() {
         return upgrade[id];
@@ -494,8 +492,8 @@ public enum WeaponType {
     /**
      * Retrieves the damage type that this weapon applies to a unit type.
      *
-     * @return DamageType used for damage calculation.
-     * @see DamageType, UnitSizeType
+     * @return {@link DamageType} used for damage calculation.
+     * @see {@link DamageType}, {@link UnitSizeType}
      */
     public DamageType damageType() {
         return damageType[id];
@@ -512,8 +510,8 @@ public enum WeaponType {
 
     /**
      * Retrieves the minimum attack range of the weapon, measured in pixels.
-     * This value is 0 for almost all weapon types, except for WeaponType.Arclite_Shock_Cannon
-     * and WeaponType.Arclite_Shock_Cannon_Edmund_Duke.
+     * This value is 0 for almost all weapon types, except for {@link WeaponType#Arclite_Shock_Cannon}
+     * and {@link WeaponType#Arclite_Shock_Cannon_Edmund_Duke}.
      *
      * @return Minimum attack range, in pixels.
      */
@@ -534,8 +532,6 @@ public enum WeaponType {
      * Retrieves the inner radius used for splash damage calculations, in pixels.
      *
      * @return Radius of the inner splash area, in pixels.
-     *
-     * @todo Add damage calculation.
      */
     public int innerSplashRadius() {
         return wpnSplashRangeInner[id];
@@ -545,8 +541,6 @@ public enum WeaponType {
      * Retrieves the middle radius used for splash damage calculations, in pixels.
      *
      * @return Radius of the middle splash area, in pixels.
-     *
-     * @todo Add damage calculation.
      */
     public int medianSplashRadius() {
         return wpnSplashRangeMid[id];
@@ -556,8 +550,6 @@ public enum WeaponType {
      * Retrieves the outer radius used for splash damage calculations, in pixels.
      *
      * @return Radius of the outer splash area, in pixels.
-     *
-     * @todo Add damage calculation.
      */
     public int outerSplashRadius() {
         return wpnSplashRangeOuter[id];
@@ -567,7 +559,7 @@ public enum WeaponType {
      * Checks if this weapon type can target air units.
      *
      * @return true if this weapon type can target air units, and false otherwise.
-     * @see Unit#isFlying, UnitType#isFlyer
+     * @see {@link Unit#isFlying}, {@link UnitType#isFlyer}
      */
     public boolean targetsAir() {
         return (wpnFlags[id] & TARG_AIR) != 0;
@@ -577,7 +569,7 @@ public enum WeaponType {
      * Checks if this weapon type can target ground units.
      *
      * @return true if this weapon type can target ground units, and false otherwise.
-     * @see Unit#isFlying, UnitType#isFlyer
+     * @see {@link Unit#isFlying}, {@link UnitType#isFlyer}
      */
     public boolean targetsGround() {
         return (wpnFlags[id] & TARG_GROUND) != 0;
@@ -587,7 +579,7 @@ public enum WeaponType {
      * Checks if this weapon type can only target mechanical units.
      *
      * @return true if this weapon type can only target mechanical units, and false otherwise.
-     * @see targetsOrgOrMech, UnitType#isMechanical
+     * @see {@link #targetsOrgOrMech}, {@link UnitType#isMechanical}
      */
     public boolean targetsMechanical() {
         return (wpnFlags[id] & TARG_MECH) != 0;
@@ -597,7 +589,7 @@ public enum WeaponType {
      * Checks if this weapon type can only target organic units.
      *
      * @return true if this weapon type can only target organic units, and false otherwise.
-     * @see targetsOrgOrMech, UnitType#isOrganic
+     * @see {@link #targetsOrgOrMech}, {@link UnitType#isOrganic}
      */
     public boolean targetsOrganic() {
         return (wpnFlags[id] & TARG_ORGANIC) != 0;
@@ -607,7 +599,7 @@ public enum WeaponType {
      * Checks if this weapon type cannot target structures.
      *
      * @return true if this weapon type cannot target buildings, and false if it can.
-     * @see UnitType#isBuilding
+     * @see {@link UnitType#isBuilding}
      */
     public boolean targetsNonBuilding() {
         return (wpnFlags[id] & TARG_NOBUILD) != 0;
@@ -617,7 +609,7 @@ public enum WeaponType {
      * Checks if this weapon type cannot target robotic units.
      *
      * @return true if this weapon type cannot target robotic units, and false if it can.
-     * @see UnitType#isRobotic
+     * @see {@link UnitType#isRobotic}
      */
     public boolean targetsNonRobotic() {
         return (wpnFlags[id] & TARG_NOROBOT) != 0;
@@ -626,7 +618,7 @@ public enum WeaponType {
     /**
      * Checks if this weapon type can target the ground.
      *
-     * @note This is more for attacks like @Psi_Storm which can target a location, not to be
+     * This is more for attacks like @Psi_Storm which can target a location, not to be
      * confused with attack move.
      *
      * @return true if this weapon type can target a location, and false otherwise.
@@ -639,7 +631,7 @@ public enum WeaponType {
      * Checks if this weapon type can only target organic or mechanical units.
      *
      * @return true if this weapon type can only target organic or mechanical units, and false otherwise.
-     * @see targetsOrganic, targetsMechanical, UnitType#isOrganic, UnitType#isMechanical
+     * @see {@link #targetsOrganic}, {@link #targetsMechanical}, {@link UnitType#isOrganic}, {@link UnitType#isMechanical}
      */
     public boolean targetsOrgOrMech() {
         return (wpnFlags[id] & TARG_ORGMECH) != 0;
@@ -647,10 +639,10 @@ public enum WeaponType {
 
     /**
      * Checks if this weapon type can only target units owned by the same player.
-     * This is used for WeaponType.Consume.
+     * This is used for {@link WeaponType#Consume}.
      *
      * @return true if this weapon type can only target your own units, and false otherwise.
-     * @see Unit#getPlayer
+     * @see {@link Unit#getPlayer}
      */
     public boolean targetsOwn() {
         return (wpnFlags[id] & TARG_OWN) != 0;

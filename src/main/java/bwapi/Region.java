@@ -13,7 +13,7 @@ import java.util.*;
  *
  * Most parameters that are available are explicitly assigned by Broodwar itself.
  *
- * @see Game#getAllRegions, Game#getRegionAt, Unit#getRegion
+ * @see {@link Game#getAllRegions}, {@link Game#getRegionAt}, {@link Unit#getRegion}
  */
 public class Region implements Comparable<Region> {
     private final RegionData regionData;
@@ -74,10 +74,10 @@ public class Region implements Comparable<Region> {
     /**
      * Retrieves a unique identifier for this region.
      *
-     * @note This identifier is explicitly assigned by Broodwar.
+     * This identifier is explicitly assigned by Broodwar.
      *
      * @return An integer that represents this region.
-     * @see Game#getRegion
+     * @see {@link Game#getRegion}
      */
     public int getID() {
         return id;
@@ -89,7 +89,7 @@ public class Region implements Comparable<Region> {
      * group ID. This function is generally used to check if a path is available between two
      * points in constant time.
      *
-     * @note This identifier is explicitly assigned by Broodwar.
+     * This identifier is explicitly assigned by Broodwar.
      *
      * @return An integer that represents the group of regions that this one is attached to.
      */
@@ -101,7 +101,7 @@ public class Region implements Comparable<Region> {
      * Retrieves the center of the region. This position is used as the node
      * of the region.
      *
-     * @return A Position indicating the center location of the Region, in pixels.
+     * @return A {@link Position} indicating the center location of the Region, in pixels.
      */
     public Position getCenter() {
         return center;
@@ -122,7 +122,7 @@ public class Region implements Comparable<Region> {
      * to other regions. A value of 2 may indicate a possible choke point, and a value
      * of 3 indicates a signficant strategic position.
      *
-     * @note This value is explicitly assigned by Broodwar.
+     * This value is explicitly assigned by Broodwar.
      *
      * @return An integer indicating this region's strategic potential.
      */
@@ -189,7 +189,7 @@ public class Region implements Comparable<Region> {
     /**
      * Retrieves the closest accessible neighbor region.
      *
-     * @return The closest Region that is accessible.
+     * @return The closest {@link Region} that is accessible.
      */
     public Region getClosestAccessibleRegion() {
         return closestAccessibleRegion;
@@ -198,7 +198,7 @@ public class Region implements Comparable<Region> {
     /**
      * Retrieves the closest inaccessible neighbor region.
      *
-     * @return The closest Region that is inaccessible.
+     * @return The closest {@link Region} that is inaccessible.
      */
     public Region getClosestInaccessibleRegion() {
         return closestInaccessibleRegion;
@@ -207,9 +207,9 @@ public class Region implements Comparable<Region> {
     /**
      * Retrieves the center-to-center distance between two regions.
      *
-     * @note Ignores all collisions.
+     * Ignores all collisions.
      *
-     * @param other The target Region to calculate distance to.
+     * @param other The target {@link Region} to calculate distance to.
      * @return The integer distance from this Region to \p other.
      */
     public int getDistance(final Region other) {
@@ -229,7 +229,7 @@ public class Region implements Comparable<Region> {
      * @return A List<Unit> containing all units in this region that have met the requirements
      * of \p pred.
      *
-     * @see UnitFilter
+     * @see {@link UnitFilter}
      */
     public List<Unit> getUnits(final UnitFilter pred) {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),

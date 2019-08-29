@@ -198,12 +198,12 @@ public enum TechType {
     }
 
     /**
-     * Retrieves the race that is required to research or use the TechType.
+     * Retrieves the race that is required to research or use the {@link TechType}.
      *
-     * @note There is an exception where @Infested_Kerrigan can use @Psi_Storm. This does not
+     * There is an exception where @Infested_Kerrigan can use @Psi_Storm. This does not
      * apply to the behavior of this function.
      *
-     * @return Race object indicating which race is designed to use this technology type.
+     * @return {@link Race} object indicating which race is designed to use this technology type.
      */
     public Race getRace() {
         return techRaces[id];
@@ -231,27 +231,27 @@ public enum TechType {
      * Retrieves the number of frames needed to research the tech type.
      *
      * @return The time, in frames, it will take for the research to complete.
-     * @see Unit#getRemainingResearchTime
+     * @see {@link Unit#getRemainingResearchTime}
      */
     public int researchTime() {
         return defaultTimeCost[id];
     }
 
     /**
-     * Retrieves the amount of energy needed to use this TechType as an ability.
+     * Retrieves the amount of energy needed to use this {@link TechType} as an ability.
      *
      * @return Energy cost of the ability.
-     * @see Unit#getEnergy
+     * @see {@link Unit#getEnergy}
      */
     public int energyCost() {
         return defaultEnergyCost[id];
     }
 
     /**
-     * Retrieves the UnitType that can research this technology.
+     * Retrieves the {@link UnitType} that can research this technology.
      *
      * @return UnitType that is able to research the technology in the game.
-     * @retval UnitType.None If the technology/ability is either provided for free or never
+     * Returns {@link UnitType#None} If the technology/ability is either provided for free or never
      * available.
      */
     public UnitType whatResearches() {
@@ -260,11 +260,11 @@ public enum TechType {
 
     /**
      * Retrieves the Weapon that is attached to this tech type.
-     * A technology's WeaponType is used to indicate the range and behaviour of the ability
+     * A technology's {@link WeaponType} is used to indicate the range and behaviour of the ability
      * when used by a Unit.
      *
      * @return WeaponType containing information about the ability's behavior.
-     * @retval WeaponType.None If there is no corresponding WeaponType.
+     * Returns {@link WeaponType#None} If there is no corresponding WeaponType.
      */
     public WeaponType getWeapon() {
         return techWeapons[id];
@@ -298,23 +298,23 @@ public enum TechType {
     }
 
     /**
-     * Retrieves the Order that a Unit uses when using this ability.
+     * Retrieves the {@link Order} that a Unit uses when using this ability.
      *
-     * @return Order representing the action a Unit uses to perform this ability
+     * @return {@link Order} representing the action a Unit uses to perform this ability
      */
     public Order getOrder() {
         return techOrders[id];
     }
 
     /**
-     * Retrieves the UnitType required to research this technology.
+     * Retrieves the {@link UnitType} required to research this technology.
      * The required unit type must be a completed unit owned by the player researching the
      * technology.
      *
-     * @return UnitType that is needed to research this tech type.
-     * @retval UnitType.None if no unit is required to research this tech type.
+     * @return {@link UnitType} that is needed to research this tech type.
+     * Returns {@link UnitType#None} if no unit is required to research this tech type.
      *
-     * @see Player#completedUnitCount
+     * @see {@link Player#completedUnitCount}
      *
      * @since 4.1.2
      */

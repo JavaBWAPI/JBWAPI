@@ -213,9 +213,9 @@ public enum UpgradeType {
 
     /**
      * Retrieves the race the upgrade is for.
-     * For example, UpgradeType.Terran_Infantry_Armor.getRace() will return Race.Terran.
+     * For example, UpgradeType.Terran_Infantry_Armor.getRace() will return {@link Race#Terran}.
      *
-     * @return Race that this upgrade belongs to.
+     * @return {@link Race} that this upgrade belongs to.
      */
     public Race getRace() {
         return upgradeRaces[id];
@@ -230,7 +230,7 @@ public enum UpgradeType {
      *
      * @param level The next upgrade level.
      *
-     * @note Upgrades start at level 0.
+     * Upgrades start at level 0.
      *
      * @return The mineral cost of the upgrade for the given \p level.
      */
@@ -256,7 +256,7 @@ public enum UpgradeType {
      *
      * @param level The next upgrade level.
      *
-     * @note Upgrades start at level 0.
+     * Upgrades start at level 0.
      *
      * @return The gas cost of the upgrade for the given \p level.
      */
@@ -282,7 +282,7 @@ public enum UpgradeType {
      *
      * @param level The next upgrade level.
      *
-     * @note Upgrades start at level 0.
+     * Upgrades start at level 0.
      *
      * @return The time cost of the upgrade for the given \p level.
      */
@@ -302,7 +302,7 @@ public enum UpgradeType {
     /**
      * Returns the type of unit that researches the upgrade.
      *
-     * @return The UnitType that is used to upgrade this type.
+     * @return The {@link UnitType} that is used to upgrade this type.
      */
     public UnitType whatUpgrades() {
         return whatUpgrades[id];
@@ -336,9 +336,9 @@ public enum UpgradeType {
      *
      * @param level The next upgrade level.
      *
-     * @note Upgrades start at level 0.
+     * Upgrades start at level 0.
      *
-     * @return UnitType required to obtain this upgrade.
+     * @return {@link UnitType} required to obtain this upgrade.
      */
     public UnitType whatsRequired(final int level) {
         return level >= 1 && level <= 3 ? requirements[level - 1][id] : UnitType.None;

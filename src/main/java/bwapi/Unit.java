@@ -6096,7 +6096,7 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a placeCOP command.
      *
-     * @see {@lin Unit#canIssueCommand}, {@link Unit#placeCOP}
+     * @see {@link Unit#canIssueCommand}, {@link Unit#placeCOP}
      */
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
