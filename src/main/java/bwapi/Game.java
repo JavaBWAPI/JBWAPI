@@ -1676,8 +1676,7 @@ public class Game {
     public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
         return units.stream()
                 .map(u -> u.issueCommand(command))
-                .collect(Collectors.toList()) // first force all commands to be issued
-                .contains(true);
+                .reduce(false, (a, b) -> a | b);
     }
 
     /**
