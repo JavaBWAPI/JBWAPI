@@ -231,7 +231,7 @@ public enum TechType {
      * Retrieves the number of frames needed to research the tech type.
      *
      * @return The time, in frames, it will take for the research to complete.
-     * @see {@link Unit#getRemainingResearchTime}
+     * @see Unit#getRemainingResearchTime
      */
     public int researchTime() {
         return defaultTimeCost[id];
@@ -241,7 +241,7 @@ public enum TechType {
      * Retrieves the amount of energy needed to use this {@link TechType} as an ability.
      *
      * @return Energy cost of the ability.
-     * @see {@link Unit#getEnergy}
+     * @see Unit#getEnergy
      */
     public int energyCost() {
         return defaultEnergyCost[id];
@@ -314,7 +314,7 @@ public enum TechType {
      * @return {@link UnitType} that is needed to research this tech type.
      * Returns {@link UnitType#None} if no unit is required to research this tech type.
      *
-     * @see {@link Player#completedUnitCount}
+     * @see Player#completedUnitCount
      *
      * @since 4.1.2
      */

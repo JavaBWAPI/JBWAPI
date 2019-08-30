@@ -13,7 +13,9 @@ import java.util.*;
  *
  * Most parameters that are available are explicitly assigned by Broodwar itself.
  *
- * @see {@link Game#getAllRegions}, {@link Game#getRegionAt}, {@link Unit#getRegion}
+ * @see Game#getAllRegions
+ * @see Game#getRegionAt
+ * @see Unit#getRegion
  */
 public class Region implements Comparable<Region> {
     private final RegionData regionData;
@@ -77,7 +79,7 @@ public class Region implements Comparable<Region> {
      * This identifier is explicitly assigned by Broodwar.
      *
      * @return An integer that represents this region.
-     * @see {@link Game#getRegion}
+     * @see Game#getRegion
      */
     public int getID() {
         return id;
@@ -229,7 +231,7 @@ public class Region implements Comparable<Region> {
      * @return A List<Unit> containing all units in this region that have met the requirements
      * of \p pred.
      *
-     * @see {@link UnitFilter}
+     * @see UnitFilter
      */
     public List<Unit> getUnits(final UnitFilter pred) {
         return game.getUnitsInRectangle(getBoundsLeft(), getBoundsTop(), getBoundsRight(), getBoundsBottom(),

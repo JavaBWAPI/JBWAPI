@@ -2,7 +2,8 @@ package bwapi;
 
 /**
  * Contains flag enumerations for BWAPI.
- * @see {@link Game#enableFlag}, {@link Game#isFlagEnabled}
+ * @see Game#enableFlag
+ * @see Game#isFlagEnabled
  */
 public enum Flag {
     /**

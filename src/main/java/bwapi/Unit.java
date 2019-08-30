@@ -91,7 +91,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer containing the unit's identifier.
      *
-     * @see {@link #getReplayID}
+     * @see #getReplayID
      */
     public int getID() {
         return id;
@@ -112,7 +112,8 @@ public class Unit implements Comparable<Unit>{
      *      to the unit or that the unit has died. You can specifically identify dead units
      *      by polling onUnitDestroy.
      *
-     * @see {@link #isVisible}, {@link #isCompleted}
+     * @see #isVisible
+     * @see #isCompleted
      */
     public boolean exists() {
         return unitData.getExists();
@@ -125,7 +126,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer containing the replay unit identifier.
      *
-     * @see {@link #getID}
+     * @see #getID
      */
     public int getReplayID() {
         return replayID;
@@ -145,7 +146,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return A {@link UnitType} objects representing the unit's type. Returns {@link UnitType#Unknown} if this unit is inaccessible or cannot be determined.
      *
-     * @see {@link #getInitialType}
+     * @see #getInitialType
      */
     public UnitType getType() {
         return UnitType.idToEnum[unitData.getType()];
@@ -162,7 +163,10 @@ public class Unit implements Comparable<Unit>{
      *
      * @return {@link Position} object representing the unit's current position. Returns {@link Position#Unknown} if this unit is inaccessible.
      *
-     * @see {@link #getTilePosition}, {@link #getInitialPosition}, {@link #getLeft}, {@link #getTop}
+     * @see #getTilePosition
+     * @see #getInitialPosition
+     * @see #getLeft
+     * @see #getTop
      */
     public Position getPosition() {
         return position;
@@ -184,7 +188,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return {@link TilePosition} object representing the unit's current tile position. Returns {@link TilePosition#Unknown} if this unit is inaccessible.
      *
-     * @see {@link #getPosition}, {@link #getInitialTilePosition}
+     * @see #getPosition
+     * @see #getInitialTilePosition
      */
     public TilePosition getTilePosition() {
         final Position p = getPosition();
@@ -209,7 +214,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return A double that represents the velocity's x component.
      *
-     * @see {@link #getVelocityY}
+     * @see #getVelocityY
      */
     public double getVelocityX() {
         return unitData.getVelocityX();
@@ -220,7 +225,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return A double that represents the velocity's y component.
      *
-     * @see {@link #getVelocityX}
+     * @see #getVelocityX
      */
     public double getVelocityY() {
         return unitData.getVelocityY();
@@ -241,7 +246,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer representing the position of the left side of the unit.
      *
-     * @see {@link #getTop}, {@link #getRight}, {@link #getBottom}
+     * @see #getTop
+     * @see #getRight
+     * @see #getBottom
      */
     public int getLeft() {
         return getX() - getType().dimensionLeft();
@@ -253,7 +260,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer representing the position of the top side of the unit.
      *
-     * @see {@link #getLeft}, {@link #getRight}, {@link #getBottom}
+     * @see #getLeft
+     * @see #getRight
+     * @see #getBottom
      */
     public int getTop() {
         return getY() - getType().dimensionUp();
@@ -265,7 +274,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer representing the position of the right side of the unit.
      *
-     * @see {@link #getLeft}, {@link #getTop}, {@link #getBottom}
+     * @see #getLeft
+     * @see #getTop
+     * @see #getBottom
      */
     public int getRight() {
         return getX() + getType().dimensionRight();
@@ -277,7 +288,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer representing the position of the bottom side of the unit.
      *
-     * @see {@link #getLeft}, {@link #getTop}, {@link #getRight}
+     * @see #getLeft
+     * @see #getTop
+     * @see #getRight
      */
     public int getBottom() {
         return getY() + getType().dimensionDown();
@@ -293,7 +306,9 @@ public class Unit implements Comparable<Unit>{
      * Battle.net. Such values include units that have 0 HP (can't be killed conventionally)
      * or even negative HP (death in one hit).
      *
-     * @see {@link UnitType#maxHitPoints}, {@link #getShields}, {@link #getInitialHitPoints}
+     * @see UnitType#maxHitPoints
+     * @see #getShields
+     * @see #getInitialHitPoints
      */
     public int getHitPoints() {
         return unitData.getHitPoints();
@@ -304,7 +319,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return An integer representing the amount of shield points a unit currently has.
      *
-     * @see {@link UnitType#maxShields}, {@link #getHitPoints}
+     * @see UnitType#maxShields
+     * @see #getHitPoints
      */
     public int getShields() {
         return unitData.getShields();
@@ -317,7 +333,7 @@ public class Unit implements Comparable<Unit>{
      *
      * Energy is required in order for units to use abilities.
      *
-     * @see {@link UnitType#maxEnergy}
+     * @see UnitType#maxEnergy
      */
     public int getEnergy() {
         return unitData.getEnergy();
@@ -331,7 +347,7 @@ public class Unit implements Comparable<Unit>{
      * @return An integer representing the last known amount of resources remaining in this
      * resource.
      *
-     * @see {@link #getInitialResources}
+     * @see #getInitialResources
      */
     public int getResources() {
         return unitData.getResources();
@@ -450,7 +466,7 @@ public class Unit implements Comparable<Unit>{
      * @param target A {@link Position} or a {@link Unit} that is used to determine if this unit has a path to the target.
      *
      * @return true If there is a path between this unit and the target position, otherwise it will return false.
-     * @see {@link Game#hasPath}
+     * @see Game#hasPath
      */
     public boolean hasPath(final Position target) {
         // Return true if this unit is an air unit
@@ -472,7 +488,8 @@ public class Unit implements Comparable<Unit>{
      * This value is comparable to {@link Game#getFrameCount}.
      *
      * @return The frame number that sent the last successfully processed command to BWAPI.
-     * @see {@link Game#getFrameCount}, {@link #getLastCommand}
+     * @see Game#getFrameCount
+     * @see #getLastCommand
      */
     public int getLastCommandFrame() {
         return lastCommandFrame;
@@ -482,7 +499,7 @@ public class Unit implements Comparable<Unit>{
      * Retrieves the last successful command that was sent to BWAPI.
      *
      * @return A {@link UnitCommand} object containing information about the command that was processed.
-     * @see {@link #getLastCommandFrame}
+     * @see #getLastCommandFrame
      */
     public UnitCommand getLastCommand() {
         return lastCommand;
@@ -546,7 +563,7 @@ public class Unit implements Comparable<Unit>{
      * It is possible for the unit's initial hit points to differ from the maximum hit
      * points.
      *
-     * @see {@link Game#getStaticNeutralUnits}
+     * @see Game#getStaticNeutralUnits
      */
     public int getInitialHitPoints() {
         return initialHitPoints;
@@ -560,7 +577,7 @@ public class Unit implements Comparable<Unit>{
      * Returns 0 if this unit was not a neutral unit at the beginning of the game, or if this
      * unit does not contain resources. It is possible that the unit simply contains 0 resources.
      *
-     * @see {@link Game#getStaticNeutralUnits}
+     * @see Game#getStaticNeutralUnits
      */
     public int getInitialResources() {
         return initialResources;
@@ -595,7 +612,7 @@ public class Unit implements Comparable<Unit>{
      * but don't actually have access to the individual interceptors.
      *
      * @return Number of interceptors in this unit.
-     * @see {@link #getInterceptors}
+     * @see #getInterceptors
      */
     public int getInterceptorCount() {
         return unitData.getInterceptorCount();
@@ -669,7 +686,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of hit points remaining on this unit's @matrix.
      *
-     * @see {@link #getDefenseMatrixTimer}, {@link #isDefenseMatrixed}
+     * @see #getDefenseMatrixTimer
+     * @see #isDefenseMatrixed
      */
     public int getDefenseMatrixPoints() {
         return unitData.getDefenseMatrixPoints();
@@ -681,7 +699,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #getDefenseMatrixPoints}, {@link #isDefenseMatrixed}
+     * @see #getDefenseMatrixPoints
+     * @see #isDefenseMatrixed
      */
     public int getDefenseMatrixTimer() {
         return unitData.getDefenseMatrixTimer();
@@ -693,7 +712,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isEnsnared}
+     * @see #isEnsnared
      */
     public int getEnsnareTimer() {
         return unitData.getEnsnareTimer();
@@ -705,7 +724,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isIrradiated}
+     * @see #isIrradiated
      */
     public int getIrradiateTimer() {
         return unitData.getIrradiateTimer();
@@ -717,7 +736,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isLockdowned}
+     * @see #isLockedDown()
      */
     public int getLockdownTimer() {
         return unitData.getLockdownTimer();
@@ -729,7 +748,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isMaelstrommed}
+     * @see #isMaelstrommed
      */
     public int getMaelstromTimer() {
         return unitData.getMaelstromTimer();
@@ -740,7 +759,7 @@ public class Unit implements Comparable<Unit>{
      * specific to the order type that is currently assigned to the unit.
      *
      * @return A value used as a timer for the primary order.
-     * @see {@link #getOrder}
+     * @see #getOrder
      */
     public int getOrderTimer() {
         return unitData.getOrderTimer();
@@ -752,7 +771,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isPlagued}
+     * @see #isPlagued
      */
     public int getPlagueTimer() {
         return unitData.getPlagueTimer();
@@ -780,7 +799,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isPlagued}
+     * @see #isPlagued
      */
     public int getStasisTimer() {
         return unitData.getStasisTimer();
@@ -792,7 +811,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Number of frames remaining until the effect is removed.
      *
-     * @see {@link #isPlagued}
+     * @see #isPlagued
      */
     public int getStimTimer() {
         return unitData.getStimTimer();
@@ -815,7 +834,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return a List<UnitType> containing all the types that are in this factory's training
      * queue, from oldest to most recent.
-     * @see {@link #train}, {@link #cancelTrain}, {@link #isTraining}
+     * @see #train
+     * @see #cancelTrain
+     * @see #isTraining
      */
     public List<UnitType> getTrainingQueue() {
         return IntStream.range(0, unitData.getTrainingQueueCount())
@@ -829,7 +850,10 @@ public class Unit implements Comparable<Unit>{
      * @return {@link TechType} indicating the technology being researched by this unit.
      * Returns {@link TechType#None} if this unit is not researching anything.
      *
-     * @see {@link #research}, {@link #cancelResearch}, {@link #isResearching}, {@link #getRemainingResearchTime}
+     * @see #research
+     * @see #cancelResearch
+     * @see #isResearching
+     * @see #getRemainingResearchTime
      */
     public TechType getTech() {
         return TechType.idToEnum[unitData.getTech()];
@@ -841,7 +865,10 @@ public class Unit implements Comparable<Unit>{
      * @return {@link UpgradeType} indicating the upgrade in progress by this unit.
      * Returns {@link UpgradeType#None} if this unit is not upgrading anything.
      *
-     * @see {@link #upgrade}, {@link #cancelUpgrade}, {@link #isUpgrading}, {@link #getRemainingUpgradeTime}
+     * @see #upgrade
+     * @see #cancelUpgrade
+     * @see #isUpgrading
+     * @see #getRemainingUpgradeTime
      */
     public UpgradeType getUpgrade() {
         return UpgradeType.idToEnum[unitData.getUpgrade()];
@@ -868,7 +895,8 @@ public class Unit implements Comparable<Unit>{
      * the number of frames remaining until the next larva spawns.
      * Returns 0 if the unit is not training or has three larvae.
      *
-     * + @see {@link #train}, {@link #getTrainingQueue}
+     * + @see #train
+     * @see #getTrainingQueue
      */
     public int getRemainingTrainTime() {
         return unitData.getRemainingTrainTime();
@@ -882,7 +910,10 @@ public class Unit implements Comparable<Unit>{
      * researched by this unit.
      * Returns 0 if the unit is not researching anything.
      *
-     * @see {@link #research}, {@link #cancelResearch}, {@link #isResearching}, {@link #getTech}
+     * @see #research
+     * @see #cancelResearch
+     * @see #isResearching
+     * @see #getTech
      */
     public int getRemainingResearchTime() {
         return unitData.getRemainingResearchTime();
@@ -894,7 +925,10 @@ public class Unit implements Comparable<Unit>{
      * @return The remaining upgrade time, in frames, for the current upgrade.
      * Returns 0 if the unit is not upgrading anything.
      *
-     * @see {@link #upgrade}, {@link #cancelUpgrade}, {@link #isUpgrading}, {@link #getUpgrade}
+     * @see #upgrade
+     * @see #cancelUpgrade
+     * @see #isUpgrading
+     * @see #getUpgrade
      */
     public int getRemainingUpgradeTime() {
         return unitData.getRemainingUpgradeTime();
@@ -925,7 +959,7 @@ public class Unit implements Comparable<Unit>{
      * acquired automatically without issuing an order, use {@link #getOrderTarget}.
      *
      * @return Unit that is currently being targeted by this unit.
-     * @see {@link #getOrderTarget}
+     * @see #getOrderTarget
      */
     public Unit getTarget() {
         return game.getUnit(unitData.getTarget());
@@ -969,7 +1003,8 @@ public class Unit implements Comparable<Unit>{
      * will be set in this case, but not getTarget.
      *
      * @return The {@link Unit} that this unit is currently targetting.
-     * @see {@link #getTarget}, {@link #getOrder}
+     * @see #getTarget
+     * @see #getOrder
      */
     public Unit getOrderTarget() {
         return game.getUnit(unitData.getOrderTarget());
@@ -981,7 +1016,8 @@ public class Unit implements Comparable<Unit>{
      * returns the location that the unit is trying to move to.
      *
      * @return {@link Position} that this unit is currently targetting.
-     * @see {@link #getTargetPosition}, {@link #getOrder}
+     * @see #getTargetPosition
+     * @see #getOrder
      */
     public Position getOrderTargetPosition() {
         return new Position(unitData.getOrderTargetPositionX(), unitData.getOrderTargetPositionY());
@@ -996,7 +1032,8 @@ public class Unit implements Comparable<Unit>{
      *
      * If {@link #getRallyUnit} is valid, then this value is ignored.
      *
-     * @see {@link #setRallyPoint}, {@link #getRallyUnit}
+     * @see #setRallyPoint
+     * @see #getRallyUnit
      */
     public Position getRallyPosition() {
         return new Position(unitData.getRallyPositionX(), unitData.getRallyPositionY());
@@ -1012,7 +1049,8 @@ public class Unit implements Comparable<Unit>{
      * A rallied unit takes precedence over a rallied position. That is if the return value
      * is valid(non-null), then getRallyPosition is ignored.
      *
-     * @see {@link #setRallyPoint}, {@link #getRallyPosition}
+     * @see #setRallyPoint
+     * @see #getRallyPosition
      */
     public Unit getRallyUnit() {
         return game.getUnit(unitData.getRallyUnit());
@@ -1084,7 +1122,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return The number of spots available to transport a unit.
      *
-     * @see {@link #getLoadedUnits}
+     * @see #getLoadedUnits
      */
     public int getSpaceRemaining() {
         int space = getType().spaceProvided();
@@ -1111,7 +1149,7 @@ public class Unit implements Comparable<Unit>{
      * intended for @Carriers and its hero.
      *
      * @return List<Unit> containing @Interceptor units owned by this carrier.
-     * @see {@link #getInterceptorCount}
+     * @see #getInterceptorCount
      */
     public List<Unit> getInterceptors() {
         if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
@@ -1128,7 +1166,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return Hatchery unit that has ownership of this larva.
      * Returns null if the current unit is not a @Larva or has no parent.
-     * @see {@link #getLarva}
+     * @see #getLarva
      */
     public Unit getHatchery() {
         return game.getUnit(unitData.getHatchery());
@@ -1141,7 +1179,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return List<Unit> containing @Larva units owned by this unit. The set will be empty if
      * there are none.
-     * @see {@link #getHatchery}
+     * @see #getHatchery
      */
     public List<Unit> getLarva() {
         if (!getType().producesLarva()) {
@@ -1168,7 +1206,10 @@ public class Unit implements Comparable<Unit>{
      * @return A List<Unit> containing the set of units that match the given criteria.
      *
      *
-     * @see {@link #getClosestUnit}, {@link #getUnitsInWeaponRange}, {@link Game#getUnitsInRadius}, {@link Game#getUnitsInRectangle}
+     * @see Game#getClosestUnit
+     * @see #getUnitsInWeaponRange
+     * @see Game#getUnitsInRadius
+     * @see Game#getUnitsInRectangle
      */
     public List<Unit> getUnitsInRadius(final int radius, final UnitFilter pred) {
         if (!exists()) {
@@ -1192,7 +1233,10 @@ public class Unit implements Comparable<Unit>{
      * @param weapon The weapon type to use as a filter for distance and units that can be hit by it.
      * @param pred A predicate used as an additional filter. If omitted, no additional filter is used.
      *
-     * @see {@link #getUnitsInRadius}, {@link #getClosestUnit}, {@link Game#getUnitsInRadius}, {@link Game#getUnitsInRectangle}
+     * @see #getUnitsInRadius
+     * @see Game#getClosestUnit
+     * @see Game#getUnitsInRadius
+     * @see Game#getUnitsInRectangle
      */
     public List<Unit> getUnitsInWeaponRange(final WeaponType weapon, final UnitFilter pred) {
         // Return if this unit does not exist
@@ -1285,7 +1329,10 @@ public class Unit implements Comparable<Unit>{
      * being constructed by an attached SCV.
      * false if this is either completed, not a structure, or has no SCV constructing it
      *
-     * @see {@link #build}, {@link #cancelConstruction}, {@link #haltConstruction}, {@link #isConstructing}
+     * @see #build
+     * @see #cancelConstruction
+     * @see #haltConstruction
+     * @see #isConstructing
      */
     public boolean isBeingConstructed() {
         if (isMorphing()) {
@@ -1344,7 +1391,8 @@ public class Unit implements Comparable<Unit>{
      * an armed @Spider_Mine.
      *
      * @return true if this unit is burrowed, and false otherwise
-     * @see {@link #burrow}, {@link #unburrow}
+     * @see #burrow
+     * @see #unburrow
      */
     public boolean isBurrowed() {
         return unitData.isBurrowed();
@@ -1360,7 +1408,9 @@ public class Unit implements Comparable<Unit>{
      * @return true if this is a worker unit carrying vespene gas, and false if it is either
      * not a worker, or not carrying gas.
      *
-     * @see {@link #returnCargo}, {@link #isGatheringGas}, {@link #isCarryingMinerals}
+     * @see #returnCargo
+     * @see #isGatheringGas
+     * @see #isCarryingMinerals
      */
     public boolean isCarryingGas() {
         return unitData.getCarryResourceType() == 1;
@@ -1372,7 +1422,9 @@ public class Unit implements Comparable<Unit>{
      * @return true if this is a worker unit carrying minerals, and false if it is either
      * not a worker, or not carrying minerals.
      *
-     * @see {@link #returnCargo}, {@link #isGatheringMinerals}, {@link #isCarryingMinerals}
+     * @see #returnCargo
+     * @see #isGatheringMinerals
+     * @see #isCarryingMinerals
      */
     public boolean isCarryingMinerals() {
         return unitData.getCarryResourceType() == 2;
@@ -1382,7 +1434,8 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is currently @cloaked.
      *
      * @return true if this unit is cloaked, and false if it is visible.
-     * @see {@link #cloak}, {@link #decloak}
+     * @see #cloak
+     * @see #decloak
      */
     public boolean isCloaked() {
         return unitData.isCloaked();
@@ -1404,7 +1457,10 @@ public class Unit implements Comparable<Unit>{
      * @return true when a unit has been issued an order to build a structure and is moving to
      * the build location, or is currently constructing something.
      *
-     * @see {@link #isBeingConstructed}, {@link #build}, {@link #cancelConstruction}, {@link #haltConstruction}
+     * @see #isBeingConstructed
+     * @see #build
+     * @see #cancelConstruction
+     * @see #haltConstruction
      */
     public boolean isConstructing() {
         return unitData.isConstructing();
@@ -1445,7 +1501,8 @@ public class Unit implements Comparable<Unit>{
      * either a flyer or a flying building.
      *
      * @return true if this unit is in the air, and false if it is on the ground
-     * @see {@link UnitType#isFlyer}, {@link Unit#isLifted}
+     * @see UnitType#isFlyer
+     * @see Unit#isLifted
      */
     public boolean isFlying() {
         return getType().isFlyer() || isLifted();
@@ -1457,7 +1514,8 @@ public class Unit implements Comparable<Unit>{
      * it is following.
      *
      * @return true if this unit is following another unit, and false if it is not
-     * @see {@link #follow}, {@link #getTarget}
+     * @see #follow
+     * @see #getTarget
      */
     public boolean isFollowing() {
         return getOrder() == Order.Follow;
@@ -1469,7 +1527,7 @@ public class Unit implements Comparable<Unit>{
      * returning gas to a resource depot.
      *
      * @return true if this unit is harvesting gas, and false if it is not
-     * @see {@link #isCarryingGas}
+     * @see #isCarryingGas
      */
     public boolean isGatheringGas() {
         if (!unitData.isGathering()) {
@@ -1496,7 +1554,7 @@ public class Unit implements Comparable<Unit>{
      * minerals to a resource depot.
      *
      * @return true if this unit is gathering minerals, and false if it is not
-     * @see {@link #isCarryingMinerals}
+     * @see #isCarryingMinerals
      */
     public boolean isGatheringMinerals() {
         if (!unitData.isGathering()) {
@@ -1524,7 +1582,7 @@ public class Unit implements Comparable<Unit>{
      * destroyed (see {@link Unit#getRemoveTimer}).
      *
      * @return true if the unit is a hallucination and false otherwise.
-     * @see {@link #getRemoveTimer}
+     * @see #getRemoveTimer
      */
     public boolean isHallucination() {
         return unitData.isHallucination();
@@ -1536,7 +1594,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is holding position, and false if it is not.
      *
-     * @see {@link #holdPosition}
+     * @see #holdPosition
      */
     public boolean isHoldingPosition() {
         return getOrder() == HoldPosition;
@@ -1572,7 +1630,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is idle, and false if this unit is performing any action, such
      * as moving or attacking
-     * @see {@link Unit#stop}
+     * @see Unit#stop
      */
     public boolean isIdle() {
         return unitData.isIdle();
@@ -1638,7 +1696,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is irradiated, and false otherwise
      *
-     * @see {@link #getIrradiateTimer}
+     * @see #getIrradiateTimer
      */
     public boolean isIrradiated() {
         return getIrradiateTimer() != 0;
@@ -1650,7 +1708,7 @@ public class Unit implements Comparable<Unit>{
      * return true.
      *
      * @return true if this unit is a @Terran structure lifted off the ground.
-     * @see {@link #isFlying}
+     * @see #isFlying
      */
     public boolean isLifted() {
         return unitData.isLifted();
@@ -1660,7 +1718,9 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is currently loaded into another unit such as a @Transport.
      *
      * @return true if this unit is loaded in another one, and false otherwise
-     * @see {@link #load}, {@link #unload}, {@link #unloadAll}
+     * @see #load
+     * @see #unload
+     * @see #unloadAll
      */
     public boolean isLoaded() {
         return getTransport() != null;
@@ -1670,7 +1730,7 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is currently @locked by a @Ghost.
      *
      * @return true if this unit is locked down, and false otherwise
-     * @see {@link #getLockdownTimer}
+     * @see #getLockdownTimer
      */
     public boolean isLockedDown() {
         return getLockdownTimer() != 0;
@@ -1680,7 +1740,7 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit has been @Maelstrommed by a @Dark_Archon.
      *
      * @return true if this unit is maelstrommed, and false otherwise
-     * @see {@link #getMaelstromTimer}
+     * @see #getMaelstromTimer
      */
     public boolean isMaelstrommed() {
         return getMaelstromTimer() != 0;
@@ -1693,7 +1753,10 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if the unit is currently morphing, false if the unit is not morphing
      *
-     * @see {@link #morph}, {@link #cancelMorph}, {@link #getBuildType}, {@link #getRemainingBuildTime}
+     * @see #morph
+     * @see #cancelMorph
+     * @see #getBuildType
+     * @see #getRemainingBuildTime
      */
     public boolean isMorphing() {
         return unitData.isMorphing();
@@ -1703,7 +1766,7 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is currently moving.
      *
      * @return true if this unit is moving, and false if it is not
-     * @see {@link #stop}
+     * @see #stop
      */
     public boolean isMoving() {
         return unitData.isMoving();
@@ -1722,7 +1785,7 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is patrolling between two positions.
      *
      * @return true if this unit is patrolling and false if it is not
-     * @see {@link #patrol}
+     * @see #patrol
      */
     public boolean isPatrolling() {
         return getOrder() == Patrol;
@@ -1733,7 +1796,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is inflicted with @plague and is taking damage, and false if it
      * is clean
-     * @see {@link #getPlagueTimer}
+     * @see #getPlagueTimer
      */
     public boolean isPlagued() {
         return getPlagueTimer() != 0;
@@ -1755,7 +1818,10 @@ public class Unit implements Comparable<Unit>{
      * See TechTypes for a complete list of technologies in Broodwar.
      *
      * @return true if this structure is researching a technology, false otherwise
-     * @see {@link #research}, {@link #cancelResearch}, {@link #getTech}, {@link #getRemainingResearchTime},
+     * @see #research
+     * @see #cancelResearch
+     * @see #getTech
+     * @see #getRemainingResearchTime,
      */
     public boolean isResearching() {
         return getOrder() == ResearchTech;
@@ -1766,7 +1832,7 @@ public class Unit implements Comparable<Unit>{
      * function is only available if the flag Flag#UserInput is enabled.
      *
      * @return true if this unit is currently selected, and false if this unit is not selected
-     * @see {@link Game#getSelectedUnits}
+     * @see Game#getSelectedUnits
      */
     public boolean isSelected() {
         return unitData.isSelected();
@@ -1777,7 +1843,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if the unit is in siege mode, and false if it is either not in siege mode or
      * not a @Siege_Tank
-     * @see {@link #siege}, {@link #unsiege}
+     * @see #siege
+     * @see #unsiege
      */
     public boolean isSieged() {
         final UnitType t = getType();
@@ -1789,7 +1856,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is starting an attack.
      *
-     * @see {@link #attack}, {@link #getGroundWeaponCooldown}, {@link #getAirWeaponCooldown}
+     * @see #attack
+     * @see #getGroundWeaponCooldown
+     * @see #getAirWeaponCooldown
      */
     public boolean isStartingAttack() {
         return unitData.isStartingAttack();
@@ -1804,7 +1873,7 @@ public class Unit implements Comparable<Unit>{
      * This function does not necessarily imply that the unit is invincible, since there
      * is a feature in the @UMS game type that allows stasised units to be vulnerable.
      *
-     * @see {@link #getStasisTimer}
+     * @see #getStasisTimer
      */
     public boolean isStasised() {
         return getStasisTimer() != 0;
@@ -1814,7 +1883,7 @@ public class Unit implements Comparable<Unit>{
      * Checks if this unit is currently under the influence of a @Stim_Pack.
      *
      * @return true if this unit has used a stim pack, false otherwise
-     * @see {@link #getStimTimer}
+     * @see #getStimTimer
      */
     public boolean isStimmed() {
         return getStimTimer() != 0;
@@ -1840,7 +1909,10 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if this unit is currently training another unit, and false otherwise.
      *
-     * @see {@link #train}, {@link #getTrainingQueue}, {@link #cancelTrain}, {@link #getRemainingTrainTime}
+     * @see #train
+     * @see #getTrainingQueue
+     * @see #cancelTrain
+     * @see #getRemainingTrainTime
      */
     public boolean isTraining() {
         return unitData.isTraining();
@@ -1903,7 +1975,10 @@ public class Unit implements Comparable<Unit>{
      * See UpgradeTypes for a full list of upgrades in Broodwar.
      *
      * @return true if this structure is upgrading, false otherwise
-     * @see {@link #upgrade}, {@link #cancelUpgrade}, {@link #getUpgrade}, {@link #getRemainingUpgradeTime}
+     * @see #upgrade
+     * @see #cancelUpgrade
+     * @see #getUpgrade
+     * @see #getRemainingUpgradeTime
      */
     public boolean isUpgrading() {
         return getOrder() == Upgrade;
@@ -1923,7 +1998,7 @@ public class Unit implements Comparable<Unit>{
      * If the {@link Flag#CompleteMapInformation} flag is enabled, existing units hidden by the
      * fog of war will be accessible, but isVisible will still return false.
      *
-     * @see {@link #exists}
+     * @see #exists
      */
     public boolean isVisible(final Player player) {
         return unitData.isVisible(player.getID());
@@ -1935,7 +2010,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the unit can be a target, false if an error occurred and the unit can not be a target.
      *
-     * @see {@link Unit#canTargetUnit}
+     * @see Unit#canTargetUnit
      */
     public boolean isTargetable() {
         if (!exists()) {
@@ -1969,7 +2044,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link UnitCommandType}, {@link Unit#canIssueCommand}
+     * @see UnitCommandType
+     * @see Unit#canIssueCommand
      */
     public boolean issueCommand(final UnitCommand command) {
         if (!canIssueCommand(command)) {
@@ -2027,7 +2103,7 @@ public class Unit implements Comparable<Unit>{
      *
      * A @Medic will use Heal Move instead of attack.
      *
-     * @see {@link Unit#canAttack}
+     * @see Unit#canAttack
      */
     public boolean attack(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.attack(this, target, shiftQueueCommand));
@@ -2055,7 +2131,9 @@ public class Unit implements Comparable<Unit>{
      * You must have sufficient resources and meet the necessary requirements in order to
      * build a structure.
      *
-     * @see {@link Unit#train}, {@link Unit#cancelConstruction}, {@link Unit#canBuild}
+     * @see Unit#train
+     * @see Unit#cancelConstruction
+     * @see Unit#canBuild
      */
     public boolean build(final UnitType type, final TilePosition target) {
         return issueCommand(UnitCommand.build(this, target, type));
@@ -2074,7 +2152,9 @@ public class Unit implements Comparable<Unit>{
      * You must have sufficient resources and meet the necessary requirements in order to
      * build a structure.
      *
-     * @see {@link Unit#build}, {@link Unit#cancelAddon}, {@link Unit#canBuildAddon}
+     * @see Unit#build
+     * @see Unit#cancelAddon
+     * @see Unit#canBuildAddon
      */
     public boolean buildAddon(final UnitType type) {
         return issueCommand(UnitCommand.buildAddon(this, type));
@@ -2098,7 +2178,10 @@ public class Unit implements Comparable<Unit>{
      * If you call this using a @Hatchery, @Lair, or @Hive, then it will automatically
      * pass the command to one of its @Larvae.
      *
-     * @see {@link Unit#build}, {@link Unit#morph}, {@link Unit#cancelTrain}, {@link Unit#isTraining},
+     * @see Unit#build
+     * @see Unit#morph
+     * @see Unit#cancelTrain
+     * @see Unit#isTraining,
      * {@link Unit#canTrain}
      */
     public boolean train(final UnitType type) {
@@ -2115,7 +2198,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link Unit#build}, {@link Unit#morph}, {@link Unit#canMorph}
+     * @see Unit#build
+     * @see Unit#morph
+     * @see Unit#canMorph
      */
     public boolean morph(final UnitType type) {
         return issueCommand(UnitCommand.morph(this, type));
@@ -2131,7 +2216,11 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #cancelResearch}, {@link #isResearching}, {@link #getRemainingResearchTime}, {@link #getTech}, {@link #canResearch}
+     * @see #cancelResearch
+     * @see #isResearching
+     * @see #getRemainingResearchTime
+     * @see #getTech
+     * @see #canResearch
      */
     public boolean research(final TechType tech) {
         return issueCommand(UnitCommand.research(this, tech));
@@ -2147,7 +2236,11 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #cancelUpgrade}, {@link #isUpgrading}, {@link #getRemainingUpgradeTime}, {@link #getUpgrade}, {@link #canUpgrade}
+     * @see #cancelUpgrade
+     * @see #isUpgrading
+     * @see #getRemainingUpgradeTime
+     * @see #getUpgrade
+     * @see #canUpgrade
      */
     public boolean upgrade(final UpgradeType upgrade) {
         return issueCommand(UnitCommand.upgrade(this, upgrade));
@@ -2163,7 +2256,11 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #getRallyPosition}, {@link #getRallyUnit}, {@link #canSetRallyPoint}, {@link #canSetRallyPosition}, {@link #canSetRallyUnit}
+     * @see #getRallyPosition
+     * @see #getRallyUnit
+     * @see #canSetRallyPoint
+     * @see #canSetRallyPosition
+     * @see #canSetRallyUnit
      */
     public boolean setRallyPoint(final Position target) {
         return issueCommand(UnitCommand.setRallyPoint(this, target));
@@ -2187,7 +2284,8 @@ public class Unit implements Comparable<Unit>{
      * the command would fail.
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isMoving}, {@link #canMove}
+     * @see #isMoving
+     * @see #canMove
      */
     public boolean move(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.move(this, target, shiftQueueCommand));
@@ -2211,7 +2309,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isPatrolling}, {@link #canPatrol}
+     * @see #isPatrolling
+     * @see #canPatrol
      */
     public boolean patrol(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.patrol(this, target, shiftQueueCommand));
@@ -2231,7 +2330,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #canHoldPosition}, {@link #isHoldingPosition}
+     * @see #canHoldPosition
+     * @see #isHoldingPosition
      */
     public boolean holdPosition(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.holdPosition(this, shiftQueueCommand));
@@ -2251,7 +2351,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #canStop}, {@link #isIdle}
+     * @see #canStop
+     * @see #isIdle
      */
     public boolean stop(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.stop(this, shiftQueueCommand));
@@ -2273,7 +2374,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isFollowing}, {@link #canFollow}, {@link #getOrderTarget}
+     * @see #isFollowing
+     * @see #canFollow
+     * @see #getOrderTarget
      */
     public boolean follow(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.follow(this, target, shiftQueueCommand));
@@ -2294,7 +2397,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isGatheringGas}, {@link #isGatheringMinerals}, {@link #canGather}
+     * @see #isGatheringGas
+     * @see #isGatheringMinerals
+     * @see #canGather
      */
     public boolean gather(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.gather(this, target, shiftQueueCommand));
@@ -2316,7 +2421,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isCarryingGas}, {@link #isCarryingMinerals}, {@link #canReturnCargo}
+     * @see #isCarryingGas
+     * @see #isCarryingMinerals
+     * @see #canReturnCargo
      */
     public boolean returnCargo(final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.returnCargo(this, shiftQueueCommand));
@@ -2338,7 +2445,8 @@ public class Unit implements Comparable<Unit>{
      *
      *  There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isRepairing}, {@link #canRepair}
+     * @see #isRepairing
+     * @see #canRepair
      */
     public boolean repair(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.repair(this, target, shiftQueueCommand));
@@ -2353,7 +2461,9 @@ public class Unit implements Comparable<Unit>{
      * the command would fail.
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #unburrow}, {@link #isBurrowed}, {@link #canBurrow}
+     * @see #unburrow
+     * @see #isBurrowed
+     * @see #canBurrow
      */
     public boolean burrow() {
         return issueCommand(UnitCommand.burrow(this));
@@ -2367,7 +2477,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #burrow}, {@link #isBurrowed}, {@link #canUnburrow}
+     * @see #burrow
+     * @see #isBurrowed
+     * @see #canUnburrow
      */
     public boolean unburrow() {
         return issueCommand(UnitCommand.unburrow(this));
@@ -2381,7 +2493,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #decloak}, {@link #isCloaked}, {@link #canCloak}
+     * @see #decloak
+     * @see #isCloaked
+     * @see #canCloak
      */
     public boolean cloak() {
         return issueCommand(UnitCommand.cloak(this));
@@ -2395,7 +2509,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #cloak}, {@link #isCloaked}, {@link #canDecloak}
+     * @see #cloak
+     * @see #isCloaked
+     * @see #canDecloak
      */
     public boolean decloak() {
         return issueCommand(UnitCommand.decloak(this));
@@ -2409,7 +2525,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #unsiege}, {@link #isSieged}, {@link #canSiege}
+     * @see #unsiege
+     * @see #isSieged
+     * @see #canSiege
      */
     public boolean siege() {
         return issueCommand(UnitCommand.siege(this));
@@ -2423,7 +2541,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #siege}, {@link #isSieged}, {@link #canUnsiege}
+     * @see #siege
+     * @see #isSieged
+     * @see #canUnsiege
      */
     public boolean unsiege() {
         return issueCommand(UnitCommand.unsiege(this));
@@ -2437,7 +2557,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #land}, {@link #isLifted}, {@link #canLift}
+     * @see #land
+     * @see #isLifted
+     * @see #canLift
      */
     public boolean lift() {
         return issueCommand(UnitCommand.lift(this));
@@ -2454,7 +2576,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #lift}, {@link #isLifted}, {@link #canLand}
+     * @see #lift
+     * @see #isLifted
+     * @see #canLand
      */
     public boolean land(final TilePosition target) {
         return issueCommand(UnitCommand.land(this, target));
@@ -2475,7 +2599,10 @@ public class Unit implements Comparable<Unit>{
      *
      *  There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #unload}, {@link #unloadAll}, {@link #getLoadedUnits}, {@link #isLoaded}
+     * @see #unload
+     * @see #unloadAll
+     * @see #getLoadedUnits
+     * @see #isLoaded
      */
     public boolean load(final Unit target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.load(this, target, shiftQueueCommand));
@@ -2492,7 +2619,12 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #load}, {@link #unloadAll}, {@link #getLoadedUnits}, {@link #isLoaded}, {@link #canUnload}, {@link #canUnloadAtPosition}
+     * @see #load
+     * @see #unloadAll
+     * @see #getLoadedUnits
+     * @see #isLoaded
+     * @see #canUnload
+     * @see #canUnloadAtPosition
      */
     public boolean unload(final Unit target) {
         return issueCommand(UnitCommand.unload(this, target));
@@ -2521,7 +2653,12 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #load}, {@link #unload}, {@link #getLoadedUnits}, {@link #isLoaded}, {@link #canUnloadAll}, {@link #canUnloadAtPosition}
+     * @see #load
+     * @see #unload
+     * @see #getLoadedUnits
+     * @see #isLoaded
+     * @see #canUnloadAll
+     * @see #canUnloadAtPosition
      */
     public boolean unloadAll(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.unloadAll(this, target, shiftQueueCommand));
@@ -2546,7 +2683,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #canRightClick}, {@link #canRightClickPosition}, {@link #canRightClickUnit}
+     * @see #canRightClick
+     * @see #canRightClickPosition
+     * @see #canRightClickUnit
      */
     public boolean rightClick(final Position target, final boolean shiftQueueCommand) {
         return issueCommand(UnitCommand.rightClick(this, target, shiftQueueCommand));
@@ -2566,7 +2705,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isConstructing}, {@link #canHaltConstruction}
+     * @see #isConstructing
+     * @see #canHaltConstruction
      */
     public boolean haltConstruction() {
         return issueCommand(UnitCommand.haltConstruction(this));
@@ -2580,7 +2720,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #isBeingConstructed}, {@link #build}, {@link #canCancelConstruction}
+     * @see #isBeingConstructed
+     * @see #build
+     * @see #canCancelConstruction
      */
     public boolean cancelConstruction() {
         return issueCommand(UnitCommand.cancelConstruction(this));
@@ -2594,7 +2736,8 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #canCancelAddon}, {@link #buildAddon}
+     * @see #canCancelAddon
+     * @see #buildAddon
      */
     public boolean cancelAddon() {
         return issueCommand(UnitCommand.cancelAddon(this));
@@ -2612,7 +2755,12 @@ public class Unit implements Comparable<Unit>{
      * The value of slot is passed directly to Broodwar. Other negative values have no
      * effect.
      *
-     * @see {@link #train}, {@link #cancelTrain}, {@link #isTraining}, {@link #getTrainingQueue}, {@link #canCancelTrain}, {@link #canCancelTrainSlot}
+     * @see #train
+     * @see #cancelTrain
+     * @see #isTraining
+     * @see #getTrainingQueue
+     * @see #canCancelTrain
+     * @see #canCancelTrainSlot
      */
     public boolean cancelTrain(final int slot) {
         return issueCommand(UnitCommand.cancelTrain(this, slot));
@@ -2626,7 +2774,9 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #morph}, {@link #isMorphing}, {@link #canCancelMorph}
+     * @see #morph
+     * @see #isMorphing
+     * @see #canCancelMorph
      */
     public boolean cancelMorph() {
         return issueCommand(UnitCommand.cancelMorph(this));
@@ -2640,7 +2790,10 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #research}, {@link #isResearching}, {@link #getTech}, {@link #canCancelResearch}
+     * @see #research
+     * @see #isResearching
+     * @see #getTech
+     * @see #canCancelResearch
      */
     public boolean cancelResearch() {
         return issueCommand(UnitCommand.cancelResearch(this));
@@ -2654,7 +2807,10 @@ public class Unit implements Comparable<Unit>{
      *
      * There is a small chance for a command to fail after it has been passed to Broodwar.
      *
-     * @see {@link #upgrade}, {@link #isUpgrading}, {@link #getUpgrade}, {@link #canCancelUpgrade}
+     * @see #upgrade
+     * @see #isUpgrading
+     * @see #getUpgrade
+     * @see #canCancelUpgrade
      */
     public boolean cancelUpgrade() {
         return issueCommand(UnitCommand.cancelUpgrade(this));
@@ -2673,7 +2829,10 @@ public class Unit implements Comparable<Unit>{
      * @return true if the command was passed to Broodwar, and false if BWAPI determined that
      * the command would fail.
      *
-     * @see {@link #canUseTechWithOrWithoutTarget}, {@link #canUseTech}, {@link #canUseTechWithoutTarget}, {@link #canUseTechUnit},
+     * @see #canUseTechWithOrWithoutTarget
+     * @see #canUseTech
+     * @see #canUseTechWithoutTarget
+     * @see #canUseTechUnit,
      *      {@link #canUseTechPosition}, {@link TechType}
      */
     public boolean useTech(final TechType tech, final Position target) {
@@ -2697,7 +2856,7 @@ public class Unit implements Comparable<Unit>{
      *
      * This command is only available for the first 10 minutes of the game, as in Broodwar.
      *
-     * @see {@link #canPlaceCOP}
+     * @see #canPlaceCOP
      */
     public boolean placeCOP(final TilePosition target) {
         return issueCommand(UnitCommand.placeCOP(this, target));
@@ -2744,7 +2903,9 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI determined that the command is valid, false if an error occurred and the command is invalid.
      *
-     * @see {@link UnitCommandType}, {@link Unit#canCommand}, {@link Unit#canIssueCommandType},
+     * @see UnitCommandType
+     * @see Unit#canCommand
+     * @see Unit#canIssueCommandType,
      * {@link Unit#canTargetUnit}
      */
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -2899,7 +3060,8 @@ public class Unit implements Comparable<Unit>{
      *   - stop for @Larva, to move it to a different side of the @Hatchery / @Lair / @Hive (e.g.
      *     so that @Drones morphed later morph nearer to minerals/gas).
      *
-     * @see {@link UnitCommandType}, {@link Unit#canIssueCommand},
+     * @see UnitCommandType
+     * @see Unit#canIssueCommand,
      * {@link Unit#canCommandGrouped}, {@link Unit#canIssueCommandTypeGrouped}, {@link Unit#canTargetUnit}
      */
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
@@ -3016,7 +3178,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the unit can be commanded, false if an error occurred and the unit can not be commanded.
      *
-     * @see {@link Unit#canIssueCommand}
+     * @see Unit#canIssueCommand
      */
     public boolean canCommand() {
         if (!exists() || !getPlayer().equals(game.self())) {
@@ -3069,7 +3231,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the unit can be commanded grouped, false if an error occurred and the unit can not be commanded grouped.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canIssueCommand}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canIssueCommand
      */
     public boolean canCommandGrouped(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3093,7 +3256,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the command type is invalid, false if an error occurred and the command type is invalid.
      *
-     * @see {@link UnitCommandType}, {@link Unit#canIssueCommand}
+     * @see UnitCommandType
+     * @see Unit#canIssueCommand
      */
     public boolean canIssueCommandType(UnitCommandType ct, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3210,7 +3374,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the command type is invalid, false if an error occurred and the command type is invalid.
      *
-     * @see {@link UnitCommandType}, {@link Unit#canIssueCommandGrouped}
+     * @see UnitCommandType
+     * @see Unit#canIssueCommandGrouped
      */
     public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3336,7 +3501,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @return true if BWAPI was unable to determine whether the unit can target the given unit, false if an error occurred and the unit can not target the given unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#isTargetable}
+     * @see Unit#canIssueCommand
+     * @see Unit#isTargetable
      */
     public boolean canTargetUnit(Unit targetUnit, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3384,7 +3550,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute an attack command to attack-move or attack a unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#attack},
+     * @see Unit#canIssueCommand
+     * @see Unit#attack,
      * {@link Unit#canAttackMove}, {@link Unit#canAttackUnit}
      */
     public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -3463,7 +3630,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute an attack command to attack-move or attack a unit,
      * as part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canAttack}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canAttack
      */
     public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3498,7 +3666,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute an attack command to attack-move.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#attack}
+     * @see Unit#canIssueCommand
+     * @see Unit#attack
      */
     public boolean canAttackMove(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3520,7 +3689,8 @@ public class Unit implements Comparable<Unit>{
      * Checks whether the unit is able to execute an attack command to attack-move, as part of a
      * List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canAttackMove}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canAttackMove
      */
     public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3589,7 +3759,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute an attack command to attack a unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#attack}
+     * @see Unit#canIssueCommand
+     * @see Unit#attack
      */
     public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3694,7 +3865,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute an attack command to attack a unit,
      * as part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canAttackUnit}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canAttackUnit
      */
     public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3793,7 +3965,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a build command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#build}
+     * @see Unit#canIssueCommand
+     * @see Unit#build
      */
     public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3844,7 +4017,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a buildAddon command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#buildAddon}
+     * @see Unit#canIssueCommand
+     * @see Unit#buildAddon
      */
     public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3909,7 +4083,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a train command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#train}
+     * @see Unit#canIssueCommand
+     * @see Unit#train
      */
     public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3999,7 +4174,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a morph command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#morph}
+     * @see Unit#canIssueCommand
+     * @see Unit#morph
      */
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4054,7 +4230,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a research command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#research}
+     * @see Unit#canIssueCommand
+     * @see Unit#research
      */
     public boolean canResearch(TechType type, boolean checkCanIssueCommandType) {
         final Player self = game.self();
@@ -4112,7 +4289,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute an upgrade command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#upgrade}
+     * @see Unit#canIssueCommand
+     * @see Unit#upgrade
      */
     public boolean canUpgrade(UpgradeType type, boolean checkCanIssueCommandType) {
         final Player self = game.self();
@@ -4194,7 +4372,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a setRallyPoint command to a
      * position or unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#setRallyPoint},
+     * @see Unit#canIssueCommand
+     * @see Unit#setRallyPoint,
      * {@link Unit#canSetRallyPosition}, {@link Unit#canSetRallyUnit}.
      */
     public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -4223,7 +4402,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a setRallyPoint command to a position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#setRallyPoint}
+     * @see Unit#canIssueCommand
+     * @see Unit#setRallyPoint
      */
     public boolean canSetRallyPosition(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4266,7 +4446,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a setRallyPoint command to a unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#setRallyPoint}
+     * @see Unit#canIssueCommand
+     * @see Unit#setRallyPoint
      */
     public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4287,7 +4468,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a move command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#move}
+     * @see Unit#canIssueCommand
+     * @see Unit#move
      */
     public boolean canMove(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4332,7 +4514,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a move command, as part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canMove}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canMove
      */
     public boolean canMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4356,7 +4539,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a patrol command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#patrol}
+     * @see Unit#canIssueCommand
+     * @see Unit#patrol
      */
     public boolean canPatrol(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4376,7 +4560,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a patrol command, as part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canPatrol}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canPatrol
      */
     public boolean canPatrolGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4417,7 +4602,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a follow command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#follow}
+     * @see Unit#canIssueCommand
+     * @see Unit#follow
      */
     public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4481,7 +4667,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a gather command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#gather}
+     * @see Unit#canIssueCommand
+     * @see Unit#gather
      */
     public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4520,7 +4707,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a returnCargo command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#returnCargo}
+     * @see Unit#canIssueCommand
+     * @see Unit#returnCargo
      */
     public boolean canReturnCargo(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4550,7 +4738,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a holdPosition command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#holdPosition}
+     * @see Unit#canIssueCommand
+     * @see Unit#holdPosition
      */
     public boolean canHoldPosition(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4591,7 +4780,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a stop command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#stop}
+     * @see Unit#canIssueCommand
+     * @see Unit#stop
      */
     public boolean canStop(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4653,7 +4843,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a repair command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#repair}
+     * @see Unit#canIssueCommand
+     * @see Unit#repair
      */
     public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4688,7 +4879,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a burrow command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#burrow}
+     * @see Unit#canIssueCommand
+     * @see Unit#burrow
      */
     public boolean canBurrow(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4705,7 +4897,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute an unburrow command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unburrow}
+     * @see Unit#canIssueCommand
+     * @see Unit#unburrow
      */
     public boolean canUnburrow(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4725,7 +4918,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cloak command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cloak}
+     * @see Unit#canIssueCommand
+     * @see Unit#cloak
      */
     public boolean canCloak(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4742,7 +4936,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a decloak command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#decloak}
+     * @see Unit#canIssueCommand
+     * @see Unit#decloak
      */
     public boolean canDecloak(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4762,7 +4957,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a siege command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#siege}
+     * @see Unit#canIssueCommand
+     * @see Unit#siege
      */
     public boolean canSiege(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4779,7 +4975,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute an unsiege command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unsiege}
+     * @see Unit#canIssueCommand
+     * @see Unit#unsiege
      */
     public boolean canUnsiege(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4803,7 +5000,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a lift command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#lift}
+     * @see Unit#canIssueCommand
+     * @see Unit#lift
      */
     public boolean canLift(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4848,7 +5046,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a land command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#land}
+     * @see Unit#canIssueCommand
+     * @see Unit#land
      */
     public boolean canLand(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4906,7 +5105,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a load command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#load}
+     * @see Unit#canIssueCommand
+     * @see Unit#load
      */
     public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4986,7 +5186,9 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute an unload command or unloadAll at
      * current position command or unloadAll at a different position command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unload}, {@link Unit#unloadAll}
+     * @see Unit#canIssueCommand
+     * @see Unit#unload
+     * @see Unit#unloadAll
      */
     public boolean canUnloadWithOrWithoutTarget(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5023,7 +5225,9 @@ public class Unit implements Comparable<Unit>{
      * current position command or unloadAll at a different position command, for a given
      * position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unload}, {@link Unit#unloadAll}
+     * @see Unit#canIssueCommand
+     * @see Unit#unload
+     * @see Unit#unloadAll
      */
     public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5070,7 +5274,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute an unload command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unload}
+     * @see Unit#canIssueCommand
+     * @see Unit#unload
      */
     public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5103,7 +5308,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute an unloadAll command for the current position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unloadAll}
+     * @see Unit#canIssueCommand
+     * @see Unit#unloadAll
      */
     public boolean canUnloadAll(boolean checkCommandibility) {
         return canUnloadAtPosition(getPosition(), true, checkCommandibility);
@@ -5137,7 +5343,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute an unloadAll command for a different
      * position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#unloadAll}
+     * @see Unit#canIssueCommand
+     * @see Unit#unloadAll
      */
     public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5190,7 +5397,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a rightClick command to a position
      * or unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#rightClick},
+     * @see Unit#canIssueCommand
+     * @see Unit#rightClick,
      * {@link Unit#canRightClickPosition}, {@link Unit#canRightClickUnit}.
      */
     public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -5268,7 +5476,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a rightClick command to a position
      * or unit, as part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canRightClickUnit}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canRightClickUnit
      */
     public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5303,7 +5512,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a rightClick command for a position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#rightClick}
+     * @see Unit#canIssueCommand
+     * @see Unit#rightClick
      */
     public boolean canRightClickPosition(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5328,7 +5538,8 @@ public class Unit implements Comparable<Unit>{
      * Checks whether the unit is able to execute a rightClick command for a position, as part of
      * a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canRightClick}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canRightClick
      */
     public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5377,7 +5588,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a rightClick command to a unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#rightClick}
+     * @see Unit#canIssueCommand
+     * @see Unit#rightClick
      */
     public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5447,7 +5659,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a rightClick command to a unit, as
      * part of a List<Unit>.
      *
-     * @see {@link Unit#canIssueCommandGrouped}, {@link Unit#canRightClickUnit}
+     * @see Unit#canIssueCommandGrouped
+     * @see Unit#canRightClickUnit
      */
     public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5480,7 +5693,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a haltConstruction command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#haltConstruction}
+     * @see Unit#canIssueCommand
+     * @see Unit#haltConstruction
      */
     public boolean canHaltConstruction(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5498,7 +5712,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelConstruction command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelConstruction}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelConstruction
      */
     public boolean canCancelConstruction(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5519,7 +5734,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelAddon command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelAddon}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelAddon
      */
     public boolean canCancelAddon(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5536,7 +5752,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelTrain command for any slot.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelTrain}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelTrain
      */
     public boolean canCancelTrain(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5566,7 +5783,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a cancelTrain command for an
      * unspecified slot.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelTrain}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelTrain
      */
     public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5587,7 +5805,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelMorph command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelMorph}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelMorph
      */
     public boolean canCancelMorph(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5607,7 +5826,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelResearch command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelResearch}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelResearch
      */
     public boolean canCancelResearch(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5624,7 +5844,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a cancelUpgrade command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#cancelUpgrade}
+     * @see Unit#canIssueCommand
+     * @see Unit#cancelUpgrade
      */
     public boolean canCancelUpgrade(boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5664,7 +5885,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a useTech command without a target or
      * or a useTech command with a target position or a useTech command with a target unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#useTech}
+     * @see Unit#canIssueCommand
+     * @see Unit#useTech
      */
     public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5753,7 +5975,8 @@ public class Unit implements Comparable<Unit>{
      * Checks whether the unit is able to execute a useTech command for a specified position or
      * unit (only specify null if the TechType does not target another position/unit).
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#useTech},
+     * @see Unit#canIssueCommand
+     * @see Unit#useTech,
      * {@link Unit#canUseTechWithoutTarget}, {@link Unit#canUseTechUnit}, {@link Unit#canUseTechPosition}
      */
     public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
@@ -5785,7 +6008,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Checks whether the unit is able to execute a useTech command without a target.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#useTech}
+     * @see Unit#canIssueCommand
+     * @see Unit#useTech
      */
     public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5845,7 +6069,8 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute a useTech command with an unspecified
      * target unit.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#useTech}
+     * @see Unit#canIssueCommand
+     * @see Unit#useTech
      */
     public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -6051,7 +6276,8 @@ public class Unit implements Comparable<Unit>{
      * Checks whether the unit is able to execute a useTech command with an unspecified target
      * position.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#useTech}
+     * @see Unit#canIssueCommand
+     * @see Unit#useTech
      */
     public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -6096,7 +6322,8 @@ public class Unit implements Comparable<Unit>{
     /**
      * Cheap checks for whether the unit is able to execute a placeCOP command.
      *
-     * @see {@link Unit#canIssueCommand}, {@link Unit#placeCOP}
+     * @see Unit#canIssueCommand
+     * @see Unit#placeCOP
      */
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {

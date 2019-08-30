@@ -8,7 +8,7 @@ import static bwapi.TechType.*;
  * The {@link UnitType} is used to get information about a particular type of unit, such as its cost,
  * build time, weapon, hit points, abilities, etc.
  *
- * @see {@link Unit#getType}
+ * @see Unit#getType
  */
 public enum UnitType {
     Terran_Marine(0),
@@ -459,7 +459,7 @@ public enum UnitType {
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Number of frames needed in order to build the unit.
-     * @see {@link Unit#getRemainingBuildTime}
+     * @see Unit#getRemainingBuildTime
      */
     public int buildTime() {
         return UnitTypeContainer.defaultTimeCost[id];
@@ -473,7 +473,9 @@ public enum UnitType {
      * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
      *
      * @return Integer containing the supply required to build this unit.
-     * @see {@link #supplyProvided}, {@link Player#supplyTotal}, {@link Player#supplyUsed}
+     * @see #supplyProvided
+     * @see Player#supplyTotal
+     * @see Player#supplyUsed
      */
     public int supplyRequired() {
         return UnitTypeContainer.unitSupplyRequired[id];
@@ -486,7 +488,9 @@ public enum UnitType {
      * In Starcraft programming, the managed supply values are double than what they appear
      * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
      *
-     * @see {@link #supplyRequired}, {@link Player#supplyTotal}, {@link Player#supplyUsed}
+     * @see #supplyRequired
+     * @see Player#supplyTotal
+     * @see Player#supplyUsed
      */
     public int supplyProvided() {
         return UnitTypeContainer.unitSupplyProvided[id];
@@ -497,7 +501,7 @@ public enum UnitType {
      *
      * @return Amount of space required by this unit type for transport.
      * Returns 255 If this unit type can not be transported.
-     * @see {@link #spaceProvided}
+     * @see #spaceProvided
      */
     public int spaceRequired() {
         return UnitTypeContainer.unitSpaceRequired[id];
@@ -508,7 +512,7 @@ public enum UnitType {
      * transportation.
      *
      * @return The number of slots provided by this unit type.
-     * @see {@link #spaceRequired}
+     * @see #spaceRequired
      */
     public int spaceProvided() {
         return UnitTypeContainer.unitSpaceProvided[id];
@@ -519,7 +523,7 @@ public enum UnitType {
      * used for calculating scores in the post-game score screen.
      *
      * @return Number of points awarded for constructing this unit type.
-     * @see {@link #destroyScore}
+     * @see #destroyScore
      */
     public int buildScore() {
         return UnitTypeContainer.unitBuildScore[id];
@@ -530,7 +534,7 @@ public enum UnitType {
      * used for calculating scores in the post-game score screen.
      *
      * @return Number of points awarded for killing this unit type.
-     * @see {@link #buildScore}
+     * @see #buildScore
      */
     public int destroyScore() {
         return UnitTypeContainer.unitDestroyScore[id];
@@ -541,7 +545,7 @@ public enum UnitType {
      * damage types to determine the amount of damage that will be dealt to this type.
      *
      * @return {@link UnitSizeType} indicating the conceptual size of the unit type.
-     * @see {@link WeaponType#damageType}
+     * @see WeaponType#damageType()
      */
     public UnitSizeType size() {
         return UnitTypeContainer.unitSize[id];
@@ -655,7 +659,8 @@ public enum UnitType {
      * Retrieves this unit type's weapon type used when attacking targets on the ground.
      *
      * @return {@link WeaponType} used as this unit type's ground weapon.
-     * @see {@link #maxGroundHits}, {@link #airWeapon}
+     * @see #maxGroundHits
+     * @see #airWeapon
      */
     public WeaponType groundWeapon() {
         return UnitTypeContainer.groundWeapon[id];
@@ -667,7 +672,8 @@ public enum UnitType {
      * unit type's damage potential.
      *
      * @return Maximum number of hits given to ground targets.
-     * @see {@link #groundWeapon}, {@link #maxAirHits}
+     * @see #groundWeapon
+     * @see #maxAirHits
      */
     public int maxGroundHits() {
         return UnitTypeContainer.groundWeaponHits[id];
@@ -677,7 +683,8 @@ public enum UnitType {
      * Retrieves this unit type's weapon type used when attacking targets in the air.
      *
      * @return WeaponType used as this unit type's air weapon.
-     * @see {@link #maxAirHits}, {@link #groundWeapon}
+     * @see #maxAirHits
+     * @see #groundWeapon
      */
     public WeaponType airWeapon() {
         return UnitTypeContainer.airWeapon[id];
@@ -689,7 +696,8 @@ public enum UnitType {
      * unit type's damage potential.
      *
      * @return Maximum number of hits given to air targets.
-     * @see {@link #airWeapon}, {@link #maxGroundHits}
+     * @see #airWeapon
+     * @see #maxGroundHits
      */
     public int maxAirHits() {
         return UnitTypeContainer.airWeaponHits[id];
@@ -960,7 +968,7 @@ public enum UnitType {
      * is researched.
      *
      * The @Lurker can burrow even without researching the ability.
-     * @see {@link TechType#Burrow}
+     * @see TechType#Burrowing
      * @return true if this unit can use the @Burrow ability, and false otherwise.
      */
     public boolean isBurrowable() {
@@ -973,7 +981,9 @@ public enum UnitType {
      * units which are permanently cloaked.
      *
      * @return true if this unit has a cloaking ability, false otherwise.
-     * @see {@link #hasPermanentCloak}, {@link TechType#Cloaking_Field}, {@link TechType#Personnel_Cloaking}
+     * @see #hasPermanentCloak
+     * @see TechType#Cloaking_Field
+     * @see TechType#Personnel_Cloaking
      */
     public boolean isCloakable() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Cloakable) != 0;
@@ -1048,7 +1058,7 @@ public enum UnitType {
      * each. They are {@link UnitType#Special_Zerg_Beacon}, {@link UnitType#Special_Terran_Beacon}, and
      * {@link UnitType#Special_Protoss_Beacon}.
      *
-     * @see {@link #isFlagBeacon}
+     * @see #isFlagBeacon
      * @return true if this unit type is one of the three race beacons, and false otherwise.
      */
     public boolean isBeacon() {
@@ -1063,7 +1073,7 @@ public enum UnitType {
      * {@link UnitType#Special_Terran_Flag_Beacon}, and {@link UnitType#Special_Protoss_Flag_Beacon}.
      * Flag beacons spawn a @Flag after some ARBITRARY I FORGOT AMOUNT OF FRAMES.
      *
-     * @see {@link #isBeacon}
+     * @see #isBeacon
      * @return true if this unit type is one of the three race flag beacons, and false otherwise.
      */
     public boolean isFlagBeacon() {
@@ -1160,11 +1170,11 @@ public enum UnitType {
 
     /**
      * Checks if this unit type is capable of constructing an add-on. An add-on is an extension
-     * or attachment for @Terran structures, specifically the @Command_Center, @Factory,
-     * @Starport, and @Science_Facility.
+     * or attachment for <em>Terran</em> structures, specifically the <em>Command_Center</em>, <em>Factory</em>,
+     * <em>Starport</em>, and <em>Science_Facility</em>.
      *
      * @return true if this unit type can construct an add-on, and false if it can not.
-     * @see {@link #isAddon}
+     * @see #isAddon
      */
     public boolean canBuildAddon() {
         return this == Terran_Command_Center ||
@@ -1182,7 +1192,7 @@ public enum UnitType {
      * actually available in the current game for a specific player.
      *
      * @return List of UnitTypes containing the units it can build.
-     * @see {@link Player#isUnitAvailable}
+     * @see Player#isUnitAvailable
      *
      * @since 4.1.2
      */
@@ -1198,7 +1208,7 @@ public enum UnitType {
      * current game for a specific player.
      *
      * @return List of TechTypes containing the technology types that can be researched.
-     * @see {@link Player#isResearchAvailable}
+     * @see Player#isResearchAvailable
      *
      * @since 4.1.2
      */
@@ -1213,7 +1223,7 @@ public enum UnitType {
      * to check if an upgrade is available.
      *
      * @return List of UpgradeTypes containing the upgrade types that can be upgraded.
-     * @see {@link Player#getMaxUpgradeLevel}
+     * @see Player#getMaxUpgradeLevel
      *
      * @since 4.1.2
      */
@@ -1228,7 +1238,8 @@ public enum UnitType {
      *
      * @param type The unit type to check.
      *
-     * @see {@link TechType#whatResearches}, {@link UpgradeType#whatUpgrades}
+     * @see TechType#whatResearches()
+     * @see UpgradeType#whatUpgrades()
      * @since 4.2.0
      */
     public boolean isSuccessorOf(final UnitType type) {

@@ -15,7 +15,8 @@ import static bwapi.WeaponType.*;
  * a match will have his or her own player instance. There is also a neutral player which owns
  * all the neutral units (such as mineral patches and vespene geysers).
  *
- * @see {@link PlayerType}, {@link Race}
+ * @see PlayerType
+ * @see Race
  */
 public class Player implements Comparable<Player>{
     private final PlayerData playerData;
@@ -115,7 +116,7 @@ public class Player implements Comparable<Player>{
      * This function will also return false if this player is neutral or an observer, or
      * if \p player is neutral or an observer.
      *
-     * @see {@link #isEnemy}
+     * @see #isEnemy
      */
     public boolean isAlly(final Player player) {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
@@ -134,7 +135,7 @@ public class Player implements Comparable<Player>{
      * This function will also return false if this player is neutral or an observer, or if
      * \p player is neutral or an observer.
      *
-     * @see {@link #isAlly}
+     * @see #isAlly
      */
     public boolean isEnemy(final Player player) {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
@@ -160,7 +161,7 @@ public class Player implements Comparable<Player>{
      * Returns {@link TilePosition#Unknown} if an error occured while trying to retrieve the start
      * location.
      *
-     * @see {@link Game#getStartLocations}
+     * @see Game#getStartLocations
      */
     public TilePosition getStartLocation() {
         return startLocation;
@@ -331,7 +332,7 @@ public class Player implements Comparable<Player>{
      *
      * @return The total supply available for this player and the given \p race.
      *
-     * @see {@link #supplyUsed}
+     * @see #supplyUsed
      */
     public int supplyTotal(final Race race) {
         return playerData.getSupplyTotal(race.id);
@@ -348,7 +349,7 @@ public class Player implements Comparable<Player>{
      *
      * @return The supply that is in use for this player and the given \p race.
      *
-     * @see {@link #supplyTotal}
+     * @see #supplyTotal
      */
     public int supplyUsed(final Race race) {
         return playerData.getSupplyUsed(race.id);
@@ -370,7 +371,9 @@ public class Player implements Comparable<Player>{
      *
      * @return The total number of units of the given type that the player owns.
      *
-     * @see {@link #visibleUnitCount}, {@link #completedUnitCount}, {@link #incompleteUnitCount}
+     * @see #visibleUnitCount
+     * @see #completedUnitCount
+     * @see #incompleteUnitCount
      */
     public int allUnitCount(final UnitType unit) {
         return playerData.getAllUnitCount(unit.id);
@@ -389,7 +392,9 @@ public class Player implements Comparable<Player>{
      * @return The total number of units of the given type that the player owns, and is visible
      *   to the BWAPI player.
      *
-     * @see {@link #allUnitCount}, {@link #completedUnitCount}, {@link #incompleteUnitCount}
+     * @see #allUnitCount
+     * @see #completedUnitCount
+     * @see #incompleteUnitCount
      */
     public int visibleUnitCount(final UnitType unit) {
         return playerData.getVisibleUnitCount(unit.id);
@@ -408,7 +413,9 @@ public class Player implements Comparable<Player>{
      *
      * @return The number of completed units of the given type that the player owns.
      *
-     * @see {@link #allUnitCount}, {@link #visibleUnitCount}, {@link #incompleteUnitCount}
+     * @see #allUnitCount
+     * @see #visibleUnitCount
+     * @see #incompleteUnitCount
      */
     public int completedUnitCount(final UnitType unit) {
         return playerData.getCompletedUnitCount(unit.id);
@@ -431,7 +438,9 @@ public class Player implements Comparable<Player>{
      *
      * @return The number of incomplete units of the given type that the player owns.
      *
-     * @see {@link #allUnitCount}, {@link #visibleUnitCount}, {@link #completedUnitCount}
+     * @see #allUnitCount
+     * @see #visibleUnitCount
+     * @see #completedUnitCount
      */
     public int incompleteUnitCount(final UnitType unit) {
         return allUnitCount(unit) - completedUnitCount(unit);
@@ -475,7 +484,8 @@ public class Player implements Comparable<Player>{
      *
      * @return The number of levels that the \p upgrade has been upgraded for this player.
      *
-     * @see {@link Unit#upgrade}, {@link #getMaxUpgradeLevel}
+     * @see Unit#upgrade
+     * @see #getMaxUpgradeLevel
      */
     public int getUpgradeLevel(final UpgradeType upgrade) {
         return playerData.getUpgradeLevel(upgrade.id);
@@ -488,7 +498,9 @@ public class Player implements Comparable<Player>{
      *
      * @return true if the player has obtained the given \p tech, or false if they have not
      *
-     * @see {@link #isResearching}, {@link Unit#research}, {@link #isResearchAvailable}
+     * @see #isResearching
+     * @see Unit#research
+     * @see #isResearchAvailable
      */
     public boolean hasResearched(final TechType tech) {
         return playerData.getHasResearched(tech.id);
@@ -501,7 +513,8 @@ public class Player implements Comparable<Player>{
      *
      * @return true if the player is currently researching the \p tech, or false otherwise
      *
-     * @see {@link Unit#research}, {@link #hasResearched}
+     * @see Unit#research
+     * @see #hasResearched
      */
     public boolean isResearching(final TechType tech) {
         return playerData.isResearching(tech.id);
@@ -514,7 +527,7 @@ public class Player implements Comparable<Player>{
      *
      * @return true if the player is currently upgrading the given \p upgrade, false otherwise
      *
-     * @see {@link Unit#upgrade}
+     * @see Unit#upgrade
      */
     public boolean isUpgrading(final UpgradeType upgrade) {
         return playerData.isUpgrading(upgrade.id);

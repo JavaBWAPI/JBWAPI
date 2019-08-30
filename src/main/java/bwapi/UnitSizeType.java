@@ -7,7 +7,9 @@ package bwapi;
  * This corresponds with {@link DamageType} for several different damage reduction
  * applications.
  *
- * @see {@link DamageType}, {@link UnitType}, {@link UnitSizeType}
+ * @see DamageType
+ * @see UnitType
+ * @see UnitSizeType
  *
  * [View on Starcraft Campendium (Official Website)](http://classic.battle.net/scc/gs/damage.shtml)<br>
  */

@@ -510,7 +510,7 @@ public class Game {
      * Retrieves the {@link GameType} of the current game.
      *
      * @return {@link GameType} indicating the rules of the match.
-     * @see {@link GameType}
+     * @see GameType
      */
     public GameType getGameType() {
         return GameType.idToEnum[gameData.getGameType()];
@@ -521,7 +521,7 @@ public class Game {
      * indicates the delay between issuing a command and having it processed.
      *
      * @return The {@link Latency} setting of the game, which is of Latency.
-     * @see {@link Latency}
+     * @see Latency
      *
      */
     public Latency getLatency() {
@@ -552,7 +552,7 @@ public class Game {
      * Retrieves the logical frame rate of the game in frames per second (FPS).
      *
      * @return Logical frames per second that the game is currently running at as an integer.
-     * @see {@link #getAverageFPS}
+     * @see #getAverageFPS
      */
     public int getFPS() {
         return gameData.getFps();
@@ -563,7 +563,7 @@ public class Game {
      *
      * @return Average logical frames per second that the game is currently running at as a
      * double.
-     * @see {@link #getFPS}
+     * @see #getFPS
      */
     public double getAverageFPS() {
         return gameData.getAverageFPS();
@@ -586,7 +586,7 @@ public class Game {
      * @return A boolean indicating the state of the given \p button. true if the button was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      *
-     * @see {@link MouseButton}
+     * @see MouseButton
      */
     public boolean getMouseState(final MouseButton button) {
         return gameData.getMouseState(button.id);
@@ -600,7 +600,7 @@ public class Game {
      * @return A boolean indicating the state of the given \p key. true if the key was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      *
-     * @see {@link Key}
+     * @see Key
      */
     public boolean getKeyState(final Key key) {
         return gameData.getKeyState(key.id);
@@ -611,7 +611,7 @@ public class Game {
      * map, in pixels.
      *
      * @return {@link Position} containing the coordinates of the top left corner of the game's viewport. Returns {@link Position#Unknown} always if {@link Flag#UserInput} is disabled.
-     * @see {@link #setScreenPosition}
+     * @see #setScreenPosition
      */
     public Position getScreenPosition() {
         return new Position(gameData.getScreenX(), gameData.getScreenY());
@@ -627,7 +627,7 @@ public class Game {
      *
      * @param x The x coordinate to move the screen to, in pixels.
      * @param y The y coordinate to move the screen to, in pixels.
-     * @see {@link #getScreenPosition}
+     * @see #getScreenPosition
      */
     public void setScreenPosition(final int x, final int y) {
         addCommand(SetScreenPosition, x, y);
@@ -658,7 +658,7 @@ public class Game {
      *
      * @return true if the given \p flag is enabled, false if the flag is disabled.
      *
-     * @see {@link Flag}
+     * @see Flag
      */
     public boolean isFlagEnabled(final Flag flag) {
         return gameData.getFlags(flag.id);
@@ -672,7 +672,7 @@ public class Game {
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
      *
-     * @see {@link Flag}
+     * @see Flag
      */
     public void enableFlag(final Flag flag) {
         addCommand(EnableFlag, flag.id, 1);
@@ -778,7 +778,7 @@ public class Game {
      * @param right The right position of the rectangle. This value includes the entire map width by default.
      * @param bottom The bottom position of the rectangle. This value includes the entire map height by default.
      *
-     * @see {@link UnitFilter}
+     * @see UnitFilter
      */
     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
         return getUnitsInRectangle(left, top, right, bottom, pred).stream()
@@ -808,7 +808,7 @@ public class Game {
      *
      * @return The desired unit that is closest to center. Returns null If a suitable unit was not found.
      *
-     * @see {@link UnitFilter}
+     * @see UnitFilter
      */
     public Unit getClosestUnit(final Position center, final int radius, final UnitFilter pred) {
         return getUnitsInRadius(center, radius, pred).stream()
@@ -847,7 +847,8 @@ public class Game {
      *
      * @return Map file name as String object.
      *
-     * @see {@link #mapPathName}, {@link #mapName}
+     * @see #mapPathName
+     * @see #mapName
      */
     public String mapFileName() {
         return mapFileName;
@@ -858,7 +859,8 @@ public class Game {
      *
      * @return Map file name as String object.
      *
-     * @see {@link #mapFileName}, {@link #mapName}
+     * @see #mapFileName
+     * @see #mapName
      */
     public String mapPathName() {
         return mapPathName;
@@ -869,7 +871,8 @@ public class Game {
      *
      * @return Map title as String object.
      *
-     * @see {@link #mapFileName}, {@link #mapPathName}
+     * @see #mapFileName
+     * @see #mapPathName
      */
     public String mapName() {
         return mapName;
@@ -999,7 +1002,7 @@ public class Game {
      *
      * @return true if the player has explored the given tile position (partially revealed fog), false if the tile position was never explored (completely black fog).
      *
-     * @see {@link #isVisible}
+     * @see #isVisible
      */
     public boolean isExplored(final int tileX, final int tileY) {
         return isExplored(new TilePosition(tileX, tileY));
@@ -1512,7 +1515,7 @@ public class Game {
      *
      * @return A List<TilePosition> containing all the {@link TilePosition} objects that indicate a start
      * location.
-     * @see {@link Player#getStartLocation}
+     * @see Player#getStartLocation
      */
     public List<TilePosition> getStartLocations() {
         return startLocations;
@@ -1537,7 +1540,7 @@ public class Game {
      *
      * @param string String to send.
      *
-     * @see {@link #sendTextEx}
+     * @see #sendTextEx
      */
     public void sendText(final String string) {
         addCommand(SendText, client.addString(string), 0);
@@ -1550,7 +1553,7 @@ public class Game {
      * @param toAllies If this parameter is set to true, then the message is only sent to allied players, otherwise it will be sent to all players.
      * @param string String to send.
      *
-     * @see {@link #sendText}
+     * @see #sendText
      */
     public void sendTextEx(final boolean toAllies, final String string) {
         addCommand(SendText, client.addString(string), toAllies ? 1 : 0);
@@ -1590,7 +1593,8 @@ public class Game {
      * will still be called.
      *
      * @return true if the game is paused and false otherwise
-     * @see {@link #pauseGame}, {@link #resumeGame}
+     * @see #pauseGame
+     * @see #resumeGame
      */
     public boolean isPaused() {
         return gameData.isPaused();
@@ -1607,7 +1611,7 @@ public class Game {
 
     /**
      * Pauses the game. While paused, {@link BWEventListener#onFrame} will still be called.
-     * @see {@link #resumeGame}
+     * @see #resumeGame
      */
     public void pauseGame() {
         addCommand(PauseGame, 0, 0);
@@ -1615,7 +1619,7 @@ public class Game {
 
     /**
      * Resumes the game from a paused state.
-     * @see {@link #pauseGame}
+     * @see #pauseGame
      */
     public void resumeGame() {
         addCommand(ResumeGame, 0, 0);
@@ -1656,7 +1660,8 @@ public class Game {
      *
      * @param speed The time spent per frame, in milliseconds. A value of 0 indicates that frames are executed immediately with no delay. Negative values will restore the default value as listed above.
      *
-     * @see {@link #setFrameSkip}, {@link #getFPS}
+     * @see #setFrameSkip
+     * @see #getFPS
      */
     public void setLocalSpeed(final int speed) {
         addCommand(SetLocalSpeed, speed, 0);
@@ -1686,7 +1691,7 @@ public class Game {
      * @return A List<Unit> containing the user's selected units. If {@link Flag#UserInput} is disabled,
      * then this set is always empty.
      *
-     * @see {@link #enableFlag}
+     * @see #enableFlag
      */
     public List<Unit> getSelectedUnits() {
         return IntStream.range(0, gameData.getSelectedUnitCount())
@@ -1710,7 +1715,7 @@ public class Game {
      * {@link Game#enemies} function.
      *
      * @return Player interface representing an enemy player. Returns null if there is no enemy or the current game is a replay.
-     * @see {@link #enemies}
+     * @see #enemies
      */
     public Player enemy() {
         return enemy;
@@ -2140,7 +2145,8 @@ public class Game {
      * introducing lag.
      *
      * @return Difference in frames between commands being sent and executed.
-     * @see {@link #getLatencyTime}, {@link #getRemainingLatencyFrames}
+     * @see #getLatencyTime
+     * @see #getRemainingLatencyFrames
      */
     public int getLatencyFrames() {
         return gameData.getLatencyFrames();
@@ -2151,7 +2157,8 @@ public class Game {
      * the command being executed by Broodwar.
      *
      * @return Difference in milliseconds between commands being sent and executed.
-     * @see {@link #getLatencyFrames}, {@link #getRemainingLatencyTime}
+     * @see #getLatencyFrames
+     * @see #getRemainingLatencyTime
      */
     public int getLatencyTime() {
         return gameData.getLatencyTime();
@@ -2163,7 +2170,8 @@ public class Game {
      *
      * @return Number of frames until a command is executed if it were sent in the current
      * frame.
-     * @see {@link #getRemainingLatencyTime}, {@link #getLatencyFrames}
+     * @see #getRemainingLatencyTime
+     * @see #getLatencyFrames
      */
     public int getRemainingLatencyFrames() {
         return gameData.getRemainingLatencyFrames();
@@ -2175,7 +2183,8 @@ public class Game {
      *
      * @return Amount of time, in milliseconds, until a command is executed if it were sent in
      * the current frame.
-     * @see {@link #getRemainingLatencyFrames}, {@link #getLatencyTime}
+     * @see #getRemainingLatencyFrames
+     * @see #getLatencyTime
      */
     public int getRemainingLatencyTime() {
         return gameData.getRemainingLatencyTime();
@@ -2203,7 +2212,7 @@ public class Game {
      * Checks the state of latency compensation.
      *
      * @return true if latency compensation is enabled, false if it is disabled.
-     * @see {@link #setLatCom}
+     * @see #setLatCom
      */
     public boolean isLatComEnabled() {
         return gameData.getHasLatCom();
@@ -2217,7 +2226,7 @@ public class Game {
      *
      * @param isEnabled Set whether the latency compensation feature will be enabled (true) or disabled (false).
      *
-     * @see {@link #isLatComEnabled}.
+     * @see #isLatComEnabled
      */
     public void setLatCom(final boolean isEnabled) {
         addCommand(SetLatCom, isEnabled ? 1 : 0, 0);
@@ -2256,7 +2265,7 @@ public class Game {
      *
      * @param frameSkip Number of graphical frames per logical frame. If this value is 0 or less, then it will default to 1.
      *
-     * @see {@link #setLocalSpeed}
+     * @see #setLocalSpeed
      */
     public void setFrameSkip(int frameSkip) {
         addCommand(SetFrameSkip, frameSkip, 0);
@@ -2287,7 +2296,7 @@ public class Game {
      * @param destination The destination position.
      *
      * @return true if there is a path between the two positions, and false if there is not.
-     * @see {@link Unit#hasPath}
+     * @see Unit#hasPath
      */
     public boolean hasPath(final Position source, final Position destination) {
         if (source == null || destination == null) {
@@ -2310,7 +2319,7 @@ public class Game {
      *
      * @param size The size of the text. This value is one of Text#Size. If this value is omitted, then a default value of {@link TextSize#Default} is used.
      *
-     * @see {@link TextSize}
+     * @see TextSize
      */
     public void setTextSize(final TextSize size) {
         textSize = size;
@@ -2447,7 +2456,8 @@ public class Game {
      *
      * @return the Region interface at the given position. Returns null if the provided position is not valid (i.e. not within the map bounds).
      *
-     * @see {@link #getAllRegions}, {@link #getRegion}
+     * @see #getAllRegions
+     * @see #getRegion
      */
     public Region getRegionAt(final int x, final int y) {
         return getRegionAt(new Position(x, y));
@@ -2536,7 +2546,7 @@ public class Game {
      * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then this parameter will default to {@link #self}.
      *
      * @return The amount of damage that fromType would deal to toType.
-     * @see {@link #getDamageTo}
+     * @see #getDamageTo
      */
     public int getDamageFrom(final UnitType fromType, final UnitType toType, final Player fromPlayer, final Player toPlayer) {
         return getDamageFromImpl(fromType, toType, fromPlayer, toPlayer == null ? self() : toPlayer);
@@ -2564,7 +2574,7 @@ public class Game {
      * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then this parameter will default to {@link #self}).
      *
      * @return The amount of damage that fromType would deal to toType.
-     * @see {@link #getDamageFrom}
+     * @see #getDamageFrom
      */
     public int getDamageTo(final UnitType toType, final UnitType fromType, final Player toPlayer, final Player fromPlayer) {
         return getDamageFromImpl(fromType, toType, fromPlayer == null ? self() : fromPlayer, toPlayer);

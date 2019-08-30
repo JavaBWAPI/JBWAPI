@@ -48,7 +48,7 @@ public enum PlayerType {
      * {@link PlayerType#Closed} would not be a valid in-game type.
      *
      * @return true if the type can appear in-game, false otherwise.
-     * @see {@link #isLobbyType}
+     * @see #isLobbyType
      */
     public boolean isGameType() {
         return this == Player || this == Computer || isRescueNeutralType();

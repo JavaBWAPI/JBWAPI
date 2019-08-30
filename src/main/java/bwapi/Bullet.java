@@ -23,7 +23,8 @@ import java.util.Objects;
  * If {@link Flag#CompleteMapInformation} is disabled, then a {@link Bullet} is accessible if and only if
  * it is visible. Otherwise if {@link Flag#CompleteMapInformation} is enabled, then all Bullets
  * in the game are accessible.
- * @see {@link Game#getBullets}, {@link Bullet#exists}
+ * @see Game#getBullets
+ * @see Bullet#exists
  */
 public class Bullet implements Comparable<Bullet> {
     private final BulletData bulletData;
@@ -56,7 +57,8 @@ public class Bullet implements Comparable<Bullet> {
      * {@link Bullet} information.
      * 
      * @return true if the bullet exists or is visible, false if the bullet was destroyed or has gone out of scope.
-     * @see {@link #isVisible}, {@link Unit#exists}
+     * @see #isVisible
+     * @see Unit#exists
      */
     public boolean exists() {
         return bulletData.getExists();
@@ -84,7 +86,7 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieves the {@link Unit} that the {@link Bullet} spawned from.
      *
      * @return  The owning {@link Unit} object. Returns null if the source can not be identified or is inaccessible.
-     * @see {@link #getTarget}
+     * @see #getTarget
      */
     public Unit getSource() {
         return game.getUnit(bulletData.getSource());
@@ -94,7 +96,7 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieves the Bullet's current position.
      *
      * @return  A {@link Position} containing the Bullet's current coordinates. Returns {@link Position#Unknown} if the {@link Bullet} is inaccessible.
-     * @see {@link #getTargetPosition}
+     * @see #getTargetPosition
      */
     public Position getPosition() {
         return new Position(bulletData.getPositionX(), bulletData.getPositionY());
@@ -115,7 +117,8 @@ public class Bullet implements Comparable<Bullet> {
      *
      * @return  A double representing the number of pixels moved on the X axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
      *
-     * @see {@link #getVelocityY}, {@link #getAngle}
+     * @see #getVelocityY
+     * @see #getAngle
      */
     public double getVelocityX() {
         return bulletData.getVelocityX();
@@ -126,7 +129,8 @@ public class Bullet implements Comparable<Bullet> {
      *
      * @return  A double representing the number of pixels moved on the Y axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
      *
-     * @see {@link #getVelocityX}, {@link #getAngle}
+     * @see #getVelocityX
+     * @see #getAngle
      */
     public double getVelocityY() {
         return bulletData.getVelocityY();
@@ -136,7 +140,8 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieves the Unit interface that the {@link Bullet} is heading to.
      *
      * @return  The target Unit object, if one exists. Returns null if the Bullet's target {@link Unit} is inaccessible, the {@link Bullet} is targetting the ground, or if the {@link Bullet} itself is inaccessible.
-     * @see {@link #getTargetPosition}, {@link #getSource}
+     * @see #getTargetPosition
+     * @see #getSource
      */
     public Unit getTarget() {
         return game.getUnit(bulletData.getTarget());
@@ -146,7 +151,8 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieves the target position that the {@link Bullet} is heading to.
      *
      * @return  A {@link Position} indicating where the {@link Bullet} is headed. Returns {@link Position#Unknown} if the bullet is inaccessible.
-     * @see {@link #getTarget}, {@link #getPosition}
+     * @see #getTarget
+     * @see #getPosition
      */
     public Position getTargetPosition() {
         return new Position(bulletData.getTargetPositionX(), bulletData.getTargetPositionY());

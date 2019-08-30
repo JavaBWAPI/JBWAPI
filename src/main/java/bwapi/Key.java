@@ -3,7 +3,7 @@ package bwapi;
 /**
  * An enumeration of keyboard input values.
  *
- * @see {@link Game#getKeyState}
+ * @see Game#getKeyState
  */
 public enum Key {
     K_LBUTTON(1),

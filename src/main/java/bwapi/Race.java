@@ -11,7 +11,8 @@ import static bwapi.UnitType.*;
  * For example, the default worker and supply provider {@link UnitType}.
  *
  * As you should already know, Starcraft has three races: @Terran , @Protoss , and @Zerg .
- * @see {@link UnitType#getRace}, {@link Player#getRace}
+ * @see UnitType#getRace
+ * @see Player#getRace
  */
 public enum Race {
     Zerg(0),
