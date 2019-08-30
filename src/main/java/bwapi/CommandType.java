@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Used in {@link UnitCommand}.
+ */
 public enum CommandType {
     None(0),
     SetScreenPosition(1),

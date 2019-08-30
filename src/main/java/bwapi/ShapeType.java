@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Used in {@link UnitCommand}
+ */
 enum ShapeType {
     None(0),
     Text(1),

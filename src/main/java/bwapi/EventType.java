@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Enumeration of callback event types.
+ */
 public enum EventType {
     MatchStart(0),
     MatchEnd(1),

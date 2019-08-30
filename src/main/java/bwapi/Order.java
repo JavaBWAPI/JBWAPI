@@ -2,6 +2,14 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ An Order (Order type) represents a Unit's current action and can be retrieved with
+ {@link Unit#getOrder}.
+ 
+ It can also be used to identify the current state of the
+ unit during command execution (gathering minerals can consist of {@link #MoveToMinerals},
+ {@link #WaitForMinerals}, {@link #MiningMinerals}, etc.).
+ */
 public enum Order {
     Die(0),
     Stop(1),
