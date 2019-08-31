@@ -1821,7 +1821,7 @@ public class Unit implements Comparable<Unit>{
      * @see #research
      * @see #cancelResearch
      * @see #getTech
-     * @see #getRemainingResearchTime,
+     * @see #getRemainingResearchTime
      */
     public boolean isResearching() {
         return getOrder() == ResearchTech;
@@ -2181,8 +2181,8 @@ public class Unit implements Comparable<Unit>{
      * @see Unit#build
      * @see Unit#morph
      * @see Unit#cancelTrain
-     * @see Unit#isTraining,
-     * {@link Unit#canTrain}
+     * @see Unit#isTraining
+     * @see Unit#canTrain
      */
     public boolean train(final UnitType type) {
         return issueCommand(UnitCommand.train(this, type));
@@ -2832,8 +2832,9 @@ public class Unit implements Comparable<Unit>{
      * @see #canUseTechWithOrWithoutTarget
      * @see #canUseTech
      * @see #canUseTechWithoutTarget
-     * @see #canUseTechUnit,
-     *      {@link #canUseTechPosition}, {@link TechType}
+     * @see #canUseTechUnit
+     * @see #canUseTechPosition
+     * @see TechType
      */
     public boolean useTech(final TechType tech, final Position target) {
         return issueCommand(UnitCommand.useTech(this, tech, target));
@@ -2905,8 +2906,8 @@ public class Unit implements Comparable<Unit>{
      *
      * @see UnitCommandType
      * @see Unit#canCommand
-     * @see Unit#canIssueCommandType,
-     * {@link Unit#canTargetUnit}
+     * @see Unit#canIssueCommandType
+     * @see Unit#canTargetUnit
      */
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3061,8 +3062,10 @@ public class Unit implements Comparable<Unit>{
      *     so that @Drones morphed later morph nearer to minerals/gas).
      *
      * @see UnitCommandType
-     * @see Unit#canIssueCommand,
-     * {@link Unit#canCommandGrouped}, {@link Unit#canIssueCommandTypeGrouped}, {@link Unit#canTargetUnit}
+     * @see Unit#canIssueCommand
+     * @see Unit#canCommandGrouped
+     * @see Unit#canIssueCommandTypeGrouped
+     * @see Unit#canTargetUnit
      */
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -3551,8 +3554,9 @@ public class Unit implements Comparable<Unit>{
      * Cheap checks for whether the unit is able to execute an attack command to attack-move or attack a unit.
      *
      * @see Unit#canIssueCommand
-     * @see Unit#attack,
-     * {@link Unit#canAttackMove}, {@link Unit#canAttackUnit}
+     * @see Unit#attack
+     * @see Unit#canAttackMove
+     * @see Unit#canAttackUnit
      */
     public boolean canAttack(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -4373,8 +4377,9 @@ public class Unit implements Comparable<Unit>{
      * position or unit.
      *
      * @see Unit#canIssueCommand
-     * @see Unit#setRallyPoint,
-     * {@link Unit#canSetRallyPosition}, {@link Unit#canSetRallyUnit}.
+     * @see Unit#setRallyPoint
+     * @see Unit#canSetRallyPosition
+     * @see Unit#canSetRallyUnit
      */
     public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5398,8 +5403,9 @@ public class Unit implements Comparable<Unit>{
      * or unit.
      *
      * @see Unit#canIssueCommand
-     * @see Unit#rightClick,
-     * {@link Unit#canRightClickPosition}, {@link Unit#canRightClickUnit}.
+     * @see Unit#rightClick
+     * @see Unit#canRightClickPosition
+     * @see Unit#canRightClickUnit
      */
     public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {
@@ -5976,8 +5982,10 @@ public class Unit implements Comparable<Unit>{
      * unit (only specify null if the TechType does not target another position/unit).
      *
      * @see Unit#canIssueCommand
-     * @see Unit#useTech,
-     * {@link Unit#canUseTechWithoutTarget}, {@link Unit#canUseTechUnit}, {@link Unit#canUseTechPosition}
+     * @see Unit#useTech
+     * @see Unit#canUseTechWithoutTarget
+     * @see Unit#canUseTechUnit
+     * @see Unit#canUseTechPosition
      */
     public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
         if (checkCommandibility && !canCommand()) {

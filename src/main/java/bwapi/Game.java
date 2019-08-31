@@ -14,7 +14,7 @@ import static bwapi.Race.Zerg;
 import static bwapi.UnitType.*;
 
 /**
- * The{@link Game} class is implemented by BWAPI and is the primary means of obtaining all
+ * The {@link Game} class is implemented by BWAPI and is the primary means of obtaining all
  * game state information from Starcraft Broodwar. Game state information includes all units,
  * resources, players, forces, bullets, terrain, fog of war, regions, etc.
  */
