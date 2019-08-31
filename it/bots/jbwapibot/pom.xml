@@ -9,7 +9,7 @@
   <parent>
     <groupId>jbwapi.it</groupId>
     <artifactId>bots</artifactId>
-    <version>0.7.2</version>
+    <version>0.8</version>
   </parent>
 
   <artifactId>MarineHell</artifactId>
