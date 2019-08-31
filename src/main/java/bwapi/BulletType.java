@@ -2,6 +2,11 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * This enum represents a type of bullet.
+ *
+ * Internally, these are the same IDs as flingy types in Broodwar.
+ */
 public enum BulletType {
     Melee(0),
 

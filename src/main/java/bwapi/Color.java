@@ -3,18 +3,60 @@ package bwapi;
 
 import java.util.Objects;
 
+/**
+ * The Color object is used in drawing routines to specify the color to use.
+ *
+ * Starcraft uses a 256 color palette for rendering. Thus, the colors available are
+ * limited to this palette.
+ */
 public class Color {
+    /**
+     * The default color for Player 1.
+     */
     public final static Color Red = new Color(111);
+    /**
+     * The default color for Player 2.
+     */
     public final static Color Blue = new Color(165);
+    /**
+     * The default color for Player 3.
+     */
     public final static Color Teal = new Color(159);
+    /**
+     * The default color for Player 4.
+     */
     public final static Color Purple = new Color(164);
+    /**
+     * The default color for Player 5.
+     */
     public final static Color Orange = new Color(156);
+    /**
+     * The default color for Player 6.
+     */
     public final static Color Brown = new Color(19);
+    /**
+     * A bright white. Note that this is lighter than Player 7's white.
+     */
     public final static Color White = new Color(255);
+    /**
+     * The default color for Player 8.
+     */
     public final static Color Yellow = new Color(135);
+    /**
+     * The alternate color for Player 7 on Ice tilesets.
+     */
     public final static Color Green = new Color(117);
+    /**
+     * The default color for Neutral (Player 12).
+     */
     public final static Color Cyan = new Color(128);
+    /**
+     * The color black.
+     */
     public final static Color Black = new Color(0);
+    /**
+     * The color grey.
+     */
     public final static Color Grey = new Color(74);
 
     private static final RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
@@ -66,10 +108,25 @@ public class Color {
     }
     public final int id;
 
-    public Color(final int r, final int g, final int b) {
-        id = getRGBIndex(r, g, b);
+    /**
+     * A constructor that uses the color index in the palette that is closest to the
+     * given rgb values. On its first call, the colors in the palette will be sorted for fast indexing.
+     *
+     * This function computes the distance of the RGB values and may not be accurate.
+     *
+     * @param red The amount of red.
+     * @param green The amount of green.
+     * @param blue The amount of blue.
+     */
+    public Color(final int red, final int green, final int blue) {
+        id = getRGBIndex(red, green, blue);
     }
 
+    /**
+     * A constructor that uses the color at the specified palette index.
+     *
+     * @param id The index of the color in the 256-color palette.
+     */
     public Color(final int id) {
         this.id = id;
     }

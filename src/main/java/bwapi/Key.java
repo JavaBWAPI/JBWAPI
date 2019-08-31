@@ -1,5 +1,10 @@
 package bwapi;
 
+/**
+ * An enumeration of keyboard input values.
+ *
+ * @see Game#getKeyState
+ */
 public enum Key {
     K_LBUTTON(1),
     K_RBUTTON(2),

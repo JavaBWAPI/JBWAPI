@@ -2,6 +2,11 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * An enum that represents game types in Broodwar.
+ *
+ * A game type is selected when creating a game.
+ */
 public enum GameType {
     None(0),
     Custom(1),          // Warcraft III
