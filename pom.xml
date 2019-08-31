@@ -74,7 +74,7 @@
                                 <argument>-classpath</argument>
                                 <classpath/>
                                 <argument>org.openjdk.jmh.Main</argument>
-                                <argument>.*</argument>
+                                <argument>".*"</argument>
                             </arguments>
                         </configuration>
                     </execution>
