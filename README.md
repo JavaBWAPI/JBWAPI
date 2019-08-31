@@ -70,7 +70,9 @@ or if you already have maven installed
 
 ## documentation
 
-The api documentation can be found [here](https://javabwapi.github.io/JBWAPI/).
+The API documentation can be found [here](https://javabwapi.github.io/JBWAPI/).
+
+You can also ask any further questions on the [SSCAIT Discord](https://discord.gg/DqvHsq9)
 
 ## tutorial
 
