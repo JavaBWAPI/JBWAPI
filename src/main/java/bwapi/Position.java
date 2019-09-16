@@ -44,4 +44,8 @@ public class Position extends Point {
     public double getDistance(final Position position) {
         return getDistance(position.x, position.y);
     }
+
+    public int getApproxDistance(Position position) {
+        return super.getApproxDistance(position);
+    }
 }
