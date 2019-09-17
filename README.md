@@ -35,7 +35,7 @@ Add JBWAPI as a dependecy
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>0.8</version>
+    <version>0.8.1</version>
 </dependency>
 ```
 
