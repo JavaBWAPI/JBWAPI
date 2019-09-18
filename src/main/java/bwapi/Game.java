@@ -170,6 +170,26 @@ public class Game {
 
         units = new Unit[10000];
 
+        randomSeed = gameData.getRandomSeed();
+
+        revision = gameData.getRevision();
+        debug = gameData.isDebug();
+        self = players[gameData.getSelf()];
+        enemy = players[gameData.getEnemy()];
+        neutral = players[gameData.getNeutral()];
+        replay = gameData.isReplay();
+        multiplayer = gameData.isMultiplayer();
+        battleNet = gameData.isBattleNet();
+        startLocations = IntStream.range(0, gameData.getStartLocationCount())
+                .mapToObj(i -> new TilePosition(gameData.getStartLocations(i)))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        mapWidth = gameData.getMapWidth();
+        mapHeight = gameData.getMapHeight();
+        mapFileName = gameData.getMapFileName();
+        mapPathName = gameData.getMapPathName();
+        mapName = gameData.getMapName();
+        mapHash = gameData.getMapHash();
+
         final List<Unit> staticMinerals = new ArrayList<>();
         final List<Unit> staticGeysers = new ArrayList<>();
         final List<Unit> staticNeutralUnits = new ArrayList<>();
@@ -198,28 +218,6 @@ public class Game {
         this.staticGeysers = Collections.unmodifiableList(staticGeysers);
         this.staticNeutralUnits = Collections.unmodifiableList(staticNeutralUnits);
         this.allUnits = Collections.unmodifiableList(allUnits);
-
-
-
-        randomSeed = gameData.getRandomSeed();
-
-        revision = gameData.getRevision();
-        debug = gameData.isDebug();
-        self = players[gameData.getSelf()];
-        enemy = players[gameData.getEnemy()];
-        neutral = players[gameData.getNeutral()];
-        replay = gameData.isReplay();
-        multiplayer = gameData.isMultiplayer();
-        battleNet = gameData.isBattleNet();
-        startLocations = IntStream.range(0, gameData.getStartLocationCount())
-                .mapToObj(i -> new TilePosition(gameData.getStartLocations(i)))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        mapWidth = gameData.getMapWidth();
-        mapHeight = gameData.getMapHeight();
-        mapFileName = gameData.getMapFileName();
-        mapPathName = gameData.getMapPathName();
-        mapName = gameData.getMapName();
-        mapHash = gameData.getMapHash();
 
         buildable = new boolean[mapWidth][mapHeight];
         groundHeight = new int[mapWidth][mapHeight];
