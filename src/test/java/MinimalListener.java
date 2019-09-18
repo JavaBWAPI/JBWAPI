@@ -2,6 +2,7 @@ import bwapi.DefaultBWListener;
 import bwapi.BWClient;
 import bwapi.Game;
 import bwapi.Player;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 class MinimalListener extends DefaultBWListener {
 	final BWClient bwClient;
