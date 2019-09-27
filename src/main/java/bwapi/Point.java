@@ -1,13 +1,13 @@
 package bwapi;
 
-class Point implements Comparable<Point>{
+public abstract class Point<T extends Point> implements Comparable<Point>{
     static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;
     public final int y;
     private final int scalar;
 
-    Point(final int x, final int y, final int type) {
+    protected Point(final int x, final int y, final int type) {
         this.x = x;
         this.y = y;
         this.scalar = type;
@@ -29,9 +29,9 @@ class Point implements Comparable<Point>{
         return "[" + x + ", " + y + "]";
     }
 
-    protected double getDistance(final int x, final int y) {
-        final int dx = x - this.x;
-        final int dy = y - this.y;
+    public double getDistance(T point) {
+        final int dx = point.x - this.x;
+        final int dy = point.y - this.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
@@ -52,10 +52,17 @@ class Point implements Comparable<Point>{
         return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
     }
 
-    public int getApproxDistance(final Point point) {
+    public int getApproxDistance(final T point) {
         return getApproxDistance(x, y, point.x, point.y);
     }
 
+    public abstract T subtract(T other);
+
+    public abstract T add(T other);
+
+    public abstract T divide(int divisor);
+
+    public abstract T multiply(int multiplier);
 
     @Override
     public boolean equals(Object o) {

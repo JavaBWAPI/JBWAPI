@@ -1,7 +1,7 @@
 package bwapi;
 
 
-public class Position extends Point {
+public class Position extends Point<Position> {
 
     public static final int SIZE_IN_PIXELS = 1;
     public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
@@ -39,13 +39,5 @@ public class Position extends Point {
 
     public Position multiply(final int multiplier) {
         return new Position(x * multiplier, y * multiplier);
-    }
-
-    public double getDistance(final Position position) {
-        return getDistance(position.x, position.y);
-    }
-
-    public int getApproxDistance(Position position) {
-        return super.getApproxDistance(position);
     }
 }
