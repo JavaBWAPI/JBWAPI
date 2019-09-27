@@ -4,6 +4,7 @@ import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -2269,16 +2270,145 @@ public class Game {
         addCommand(SetFrameSkip, frameSkip, 0);
     }
 
-    // If you need these please implement (see addCommand and make a PR to the github repo)
-    // public boolean setAlliance(Player player, boolean allied);
-    // public boolean setAlliance(Player player);
-    // public boolean setAlliance(Player player, boolean allied, boolean alliedVictory);
-    // public boolean setVision(Player player, boolean enabled);
-    // public void setGUI(bool enabled);
-    // public int getLastEventTime();
-    // public boolean setMap(final String cstr_mapFileName);
-    // public boolean setRevealAll();
-    // public boolean setRevealAll(boolean reveal);
+    /**
+     * Sets the alliance state of the current player with the target player.</summary>
+     *
+     * @param player The target player to set alliance with.
+     * @param allied If true, the current player will ally the target player. If false, the current player
+     *   will make the target player an enemy. This value is true by default.
+     * @param alliedVictory Sets the state of "allied victory". If true, the game will end in a victory if all
+     *   allied players have eliminated their opponents. Otherwise, the game will only end if
+     *   no other players are remaining in the game. This value is true by default.
+     */
+    public boolean setAlliance(Player player, boolean allied, boolean alliedVictory) {
+        if (self() == null || isReplay() || player == self || player.equals(self())) {
+            return false;
+        }
+
+        addCommand(CommandType.SetAllies, player.getID(), allied ? (alliedVictory ? 2 : 1) : 0);
+        return true;
+    }
+
+    public boolean setAlliance(Player player, boolean allied) {
+        return setAlliance(player, allied, true);
+    }
+
+    public boolean setAlliance(Player player) {
+        return setAlliance(player, true);
+    }
+
+    /**
+     * In a game, this function sets the vision of the current BWAPI player with the
+     * target player.
+     * 
+     * In a replay, this function toggles the visibility of the target player.
+     *
+     * @param player The target player to toggle vision.
+     * @param enabled The vision state. If true, and in a game, the current player will enable shared vision
+     *   with the target player, otherwise it will unshare vision. If in a replay, the vision
+     *   of the target player will be shown, otherwise the target player will be hidden. This
+     *   value is true by default.
+     */
+    public boolean setVision(Player player, boolean enabled) {
+        // Param check
+        if ( player == null) {
+            return false;
+        }
+
+        if ( !isReplay() && (self() == null || player.equals(self()))) {
+            return false;
+        }
+
+        addCommand(CommandType.SetVision, player.getID(), enabled ? 1 : 0);
+        return true;
+    }
+
+    /** 
+     * Checks if the GUI is enabled.
+     * 
+     * The GUI includes all drawing functions of BWAPI, as well as screen updates from Broodwar.
+     *
+     * @return true if the GUI is enabled, and everything is visible, false if the GUI is disabled and drawing
+     * functions are rejected
+     *
+     * @see #setGUI 
+     */
+    boolean isGUIEnabled() {
+        return gameData.getHasGUI();
+    }
+
+    /**
+     * Sets the rendering state of the Starcraft GUI.
+     *
+     * This typically gives Starcraft a very low graphical frame rate and disables all drawing functionality in BWAPI.
+     *
+     * @param enabled A boolean value that determines the state of the GUI. Passing false to this function
+     *   will disable the GUI, and true will enable it.
+     *
+     * @see #isGUIEnabled
+     */
+    public void setGUI(boolean enabled) {
+        gameData.setHasGUI(enabled);
+        //queue up command for server so it also applies the change
+        addCommand(CommandType.SetGui, enabled ? 1 : 0, 0);
+    }
+
+    /**
+     * Retrieves the amount of time (in milliseconds) that has elapsed when running the last AI
+     * module callback.
+     *
+     * This is used by tournament modules to penalize AI modules that use too
+     * much processing time.
+     *
+     * @return Time in milliseconds spent in last AI module call. Returns 0 When called from an AI module.
+     */
+    public int getLastEventTime() {
+         return 0;
+    }
+
+    /**
+     * Changes the map to the one specified.
+     *
+     * Once restarted, the game will load the map that was provided.
+     * Changes do not take effect unless the game is restarted.
+     *
+     * @param mapFileName A string containing the path and file name to the desired map.
+     *
+     * @return Returns true if the function succeeded and has changed the map. Returns false if the function failed,
+     * does not have permission from the tournament module, failed to find the map specified, or received an invalid
+     * parameter.
+     */
+    public boolean setMap(final String mapFileName) {
+        if (mapFileName == null || mapFileName.length() >= 260 || mapFileName.charAt(0) == 0) {
+            return false;
+        }
+
+        if (!(new File(mapFileName).exists())) {
+            return false;
+        }
+
+        addCommand(CommandType.SetMap, client.addString(mapFileName), 0);
+        return true;
+    }
+
+    /**
+     * Sets the state of the fog of war when watching a replay.
+     *
+     * @param reveal The state of the reveal all flag. If false, all fog of war will be enabled. If true,
+     *               then the fog of war will be revealed. It is true by default.
+     */
+    public boolean setRevealAll(boolean reveal) {
+        if ( !isReplay() ) {
+            return false;
+        }
+        addCommand(CommandType.SetRevealAll, reveal ? 1 : 0, 0);
+        return true;
+    }
+
+    public boolean setRevealAll() {
+        return setRevealAll(true);
+    }
+
 
     /**
      * Checks if there is a path from source to destination. This only checks
