@@ -1487,7 +1487,7 @@ public class Game {
 
     /**
      * Prints text to the screen as a notification. This function allows text
-     * formatting using {@link TextColor#formatText}.
+     * formatting using {@link Text#formatText}.
      * <p>
      * That text printed through this function is not seen by other players or in replays.
      *

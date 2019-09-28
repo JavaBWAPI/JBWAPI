@@ -5,7 +5,7 @@ package bwapi;
  * <p>
  * Such codes are used in calls to {@link Game#drawText}, {@link Game#printf}
  */
-public enum TextColor {
+public enum Text {
     /**
      * Uses the previous color that was specified before the current one.
      */
@@ -117,14 +117,14 @@ public enum TextColor {
 
     final byte id;
 
-    TextColor(final int id) {
+    Text(final int id) {
         this.id = (byte) id;
     }
 
     /**
      * Format text with a textcolor to display on broodwar
      */
-    public static String formatText(final String text, final TextColor format) {
+    public static String formatText(final String text, final Text format) {
         final byte[] data = text.getBytes();
         final int len = text.length();
         final byte[] formatted = new byte[len + 1];
