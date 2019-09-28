@@ -96,7 +96,7 @@ public class Game {
     private short[] mapSplitTilesRegion1;
     private short[] mapSplitTilesRegion2;
     // USER DEFINED
-    private TextSize textSize = TextSize.Default;
+    private Text.Size textSize = Text.Size.Default;
 
     Game(Client client) {
         this.client = client;
@@ -2394,16 +2394,16 @@ public class Game {
     }
 
     public void setTextSize() {
-        setTextSize(TextSize.Default);
+        setTextSize(Text.Size.Default);
     }
 
     /**
      * Sets the size of the text for all calls to {@link #drawText} following this one.
      *
-     * @param size The size of the text. This value is one of Text#Size. If this value is omitted, then a default value of {@link TextSize#Default} is used.
-     * @see TextSize
+     * @param size The size of the text. This value is one of Text#Size. If this value is omitted, then a default value of {@link Text.Size#Default} is used.
+     * @see Text.Size
      */
-    public void setTextSize(final TextSize size) {
+    public void setTextSize(final Text.Size size) {
         textSize = size;
     }
 
