@@ -5,10 +5,6 @@ import sun.nio.ch.DirectBuffer;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
@@ -29,8 +25,7 @@ class WrappedBuffer {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
             return (Unsafe) theUnsafe.get(null);
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             return null;
         }

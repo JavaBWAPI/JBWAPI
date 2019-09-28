@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Contains enumeration of known latency values.
+ *
  * @see Game#getLatency
  */
 public enum Latency {

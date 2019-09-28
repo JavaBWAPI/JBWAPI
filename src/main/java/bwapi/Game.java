@@ -4,7 +4,6 @@ import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -154,7 +153,7 @@ public class Game {
         final int bulletCount = 100;
         bullets = new Bullet[bulletCount];
         for (int id = 0; id < bulletCount; id++) {
-            bullets[id] = new Bullet(gameData.getBullets(id), id,this);
+            bullets[id] = new Bullet(gameData.getBullets(id), id, this);
         }
 
         final int regionCount = gameData.getRegionCount();
@@ -285,8 +284,8 @@ public class Game {
     void onFrame(final int frame) {
         if (frame > 0) {
             allUnits = visibleUnits.stream()
-                .map(i -> units[i])
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+                    .map(i -> units[i])
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
     }
@@ -346,7 +345,7 @@ public class Game {
      * Retrieves the set of all accessible units.
      * If {@link Flag#CompleteMapInformation} is enabled, then the set also includes units that are not
      * visible to the player.
-     *
+     * <p>
      * Units that are inside refineries are not included in this set.
      *
      * @return List<Unit> containing all known units in the game.
@@ -392,7 +391,7 @@ public class Game {
     /**
      * Retrieves the set of all @minerals that were available at the beginning of the
      * game.
-     *
+     * <p>
      * This set includes resources that have been mined out or are inaccessible.
      *
      * @return List<Unit> containing static @minerals
@@ -404,7 +403,7 @@ public class Game {
     /**
      * Retrieves the set of all @geysers that were available at the beginning of the
      * game.
-     *
+     * <p>
      * This set includes resources that are inaccessible.
      *
      * @return List<Unit> containing static @geysers
@@ -416,7 +415,7 @@ public class Game {
     /**
      * Retrieves the set of all units owned by the neutral player (resources, critters,
      * etc.) that were available at the beginning of the game.
-     *
+     * <p>
      * This set includes units that are inaccessible.
      *
      * @return List<Unit> containing static neutral units
@@ -438,7 +437,7 @@ public class Game {
 
     /**
      * Retrieves the set of all accessible @Nuke dots.
-     *
+     * <p>
      * Nuke dots are the red dots painted by a @Ghost when using the nuclear strike ability.
      *
      * @return Set of Positions giving the coordinates of nuke locations.
@@ -453,7 +452,6 @@ public class Game {
      * Retrieves the {@link Force} object associated with a given identifier.
      *
      * @param forceID The identifier for the Force object.
-     *
      * @return {@link Force} object mapped to the given forceID. Returns null if the given identifier is invalid.
      */
     public Force getForce(final int forceID) {
@@ -467,7 +465,6 @@ public class Game {
      * Retrieves the {@link Player} object associated with a given identifier.
      *
      * @param playerID The identifier for the {@link Player} object.
-     *
      * @return {@link Player} object mapped to the given playerID. null if the given identifier is invalid.
      */
     public Player getPlayer(final int playerID) {
@@ -481,7 +478,6 @@ public class Game {
      * Retrieves the {@link Unit} object associated with a given identifier.
      *
      * @param unitID The identifier for the {@link Unit} object.
-     *
      * @return {@link Unit} object mapped to the given unitID. null if the given identifier is invalid.
      */
     public Unit getUnit(final int unitID) {
@@ -495,11 +491,10 @@ public class Game {
      * Retrieves the {@link Region} object associated with a given identifier.
      *
      * @param regionID The identifier for the {@link Region} object.
-     *
      * @return {@link Region} object mapped to the given regionID. Returns null if the given ID is invalid.
      */
     public Region getRegion(final int regionID) {
-        if (regionID <  0 || regionID >= regions.length) {
+        if (regionID < 0 || regionID >= regions.length) {
             return null;
         }
         return regions[regionID];
@@ -521,7 +516,6 @@ public class Game {
      *
      * @return The {@link Latency} setting of the game, which is of Latency.
      * @see Latency
-     *
      */
     public Latency getLatency() {
         return Latency.idToEnum[gameData.getLatency()];
@@ -581,10 +575,8 @@ public class Game {
      * Retrieves the state of the given mouse button.
      *
      * @param button A {@link MouseButton} enum member indicating which button on the mouse to check.
-     *
      * @return A boolean indicating the state of the given button. true if the button was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
-     *
      * @see MouseButton
      */
     public boolean getMouseState(final MouseButton button) {
@@ -595,10 +587,8 @@ public class Game {
      * Retrieves the state of the given keyboard key.
      *
      * @param key A {@link Key} enum member indicating which key on the keyboard to check.
-     *
      * @return A boolean indicating the state of the given key. true if the key was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
-     *
      * @see Key
      */
     public boolean getKeyState(final Key key) {
@@ -649,14 +639,12 @@ public class Game {
 
     /**
      * Checks if the state of the given flag is enabled or not.
-     *
+     * <p>
      * Flags may only be enabled at the start of the match during the {@link BWEventListener#onStart}
      * callback.
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
-     *
      * @return true if the given flag is enabled, false if the flag is disabled.
-     *
      * @see Flag
      */
     public boolean isFlagEnabled(final Flag flag) {
@@ -665,12 +653,11 @@ public class Game {
 
     /**
      * Enables the state of a given flag.
-     *
+     * <p>
      * Flags may only be enabled at the start of the match during the {@link BWEventListener#onStart}
      * callback.
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
-     *
      * @see Flag
      */
     public void enableFlag(final Flag flag) {
@@ -690,8 +677,7 @@ public class Game {
      *
      * @param tileX The X position, in tiles.
      * @param tileY The Y position, in tiles.
-     * @param pred A function predicate that indicates which units are included in the returned set.
-     *
+     * @param pred  A function predicate that indicates which units are included in the returned set.
      * @return A List<Unit> object consisting of all the units that have any part of them on the
      * given build tile.
      */
@@ -709,12 +695,11 @@ public class Game {
     /**
      * Retrieves the set of accessible units that are in a given rectangle.
      *
-     * @param left The X coordinate of the left position of the bounding box, in pixels.
-     * @param top The Y coordinate of the top position of the bounding box, in pixels.
-     * @param right The X coordinate of the right position of the bounding box, in pixels.
+     * @param left   The X coordinate of the left position of the bounding box, in pixels.
+     * @param top    The Y coordinate of the top position of the bounding box, in pixels.
+     * @param right  The X coordinate of the right position of the bounding box, in pixels.
      * @param bottom The Y coordinate of the bottom position of the bounding box, in pixels.
-     * @param pred A function predicate that indicates which units are included in the returned set.
-     *
+     * @param pred   A function predicate that indicates which units are included in the returned set.
      * @return A List<Unit> object consisting of all the units that have any part of them within the
      * given rectangle bounds.
      */
@@ -740,11 +725,10 @@ public class Game {
      * Retrieves the set of accessible units that are within a given radius of a
      * position.
      *
-     * @param x The x coordinate of the center, in pixels.
-     * @param y The y coordinate of the center, in pixels.
+     * @param x      The x coordinate of the center, in pixels.
+     * @param y      The y coordinate of the center, in pixels.
      * @param radius The radius from the center, in pixels, to include units.
-     * @param pred A function predicate that indicates which units are included in the returned set.
-     *
+     * @param pred   A function predicate that indicates which units are included in the returned set.
      * @return A List<Unit> object consisting of all the units that have any part of them within the
      * given radius from the center position.
      */
@@ -771,12 +755,11 @@ public class Game {
      * pred within an optional rectangle.
      *
      * @param center The position to start searching for the closest unit.
-     * @param pred The {@link UnitFilter} predicate to determine which units should be included. This includes all units by default.
-     * @param left The left position of the rectangle. This value is 0 by default.
-     * @param top The top position of the rectangle. This value is 0 by default.
-     * @param right The right position of the rectangle. This value includes the entire map width by default.
+     * @param pred   The {@link UnitFilter} predicate to determine which units should be included. This includes all units by default.
+     * @param left   The left position of the rectangle. This value is 0 by default.
+     * @param top    The top position of the rectangle. This value is 0 by default.
+     * @param right  The right position of the rectangle. This value includes the entire map width by default.
      * @param bottom The bottom position of the rectangle. This value includes the entire map height by default.
-     *
      * @see UnitFilter
      */
     public Unit getClosestUnitInRectangle(final Position center, final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
@@ -802,11 +785,9 @@ public class Game {
      * pred within an optional radius.
      *
      * @param center The position to start searching for the closest unit.
-     * @param pred The UnitFilter predicate to determine which units should be included. This includes all units by default.
+     * @param pred   The UnitFilter predicate to determine which units should be included. This includes all units by default.
      * @param radius The radius to search in. If omitted, the entire map will be searched.
-     *
      * @return The desired unit that is closest to center. Returns null If a suitable unit was not found.
-     *
      * @see UnitFilter
      */
     public Unit getClosestUnit(final Position center, final int radius, final UnitFilter pred) {
@@ -845,7 +826,6 @@ public class Game {
      * Retrieves the file name of the currently loaded map.
      *
      * @return Map file name as String object.
-     *
      * @see #mapPathName
      * @see #mapName
      */
@@ -857,7 +837,6 @@ public class Game {
      * Retrieves the full path name of the currently loaded map.
      *
      * @return Map file name as String object.
-     *
      * @see #mapFileName
      * @see #mapName
      */
@@ -869,7 +848,6 @@ public class Game {
      * Retrieves the title of the currently loaded map.
      *
      * @return Map title as String object.
-     *
      * @see #mapFileName
      * @see #mapPathName
      */
@@ -881,7 +859,7 @@ public class Game {
      * Calculates the SHA-1 hash of the currently loaded map file.
      *
      * @return String object containing SHA-1 hash.
-     *
+     * <p>
      * Campaign maps will return a hash of their internal map chunk components(.chk), while
      * standard maps will return a hash of their entire map archive (.scm,.scx).
      */
@@ -891,14 +869,13 @@ public class Game {
 
     /**
      * Checks if the given mini-tile position is walkable.
-     *
+     * <p>
      * This function only checks if the static terrain is walkable. Its current occupied
      * state is excluded from this check. To see if the space is currently occupied or not, then
      * see {@link #getUnitsInRectangle}.
      *
      * @param walkX The x coordinate of the mini-tile, in mini-tile units (8 pixels).
      * @param walkY The y coordinate of the mini-tile, in mini-tile units (8 pixels).
-     *
      * @return true if the mini-tile is walkable and false if it is impassable for ground units.
      */
     public boolean isWalkable(final int walkX, final int walkY) {
@@ -917,15 +894,14 @@ public class Game {
      *
      * @param tileX X position to query, in tiles
      * @param tileY Y position to query, in tiles
-     *
      * @return The tile height as an integer. Possible values are:
-     *     - 0: Low ground
-     *     - 1: Low ground doodad
-     *     - 2: High ground
-     *     - 3: High ground doodad
-     *     - 4: Very high ground
-     *     - 5: Very high ground doodad
-     *     .
+     * - 0: Low ground
+     * - 1: Low ground doodad
+     * - 2: High ground
+     * - 3: High ground doodad
+     * - 4: Very high ground
+     * - 5: Very high ground doodad
+     * .
      */
     public int getGroundHeight(final int tileX, final int tileY) {
         return getGroundHeight(new TilePosition(tileX, tileY));
@@ -947,10 +923,9 @@ public class Game {
      * other requirements are met, a structure can be placed on this tile. This function uses
      * static map data.
      *
-     * @param tileX The x value of the tile to check.
-     * @param tileY The y value of the tile to check.
+     * @param tileX            The x value of the tile to check.
+     * @param tileY            The y value of the tile to check.
      * @param includeBuildings If this is true, then this function will also check if any visible structures are occupying the space. If this value is false, then it only checks the static map data for tile buildability. This value is false by default.
-     *
      * @return boolean identifying if the given tile position is buildable (true) or not (false).
      * If includeBuildings was provided, then it will return false if a structure is currently
      * occupying the tile.
@@ -975,7 +950,6 @@ public class Game {
      *
      * @param tileX The x value of the tile to check.
      * @param tileY The y value of the tile to check.
-     *
      * @return boolean identifying the visibility of the tile. If the given tile is visible, then
      * the value is true. If the given tile is concealed by the fog of war, then this value will
      * be false.
@@ -998,9 +972,7 @@ public class Game {
      *
      * @param tileX The x tile coordinate to check.
      * @param tileY The y tile coordinate to check.
-     *
      * @return true if the player has explored the given tile position (partially revealed fog), false if the tile position was never explored (completely black fog).
-     *
      * @see #isVisible
      */
     public boolean isExplored(final int tileX, final int tileY) {
@@ -1019,7 +991,6 @@ public class Game {
      *
      * @param tileX The x tile coordinate to check.
      * @param tileY The y tile coordinate to check.
-     *
      * @return true if the given tile has creep on it, false if the given tile does not have creep, or if it is concealed by the fog of war.
      */
     public boolean hasCreep(final int tileX, final int tileY) {
@@ -1041,10 +1012,9 @@ public class Game {
      * Checks if the given pixel position is powered by an owned @Protoss_Pylon for an
      * optional unit type.
      *
-     * @param x The x pixel coordinate to check.
-     * @param y The y pixel coordinate to check.
+     * @param x        The x pixel coordinate to check.
+     * @param y        The y pixel coordinate to check.
      * @param unitType Checks if the given {@link UnitType} requires power or not. If ommitted, then it will assume that the position requires power for any unit type.
-     *
      * @return true if the type at the given position will have power, false if the type at the given position will be unpowered.
      */
     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
@@ -1089,10 +1059,9 @@ public class Game {
      * Checks if the given tile position if powered by an owned @Protoss_Pylon for an
      * optional unit type.
      *
-     * @param tileX The x tile coordinate to check.
-     * @param tileY The y tile coordinate to check.
+     * @param tileX    The x tile coordinate to check.
+     * @param tileY    The y tile coordinate to check.
      * @param unitType Checks if the given UnitType will be powered if placed at the given tile position. If omitted, then only the immediate tile position is checked for power, and the function will assume that the location requires power for any unit type.
-     *
      * @return true if the type at the given tile position will receive power, false if the type will be unpowered at the given tile position.
      */
     public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
@@ -1119,20 +1088,19 @@ public class Game {
      * Checks if the given unit type can be built at the given build tile position.
      * This function checks for creep, power, and resource distance requirements in addition to
      * the tiles' buildability and possible units obstructing the build location.
-     *
+     * <p>
      * If the type is an addon and a builer is provided, then the location of the addon will
      * be placed 4 tiles to the right and 1 tile down from the given position. If the builder
      * is not given, then the check for the addon will be conducted at position.
-     *
+     * <p>
      * If type is UnitType.Special_Start_Location, then the area for a resource depot
      * (@Command_Center, @Hatchery, @Nexus) is checked as normal, but any potential obstructions
      * (existing structures, creep, units, etc.) are ignored.
      *
-     * @param position Indicates the tile position that the top left corner of the structure is intended to go.
-     * @param type The UnitType to check for.
-     * @param builder The intended unit that will build the structure. If specified, then this function will also check if there is a path to the build site and exclude the builder from the set of units that may be blocking the build site.
+     * @param position      Indicates the tile position that the top left corner of the structure is intended to go.
+     * @param type          The UnitType to check for.
+     * @param builder       The intended unit that will build the structure. If specified, then this function will also check if there is a path to the build site and exclude the builder from the set of units that may be blocking the build site.
      * @param checkExplored If this parameter is true, it will also check if the target position has been explored by the current player. This value is false by default, ignoring the explored state of the build site.
-     *
      * @return true indicating that the structure can be placed at the given tile position, and
      * false if something may be obstructing the build location.
      */
@@ -1184,8 +1152,8 @@ public class Game {
         if (type != Special_Start_Location) {
             final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
             final List<Unit> unitsInRect = getUnitsInRectangle(
-                targPos.subtract(new Position(type.dimensionLeft(), type.dimensionUp())),
-                targPos.add(new Position(type.dimensionRight(), type.dimensionDown())),
+                    targPos.subtract(new Position(type.dimensionLeft(), type.dimensionUp())),
+                    targPos.add(new Position(type.dimensionRight(), type.dimensionDown())),
                     u -> !u.isFlying() && !u.isLoaded() && (builder != u || type == Zerg_Nydus_Canal));
 
             for (final Unit u : unitsInRect) {
@@ -1260,9 +1228,8 @@ public class Game {
      * player. These include resources, supply, technology tree, availability, and
      * required units.
      *
-     * @param type The {@link UnitType} to check.
+     * @param type    The {@link UnitType} to check.
      * @param builder The Unit that will be used to build/train the provided unit type. If this value is null or excluded, then the builder will be excluded in the check.
-     *
      * @return true indicating that the type can be made. If builder is provided, then it is
      * only true if builder can make the type. Otherwise it will return false, indicating
      * that the unit type can not be made.
@@ -1390,10 +1357,9 @@ public class Game {
      * current player. These include resources, technology tree, availability, and
      * required units.
      *
-     * @param type The {@link TechType} to check.
-     * @param unit The {@link Unit} that will be used to research the provided technology type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param type                     The {@link TechType} to check.
+     * @param unit                     The {@link Unit} that will be used to research the provided technology type. If this value is null or excluded, then the unit will be excluded in the check.
      * @param checkCanIssueCommandType TODO fill this in
-     *
      * @return true indicating that the type can be researched. If unit is provided, then it is
      * only true if unit can research the type. Otherwise it will return false, indicating
      * that the technology can not be researched.
@@ -1455,10 +1421,9 @@ public class Game {
      * current player. These include resources, technology tree, availability, and
      * required units.
      *
-     * @param type The {@link UpgradeType} to check.
-     * @param unit The {@link Unit} that will be used to upgrade the provided upgrade type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param type                     The {@link UpgradeType} to check.
+     * @param unit                     The {@link Unit} that will be used to upgrade the provided upgrade type. If this value is null or excluded, then the unit will be excluded in the check.
      * @param checkCanIssueCommandType TODO fill this in
-     *
      * @return true indicating that the type can be upgraded. If unit is provided, then it is
      * only true if unit can upgrade the type. Otherwise it will return false, indicating
      * that the upgrade can not be upgraded.
@@ -1523,7 +1488,7 @@ public class Game {
     /**
      * Prints text to the screen as a notification. This function allows text
      * formatting using {@link TextColor#formatText}.
-     *
+     * <p>
      * That text printed through this function is not seen by other players or in replays.
      *
      * @param string String to print.
@@ -1534,11 +1499,10 @@ public class Game {
 
     /**
      * Sends a text message to all other players in the game.
-     *
+     * <p>
      * In a single player game this function can be used to execute cheat codes.
      *
      * @param string String to send.
-     *
      * @see #sendTextEx
      */
     public void sendText(final String string) {
@@ -1550,8 +1514,7 @@ public class Game {
      * allies.
      *
      * @param toAllies If this parameter is set to true, then the message is only sent to allied players, otherwise it will be sent to all players.
-     * @param string String to send.
-     *
+     * @param string   String to send.
      * @see #sendText
      */
     public void sendTextEx(final boolean toAllies, final String string) {
@@ -1610,6 +1573,7 @@ public class Game {
 
     /**
      * Pauses the game. While paused, {@link BWEventListener#onFrame} will still be called.
+     *
      * @see #resumeGame
      */
     public void pauseGame() {
@@ -1618,6 +1582,7 @@ public class Game {
 
     /**
      * Resumes the game from a paused state.
+     *
      * @see #pauseGame
      */
     public void resumeGame() {
@@ -1643,22 +1608,21 @@ public class Game {
     /**
      * Sets the number of milliseconds Broodwar spends in each frame. The
      * default values are as follows:
-     *   - Fastest: 42ms/frame
-     *   - Faster: 48ms/frame
-     *   - Fast: 56ms/frame
-     *   - Normal: 67ms/frame
-     *   - Slow: 83ms/frame
-     *   - Slower: 111ms/frame
-     *   - Slowest: 167ms/frame
-     *
+     * - Fastest: 42ms/frame
+     * - Faster: 48ms/frame
+     * - Fast: 56ms/frame
+     * - Normal: 67ms/frame
+     * - Slow: 83ms/frame
+     * - Slower: 111ms/frame
+     * - Slowest: 167ms/frame
+     * <p>
      * Specifying a value of 0 will not guarantee that logical frames are executed as fast
      * as possible. If that is the intention, use this in combination with #setFrameSkip.
-     *
+     * <p>
      * Changing this value will cause the execution of @UMS scenario triggers to glitch.
      * This will only happen in campaign maps and custom scenarios (non-melee).
      *
      * @param speed The time spent per frame, in milliseconds. A value of 0 indicates that frames are executed immediately with no delay. Negative values will restore the default value as listed above.
-     *
      * @see #setFrameSkip
      * @see #getFPS
      */
@@ -1671,9 +1635,8 @@ public class Game {
      * splits the set into groups of 12 and issues the same command to each of them. If a unit
      * is not capable of executing the command, then it is simply ignored.
      *
-     * @param units A List<Unit> containing all the units to issue the command for.
+     * @param units   A List<Unit> containing all the units to issue the command for.
      * @param command A {@link UnitCommand} object containing relevant information about the command to be issued. The {@link Unit} object associated with the command will be ignored.
-     *
      * @return true if any one of the units in the List<Unit> were capable of executing the
      * command, and false if none of the units were capable of executing the command.
      */
@@ -1689,7 +1652,6 @@ public class Game {
      *
      * @return A List<Unit> containing the user's selected units. If {@link Flag#UserInput} is disabled,
      * then this set is always empty.
-     *
      * @see #enableFlag
      */
     public List<Unit> getSelectedUnits() {
@@ -1800,12 +1762,12 @@ public class Game {
     /**
      * Draws a rectangle on the screen with the given color.
      *
-     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param left The x coordinate, in pixels, relative to ctype, of the left edge of the rectangle.
-     * @param top The y coordinate, in pixels, relative to ctype, of the top edge of the rectangle.
-     * @param right The x coordinate, in pixels, relative to ctype, of the right edge of the rectangle.
-     * @param bottom The y coordinate, in pixels, relative to ctype, of the bottom edge of the rectangle.
-     * @param color The color of the rectangle.
+     * @param ctype   The coordinate type. Indicates the relative position to draw the shape.
+     * @param left    The x coordinate, in pixels, relative to ctype, of the left edge of the rectangle.
+     * @param top     The y coordinate, in pixels, relative to ctype, of the top edge of the rectangle.
+     * @param right   The x coordinate, in pixels, relative to ctype, of the right edge of the rectangle.
+     * @param bottom  The y coordinate, in pixels, relative to ctype, of the bottom edge of the rectangle.
+     * @param color   The color of the rectangle.
      * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
      */
     public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color, final boolean isSolid) {
@@ -1867,14 +1829,14 @@ public class Game {
     /**
      * Draws a triangle on the screen with the given color.
      *
-     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param ax The x coordinate, in pixels, relative to ctype, of the first point.
-     * @param ay The y coordinate, in pixels, relative to ctype, of the first point.
-     * @param bx The x coordinate, in pixels, relative to ctype, of the second point.
-     * @param by The y coordinate, in pixels, relative to ctype, of the second point.
-     * @param cx The x coordinate, in pixels, relative to ctype, of the third point.
-     * @param cy The y coordinate, in pixels, relative to ctype, of the third point.
-     * @param color The color of the triangle.
+     * @param ctype   The coordinate type. Indicates the relative position to draw the shape.
+     * @param ax      The x coordinate, in pixels, relative to ctype, of the first point.
+     * @param ay      The y coordinate, in pixels, relative to ctype, of the first point.
+     * @param bx      The x coordinate, in pixels, relative to ctype, of the second point.
+     * @param by      The y coordinate, in pixels, relative to ctype, of the second point.
+     * @param cx      The x coordinate, in pixels, relative to ctype, of the third point.
+     * @param cy      The y coordinate, in pixels, relative to ctype, of the third point.
+     * @param color   The color of the triangle.
      * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
      */
     public void drawTriangle(CoordinateType ctype, int ax, int ay, int bx, int by, int cx, int cy, Color color, boolean isSolid) {
@@ -1937,11 +1899,11 @@ public class Game {
     /**
      * Draws a circle on the screen with the given color.
      *
-     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param x The x coordinate, in pixels, relative to ctype.
-     * @param y The y coordinate, in pixels, relative to ctype.
-     * @param radius The radius of the circle, in pixels.
-     * @param color The color of the circle.
+     * @param ctype   The coordinate type. Indicates the relative position to draw the shape.
+     * @param x       The x coordinate, in pixels, relative to ctype.
+     * @param y       The y coordinate, in pixels, relative to ctype.
+     * @param radius  The radius of the circle, in pixels.
+     * @param color   The color of the circle.
      * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
      */
     public void drawCircle(CoordinateType ctype, int x, int y, int radius, Color color, boolean isSolid) {
@@ -2003,12 +1965,12 @@ public class Game {
     /**
      * Draws an ellipse on the screen with the given color.
      *
-     * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param x The x coordinate, in pixels, relative to ctype.
-     * @param y The y coordinate, in pixels, relative to ctype.
-     * @param xrad The x radius of the ellipse, in pixels.
-     * @param yrad The y radius of the ellipse, in pixels.
-     * @param color The color of the ellipse.
+     * @param ctype   The coordinate type. Indicates the relative position to draw the shape.
+     * @param x       The x coordinate, in pixels, relative to ctype.
+     * @param y       The y coordinate, in pixels, relative to ctype.
+     * @param xrad    The x radius of the ellipse, in pixels.
+     * @param yrad    The y radius of the ellipse, in pixels.
+     * @param color   The color of the ellipse.
      * @param isSolid If true, then the shape will be filled and drawn as a solid, otherwise it will be drawn as an outline. If omitted, this value will default to false.
      */
     public void drawEllipse(CoordinateType ctype, int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
@@ -2067,8 +2029,8 @@ public class Game {
      * Draws a dot on the map or screen with a given color.
      *
      * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param x The x coordinate, in pixels, relative to ctype.
-     * @param y The y coordinate, in pixels, relative to ctype.
+     * @param x     The x coordinate, in pixels, relative to ctype.
+     * @param y     The y coordinate, in pixels, relative to ctype.
      * @param color The color of the dot.
      */
     public void drawDot(CoordinateType ctype, int x, int y, Color color) {
@@ -2103,10 +2065,10 @@ public class Game {
      * Draws a line on the map or screen with a given color.
      *
      * @param ctype The coordinate type. Indicates the relative position to draw the shape.
-     * @param x1 The starting x coordinate, in pixels, relative to ctype.
-     * @param y1 The starting y coordinate, in pixels, relative to ctype.
-     * @param x2 The ending x coordinate, in pixels, relative to ctype.
-     * @param y2 The ending y coordinate, in pixels, relative to ctype.
+     * @param x1    The starting x coordinate, in pixels, relative to ctype.
+     * @param y1    The starting y coordinate, in pixels, relative to ctype.
+     * @param x2    The ending x coordinate, in pixels, relative to ctype.
+     * @param y2    The ending y coordinate, in pixels, relative to ctype.
      * @param color The color of the line.
      */
     public void drawLine(CoordinateType ctype, int x1, int y1, int x2, int y2, Color color) {
@@ -2142,7 +2104,7 @@ public class Game {
     /**
      * Retrieves the maximum delay, in number of frames, between a command being issued
      * and the command being executed by Broodwar.
-     *
+     * <p>
      * In Broodwar, latency is used to keep the game synchronized between players without
      * introducing lag.
      *
@@ -2227,7 +2189,6 @@ public class Game {
      * consecutive frames for the results. Latency compensation is enabled by default.
      *
      * @param isEnabled Set whether the latency compensation feature will be enabled (true) or disabled (false).
-     *
      * @see #isLatComEnabled
      */
     public void setLatCom(final boolean isEnabled) {
@@ -2241,7 +2202,7 @@ public class Game {
      * Starcraft instance an AI module belongs to. The very first instance should
      * return 0.
      *
-     * @return  An integer value representing the instance number.
+     * @return An integer value representing the instance number.
      */
     public int getInstanceNumber() {
         return gameData.getInstanceID();
@@ -2255,7 +2216,6 @@ public class Game {
      * Retrieves the Actions Per Minute (APM) that the bot is producing.
      *
      * @param includeSelects If true, the return value will include selections as individual commands, otherwise it will exclude selections. This value is false by default.
-     *
      * @return The number of actions that the bot has executed per minute, on average.
      */
     public int getAPM(final boolean includeSelects) {
@@ -2268,7 +2228,6 @@ public class Game {
      * which the game runs.
      *
      * @param frameSkip Number of graphical frames per logical frame. If this value is 0 or less, then it will default to 1.
-     *
      * @see #setLocalSpeed
      */
     public void setFrameSkip(int frameSkip) {
@@ -2278,12 +2237,12 @@ public class Game {
     /**
      * Sets the alliance state of the current player with the target player.</summary>
      *
-     * @param player The target player to set alliance with.
-     * @param allied If true, the current player will ally the target player. If false, the current player
-     *   will make the target player an enemy. This value is true by default.
+     * @param player        The target player to set alliance with.
+     * @param allied        If true, the current player will ally the target player. If false, the current player
+     *                      will make the target player an enemy. This value is true by default.
      * @param alliedVictory Sets the state of "allied victory". If true, the game will end in a victory if all
-     *   allied players have eliminated their opponents. Otherwise, the game will only end if
-     *   no other players are remaining in the game. This value is true by default.
+     *                      allied players have eliminated their opponents. Otherwise, the game will only end if
+     *                      no other players are remaining in the game. This value is true by default.
      */
     public boolean setAlliance(Player player, boolean allied, boolean alliedVictory) {
         if (self() == null || isReplay() || player == null || player.equals(self())) {
@@ -2305,14 +2264,14 @@ public class Game {
     /**
      * In a game, this function sets the vision of the current BWAPI player with the
      * target player.
-     * 
+     * <p>
      * In a replay, this function toggles the visibility of the target player.
      *
-     * @param player The target player to toggle vision.
+     * @param player  The target player to toggle vision.
      * @param enabled The vision state. If true, and in a game, the current player will enable shared vision
-     *   with the target player, otherwise it will unshare vision. If in a replay, the vision
-     *   of the target player will be shown, otherwise the target player will be hidden. This
-     *   value is true by default.
+     *                with the target player, otherwise it will unshare vision. If in a replay, the vision
+     *                of the target player will be shown, otherwise the target player will be hidden. This
+     *                value is true by default.
      */
     public boolean setVision(Player player, boolean enabled) {
         if (player == null) {
@@ -2327,15 +2286,14 @@ public class Game {
         return true;
     }
 
-    /** 
+    /**
      * Checks if the GUI is enabled.
-     * 
+     * <p>
      * The GUI includes all drawing functions of BWAPI, as well as screen updates from Broodwar.
      *
      * @return true if the GUI is enabled, and everything is visible, false if the GUI is disabled and drawing
      * functions are rejected
-     *
-     * @see #setGUI 
+     * @see #setGUI
      */
     boolean isGUIEnabled() {
         return gameData.getHasGUI();
@@ -2343,12 +2301,11 @@ public class Game {
 
     /**
      * Sets the rendering state of the Starcraft GUI.
-     *
+     * <p>
      * This typically gives Starcraft a very low graphical frame rate and disables all drawing functionality in BWAPI.
      *
      * @param enabled A boolean value that determines the state of the GUI. Passing false to this function
-     *   will disable the GUI, and true will enable it.
-     *
+     *                will disable the GUI, and true will enable it.
      * @see #isGUIEnabled
      */
     public void setGUI(boolean enabled) {
@@ -2360,24 +2317,23 @@ public class Game {
     /**
      * Retrieves the amount of time (in milliseconds) that has elapsed when running the last AI
      * module callback.
-     *
+     * <p>
      * This is used by tournament modules to penalize AI modules that use too
      * much processing time.
      *
      * @return Time in milliseconds spent in last AI module call. Returns 0 When called from an AI module.
      */
     public int getLastEventTime() {
-         return 0;
+        return 0;
     }
 
     /**
      * Changes the map to the one specified.
-     *
+     * <p>
      * Once restarted, the game will load the map that was provided.
      * Changes do not take effect unless the game is restarted.
      *
      * @param mapFileName A string containing the path and file name to the desired map.
-     *
      * @return Returns true if the function succeeded and has changed the map. Returns false if the function failed,
      * does not have permission from the tournament module, failed to find the map specified, or received an invalid
      * parameter.
@@ -2398,7 +2354,7 @@ public class Game {
      *               then the fog of war will be revealed. It is true by default.
      */
     public boolean setRevealAll(boolean reveal) {
-        if ( !isReplay() ) {
+        if (!isReplay()) {
             return false;
         }
         addCommand(CommandType.SetRevealAll, reveal ? 1 : 0, 0);
@@ -2416,13 +2372,12 @@ public class Game {
      * check if all units can actually travel from source to destination. Because of this
      * limitation, it has an O(1) complexity, and cases where this limitation hinders gameplay is
      * uncommon at best.
-     *
+     * <p>
      * If making queries on a unit, it's better to call {@link Unit#hasPath}, since it is
      * a more lenient version of this function that accounts for some edge cases.
      *
-     * @param source The source position.
+     * @param source      The source position.
      * @param destination The destination position.
-     *
      * @return true if there is a path between the two positions, and false if there is not.
      * @see Unit#hasPath
      */
@@ -2446,7 +2401,6 @@ public class Game {
      * Sets the size of the text for all calls to {@link #drawText} following this one.
      *
      * @param size The size of the text. This value is one of Text#Size. If this value is omitted, then a default value of {@link TextSize#Default} is used.
-     *
      * @see TextSize
      */
     public void setTextSize(final TextSize size) {
@@ -2473,86 +2427,85 @@ public class Game {
      * Right_Click uses less bytes than Move.
      *
      * @param level An integer representation of the aggressiveness for which commands are optimized. A lower level means less optimization, and a higher level means more optimization.
-     *
-     * The values for level are as follows:
-     *     - 0: No optimization.
-     *     - 1: Some optimization.
-     *       - Is not detected as a hack.
-     *       - Does not alter behaviour.
-     *       - Units performing the following actions are grouped and ordered 12 at a time:
-     *         - Attack_Unit
-     *         - Morph (@Larva only)
-     *         - Hold_Position
-     *         - Stop
-     *         - Follow
-     *         - Gather
-     *         - Return_Cargo
-     *         - Repair
-     *         - Burrow
-     *         - Unburrow
-     *         - Cloak
-     *         - Decloak
-     *         - Siege
-     *         - Unsiege
-     *         - Right_Click_Unit
-     *         - Halt_Construction
-     *         - Cancel_Train (@Carrier and @Reaver only)
-     *         - Cancel_Train_Slot (@Carrier and @Reaver only)
-     *         - Cancel_Morph (for non-buildings only)
-     *         - Use_Tech
-     *         - Use_Tech_Unit
-     *         .
-     *       - The following order transformations are applied to allow better grouping:
-     *         - Attack_Unit becomes Right_Click_Unit if the target is an enemy
-     *         - Move becomes Right_Click_Position
-     *         - Gather becomes Right_Click_Unit if the target contains resources
-     *         - Set_Rally_Position becomes Right_Click_Position for buildings
-     *         - Set_Rally_Unit becomes Right_Click_Unit for buildings
-     *         - Use_Tech_Unit with Infestation becomes Right_Click_Unit if the target is valid
-     *         .
-     *       .
-     *     - 2: More optimization by grouping structures.
-     *       - Includes the optimizations made by all previous levels.
-     *       - May be detected as a hack by some replay utilities.
-     *       - Does not alter behaviour.
-     *       - Units performing the following actions are grouped and ordered 12 at a time:
-     *         - Attack_Unit (@Turrets, @Photon_Cannons, @Sunkens, @Spores)
-     *         - Train
-     *         - Morph
-     *         - Set_Rally_Unit
-     *         - Lift
-     *         - Cancel_Construction
-     *         - Cancel_Addon
-     *         - Cancel_Train
-     *         - Cancel_Train_Slot
-     *         - Cancel_Morph
-     *         - Cancel_Research
-     *         - Cancel_Upgrade
-     *         .
-     *       .
-     *     - 3: Extensive optimization
-     *       - Includes the optimizations made by all previous levels.
-     *       - Units may behave or move differently than expected.
-     *       - Units performing the following actions are grouped and ordered 12 at a time:
-     *         - Attack_Move
-     *         - Set_Rally_Position
-     *         - Move
-     *         - Patrol
-     *         - Unload_All
-     *         - Unload_All_Position
-     *         - Right_Click_Position
-     *         - Use_Tech_Position
-     *         .
-     *       .
-     *     - 4: Aggressive optimization
-     *       - Includes the optimizations made by all previous levels.
-     *       - Positions used in commands will be rounded to multiples of 32.
-     *       - @High_Templar and @Dark_Templar that merge into @Archons will be grouped and may
-     *         choose a different target to merge with. It will not merge with a target that
-     *         wasn't included.
-     *       .
-     *     .
-     *
+     *              <p>
+     *              The values for level are as follows:
+     *              - 0: No optimization.
+     *              - 1: Some optimization.
+     *              - Is not detected as a hack.
+     *              - Does not alter behaviour.
+     *              - Units performing the following actions are grouped and ordered 12 at a time:
+     *              - Attack_Unit
+     *              - Morph (@Larva only)
+     *              - Hold_Position
+     *              - Stop
+     *              - Follow
+     *              - Gather
+     *              - Return_Cargo
+     *              - Repair
+     *              - Burrow
+     *              - Unburrow
+     *              - Cloak
+     *              - Decloak
+     *              - Siege
+     *              - Unsiege
+     *              - Right_Click_Unit
+     *              - Halt_Construction
+     *              - Cancel_Train (@Carrier and @Reaver only)
+     *              - Cancel_Train_Slot (@Carrier and @Reaver only)
+     *              - Cancel_Morph (for non-buildings only)
+     *              - Use_Tech
+     *              - Use_Tech_Unit
+     *              .
+     *              - The following order transformations are applied to allow better grouping:
+     *              - Attack_Unit becomes Right_Click_Unit if the target is an enemy
+     *              - Move becomes Right_Click_Position
+     *              - Gather becomes Right_Click_Unit if the target contains resources
+     *              - Set_Rally_Position becomes Right_Click_Position for buildings
+     *              - Set_Rally_Unit becomes Right_Click_Unit for buildings
+     *              - Use_Tech_Unit with Infestation becomes Right_Click_Unit if the target is valid
+     *              .
+     *              .
+     *              - 2: More optimization by grouping structures.
+     *              - Includes the optimizations made by all previous levels.
+     *              - May be detected as a hack by some replay utilities.
+     *              - Does not alter behaviour.
+     *              - Units performing the following actions are grouped and ordered 12 at a time:
+     *              - Attack_Unit (@Turrets, @Photon_Cannons, @Sunkens, @Spores)
+     *              - Train
+     *              - Morph
+     *              - Set_Rally_Unit
+     *              - Lift
+     *              - Cancel_Construction
+     *              - Cancel_Addon
+     *              - Cancel_Train
+     *              - Cancel_Train_Slot
+     *              - Cancel_Morph
+     *              - Cancel_Research
+     *              - Cancel_Upgrade
+     *              .
+     *              .
+     *              - 3: Extensive optimization
+     *              - Includes the optimizations made by all previous levels.
+     *              - Units may behave or move differently than expected.
+     *              - Units performing the following actions are grouped and ordered 12 at a time:
+     *              - Attack_Move
+     *              - Set_Rally_Position
+     *              - Move
+     *              - Patrol
+     *              - Unload_All
+     *              - Unload_All_Position
+     *              - Right_Click_Position
+     *              - Use_Tech_Position
+     *              .
+     *              .
+     *              - 4: Aggressive optimization
+     *              - Includes the optimizations made by all previous levels.
+     *              - Positions used in commands will be rounded to multiples of 32.
+     *              - @High_Templar and @Dark_Templar that merge into @Archons will be grouped and may
+     *              choose a different target to merge with. It will not merge with a target that
+     *              wasn't included.
+     *              .
+     *              .
      */
     public void setCommandOptimizationLevel(final int level) {
         addCommand(SetCommandOptimizerLevel, level, 0);
@@ -2581,9 +2534,7 @@ public class Game {
      *
      * @param x The x coordinate, in pixels.
      * @param y The y coordinate, in pixels.
-     *
      * @return the Region interface at the given position. Returns null if the provided position is not valid (i.e. not within the map bounds).
-     *
      * @see #getAllRegions
      * @see #getRegion
      */
@@ -2625,12 +2576,11 @@ public class Game {
      * Retrieves a basic build position just as the default Computer AI would.
      * This allows users to find simple build locations without relying on external libraries.
      *
-     * @param type A valid UnitType representing the unit type to accomodate space for.
+     * @param type            A valid UnitType representing the unit type to accomodate space for.
      * @param desiredPosition A valid TilePosition containing the desired placement position.
-     * @param maxRange The maximum distance (in tiles) to build from desiredPosition.
-     * @param creep A special boolean value that changes the behaviour of @Creep_Colony placement.
-     *
-     * @return  A TilePosition containing the location that the structure should be constructed at. Returns {@link TilePosition#Invalid} If a build location could not be found within maxRange.
+     * @param maxRange        The maximum distance (in tiles) to build from desiredPosition.
+     * @param creep           A special boolean value that changes the behaviour of @Creep_Colony placement.
+     * @return A TilePosition containing the location that the structure should be constructed at. Returns {@link TilePosition#Invalid} If a build location could not be found within maxRange.
      */
     public TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep) {
         return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
@@ -2668,11 +2618,10 @@ public class Game {
      * as the damage from fromType to toType. Does not include shields in calculation.
      * Includes upgrades if players are provided.
      *
-     * @param fromType The unit type that will be dealing the damage.
-     * @param toType The unit type that will be receiving the damage.
+     * @param fromType   The unit type that will be dealing the damage.
+     * @param toType     The unit type that will be receiving the damage.
      * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then no player will be used to calculate the upgrades for fromType.
-     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then this parameter will default to {@link #self}.
-     *
+     * @param toPlayer   The player owner of the type that will be receiving the damage. If omitted, then this parameter will default to {@link #self}.
      * @return The amount of damage that fromType would deal to toType.
      * @see #getDamageTo
      */
@@ -2692,15 +2641,14 @@ public class Game {
      * Calculates the damage dealt for a given player. It can be understood as
      * the damage to toType from fromType. Does not include shields in calculation.
      * Includes upgrades if players are provided.
-     *
+     * <p>
      * This function is nearly the same as {@link #getDamageFrom}. The only difference is that
      * the last parameter is intended to default to {@link #self}.
      *
-     * @param toType The unit type that will be receiving the damage.
-     * @param fromType The unit type that will be dealing the damage.
-     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then no player will be used to calculate the upgrades for toType.
+     * @param toType     The unit type that will be receiving the damage.
+     * @param fromType   The unit type that will be dealing the damage.
+     * @param toPlayer   The player owner of the type that will be receiving the damage. If omitted, then no player will be used to calculate the upgrades for toType.
      * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then this parameter will default to {@link #self}).
-     *
      * @return The amount of damage that fromType would deal to toType.
      * @see #getDamageFrom
      */

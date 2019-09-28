@@ -10,7 +10,7 @@ import static bwapi.Order.*;
 /**
  * The {@link TechType} (or Technology Type, also referred to as an Ability) represents a Unit's ability
  * which can be researched with {@link Unit#research} or used with {@link Unit#useTech}.
- *
+ * <p>
  * In order for a {@link Unit} to use its own specialized ability, it must first be available and researched.
  */
 public enum TechType {
@@ -199,7 +199,7 @@ public enum TechType {
 
     /**
      * Retrieves the race that is required to research or use the {@link TechType}.
-     *
+     * <p>
      * There is an exception where @Infested_Kerrigan can use @Psi_Storm. This does not
      * apply to the behavior of this function.
      *
@@ -313,9 +313,7 @@ public enum TechType {
      *
      * @return {@link UnitType} that is needed to research this tech type.
      * Returns {@link UnitType#None} if no unit is required to research this tech type.
-     *
      * @see Player#completedUnitCount
-     *
      * @since 4.1.2
      */
     public UnitType requiredUnit() {

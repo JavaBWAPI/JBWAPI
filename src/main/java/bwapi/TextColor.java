@@ -2,7 +2,7 @@ package bwapi;
 
 /**
  * Enum containing text formatting codes.
- *
+ * <p>
  * Such codes are used in calls to {@link Game#drawText}, {@link Game#printf}
  */
 public enum TextColor {
@@ -135,6 +135,7 @@ public enum TextColor {
 
     /**
      * Checks if the given character is a color-changing control code.
+     *
      * @return true if c is a regular color, not {@link #Previous}, {@link #Invisible, {@link #Invisible2}, {@link #Align_Right} or {@link #Align_Center}
      * @since 4.2.0
      */

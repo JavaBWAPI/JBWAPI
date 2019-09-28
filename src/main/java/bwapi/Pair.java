@@ -2,7 +2,7 @@ package bwapi;
 
 import java.util.Objects;
 
-public class Pair<K,V> {
+public class Pair<K, V> {
     private K first;
     private V second;
 

@@ -6,23 +6,24 @@ import java.util.Objects;
 
 /**
  * An object representing a bullet or missile spawned from an attack.
- *
+ * <p>
  * The Bullet interface allows you to detect bullets, missiles, and other types
  * of non-melee attacks or special abilities that would normally be visible through
  * human eyes (A lurker spike or a Queen's flying parasite), allowing quicker reaction
  * to unavoidable consequences.
- *
+ * <p>
  * For example, ordering medics to restore units that are about to receive a lockdown
  * to compensate for latency and minimize its effects. You can't know entirely which unit
  * will be receiving a lockdown unless you can detect the lockdown missile using the
  * {@link Bullet} class.
- *
+ * <p>
  * {@link Bullet} objects are re-used after they are destroyed, however their ID is updated when it
  * represents a new Bullet.
- *
+ * <p>
  * If {@link Flag#CompleteMapInformation} is disabled, then a {@link Bullet} is accessible if and only if
  * it is visible. Otherwise if {@link Flag#CompleteMapInformation} is enabled, then all Bullets
  * in the game are accessible.
+ *
  * @see Game#getBullets
  * @see Bullet#exists
  */
@@ -40,7 +41,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves a unique identifier for the current {@link Bullet}.
      *
-     * @return  An integer value containing the identifier.
+     * @return An integer value containing the identifier.
      */
     public int getID() {
         return id;
@@ -48,14 +49,14 @@ public class Bullet implements Comparable<Bullet> {
 
     /**
      * Checks if the {@link Bullet} exists in the view of the BWAPI player.
-     *
+     * <p>
      * If {@link Flag#CompleteMapInformation} is disabled, and a {@link Bullet} is not visible, then the
      * return value will be false regardless of the Bullet's true existence. This is because
      * absolutely no state information on invisible enemy bullets is made available to the AI.
-     *
+     * <p>
      * If {@link Flag#CompleteMapInformation} is enabled, then this function is accurate for all
      * {@link Bullet} information.
-     * 
+     *
      * @return true if the bullet exists or is visible, false if the bullet was destroyed or has gone out of scope.
      * @see #isVisible
      * @see Unit#exists
@@ -67,7 +68,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the {@link Player} interface that owns the Bullet.
      *
-     * @return  The owning {@link Player} object. Returns null if the {@link Player} object for this {@link Bullet} is inaccessible.
+     * @return The owning {@link Player} object. Returns null if the {@link Player} object for this {@link Bullet} is inaccessible.
      */
     public Player getPlayer() {
         return game.getPlayer(bulletData.getPlayer());
@@ -76,7 +77,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the type of this {@link Bullet}.
      *
-     * @return  A {@link BulletType} representing the Bullet's type. Returns {@link BulletType#Unknown} if the {@link Bullet} is inaccessible.
+     * @return A {@link BulletType} representing the Bullet's type. Returns {@link BulletType#Unknown} if the {@link Bullet} is inaccessible.
      */
     public BulletType getType() {
         return BulletType.idToEnum[bulletData.getType()];
@@ -85,7 +86,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the {@link Unit} that the {@link Bullet} spawned from.
      *
-     * @return  The owning {@link Unit} object. Returns null if the source can not be identified or is inaccessible.
+     * @return The owning {@link Unit} object. Returns null if the source can not be identified or is inaccessible.
      * @see #getTarget
      */
     public Unit getSource() {
@@ -95,7 +96,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the Bullet's current position.
      *
-     * @return  A {@link Position} containing the Bullet's current coordinates. Returns {@link Position#Unknown} if the {@link Bullet} is inaccessible.
+     * @return A {@link Position} containing the Bullet's current coordinates. Returns {@link Position#Unknown} if the {@link Bullet} is inaccessible.
      * @see #getTargetPosition
      */
     public Position getPosition() {
@@ -106,7 +107,7 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieve's the direction the {@link Bullet} is facing. If the angle is 0, then
      * the {@link Bullet} is facing right.
      *
-     * @return  A double representing the direction the {@link Bullet} is facing. Returns 0.0 if the bullet is inaccessible.
+     * @return A double representing the direction the {@link Bullet} is facing. Returns 0.0 if the bullet is inaccessible.
      */
     public double getAngle() {
         return bulletData.getAngle();
@@ -115,8 +116,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the X component of the Bullet's velocity, measured in pixels per frame.
      *
-     * @return  A double representing the number of pixels moved on the X axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
-     *
+     * @return A double representing the number of pixels moved on the X axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
      * @see #getVelocityY
      * @see #getAngle
      */
@@ -127,8 +127,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the Y component of the Bullet's velocity, measured in pixels per frame.
      *
-     * @return  A double representing the number of pixels moved on the Y axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
-     *
+     * @return A double representing the number of pixels moved on the Y axis per frame. Returns 0.0 if the {@link Bullet} is inaccessible.
      * @see #getVelocityX
      * @see #getAngle
      */
@@ -139,7 +138,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the Unit interface that the {@link Bullet} is heading to.
      *
-     * @return  The target Unit object, if one exists. Returns null if the Bullet's target {@link Unit} is inaccessible, the {@link Bullet} is targetting the ground, or if the {@link Bullet} itself is inaccessible.
+     * @return The target Unit object, if one exists. Returns null if the Bullet's target {@link Unit} is inaccessible, the {@link Bullet} is targetting the ground, or if the {@link Bullet} itself is inaccessible.
      * @see #getTargetPosition
      * @see #getSource
      */
@@ -150,7 +149,7 @@ public class Bullet implements Comparable<Bullet> {
     /**
      * Retrieves the target position that the {@link Bullet} is heading to.
      *
-     * @return  A {@link Position} indicating where the {@link Bullet} is headed. Returns {@link Position#Unknown} if the bullet is inaccessible.
+     * @return A {@link Position} indicating where the {@link Bullet} is headed. Returns {@link Position#Unknown} if the bullet is inaccessible.
      * @see #getTarget
      * @see #getPosition
      */
@@ -160,12 +159,12 @@ public class Bullet implements Comparable<Bullet> {
 
     /**
      * Retrieves the timer that indicates the Bullet's life span.
-     *
+     * <p>
      * Bullets are not permanent objects, so they will often have a limited life span.
      * This life span is measured in frames. Normally a Bullet will reach its target
      * before being removed.
      *
-     * @return  An integer representing the remaining number of frames until the {@link Bullet} self-destructs. Returns 0 if the {@link Bullet} is inaccessible.
+     * @return An integer representing the remaining number of frames until the {@link Bullet} self-destructs. Returns 0 if the {@link Bullet} is inaccessible.
      */
     public int getRemoveTimer() {
         return bulletData.getRemoveTimer();
@@ -179,7 +178,6 @@ public class Bullet implements Comparable<Bullet> {
      * Retrieves the visibility state of the Bullet.
      *
      * @param player If this parameter is specified, then the Bullet's visibility to the given player is checked. If this parameter is omitted, then a default value of null is used, which will check if the BWAPI player has vision of the {@link Bullet}.
-     *
      * @return true if the {@link Bullet} is visible to the specified player, false if the {@link Bullet} is not visible to the specified player.
      */
     public boolean isVisible(final Player player) {

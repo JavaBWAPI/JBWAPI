@@ -2,6 +2,7 @@ package bwapi;
 
 /**
  * Contains flag enumerations for BWAPI.
+ *
  * @see Game#enableFlag
  * @see Game#isFlagEnabled
  */

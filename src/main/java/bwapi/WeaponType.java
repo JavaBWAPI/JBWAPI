@@ -3,7 +3,7 @@ package bwapi;
 
 /**
  * This object identifies a weapon type used by a unit to attack and deal damage.
- *
+ * <p>
  * Some weapon types can be upgraded while others are used for special abilities.
  */
 public enum WeaponType {
@@ -424,7 +424,7 @@ public enum WeaponType {
 
     /**
      * Retrieves the unit type that is intended to use this weapon type.
-     *
+     * <p>
      * There is a rare case where some hero unit types use the same weapon.
      *
      * @return The {@link UnitType} that uses this weapon.
@@ -437,7 +437,7 @@ public enum WeaponType {
 
     /**
      * Retrieves the base amount of damage that this weapon can deal per attack.
-     *
+     * <p>
      * That this damage amount must go through a {@link DamageType} and {@link UnitSizeType} filter
      * before it is applied to a unit.
      *
@@ -451,8 +451,8 @@ public enum WeaponType {
      * Determines the bonus amount of damage that this weapon type increases by for every
      * upgrade to this type.
      *
-     * @see #upgradeType
      * @return Amount of damage added for every weapon upgrade.
+     * @see #upgradeType
      */
     public int damageBonus() {
         return defaultWpnDamageBonus[id];
@@ -624,7 +624,7 @@ public enum WeaponType {
 
     /**
      * Checks if this weapon type can target the ground.
-     *
+     * <p>
      * This is more for attacks like @Psi_Storm which can target a location, not to be
      * confused with attack move.
      *

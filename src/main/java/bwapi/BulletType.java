@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * This enum represents a type of bullet.
- *
+ * <p>
  * Internally, these are the same IDs as flingy types in Broodwar.
  */
 public enum BulletType {

@@ -159,7 +159,7 @@ class BuildingPlacer {
                 //if ( !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
                 //}
-            break;
+                break;
             case Terran_Missile_Turret:  // @TODO
             case Protoss_Photon_Cannon:
                 //reserveTurretPlacement();
@@ -168,7 +168,7 @@ class BuildingPlacer {
                 //if ( creep || !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
                 // }
-            break;
+                break;
             default:
                 if (!type.isResourceDepot()) {
                     ReserveDefault(reserve, type, desiredPosition, game);

@@ -2,7 +2,11 @@ package bwapi;
 
 
 import bwapi.ClientData.RegionData;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Region objects are created by Starcraft: Broodwar to contain several tiles with the same
@@ -10,7 +14,7 @@ import java.util.*;
  * detailed information, but have a sufficient amount of data to identify general chokepoints,
  * accessibility to neighboring terrain, be used in general pathing algorithms, and used as
  * nodes to rally units to.
- *
+ * <p>
  * Most parameters that are available are explicitly assigned by Broodwar itself.
  *
  * @see Game#getAllRegions
@@ -75,7 +79,7 @@ public class Region implements Comparable<Region> {
 
     /**
      * Retrieves a unique identifier for this region.
-     *
+     * <p>
      * This identifier is explicitly assigned by Broodwar.
      *
      * @return An integer that represents this region.
@@ -90,7 +94,7 @@ public class Region implements Comparable<Region> {
      * accessible by each other. That is, all accessible regions will have the same
      * group ID. This function is generally used to check if a path is available between two
      * points in constant time.
-     *
+     * <p>
      * This identifier is explicitly assigned by Broodwar.
      *
      * @return An integer that represents the group of regions that this one is attached to.
@@ -123,7 +127,7 @@ public class Region implements Comparable<Region> {
      * Retrieves a value that represents the strategic advantage of this region relative
      * to other regions. A value of 2 may indicate a possible choke point, and a value
      * of 3 indicates a signficant strategic position.
-     *
+     * <p>
      * This value is explicitly assigned by Broodwar.
      *
      * @return An integer indicating this region's strategic potential.
@@ -208,7 +212,7 @@ public class Region implements Comparable<Region> {
 
     /**
      * Retrieves the center-to-center distance between two regions.
-     *
+     * <p>
      * Ignores all collisions.
      *
      * @param other The target {@link Region} to calculate distance to.
@@ -227,10 +231,8 @@ public class Region implements Comparable<Region> {
      * Also has the ability to filter the units before the creation of the List<Unit>.
      *
      * @param pred If this parameter is used, it is a UnitFilter or function predicate that will retrieve only the units whose attributes match the given criteria. If omitted, then a default value of null is used, in which case there is no filter.
-     *
      * @return A List<Unit> containing all units in this region that have met the requirements
      * of pred.
-     *
      * @see UnitFilter
      */
     public List<Unit> getUnits(final UnitFilter pred) {

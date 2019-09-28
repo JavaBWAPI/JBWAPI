@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * An enum that represents game types in Broodwar.
- *
+ * <p>
  * A game type is selected when creating a game.
  */
 public enum GameType {

@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /**
  * The Color object is used in drawing routines to specify the color to use.
- *
+ * <p>
  * Starcraft uses a 256 color palette for rendering. Thus, the colors available are
  * limited to this palette.
  */
@@ -97,6 +97,7 @@ public class Color {
     };
 
     private static final byte[][][] closestColor = new byte[64][64][64];
+
     static {
         for (int r = 0; r < 64; ++r) {
             for (int g = 0; g < 64; ++g) {
@@ -106,17 +107,18 @@ public class Color {
             }
         }
     }
+
     public final int id;
 
     /**
      * A constructor that uses the color index in the palette that is closest to the
      * given rgb values. On its first call, the colors in the palette will be sorted for fast indexing.
-     *
+     * <p>
      * This function computes the distance of the RGB values and may not be accurate.
      *
-     * @param red The amount of red.
+     * @param red   The amount of red.
      * @param green The amount of green.
-     * @param blue The amount of blue.
+     * @param blue  The amount of blue.
      */
     public Color(final int red, final int green, final int blue) {
         id = getRGBIndex(red, green, blue);

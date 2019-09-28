@@ -2,6 +2,7 @@ package bwapi;
 
 /**
  * An enumeration of mouse button inputs.
+ *
  * @see Game#getMouseState
  */
 public enum MouseButton {

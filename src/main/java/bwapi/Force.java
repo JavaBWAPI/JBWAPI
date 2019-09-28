@@ -9,12 +9,11 @@ import java.util.stream.Collectors;
 /**
  * The {@link Force} class is used to get information about each force in a match.
  * Normally this is considered a team.
- *
+ * <p>
  * It is not called a team because players on the same force do not necessarily need
  * to be allied at the beginning of a match.
- *
  */
-public class Force implements Comparable<Force>{
+public class Force implements Comparable<Force> {
     private final Game game;
 
     private final int id;
@@ -29,7 +28,7 @@ public class Force implements Comparable<Force>{
     /**
      * Retrieves the unique ID that represents this {@link Force}.
      *
-     * @return  An integer containing the ID for the {@link Force}.
+     * @return An integer containing the ID for the {@link Force}.
      */
     public int getID() {
         return id;
@@ -38,7 +37,7 @@ public class Force implements Comparable<Force>{
     /**
      * Retrieves the name of the {@link Force}.
      *
-     * @return  A String object containing the name of the force.
+     * @return A String object containing the name of the force.
      */
     public String getName() {
         return name;
@@ -47,7 +46,7 @@ public class Force implements Comparable<Force>{
     /**
      * Retrieves the set of players that belong to this {@link Force}.
      *
-     * @return  A List<Player> object containing the players that are part of this {@link Force}.
+     * @return A List<Player> object containing the players that are part of this {@link Force}.
      */
     public List<Player> getPlayers() {
         return game.getPlayers().stream()

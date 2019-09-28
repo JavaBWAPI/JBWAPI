@@ -24,6 +24,6 @@ enum ShapeType {
     final int id;
 
     ShapeType(final int id) {
-      this.id = id;
+        this.id = id;
     }
 }

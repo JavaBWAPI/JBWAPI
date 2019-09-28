@@ -322,7 +322,7 @@ public enum UnitType {
 
     /**
      * Identifies the required {@link TechType} in order to create certain units.
-     *
+     * <p>
      * The only unit that requires a technology is the @Lurker, which needs @Lurker_Aspect.
      *
      * @return {@link TechType} indicating the technology that must be researched in order to create this
@@ -389,7 +389,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default maximum amount of hit points that this unit type can have.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Integer indicating the maximum amount of hit points for this unit type.
@@ -400,7 +400,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default maximum amount of shield points that this unit type can have.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Integer indicating the maximum amount of shield points for this unit type.
@@ -422,7 +422,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default amount of armor that the unit type starts with, excluding upgrades.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return The amount of armor the unit type has.
@@ -433,7 +433,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default mineral price of purchasing the unit.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Mineral cost of the unit.
@@ -444,7 +444,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default vespene gas price of purchasing the unit.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Vespene gas cost of the unit.
@@ -455,7 +455,7 @@ public enum UnitType {
 
     /**
      * Retrieves the default time, in frames, needed to train, morph, or build the unit.
-     *
+     * <p>
      * This value may not necessarily match the value seen in the @UMS game type.
      *
      * @return Number of frames needed in order to build the unit.
@@ -468,7 +468,7 @@ public enum UnitType {
     /**
      * Retrieves the amount of supply that this unit type will use when created. It will use the
      * supply pool that is appropriate for its Race.
-     *
+     * <p>
      * In Starcraft programming, the managed supply values are double than what they appear
      * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
      *
@@ -484,7 +484,7 @@ public enum UnitType {
     /**
      * Retrieves the amount of supply that this unit type produces for its appropriate Race's
      * supply pool.
-     *
+     * <p>
      * In Starcraft programming, the managed supply values are double than what they appear
      * in the game. The reason for this is because @Zerglings use 0.5 visible supply.
      *
@@ -705,7 +705,7 @@ public enum UnitType {
 
     /**
      * Retrieves this unit type's top movement speed with no upgrades.
-     *
+     * <p>
      * That some units have inconsistent movement and this value is sometimes an
      * approximation.
      *
@@ -759,7 +759,7 @@ public enum UnitType {
 
     /**
      * Checks if this unit is capable of attacking.
-     *
+     * <p>
      * This function returns false for units that can only inflict damage via special
      * abilities, such as the @High_Templar.
      *
@@ -783,7 +783,7 @@ public enum UnitType {
 
     /**
      * Checks if this unit type is capable of movement.
-     *
+     * <p>
      * Buildings will return false, including @Terran liftable buildings which are capable
      * of moving when lifted.
      *
@@ -898,7 +898,6 @@ public enum UnitType {
      * distance from resources. Resource depots are typically the main building for any
      * particular race. Workers will return resources to the nearest resource depot.
      *
-     * Example:
      * @return true if the unit type is a resource depot, false if it is not.
      */
     public boolean isResourceDepot() {
@@ -966,10 +965,11 @@ public enum UnitType {
     /**
      * Checks if this unit type has the capability to use the @Burrow technology when it
      * is researched.
-     *
+     * <p>
      * The @Lurker can burrow even without researching the ability.
-     * @see TechType#Burrowing
+     *
      * @return true if this unit can use the @Burrow ability, and false otherwise.
+     * @see TechType#Burrowing
      */
     public boolean isBurrowable() {
         return (UnitTypeContainer.unitFlags[id] & UnitTypeContainer.Burrowable) != 0;
@@ -1030,7 +1030,7 @@ public enum UnitType {
      * Checks if this unit type is a hero. Heroes are types that the player
      * cannot obtain normally, and are identified by the white border around their icon when
      * selected with a group.
-     *
+     * <p>
      * There are two non-hero units included in this set, the @Civilian and @Dark_Templar_Hero.
      *
      * @return true if this unit type is a hero type, and false otherwise.
@@ -1058,8 +1058,8 @@ public enum UnitType {
      * each. They are {@link UnitType#Special_Zerg_Beacon}, {@link UnitType#Special_Terran_Beacon}, and
      * {@link UnitType#Special_Protoss_Beacon}.
      *
-     * @see #isFlagBeacon
      * @return true if this unit type is one of the three race beacons, and false otherwise.
+     * @see #isFlagBeacon
      */
     public boolean isBeacon() {
         return this == Special_Zerg_Beacon ||
@@ -1073,8 +1073,8 @@ public enum UnitType {
      * {@link UnitType#Special_Terran_Flag_Beacon}, and {@link UnitType#Special_Protoss_Flag_Beacon}.
      * Flag beacons spawn a @Flag after some ARBITRARY I FORGOT AMOUNT OF FRAMES.
      *
-     * @see #isBeacon
      * @return true if this unit type is one of the three race flag beacons, and false otherwise.
+     * @see #isBeacon
      */
     public boolean isFlagBeacon() {
         return this == Special_Zerg_Flag_Beacon ||
@@ -1113,7 +1113,6 @@ public enum UnitType {
      * spreads creep over a wide area so that @Zerg structures can be placed on it.
      *
      * @return true if this unit type spreads creep.
-     *
      * @since 4.1.2
      */
     public boolean producesCreep() {
@@ -1152,7 +1151,6 @@ public enum UnitType {
      * Checks if this unit type is a neutral critter.
      *
      * @return true if this unit type is a critter, and false otherwise.
-     *
      */
     public boolean isCritter() {
         switch (this) {
@@ -1186,14 +1184,13 @@ public enum UnitType {
     /**
      * Retrieves the set of units that this unit type is capable of creating.
      * This includes training, constructing, warping, and morphing.
-     *
+     * <p>
      * Some maps have special parameters that disable construction of units that are otherwise
      * normally available. Use {@link Player#isUnitAvailable} to determine if a unit type is
      * actually available in the current game for a specific player.
      *
      * @return List of UnitTypes containing the units it can build.
      * @see Player#isUnitAvailable
-     *
      * @since 4.1.2
      */
     public List<UnitType> buildsWhat() {
@@ -1202,14 +1199,13 @@ public enum UnitType {
 
     /**
      * Retrieves the set of technologies that this unit type is capable of researching.
-     *
+     * <p>
      * Some maps have special parameters that disable certain technologies. Use
      * {@link Player#isResearchAvailable} to determine if a technology is actually available in the
      * current game for a specific player.
      *
      * @return List of TechTypes containing the technology types that can be researched.
      * @see Player#isResearchAvailable
-     *
      * @since 4.1.2
      */
     public List<TechType> researchesWhat() {
@@ -1218,13 +1214,12 @@ public enum UnitType {
 
     /**
      * Retrieves the set of upgrades that this unit type is capable of upgrading.
-     *
+     * <p>
      * Some maps have special upgrade limitations. Use {@link Player#getMaxUpgradeLevel}
      * to check if an upgrade is available.
      *
      * @return List of UpgradeTypes containing the upgrade types that can be upgraded.
      * @see Player#getMaxUpgradeLevel
-     *
      * @since 4.1.2
      */
     public List<UpgradeType> upgradesWhat() {
@@ -1237,7 +1232,6 @@ public enum UnitType {
      * still research the @Burrow technology.
      *
      * @param type The unit type to check.
-     *
      * @see TechType#whatResearches()
      * @see UpgradeType#whatUpgrades()
      * @since 4.2.0
