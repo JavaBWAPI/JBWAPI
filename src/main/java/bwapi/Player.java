@@ -111,10 +111,10 @@ public class Player implements Comparable<Player>{
      * Checks if this player is allied to the specified player.
      *
      * @param player The player to check alliance with.
-     * Returns true if this player is allied with \p player, false if this player is not allied with \p player.
+     * Returns true if this player is allied with player, false if this player is not allied with player.
      *
      * This function will also return false if this player is neutral or an observer, or
-     * if \p player is neutral or an observer.
+     * if player is neutral or an observer.
      *
      * @see #isEnemy
      */
@@ -130,10 +130,10 @@ public class Player implements Comparable<Player>{
      *
      * @param player The player to check alliance with.
      *
-     * @return true if this player is allied with \p player, false if this player is not allied with \p player .
+     * @return true if this player is allied with player, false if this player is not allied with player .
      *
      * This function will also return false if this player is neutral or an observer, or if
-     * \p player is neutral or an observer.
+     * player is neutral or an observer.
      *
      * @see #isAlly
      */
@@ -330,7 +330,7 @@ public class Player implements Comparable<Player>{
      *
      * @param race The race to query the total supply for. If this is omitted, then the player's current race will be used.
      *
-     * @return The total supply available for this player and the given \p race.
+     * @return The total supply available for this player and the given race.
      *
      * @see #supplyUsed
      */
@@ -347,7 +347,7 @@ public class Player implements Comparable<Player>{
      *
      * @param race The race to query the used supply for. If this is omitted, then the player's current race will be used.
      *
-     * @return The supply that is in use for this player and the given \p race.
+     * @return The supply that is in use for this player and the given race.
      *
      * @see #supplyTotal
      */
@@ -482,7 +482,7 @@ public class Player implements Comparable<Player>{
      *
      * @param upgrade The UpgradeType to query.
      *
-     * @return The number of levels that the \p upgrade has been upgraded for this player.
+     * @return The number of levels that the upgrade has been upgraded for this player.
      *
      * @see Unit#upgrade
      * @see #getMaxUpgradeLevel
@@ -496,7 +496,7 @@ public class Player implements Comparable<Player>{
      *
      * @param tech The {@link TechType} to query.
      *
-     * @return true if the player has obtained the given \p tech, or false if they have not
+     * @return true if the player has obtained the given tech, or false if they have not
      *
      * @see #isResearching
      * @see Unit#research
@@ -511,7 +511,7 @@ public class Player implements Comparable<Player>{
      *
      * @param tech The {@link TechType} to query.
      *
-     * @return true if the player is currently researching the \p tech, or false otherwise
+     * @return true if the player is currently researching the tech, or false otherwise
      *
      * @see Unit#research
      * @see #hasResearched
@@ -525,7 +525,7 @@ public class Player implements Comparable<Player>{
      *
      * @param upgrade The upgrade type to query.
      *
-     * @return true if the player is currently upgrading the given \p upgrade, false otherwise
+     * @return true if the player is currently upgrading the given upgrade, false otherwise
      *
      * @see Unit#upgrade
      */
@@ -790,7 +790,7 @@ public class Player implements Comparable<Player>{
      *
      * @param upgrade The {@link UpgradeType} to retrieve the maximum upgrade level for.
      *
-     * @return Maximum upgrade level of the given \p upgrade type.
+     * @return Maximum upgrade level of the given upgrade type.
      *
      */
     public int getMaxUpgradeLevel(final UpgradeType upgrade) {
@@ -803,7 +803,7 @@ public class Player implements Comparable<Player>{
      *
      * @param tech The {@link TechType} to query.
      *
-     * @return true if the \p tech type is available to the player for research.
+     * @return true if the tech type is available to the player for research.
      */
     public boolean isResearchAvailable(final TechType tech) {
         return playerData.isResearchAvailable(tech.id);
@@ -815,7 +815,7 @@ public class Player implements Comparable<Player>{
      *
      * @param unit The {@link UnitType} to check.
      *
-     * @return true if the \p unit type is available to the player.
+     * @return true if the unit type is available to the player.
      */
     public boolean isUnitAvailable(final UnitType unit) {
         return playerData.isUnitAvailable(unit.id);

@@ -377,7 +377,7 @@ public class Unit implements Comparable<Unit>{
      * @param target A {@link Position} to calculate the distance to.
      *
      * @return An integer representation of the number of pixels between this unit and the
-     * \p target.
+     * target.
      */
     public int getDistance(final Position target) {
         // If this unit does not exist or target is invalid
@@ -1660,10 +1660,10 @@ public class Unit implements Comparable<Unit>{
      *
      * @param target The target unit to use in this check.
      *
-     * @return true if \p target is within weapon range of this unit's appropriate weapon, and
+     * @return true if target is within weapon range of this unit's appropriate weapon, and
      * false otherwise.
-     * Returns false if \p target is invalid, inaccessible, too close, too far, or this unit does
-     * not have a weapon that can attack \p target.
+     * Returns false if target is invalid, inaccessible, too close, too far, or this unit does
+     * not have a weapon that can attack target.
      */
     public boolean isInWeaponRange(final Unit target) {
         // Preliminary checks
@@ -1993,7 +1993,7 @@ public class Unit implements Comparable<Unit>{
      *
      * @param player The player to check visibility for. If this parameter is omitted, then the BWAPI player obtained from {@link Game#self()} will be used.
      *
-     * @return true if this unit is visible to the specified \p player, and false if it is not.
+     * @return true if this unit is visible to the specified player, and false if it is not.
      *
      * If the {@link Flag#CompleteMapInformation} flag is enabled, existing units hidden by the
      * fog of war will be accessible, but isVisible will still return false.

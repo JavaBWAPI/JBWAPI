@@ -454,7 +454,7 @@ public class Game {
      *
      * @param forceID The identifier for the Force object.
      *
-     * @return {@link Force} object mapped to the given \p forceID. Returns null if the given identifier is invalid.
+     * @return {@link Force} object mapped to the given forceID. Returns null if the given identifier is invalid.
      */
     public Force getForce(final int forceID) {
         if (forceID < 0 || forceID >= forces.length) {
@@ -468,7 +468,7 @@ public class Game {
      *
      * @param playerID The identifier for the {@link Player} object.
      *
-     * @return {@link Player} object mapped to the given \p playerID. null if the given identifier is invalid.
+     * @return {@link Player} object mapped to the given playerID. null if the given identifier is invalid.
      */
     public Player getPlayer(final int playerID) {
         if (playerID < 0 || playerID >= players.length) {
@@ -482,7 +482,7 @@ public class Game {
      *
      * @param unitID The identifier for the {@link Unit} object.
      *
-     * @return {@link Unit} object mapped to the given \p unitID. null if the given identifier is invalid.
+     * @return {@link Unit} object mapped to the given unitID. null if the given identifier is invalid.
      */
     public Unit getUnit(final int unitID) {
         if (unitID < 0 || unitID >= units.length) {
@@ -496,7 +496,7 @@ public class Game {
      *
      * @param regionID The identifier for the {@link Region} object.
      *
-     * @return {@link Region} object mapped to the given \p regionID. Returns null if the given ID is invalid.
+     * @return {@link Region} object mapped to the given regionID. Returns null if the given ID is invalid.
      */
     public Region getRegion(final int regionID) {
         if (regionID <  0 || regionID >= regions.length) {
@@ -582,7 +582,7 @@ public class Game {
      *
      * @param button A {@link MouseButton} enum member indicating which button on the mouse to check.
      *
-     * @return A boolean indicating the state of the given \p button. true if the button was pressed
+     * @return A boolean indicating the state of the given button. true if the button was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      *
      * @see MouseButton
@@ -596,7 +596,7 @@ public class Game {
      *
      * @param key A {@link Key} enum member indicating which key on the keyboard to check.
      *
-     * @return A boolean indicating the state of the given \p key. true if the key was pressed
+     * @return A boolean indicating the state of the given key. true if the key was pressed
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      *
      * @see Key
@@ -655,7 +655,7 @@ public class Game {
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
      *
-     * @return true if the given \p flag is enabled, false if the flag is disabled.
+     * @return true if the given flag is enabled, false if the flag is disabled.
      *
      * @see Flag
      */
@@ -933,7 +933,7 @@ public class Game {
 
     public int getGroundHeight(final TilePosition position) {
         if (!position.isValid(this)) {
-            return -1;
+            return 0;
         }
         return groundHeight[position.x][position.y];
     }
@@ -952,7 +952,7 @@ public class Game {
      * @param includeBuildings If this is true, then this function will also check if any visible structures are occupying the space. If this value is false, then it only checks the static map data for tile buildability. This value is false by default.
      *
      * @return boolean identifying if the given tile position is buildable (true) or not (false).
-     * If \p includeBuildings was provided, then it will return false if a structure is currently
+     * If includeBuildings was provided, then it will return false if a structure is currently
      * occupying the tile.
      */
     public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
@@ -1121,10 +1121,10 @@ public class Game {
      * the tiles' buildability and possible units obstructing the build location.
      *
      * If the type is an addon and a builer is provided, then the location of the addon will
-     * be placed 4 tiles to the right and 1 tile down from the given \p position. If the builder
+     * be placed 4 tiles to the right and 1 tile down from the given position. If the builder
      * is not given, then the check for the addon will be conducted at position.
      *
-     * If \p type is UnitType.Special_Start_Location, then the area for a resource depot
+     * If type is UnitType.Special_Start_Location, then the area for a resource depot
      * (@Command_Center, @Hatchery, @Nexus) is checked as normal, but any potential obstructions
      * (existing structures, creep, units, etc.) are ignored.
      *
@@ -1261,10 +1261,10 @@ public class Game {
      * required units.
      *
      * @param type The {@link UnitType} to check.
-     * @param builder The Unit that will be used to build/train the provided unit \p type. If this value is null or excluded, then the builder will be excluded in the check.
+     * @param builder The Unit that will be used to build/train the provided unit type. If this value is null or excluded, then the builder will be excluded in the check.
      *
-     * @return true indicating that the type can be made. If \p builder is provided, then it is
-     * only true if \p builder can make the \p type. Otherwise it will return false, indicating
+     * @return true indicating that the type can be made. If builder is provided, then it is
+     * only true if builder can make the type. Otherwise it will return false, indicating
      * that the unit type can not be made.
      */
     public boolean canMake(final UnitType type, final Unit builder) {
@@ -1391,11 +1391,11 @@ public class Game {
      * required units.
      *
      * @param type The {@link TechType} to check.
-     * @param unit The {@link Unit} that will be used to research the provided technology \p type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param unit The {@link Unit} that will be used to research the provided technology type. If this value is null or excluded, then the unit will be excluded in the check.
      * @param checkCanIssueCommandType TODO fill this in
      *
-     * @return true indicating that the type can be researched. If \p unit is provided, then it is
-     * only true if \p unit can research the \p type. Otherwise it will return false, indicating
+     * @return true indicating that the type can be researched. If unit is provided, then it is
+     * only true if unit can research the type. Otherwise it will return false, indicating
      * that the technology can not be researched.
      */
     public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
@@ -1456,11 +1456,11 @@ public class Game {
      * required units.
      *
      * @param type The {@link UpgradeType} to check.
-     * @param unit The {@link Unit} that will be used to upgrade the provided upgrade \p type. If this value is null or excluded, then the unit will be excluded in the check.
+     * @param unit The {@link Unit} that will be used to upgrade the provided upgrade type. If this value is null or excluded, then the unit will be excluded in the check.
      * @param checkCanIssueCommandType TODO fill this in
      *
-     * @return true indicating that the type can be upgraded. If \p unit is provided, then it is
-     * only true if \p unit can upgrade the \p type. Otherwise it will return false, indicating
+     * @return true indicating that the type can be upgraded. If unit is provided, then it is
+     * only true if unit can upgrade the type. Otherwise it will return false, indicating
      * that the upgrade can not be upgraded.
      */
     public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
@@ -1693,6 +1693,9 @@ public class Game {
      * @see #enableFlag
      */
     public List<Unit> getSelectedUnits() {
+        if (!isFlagEnabled(Flag.UserInput)) {
+            return Collections.emptyList();
+        }
         return IntStream.range(0, gameData.getSelectedUnitCount())
                 .mapToObj(i -> units[gameData.getSelectedUnits(i)])
                 .collect(Collectors.toList());
@@ -2228,6 +2231,8 @@ public class Game {
      * @see #isLatComEnabled
      */
     public void setLatCom(final boolean isEnabled) {
+        //update shared memory
+        gameData.setHasLatCom(isEnabled);
         addCommand(SetLatCom, isEnabled ? 1 : 0, 0);
     }
 
@@ -2267,7 +2272,7 @@ public class Game {
      * @see #setLocalSpeed
      */
     public void setFrameSkip(int frameSkip) {
-        addCommand(SetFrameSkip, frameSkip, 0);
+        addCommand(SetFrameSkip, Math.max(frameSkip, 1), 0);
     }
 
     /**
@@ -2281,7 +2286,7 @@ public class Game {
      *   no other players are remaining in the game. This value is true by default.
      */
     public boolean setAlliance(Player player, boolean allied, boolean alliedVictory) {
-        if (self() == null || isReplay() || player == self || player.equals(self())) {
+        if (self() == null || isReplay() || player == null || player.equals(self())) {
             return false;
         }
 
@@ -2310,12 +2315,11 @@ public class Game {
      *   value is true by default.
      */
     public boolean setVision(Player player, boolean enabled) {
-        // Param check
-        if ( player == null) {
+        if (player == null) {
             return false;
         }
 
-        if ( !isReplay() && (self() == null || player.equals(self()))) {
+        if (!isReplay() && (self() == null || player.equals(self()))) {
             return false;
         }
 
@@ -2383,10 +2387,6 @@ public class Game {
             return false;
         }
 
-        if (!(new File(mapFileName).exists())) {
-            return false;
-        }
-
         addCommand(CommandType.SetMap, client.addString(mapFileName), 0);
         return true;
     }
@@ -2439,7 +2439,7 @@ public class Game {
     }
 
     public void setTextSize() {
-        textSize = TextSize.Default;
+        setTextSize(TextSize.Default);
     }
 
     /**
@@ -2474,7 +2474,7 @@ public class Game {
      *
      * @param level An integer representation of the aggressiveness for which commands are optimized. A lower level means less optimization, and a higher level means more optimization.
      *
-     * The values for \p level are as follows:
+     * The values for level are as follows:
      *     - 0: No optimization.
      *     - 1: Some optimization.
      *       - Is not detected as a hack.
@@ -2627,10 +2627,10 @@ public class Game {
      *
      * @param type A valid UnitType representing the unit type to accomodate space for.
      * @param desiredPosition A valid TilePosition containing the desired placement position.
-     * @param maxRange The maximum distance (in tiles) to build from \p desiredPosition.
+     * @param maxRange The maximum distance (in tiles) to build from desiredPosition.
      * @param creep A special boolean value that changes the behaviour of @Creep_Colony placement.
      *
-     * @return  A TilePosition containing the location that the structure should be constructed at. Returns {@link TilePosition#Invalid} If a build location could not be found within \p maxRange.
+     * @return  A TilePosition containing the location that the structure should be constructed at. Returns {@link TilePosition#Invalid} If a build location could not be found within maxRange.
      */
     public TilePosition getBuildLocation(final UnitType type, TilePosition desiredPosition, final int maxRange, final boolean creep) {
         return BuildingPlacer.getBuildLocation(type, desiredPosition, maxRange, creep, this);
@@ -2665,12 +2665,12 @@ public class Game {
 
     /**
      * Calculates the damage received for a given player. It can be understood
-     * as the damage from \p fromType to \p toType. Does not include shields in calculation.
+     * as the damage from fromType to toType. Does not include shields in calculation.
      * Includes upgrades if players are provided.
      *
      * @param fromType The unit type that will be dealing the damage.
      * @param toType The unit type that will be receiving the damage.
-     * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then no player will be used to calculate the upgrades for \p fromType.
+     * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then no player will be used to calculate the upgrades for fromType.
      * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then this parameter will default to {@link #self}.
      *
      * @return The amount of damage that fromType would deal to toType.
@@ -2690,7 +2690,7 @@ public class Game {
 
     /**
      * Calculates the damage dealt for a given player. It can be understood as
-     * the damage to \p toType from \p fromType. Does not include shields in calculation.
+     * the damage to toType from fromType. Does not include shields in calculation.
      * Includes upgrades if players are provided.
      *
      * This function is nearly the same as {@link #getDamageFrom}. The only difference is that
@@ -2698,7 +2698,7 @@ public class Game {
      *
      * @param toType The unit type that will be receiving the damage.
      * @param fromType The unit type that will be dealing the damage.
-     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then no player will be used to calculate the upgrades for \p toType.
+     * @param toPlayer The player owner of the type that will be receiving the damage. If omitted, then no player will be used to calculate the upgrades for toType.
      * @param fromPlayer The player owner of the given type that will be dealing the damage. If omitted, then this parameter will default to {@link #self}).
      *
      * @return The amount of damage that fromType would deal to toType.

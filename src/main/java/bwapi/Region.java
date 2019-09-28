@@ -212,7 +212,7 @@ public class Region implements Comparable<Region> {
      * Ignores all collisions.
      *
      * @param other The target {@link Region} to calculate distance to.
-     * @return The integer distance from this Region to \p other.
+     * @return The integer distance from this Region to other.
      */
     public int getDistance(final Region other) {
         return getCenter().getApproxDistance(other.getCenter());
@@ -229,7 +229,7 @@ public class Region implements Comparable<Region> {
      * @param pred If this parameter is used, it is a UnitFilter or function predicate that will retrieve only the units whose attributes match the given criteria. If omitted, then a default value of null is used, in which case there is no filter.
      *
      * @return A List<Unit> containing all units in this region that have met the requirements
-     * of \p pred.
+     * of pred.
      *
      * @see UnitFilter
      */
