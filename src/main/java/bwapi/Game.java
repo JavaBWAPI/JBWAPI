@@ -324,10 +324,6 @@ public class Game {
         shape.setIsSolid(isSolid);
     }
 
-    boolean shouldApplyLatcom(Cache cache) {
-        return isLatComEnabled() && cache.valid(getFrameCount());
-    }
-
     /**
      * Retrieves the set of all teams/forces. Forces are commonly seen in @UMS
      * game types and some others such as @TvB and the team versions of game types.
