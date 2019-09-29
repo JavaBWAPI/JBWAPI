@@ -28,6 +28,14 @@ public class Player implements Comparable<Player> {
     private final Force force;
     private final TilePosition startLocation;
 
+    private PlayerSelf self = null;
+    PlayerSelf self() {
+        if (self == null) {
+            self = new PlayerSelf();
+        }
+        return self;
+    }
+
     Player(final PlayerData playerData, final int id, final Game game) {
         this.playerData = playerData;
         this.game = game;
@@ -73,7 +81,7 @@ public class Player implements Comparable<Player> {
 
     /**
      * Retrieves the race of the player. This allows you to change strategies
-     * against different races, or generalize some commands for yourself.
+     * against different races, or generalize some commands for yourself().
      *
      * @return The Race that the player is using.
      * Returns {@link Race#Unknown} if the player chose {@link Race#Random} when the game started and they
@@ -196,7 +204,11 @@ public class Player implements Comparable<Player> {
      * @return Amount of minerals that the player currently has for spending.
      */
     public int minerals() {
-        return playerData.getMinerals();
+        int minerals = playerData.getMinerals();
+        if (game.isLatComEnabled() && self().minerals.valid(game.getFrameCount())) {
+            return minerals + self().minerals.get();
+        }
+        return minerals;
     }
 
     /**
@@ -207,7 +219,11 @@ public class Player implements Comparable<Player> {
      * @return Amount of gas that the player currently has for spending.
      */
     public int gas() {
-        return playerData.getGas();
+        int gas = playerData.getGas();
+        if (game.isLatComEnabled() && self().gas.valid(game.getFrameCount())) {
+            return gas + self().gas.get();
+        }
+        return gas;
     }
 
     /**
@@ -342,7 +358,11 @@ public class Player implements Comparable<Player> {
      * @see #supplyTotal
      */
     public int supplyUsed(final Race race) {
-        return playerData.getSupplyUsed(race.id);
+        int supplyUsed = playerData.getSupplyUsed(race.id);
+        if (game.isLatComEnabled() && self().supplyUsed[race.id].valid(game.getFrameCount())) {
+            return supplyUsed + self().supplyUsed[race.id].get();
+        }
+        return supplyUsed;
     }
 
     public int allUnitCount() {
@@ -491,6 +511,9 @@ public class Player implements Comparable<Player> {
      * @see #hasResearched
      */
     public boolean isResearching(final TechType tech) {
+        if (game.isLatComEnabled() && self().isResearching[tech.id].valid(game.getFrameCount())) {
+            return self().isResearching[tech.id].get();
+        }
         return playerData.isResearching(tech.id);
     }
 
@@ -502,6 +525,9 @@ public class Player implements Comparable<Player> {
      * @see Unit#upgrade
      */
     public boolean isUpgrading(final UpgradeType upgrade) {
+        if (game.isLatComEnabled() && self().isUpgrading[upgrade.id].valid(game.getFrameCount())) {
+            return self().isResearching[upgrade.id].get();
+        }
         return playerData.isUpgrading(upgrade.id);
     }
 
