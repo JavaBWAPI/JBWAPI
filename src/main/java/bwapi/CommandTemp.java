@@ -442,9 +442,9 @@ class CommandTemp {
                 unit.self().isGathering.set(true, frame);
 
                 // @TODO: Fully time and test this order
-                if (target.getType().isMineralField())
+                if (target != null && target.exists() && target.getType().isMineralField())
                     unit.self().order.set(Order.MoveToMinerals, frame);
-                else if (target.getType().isRefinery())
+                else if (target != null && target.exists() && target.getType().isRefinery())
                     unit.self().order.set(Order.MoveToGas, frame);
 
                 break;
@@ -501,7 +501,7 @@ class CommandTemp {
                     unit.self().order.set(Order.PickupTransport, frame);
                     unit.self().target.set(getUnitID(target), frame);
                 }
-                else if (target.getType().spaceProvided() != 0) {
+                else if (target != null && target.exists() && target.getType().spaceProvided() != 0) {
                     unit.self().order.set(Order.EnterTransport, frame);
                     unit.self().target.set(getUnitID(target), frame);
                 }
@@ -647,31 +647,29 @@ class CommandTemp {
 
             // RLF
             case Right_Click_Unit:
-                unit.self().target.set(getUnitID(target), frame);
-                unit.self().isIdle.set(false, frame);
-                unit.self().isMoving.set(true, frame);
+                if (target != null && target.exists()) {
+                    unit.self().target.set(getUnitID(target), frame);
+                    unit.self().isIdle.set(false, frame);
+                    unit.self().isMoving.set(true, frame);
 
-                if (unit.getType().isWorker() && target.getType().isMineralField()) {
-                    unit.self().isGathering.set(true, frame);
-                    unit.self().order.set(Order.MoveToMinerals, frame);
-                }
-                else if (unit.getType().isWorker() && target.getType().isRefinery()) {
-                    unit.self().isGathering.set(true, frame);
-                    unit.self().order.set(Order.MoveToGas, frame);
-                }
-                else if (unit.getType().isWorker() && target.getType().getRace() == Race.Terran &&
-                                target.getType().whatBuilds().getFirst() == unit.getType() && !target.isCompleted()) {
-                    unit.self().order.set(Order.ConstructingBuilding, frame);
-                    unit.self().buildUnit.set(getUnitID(target), frame);
-                    target.self().buildUnit.set(getUnitID(unit), frame);
-                    unit.self().isConstructing.set(true, frame);
-                    target.self().isConstructing.set(true, frame);
-                }
-                else if (unit.getType().canAttack() && target.getPlayer() != unit.getPlayer() && !target.getType().isNeutral()) {
-                    unit.self().order.set(Order.AttackUnit, frame);
-                }
-                else if(unit.getType().canMove()) {
-                    unit.self().order.set(Order.Follow, frame);
+                    if (unit.getType().isWorker() && target.getType().isMineralField()) {
+                        unit.self().isGathering.set(true, frame);
+                        unit.self().order.set(Order.MoveToMinerals, frame);
+                    } else if (unit.getType().isWorker() && target.getType().isRefinery()) {
+                        unit.self().isGathering.set(true, frame);
+                        unit.self().order.set(Order.MoveToGas, frame);
+                    } else if (unit.getType().isWorker() && target.getType().getRace() == Race.Terran &&
+                            target.getType().whatBuilds().getFirst() == unit.getType() && !target.isCompleted()) {
+                        unit.self().order.set(Order.ConstructingBuilding, frame);
+                        unit.self().buildUnit.set(getUnitID(target), frame);
+                        target.self().buildUnit.set(getUnitID(unit), frame);
+                        unit.self().isConstructing.set(true, frame);
+                        target.self().isConstructing.set(true, frame);
+                    } else if (unit.getType().canAttack() && target.getPlayer() != unit.getPlayer() && !target.getType().isNeutral()) {
+                        unit.self().order.set(Order.AttackUnit, frame);
+                    } else if (unit.getType().canMove()) {
+                        unit.self().order.set(Order.Follow, frame);
+                    }
                 }
 
                 break;
@@ -828,23 +826,25 @@ class CommandTemp {
 
             // RLF
             case Use_Tech_Unit: {
-                TechType techType = TechType.idToEnum[command.extra];
+                if (target != null && target.exists()) {
+                    TechType techType = TechType.idToEnum[command.extra];
 
-                if (!techType.targetsUnit()) {
-                    return;
+                    if (!techType.targetsUnit()) {
+                        return;
+                    }
+
+                    unit.self().order.set(techType.getOrder(), frame);
+                    unit.self().orderTarget.set(getUnitID(target), frame);
+
+                    Position targetPosition    = target.getPosition();
+
+                    unit.self().targetPositionX.set(targetPosition.x, frame);
+                    unit.self().targetPositionY.set(targetPosition.y, frame);
+                    unit.self().orderTargetPositionX.set(targetPosition.x, frame);
+                    unit.self().orderTargetPositionY.set(targetPosition.y, frame);
+
+                    break;
                 }
-
-                unit.self().order.set(techType.getOrder(), frame);
-                unit.self().orderTarget.set(getUnitID(target), frame);
-
-                Position targetPosition    = target.getPosition();
-
-                unit.self().targetPositionX.set(targetPosition.x, frame);
-                unit.self().targetPositionY.set(targetPosition.y, frame);
-                unit.self().orderTargetPositionX.set(targetPosition.x, frame);
-                unit.self().orderTargetPositionY.set(targetPosition.y, frame);
-
-                break;
             }
         }
     }
