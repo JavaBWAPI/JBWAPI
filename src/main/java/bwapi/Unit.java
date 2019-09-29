@@ -5038,7 +5038,7 @@ public class Unit implements Comparable<Unit> {
         final UnitType unitThatLoadsType = unitThatLoads.getType();
 
         if (unitThatLoadsType == Terran_Bunker) {
-            if (!unitThatLoadsType.isOrganic() || unitThatLoadsType.getRace() != Terran) {
+            if (!unitToBeLoadedType.isOrganic() || unitToBeLoadedType.getRace() != Terran) {
                 return false;
             }
             if (!unitToBeLoaded.hasPath(unitThatLoads.getPosition())) {
