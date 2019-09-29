@@ -69,7 +69,7 @@ class CommandTemp {
         }
 
         // Existence test
-        if (!unit.exists()) {
+        if (unit == null || !unit.exists()) {
             return;
         }
 
@@ -100,7 +100,7 @@ class CommandTemp {
 
             // RLF
             case Attack_Unit:
-                if (target != null || !target.exists() || !unit.getType().canAttack())
+                if (target == null || !target.exists() || !unit.getType().canAttack())
                     return;
                 unit.self().order.set(Order.AttackUnit, frame);
                 unit.self().target.set(getUnitID(target), frame);
