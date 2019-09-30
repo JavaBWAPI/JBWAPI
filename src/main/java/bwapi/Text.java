@@ -5,7 +5,7 @@ package bwapi;
  * <p>
  * Such codes are used in calls to {@link Game#drawText}, {@link Game#printf}
  */
-public enum TextColor {
+public enum Text {
     /**
      * Uses the previous color that was specified before the current one.
      */
@@ -117,14 +117,14 @@ public enum TextColor {
 
     final byte id;
 
-    TextColor(final int id) {
+    Text(final int id) {
         this.id = (byte) id;
     }
 
     /**
      * Format text with a textcolor to display on broodwar
      */
-    public static String formatText(final String text, final TextColor format) {
+    public static String formatText(final String text, final Text format) {
         final byte[] data = text.getBytes();
         final int len = text.length();
         final byte[] formatted = new byte[len + 1];
@@ -142,5 +142,33 @@ public enum TextColor {
     boolean isColor() {
         final int c = this.id;
         return (2 <= c && c <= 8) || (14 <= c && c <= 17) || (21 <= c && c <= 31);
+    }
+
+    /**
+     * Enumeration of available text sizes.
+     */
+    public enum Size {
+        /**
+         * The smallest text size in the game.
+         */
+        Small(0),
+        /**
+         * The standard text size, used for most things in the game such as chat messages.
+         */
+        Default(1),
+        /**
+         * A larger text size. This size is used for the in-game countdown timer seen in @CTF and @UMS game types.
+         */
+        Large(2),
+        /**
+         * The largest text size in the game.
+         */
+        Huge(3);
+
+        final int id;
+
+        Size(final int id) {
+            this.id = id;
+        }
     }
 }
