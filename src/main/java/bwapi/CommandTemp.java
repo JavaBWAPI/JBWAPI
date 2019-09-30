@@ -418,7 +418,7 @@ class CommandTemp {
             // RLF
             case Cloak:
                 unit.self().order.set(Order.Cloak, frame);
-                unit.self().energy.set(-unit.getType().cloakingTech().energyCost(), frame);
+                unit.self().energy.setOrAdd(-unit.getType().cloakingTech().energyCost(), frame);
                 break;
 
             // RLF
