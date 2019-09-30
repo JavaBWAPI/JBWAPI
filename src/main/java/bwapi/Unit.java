@@ -311,10 +311,11 @@ public class Unit implements Comparable<Unit> {
      * @see #getInitialHitPoints
      */
     public int getHitPoints() {
+        int hitpoints = self().hitPoints.get();
         if (game.isLatComEnabled() && self().hitPoints.valid(game.getFrameCount())) {
-            return self().hitPoints.get();
+            return hitpoints + self().hitPoints.get();
         }
-        return unitData.getHitPoints();
+        return hitpoints;
     }
 
     /**
