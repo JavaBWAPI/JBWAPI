@@ -337,10 +337,11 @@ public class Unit implements Comparable<Unit> {
      * @see UnitType#maxEnergy
      */
     public int getEnergy() {
+        int energy = unitData.getEnergy();
         if (game.isLatComEnabled() && self().energy.valid(game.getFrameCount())) {
-            return self().energy.get();
+            return energy + self().energy.get();
         }
-        return unitData.getEnergy();
+        return energy;
     }
 
     /**

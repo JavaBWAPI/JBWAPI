@@ -24,7 +24,6 @@ class UnitSelf {
     IntegerCache remainingTrainTime = new IntegerCache();
     UpgradeTypeCache upgrade = new UpgradeTypeCache();
     IntegerCache remainingUpgradeTime = new IntegerCache();
-    IntegerCache energy = new IntegerCache();
     BooleanCache isMoving = new BooleanCache();
     BooleanCache isGathering = new BooleanCache();
     IntegerCache rallyPositionX = new IntegerCache();
@@ -37,6 +36,7 @@ class UnitSelf {
 
     IntegerCache hitPoints = new IntegerCache();
     IntegerCache trainingQueueCount = new IntegerCache();
+    IntegerCache energy = new IntegerCache();
 
 
     UnitSelf() {
