@@ -4,4 +4,7 @@ target/
 #intellij
 .idea/
 *.iml
+.settings
+.classpath
+.project
 
