@@ -81,7 +81,7 @@ public class Player implements Comparable<Player> {
 
     /**
      * Retrieves the race of the player. This allows you to change strategies
-     * against different races, or generalize some commands for yourself().
+     * against different races, or generalize some commands for yourself.
      *
      * @return The Race that the player is using.
      * Returns {@link Race#Unknown} if the player chose {@link Race#Random} when the game started and they

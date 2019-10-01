@@ -64,7 +64,7 @@ public class Unit implements Comparable<Unit> {
     private UnitSelf self = null;
     UnitSelf self() {
         if (self == null) {
-            self= new UnitSelf();
+            self = new UnitSelf();
         }
         return self;
     }
@@ -4294,13 +4294,13 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (self.hasUnitTypeRequirement(type.whatUpgrades())) {
+        if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
             return false;
         }
 
         final int nextLvl = self.getUpgradeLevel(type) + 1;
 
-        if (self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
+        if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
             return false;
         }
 
