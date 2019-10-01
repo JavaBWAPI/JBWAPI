@@ -546,34 +546,34 @@ public class Player implements Comparable<Player> {
      *
      * @return character code to use for text in Broodwar.
      */
-    public TextColor getTextColor() {
+    public Text getTextColor() {
         switch (playerData.getColor()) {
             case 111: // red
-                return TextColor.BrightRed;
+                return Text.BrightRed;
             case 165: // blue
-                return TextColor.Blue;
+                return Text.Blue;
             case 159: // teal
-                return TextColor.Teal;
+                return Text.Teal;
             case 164: // purp
-                return TextColor.Purple;
+                return Text.Purple;
             case 156: // orange with fix from @n00byEdge
-                return TextColor.Orange;
+                return Text.Orange;
             case 19:  // brown
-                return TextColor.Brown;
+                return Text.Brown;
             case 84:  // white
-                return TextColor.PlayerWhite;
+                return Text.PlayerWhite;
             case 135: // yellow
-                return TextColor.PlayerYellow;
+                return Text.PlayerYellow;
             case 185: // green p9
-                return TextColor.DarkGreen;
+                return Text.DarkGreen;
             case 136: // p10
-                return TextColor.LightYellow;
+                return Text.LightYellow;
             case 134: // p11
-                return TextColor.Tan;
+                return Text.Tan;
             case 51:  // p12
-                return TextColor.GreyBlue;
+                return Text.GreyBlue;
             default:
-                return TextColor.Default;
+                return Text.Default;
         }
     }
 

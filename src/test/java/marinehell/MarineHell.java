@@ -75,7 +75,7 @@ public class MarineHell extends DefaultBWListener {
 
     @Override
     public void onFrame() {
-        // game.setTextSize(10);
+        // game.setText.Size(10);
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
         game.drawTextScreen(10, 20, "Units: " + self.getUnits().size() + "; Enemies: " + enemyBuildingMemory.size());
         game.drawTextScreen(10, 30,
