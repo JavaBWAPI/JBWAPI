@@ -18,9 +18,7 @@ Also contains a modified version of the pure Java BWEM implementation from [BWAP
  - BWEM instead of BWTA as map analyser.
 
 ## Warnings
-
- - JBWAPI by default has Latency Compensation disabled (and at the moment has no LatCom at all).
- - A fake BWTA is provided for easier porting, but it translates BWTA calls to their respective BWEM calls, so specific Regions/Chokepoints etc. may differ.
+ - A fake BWTA is provided for easier porting from BWMirror, but it translates BWTA calls to their respective BWEM calls, so specific Regions/Chokepoints etc. may differ.
 
 ## Usage
 
