@@ -96,7 +96,10 @@ public class Game {
     private short[] mapSplitTilesRegion1;
     private short[] mapSplitTilesRegion2;
     // USER DEFINED
+
     private Text.Size textSize = Text.Size.Default;
+    private boolean latcom = true;
+
 
     Game(Client client) {
         this.client = client;
@@ -256,6 +259,8 @@ public class Game {
 
         observers = playerSet.stream().filter(p -> !p.equals(self) && p.isObserver())
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+
+        latcom = gameData.getHasLatCom();
     }
 
     void unitCreate(final int id) {
@@ -2179,7 +2184,7 @@ public class Game {
      * @see #setLatCom
      */
     public boolean isLatComEnabled() {
-        return gameData.getHasLatCom();
+        return latcom;
     }
 
     /**
@@ -2194,6 +2199,9 @@ public class Game {
     public void setLatCom(final boolean isEnabled) {
         //update shared memory
         gameData.setHasLatCom(isEnabled);
+        //update internal memory
+        latcom = isEnabled;
+        //update server
         addCommand(SetLatCom, isEnabled ? 1 : 0, 0);
     }
 
