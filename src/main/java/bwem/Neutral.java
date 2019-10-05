@@ -143,7 +143,7 @@ public abstract class Neutral {
     }
 
     private boolean isSameUnitTypeAs(Neutral neutral) {
-        return this.getUnit().getType().equals(neutral.getUnit().getType());
+        return this.getUnit().getType() == neutral.getUnit().getType();
     }
 
     private void putOnTiles() {

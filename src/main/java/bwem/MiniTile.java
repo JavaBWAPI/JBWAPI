@@ -158,7 +158,7 @@ public final class MiniTile {
     }
 
     boolean isAreaIdMissing() {
-        return (this.areaId.intValue() == -1);
+        return this.areaId.equals(UNINITIALIZED);
     }
 
     void replaceAreaId(final AreaId areaId) {
