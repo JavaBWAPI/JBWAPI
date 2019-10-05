@@ -5956,8 +5956,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUseTech(TechType tech) {
-        Unit u = null;
-        return canUseTech(tech, u);
+        return canUseTech(tech, (Unit) null);
     }
 
     /**
