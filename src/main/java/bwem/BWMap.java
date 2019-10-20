@@ -37,7 +37,7 @@ public abstract class BWMap {
     Altitude highestAltitude;
     final Asserter asserter;
 
-    BWMap(final Game game, Asserter asserter) {
+    BWMap(final Game game, final Asserter asserter) {
         this.game = game;
         this.players = game.getPlayers();
         this.mineralPatches = game.getMinerals();

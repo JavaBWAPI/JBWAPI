@@ -18,14 +18,16 @@ class Asserter {
             try {
                 throw exception;
             } catch (IllegalStateException e) {
-                try {
-                    outStream.write(Arrays
-                            .stream(e.getStackTrace())
-                            .map(s -> s.toString() + "\n")
-                            .collect(Collectors.joining())
-                            .getBytes());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                if (outStream != null) {
+                    try {
+                        outStream.write(Arrays
+                                .stream(e.getStackTrace())
+                                .map(s -> s.toString() + "\n")
+                                .collect(Collectors.joining())
+                                .getBytes());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         }

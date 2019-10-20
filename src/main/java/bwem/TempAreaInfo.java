@@ -33,7 +33,7 @@ class TempAreaInfo {
 
     private final Asserter asserter;
 
-    TempAreaInfo(Asserter asserter) {
+    TempAreaInfo(final Asserter asserter) {
         this.isValid = false;
         this.id = AreaId.ZERO;
         this.walkPositionWithHighestAltitude = new WalkPosition(0, 0);

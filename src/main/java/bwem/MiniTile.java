@@ -42,9 +42,9 @@ public final class MiniTile {
             areaId; // 0 -> unwalkable  ;  > 0 -> index of some Area  ;  < 0 -> some walkable terrain, but
     // too small to be part of an Area
 
-    private Asserter asserter;
+    private final Asserter asserter;
 
-    MiniTile(Asserter asserter) {
+    MiniTile(final Asserter asserter) {
         this.altitude = Altitude.UNINITIALIZED;
         this.areaId = UNINITIALIZED;
         this.asserter = asserter;

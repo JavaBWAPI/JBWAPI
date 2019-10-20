@@ -19,7 +19,7 @@ final class TileData {
 
     final Asserter asserter;
 
-    TileData(final int tileCount, final int miniTileCount, Asserter asserter) {
+    TileData(final int tileCount, final int miniTileCount, final Asserter asserter) {
         tiles = new Tile[tileCount];
         this.asserter = asserter;
         for (int i = 0; i < tileCount; ++i) {

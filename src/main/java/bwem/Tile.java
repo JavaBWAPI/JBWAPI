@@ -41,7 +41,7 @@ public final class Tile {
     private boolean isBuildable;
     private boolean isDoodad;
 
-    private Asserter asserter;
+    private final Asserter asserter;
 
     Tile(final Asserter asserter) {
         this.markable = new Markable(Tile.staticMarkable);
