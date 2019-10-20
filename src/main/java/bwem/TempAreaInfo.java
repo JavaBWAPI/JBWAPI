@@ -31,33 +31,38 @@ class TempAreaInfo {
     private boolean isValid;
     private int size;
 
-    TempAreaInfo() {
+    private final Asserter asserter;
+
+    TempAreaInfo(Asserter asserter) {
         this.isValid = false;
         this.id = AreaId.ZERO;
         this.walkPositionWithHighestAltitude = new WalkPosition(0, 0);
         this.highestAltitude = Altitude.ZERO;
+        this.asserter = asserter;
 
         //        bwem_assert(!valid());
         if (isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
     }
 
     TempAreaInfo(
             final AreaId id,
             final MiniTile miniTile,
-            final WalkPosition walkPositionWithHighestAltitude) {
+            final WalkPosition walkPositionWithHighestAltitude,
+            final Asserter asserter) {
         this.isValid = true;
         this.id = id;
         this.walkPositionWithHighestAltitude = walkPositionWithHighestAltitude;
         this.size = 0;
         this.highestAltitude = miniTile.getAltitude();
+        this.asserter = asserter;
 
         add(miniTile);
 
         //        { bwem_assert(valid()); }
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
     }
 
@@ -68,7 +73,7 @@ class TempAreaInfo {
     AreaId getId() {
         //        bwem_assert(valid());
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         return this.id;
     }
@@ -76,7 +81,7 @@ class TempAreaInfo {
     WalkPosition getWalkPositionWithHighestAltitude() {
         //        { bwem_assert(valid());
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         return this.walkPositionWithHighestAltitude;
     }
@@ -84,7 +89,7 @@ class TempAreaInfo {
     public int getSize() {
         //        bwem_assert(valid());
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         return this.size;
     }
@@ -92,7 +97,7 @@ class TempAreaInfo {
     Altitude getHighestAltitude() {
         //        bwem_assert(valid());
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         return this.highestAltitude;
     }
@@ -100,7 +105,7 @@ class TempAreaInfo {
     public void add(final MiniTile miniTile) {
         //        bwem_assert(valid());
         if (!isValid()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         ++this.size;
         miniTile.setAreaId(id);
@@ -110,10 +115,10 @@ class TempAreaInfo {
     void merge(final TempAreaInfo absorbed) {
         if (!(isValid() && absorbed.isValid())) {
             //            bwem_assert(valid() && absorbed.isValid());
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         } else if (!(this.size >= absorbed.size)) {
             //            bwem_assert (size >= absorbed.size);
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.size += absorbed.size;
         absorbed.isValid = false;

@@ -41,7 +41,9 @@ public final class Tile {
     private boolean isBuildable;
     private boolean isDoodad;
 
-    Tile() {
+    private Asserter asserter;
+
+    Tile(final Asserter asserter) {
         this.markable = new Markable(Tile.staticMarkable);
         this.neutral = null;
         this.lowestAltitude = Altitude.ZERO;
@@ -50,6 +52,7 @@ public final class Tile {
         this.groundHeight = GroundHeight.LOW_GROUND;
         this.isBuildable = false;
         this.isDoodad = false;
+        this.asserter = asserter;
     }
 
     static StaticMarkable getStaticMarkable() {
@@ -82,7 +85,7 @@ public final class Tile {
 
     void setAreaId(final AreaId areaId) {
         if (!(areaId.intValue() == -1 || getAreaId().intValue() == 0 && areaId.intValue() != 0)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.areaId = areaId;
     }
@@ -98,7 +101,7 @@ public final class Tile {
 
     void setLowestAltitude(final Altitude lowestAltitude) {
         if (!(lowestAltitude.intValue() >= 0)) {
-            throw new IllegalArgumentException();
+            asserter.throwIllegalStateException("");
         }
         this.lowestAltitude = lowestAltitude;
     }
@@ -182,7 +185,7 @@ public final class Tile {
 
     void addNeutral(final Neutral neutral) {
         if (!(getNeutral() == null && neutral != null)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.neutral = neutral;
     }
@@ -193,7 +196,7 @@ public final class Tile {
 
     void removeNeutral(final Neutral neutral) {
         if (!getNeutral().equals(neutral)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.neutral = null;
     }

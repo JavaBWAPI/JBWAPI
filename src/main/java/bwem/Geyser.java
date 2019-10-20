@@ -24,8 +24,8 @@ public final class Geyser extends Resource {
         super(unit, map);
 
         if (!unit.getType().equals(UnitType.Resource_Vespene_Geyser)) {
-            throw new IllegalArgumentException(
-                    "Unit is not a VespeneGeyser: " + unit.getClass().getName());
+            map.asserter.throwIllegalStateException(
+                    "Unit is not a VespeneGeyser: " + unit.getType());
         }
     }
 

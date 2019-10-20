@@ -39,10 +39,14 @@ public abstract class Area {
     int highGroundTileCount = 0;
     int veryHighGroundTileCount = 0;
 
-    Area(final AreaId areaId, final WalkPosition top, final int miniTileCount) {
+    protected final BWMap map;
+
+
+    Area(final AreaId areaId, final WalkPosition top, final int miniTileCount, final BWMap map) {
         this.id = areaId;
         this.walkPositionWithHighestAltitude = top;
         this.miniTileCount = miniTileCount;
+        this.map = map;
     }
 
     public AreaId getId() {
@@ -102,7 +106,7 @@ public abstract class Area {
     public List<ChokePoint> getChokePoints(final Area area) {
         final List<ChokePoint> ret = this.chokePointsByArea.get(area);
         if (ret == null) {
-            throw new IllegalArgumentException();
+            map.asserter.throwIllegalStateException("");
         }
         return ret;
     }

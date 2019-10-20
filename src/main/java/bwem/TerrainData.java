@@ -39,7 +39,7 @@ public final class TerrainData {
 
     public Tile getTile(final TilePosition tilePosition, final CheckMode checkMode) {
         if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(tilePosition))) {
-            throw new IllegalArgumentException();
+            tileData.asserter.throwIllegalStateException("");
         }
         return getTileData()
                 .getTile(getMapData().getTileSize().getX() * tilePosition.getY() + tilePosition.getX());
@@ -51,7 +51,7 @@ public final class TerrainData {
 
     public MiniTile getMiniTile(final WalkPosition walkPosition, final CheckMode checkMode) {
         if (!((checkMode == CheckMode.NO_CHECK) || getMapData().isValid(walkPosition))) {
-            throw new IllegalArgumentException();
+            tileData.asserter.throwIllegalStateException("");
         }
         return getTileData()
                 .getMiniTile(getMapData().getWalkSize().getX() * walkPosition.getY() + walkPosition.getX());

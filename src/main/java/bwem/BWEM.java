@@ -14,11 +14,23 @@ package bwem;
 
 import bwapi.Game;
 
+import java.io.OutputStream;
+
+/**
+ * BWEM Broodwar Map analysis library by Igor Dimitrijevic.
+ * Ported to Java by the OpenBW Team
+ *
+ * By default BWEM throws when an invalid state is encountered.
+ * But if you know what you are doing, you can skip these throws by setting
+ * {@link #setFailOnError} to `false`.
+ */
 public final class BWEM {
     private final BWMap map;
+    private final Asserter asserter;
 
     public BWEM(final Game game) {
-        this.map = new BWMapInitializer(game);
+        this.asserter = new Asserter();
+        this.map = new BWMapInitializer(game, asserter);
     }
 
     /**
@@ -38,5 +50,13 @@ public final class BWEM {
         }
         ((BWMapInitializer) this.map).initialize();
         this.map.assignStartingLocationsToSuitableBases();
+    }
+
+    public void setFailOnError(boolean failOnError) {
+        asserter.setFailOnError(failOnError);
+    }
+
+    public void setFailOutputStream(OutputStream outputStream) {
+        asserter.setFailOutputStream(outputStream);
     }
 }
