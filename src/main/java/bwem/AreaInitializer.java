@@ -30,23 +30,19 @@ final class AreaInitializer extends Area {
     private static final StaticMarkable staticMarkable = new StaticMarkable();
     private final Markable markable;
 
-    private final BWMap map;
-
     AreaInitializer(
             final BWMap map, final AreaId areaId, final WalkPosition top, final int miniTileCount) {
-        super(areaId, top, miniTileCount);
-
-        this.map = map;
+        super(areaId, top, miniTileCount, map);
 
         this.markable = new Markable(staticMarkable);
 
         if (!(areaId.intValue() > 0)) {
-            throw new IllegalArgumentException();
+            map.asserter.throwIllegalStateException("");
         }
 
         final MiniTile topMiniTile = this.map.getData().getMiniTile(top);
         if (!(topMiniTile.getAreaId().equals(areaId))) {
-            throw new IllegalStateException(
+            map.asserter.throwIllegalStateException(
                 "assert failed: topMiniTile.AreaId().equals(areaId): expected: "
                     + topMiniTile.getAreaId().intValue()
                     + ", actual: "
@@ -66,7 +62,7 @@ final class AreaInitializer extends Area {
 
     void addChokePoints(final Area area, final List<ChokePoint> chokePoints) {
         if (!(super.chokePointsByArea.get(area) == null && chokePoints != null)) {
-            throw new IllegalArgumentException();
+            map.asserter.throwIllegalStateException("");
         }
 
         super.chokePointsByArea.put(area, chokePoints);
@@ -76,14 +72,14 @@ final class AreaInitializer extends Area {
 
     void addMineral(final Mineral mineral) {
         if (!(mineral != null && !super.minerals.contains(mineral))) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
         super.minerals.add(mineral);
     }
 
     void addGeyser(final Geyser geyser) {
         if (!(geyser != null && !super.geysers.contains(geyser))) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
         super.geysers.add(geyser);
     }
@@ -121,7 +117,7 @@ final class AreaInitializer extends Area {
 
     int[] computeDistances(final ChokePoint startCP, final List<ChokePoint> targetCPs) {
         if (targetCPs.contains(startCP)) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
 
         final TilePosition start =
@@ -168,7 +164,7 @@ final class AreaInitializer extends Area {
             final TilePosition current = distanceAndTilePosition.getRight();
             final Tile currentTile = this.map.getData().getTile(current, CheckMode.NO_CHECK);
             if (!(currentTile.getInternalData() == currentDist)) {
-                throw new IllegalStateException(
+                map.asserter.throwIllegalStateException(
                     "currentTile.InternalData().intValue()="
                         + currentTile.getInternalData()
                         + ", currentDist="
@@ -216,7 +212,7 @@ final class AreaInitializer extends Area {
                                     toVisit.remove(
                                         new Pair<>(nextTile.getInternalData(), next));
                                 if (!removed) {
-                                    throw new IllegalStateException();
+                                    map.asserter.throwIllegalStateException("");
                                 }
                                 nextTile.setInternalData(newNextDist);
                                 toVisit.offer(new Pair<>(newNextDist, next));
@@ -232,7 +228,7 @@ final class AreaInitializer extends Area {
         }
 
         if (!(remainingTargets == 0)) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
 
         for (final Pair<Integer, TilePosition> distanceAndTilePosition : toVisit) {
@@ -452,7 +448,7 @@ final class AreaInitializer extends Area {
                 break;
             }
 
-            super.bases.add(new Base(this, bestLocation, assignedResources, blockingMinerals));
+            super.bases.add(new Base(this, bestLocation, assignedResources, blockingMinerals, map.asserter));
         }
     }
 
@@ -532,7 +528,7 @@ final class AreaInitializer extends Area {
 
     public void onMineralDestroyed(final Mineral mineral) {
         if (mineral == null) {
-            throw new IllegalArgumentException();
+            map.asserter.throwIllegalStateException("");
         }
 
         this.minerals.remove(mineral);

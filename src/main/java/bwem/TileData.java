@@ -17,15 +17,18 @@ final class TileData {
     private final Tile[] tiles;
     private final MiniTile[] miniTiles;
 
-    TileData(final int tileCount, final int miniTileCount) {
+    final Asserter asserter;
+
+    TileData(final int tileCount, final int miniTileCount, final Asserter asserter) {
         tiles = new Tile[tileCount];
+        this.asserter = asserter;
         for (int i = 0; i < tileCount; ++i) {
-            tiles[i] = new Tile();
+            tiles[i] = new Tile(asserter);
         }
 
         miniTiles = new MiniTile[miniTileCount];
         for (int i = 0; i < miniTileCount; ++i) {
-            miniTiles[i] = new MiniTile();
+            miniTiles[i] = new MiniTile(asserter);
         }
     }
 

@@ -17,6 +17,8 @@ import bwapi.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static bwapi.UnitType.*;
+
 public final class NeutralData {
     private final List<Mineral> minerals;
     private final List<Geyser> geysers;
@@ -46,16 +48,10 @@ public final class NeutralData {
             if (neutralUnit.getType().isBuilding()) {
                 this.staticBuildings.add(new StaticBuilding(neutralUnit, map));
             }
+            if ( neutralUnit.getType() == Special_Pit_Door || neutralUnit.getType() == Special_Right_Pit_Door) {
+                this.staticBuildings.add(new StaticBuilding(neutralUnit, map));
+            }
         }
-
-        // TODO: Add "Special_Pit_Door" and "Special_Right_Pit_Door" to static buildings list? See
-        // mapImpl.cpp:238.
-        //				if (n->getType() == Special_Pit_Door)
-        //					m_StaticBuildings.push_back(make_unique<StaticBuilding>(n, this));
-        //				if (n->getType() == Special_Right_Pit_Door)
-        //					m_StaticBuildings.push_back(make_unique<StaticBuilding>(n, this));
-
-        ////////////////////////////////////////////////////////////////////////
     }
 
     public List<Mineral> getMinerals() {

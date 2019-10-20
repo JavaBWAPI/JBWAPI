@@ -42,9 +42,12 @@ public final class MiniTile {
             areaId; // 0 -> unwalkable  ;  > 0 -> index of some Area  ;  < 0 -> some walkable terrain, but
     // too small to be part of an Area
 
-    MiniTile() {
+    private final Asserter asserter;
+
+    MiniTile(final Asserter asserter) {
         this.altitude = Altitude.UNINITIALIZED;
         this.areaId = UNINITIALIZED;
+        this.asserter = asserter;
     }
 
     /**
@@ -81,7 +84,7 @@ public final class MiniTile {
     void setAltitude(final Altitude altitude) {
         //        { bwem_assert_debug_only(AltitudeMissing() && (a > 0)); this.altitude = a; }
         if (!(isAltitudeMissing() && altitude.intValue() > 0)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.altitude = altitude;
     }
@@ -128,7 +131,7 @@ public final class MiniTile {
     void setAreaId(final AreaId areaId) {
         //        { bwem_assert(AreaIdMissing() && (id >= 1)); this.areaId = id; }
         if (!(isAreaIdMissing() && areaId.intValue() >= 1)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.areaId = areaId;
     }
@@ -140,7 +143,7 @@ public final class MiniTile {
     void setSea() {
         //        { bwem_assert(!Walkable() && SeaOrLake()); this.altitude = 0; }
         if (!(!isWalkable() && isSeaOrLake())) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.altitude = Altitude.ZERO;
     }
@@ -148,7 +151,7 @@ public final class MiniTile {
     void setLake() {
         //        { bwem_assert(!Walkable() && Sea()); this.altitude = -1; }
         if (!(!isWalkable() && isSea())) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.altitude = Altitude.UNINITIALIZED;
     }
@@ -158,7 +161,7 @@ public final class MiniTile {
     }
 
     boolean isAreaIdMissing() {
-        return (this.areaId.intValue() == -1);
+        return this.areaId.equals(UNINITIALIZED);
     }
 
     void replaceAreaId(final AreaId areaId) {
@@ -167,13 +170,13 @@ public final class MiniTile {
         //        if (!( (areaId.intValue() > 0) && ((id.intValue() >= 1) || (id.intValue() <= -2)) &&
         // (!id.equals(areaId)))) {
         if (!(this.areaId.intValue() > 0)) {
-            throw new IllegalStateException(
+            asserter.throwIllegalStateException(
                     "Failed assert: this.areaId.intValue() > 0: " + this.areaId.intValue());
         } else if (!((areaId.intValue() >= 1) || (areaId.intValue() <= -2))) {
-            throw new IllegalArgumentException(
+            asserter.throwIllegalStateException(
                     "Failed assert: (id.intValue() >= 1) || (id.intValue() <= -2): " + areaId.intValue());
         } else if (areaId.equals(this.areaId)) {
-            throw new IllegalArgumentException(
+            asserter.throwIllegalStateException(
                     "Failed assert: !id.equals (areaId): not expected: "
                             + this.areaId.intValue()
                             + ", actual: "
@@ -186,7 +189,7 @@ public final class MiniTile {
     void setBlocked() {
         //        { bwem_assert(AreaIdMissing()); this.areaId = blockingCP; }
         if (!isAreaIdMissing()) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.areaId = MiniTile.blockingCP;
     }
@@ -198,7 +201,7 @@ public final class MiniTile {
     void replaceBlockedAreaId(final AreaId areaId) {
         //        { bwem_assert( (areaId == blockingCP) && (id >= 1)); this.areaId = id; }
         if (!(this.areaId.equals(MiniTile.blockingCP) && areaId.intValue() >= 1)) {
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
         this.areaId = areaId;
     }

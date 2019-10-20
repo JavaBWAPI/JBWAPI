@@ -37,19 +37,23 @@ public final class Base {
     private Position center;
     private boolean isStartingLocation = false;
 
+    private final Asserter asserter;
+
     Base(
             final Area area,
             final TilePosition location,
             final List<Resource> assignedResources,
-            final List<Mineral> blockingMinerals) {
+            final List<Mineral> blockingMinerals,
+            final Asserter asserter) {
         this.area = area;
         this.location = location;
         this.center = BwemExt.centerOfBuilding(location, UnitType.Terran_Command_Center.tileSize());
         this.blockingMinerals = blockingMinerals;
+        this.asserter = asserter;
 
         //        bwem_assert(!AssignedResources.empty());
         if (assignedResources.isEmpty()) {
-            throw new IllegalArgumentException();
+            asserter.throwIllegalStateException("");
         }
 
         for (final Resource assignedResource : assignedResources) {
@@ -141,7 +145,7 @@ public final class Base {
     public void onMineralDestroyed(final Mineral mineral) {
         //    	bwem_assert(pMineral);
         if (mineral == null) {
-            throw new IllegalArgumentException();
+            asserter.throwIllegalStateException("");
         }
 
         this.minerals.remove(mineral);

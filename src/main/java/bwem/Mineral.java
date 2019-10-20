@@ -24,8 +24,7 @@ public final class Mineral extends Resource {
 
         //        bwem_assert(Type().isMineralField());
         if (!unit.getType().isMineralField()) {
-            throw new IllegalArgumentException(
-                    "Unit is not a MineralPatch: " + unit.getClass().getName());
+            map.asserter.throwIllegalStateException("Unit is not a MineralPatch: " + unit.getType());
         }
     }
 

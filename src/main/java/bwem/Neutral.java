@@ -28,7 +28,7 @@ import java.util.List;
 public abstract class Neutral {
     private final Unit bwapiUnit;
     private final Position pos;
-    private final TilePosition topLeft;
+    protected TilePosition topLeft;
     private final TilePosition tileSize;
     private final BWMap map;
     private Neutral nextStacked = null;
@@ -103,7 +103,7 @@ public abstract class Neutral {
 
     void setBlocking(final List<WalkPosition> blockedAreas) {
         if (!(this.blockedAreas.isEmpty() && !blockedAreas.isEmpty())) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
         this.blockedAreas = blockedAreas;
     }
@@ -143,12 +143,12 @@ public abstract class Neutral {
     }
 
     private boolean isSameUnitTypeAs(Neutral neutral) {
-        return this.getUnit().getClass().getName().equals(neutral.getUnit().getClass().getName());
+        return this.getUnit().getType() == neutral.getUnit().getType();
     }
 
     private void putOnTiles() {
         if (!(getNextStacked() == null)) {
-            throw new IllegalStateException();
+            map.asserter.throwIllegalStateException("");
         }
 
         for (int dy = 0; dy < getSize().getY(); ++dy)
@@ -159,28 +159,32 @@ public abstract class Neutral {
                     deltaTile.addNeutral(this);
                 } else {
                     final Neutral topNeutral = deltaTile.getNeutral().getLastStacked();
+                    // https://github.com/N00byEdge/BWEM-community/issues/30#issuecomment-400840140
+                    if (!topNeutral.getTopLeft().equals(getTopLeft()) || !topNeutral.getBottomRight().equals(getBottomRight())) {
+                        continue;
+                    }
                     if (this.equals(deltaTile.getNeutral())) {
-                        throw new IllegalStateException();
+                        map.asserter.throwIllegalStateException("");
                     } else if (this.equals(topNeutral)) {
-                        throw new IllegalStateException();
+                        map.asserter.throwIllegalStateException("");
                     } else if (topNeutral.getClass().getName().equals(Geyser.class.getName())) {
-                        throw new IllegalStateException();
+                        map.asserter.throwIllegalStateException("");
                     } else if (!topNeutral.isSameUnitTypeAs(this)) {
                         //                    bwem_assert_plus(pTop->Type() == Type(), "stacked neutrals have
-                        throw new IllegalStateException(
+                        map.asserter.throwIllegalStateException(
                                 "Stacked Neutral objects have different types: top="
                                         + topNeutral.getClass().getName()
                                         + ", this="
                                         + this.getClass().getName());
                     } else if (!(topNeutral.getTopLeft().equals(getTopLeft()))) {
                         //                    bwem_assert_plus(pTop->topLeft() == topLeft(), "stacked neutrals
-                        throw new IllegalStateException(
+                        map.asserter.throwIllegalStateException(
                                 "Stacked Neutral objects not aligned: top="
-                                        + topNeutral.toString()
+                                        + topNeutral.getTopLeft().toString()
                                         + ", this="
                                         + getTopLeft().toString());
                     } else if (!(dx == 0 && dy == 0)) {
-                        throw new IllegalStateException();
+                        map.asserter.throwIllegalStateException("");
                     } else {
                         topNeutral.nextStacked = this;
                         return;
@@ -199,7 +203,7 @@ public abstract class Neutral {
                 final Tile tile = getMap().getData()
                         .getTile(getTopLeft().add(new TilePosition(dx, dy)));
                 if (tile.getNeutral() == null) {
-                    throw new IllegalStateException();
+                    map.asserter.throwIllegalStateException("");
                 }
 
                 if (tile.getNeutral().equals(this)) {
@@ -213,12 +217,12 @@ public abstract class Neutral {
                         prevStacked = prevStacked.getNextStacked();
                     }
                     if (!(dx == 0 && dy == 0)) {
-                        throw new IllegalStateException();
+                        map.asserter.throwIllegalStateException("");
                     }
                     if (prevStacked != null) {
                         if (!prevStacked.isSameUnitTypeAs(this) || !(prevStacked
                             .getTopLeft().equals(getTopLeft()))) {
-                            throw new IllegalStateException();
+                            map.asserter.throwIllegalStateException("");
                         }
                         prevStacked.nextStacked = nextStacked;
                     }

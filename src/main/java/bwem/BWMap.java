@@ -35,8 +35,9 @@ public abstract class BWMap {
     TerrainData terrainData = null;
     NeutralData neutralData = null;
     Altitude highestAltitude;
+    final Asserter asserter;
 
-    BWMap(final Game game) {
+    BWMap(final Game game, final Asserter asserter) {
         this.game = game;
         this.players = game.getPlayers();
         this.mineralPatches = game.getMinerals();
@@ -44,6 +45,7 @@ public abstract class BWMap {
         this.units = game.getAllUnits();
         this.graph = new Graph(this);
         this.neighboringAreaChooser = new NeighboringAreaChooser();
+        this.asserter = asserter;
     }
 
     public TerrainData getData() {
@@ -89,7 +91,7 @@ public abstract class BWMap {
         }
 
         if (atLeastOneFailed) {
-            throw new IllegalStateException("At least one starting location was not assigned to a base.");
+            asserter.throwIllegalStateException("At least one starting location was not assigned to a base.");
         }
     }
 
@@ -143,7 +145,7 @@ public abstract class BWMap {
                 return;
             }
         }
-        throw new IllegalArgumentException("unit is not a Mineral");
+        asserter.throwIllegalStateException("unit is not a Mineral");
     }
 
     /**
@@ -271,8 +273,8 @@ public abstract class BWMap {
         }
 
         // TODO: Are we supposed to return start or not?
-        throw new IllegalStateException();
-        //        return start;
+        asserter.throwIllegalStateException("");
+        return start;
     }
 
     public TilePosition breadthFirstSearch(TilePosition start, Pred<Tile, TilePosition> findCond, Pred<Tile, TilePosition> visitCond) {
@@ -330,8 +332,8 @@ public abstract class BWMap {
         }
 
         // TODO: Are we supposed to return start or not?
-        throw new IllegalStateException();
-        //        return start;
+        asserter.throwIllegalStateException("");
+        return start;
     }
 
     public WalkPosition breadthFirstSearch(
@@ -368,7 +370,7 @@ public abstract class BWMap {
     void setAreaIdInTile(final TilePosition t) {
         final Tile tile = getData().getTile(t);
         if (!(tile.getAreaId().intValue() == 0)) { // initialized to 0
-            throw new IllegalStateException();
+            asserter.throwIllegalStateException("");
         }
 
         for (int dy = 0; dy < 4; ++dy) {
