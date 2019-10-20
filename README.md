@@ -56,7 +56,7 @@ allprojects {
 Add JBWAPI as a dependency:
 ```
 dependencies {
-    implementation 'com.github.JavaBWAPI:JBWAPI:0.8'
+    implementation 'com.github.JavaBWAPI:JBWAPI:1.0.0'
 }
 ```
 
