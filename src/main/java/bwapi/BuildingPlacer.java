@@ -43,8 +43,8 @@ class BuildingPlacer {
         Region pTargRegion = null;
         switch (type) {
             case Protoss_Pylon:
-                final Unit pSpecialUnitTarget = game.getClosestUnitInRadius(
-                        desiredPosition.toPosition(), 999999, u -> u.getPlayer().equals(game.self()) && !u.isPowered());
+                final Unit pSpecialUnitTarget = game.getClosestUnit(
+                        desiredPosition.toPosition(), u -> u.getPlayer().equals(game.self()) && !u.isPowered());
                 if (pSpecialUnitTarget != null) {
                     desiredPosition = pSpecialUnitTarget.getPosition().toTilePosition();
                     trimPlacement = false;
@@ -74,13 +74,11 @@ class BuildingPlacer {
             desiredPosition = pTargRegion.getCenter().toTilePosition();
         }
         // Find the best position
-        int bestDistance;
-        int fallbackDistance;
-        TilePosition bestPosition;
-        TilePosition fallbackPosition;
+        int bestDistance = 999999;
+        int fallbackDistance = 999999;
+        TilePosition bestPosition = TilePosition.None;
+        TilePosition fallbackPosition = TilePosition.None;
 
-        bestDistance = fallbackDistance = 999999;
-        bestPosition = fallbackPosition = TilePosition.None;
         for (int passCount = 0; passCount < (pTargRegion != null ? 2 : 1); ++passCount) {
             for (int y = 0; y < MAX_RANGE; ++y) {
                 for (int x = 0; x < MAX_RANGE; ++x) {
@@ -90,7 +88,7 @@ class BuildingPlacer {
                     }
                     final TilePosition currentPosition = new TilePosition(x, y).add(centerPosition);
                     //Broodwar->getGroundDistance( desiredPosition, currentPosition );
-                    final int currentDistance = desiredPosition.toPosition().getApproxDistance(currentPosition.toPosition());
+                    final int currentDistance = desiredPosition.getApproxDistance(currentPosition);
                     if (currentDistance < bestDistance) {
                         if (currentDistance <= maxRange) {
                             bestDistance = currentDistance;
@@ -101,21 +99,21 @@ class BuildingPlacer {
                         }
                     }
                 }
-                // Break pass if position is found
-                if (bestPosition != TilePosition.None) {
-                    break;
-                }
+            }
+            // Break pass if position is found
+            if (!bestPosition.equals(TilePosition.None)) {
+                break;
+            }
 
-                // Break if an alternative position was found
-                if (fallbackPosition != TilePosition.None) {
-                    bestPosition = fallbackPosition;
-                    break;
-                }
+            // Break if an alternative position was found
+            if (!fallbackPosition.equals(TilePosition.None)) {
+                bestPosition = fallbackPosition;
+                break;
+            }
 
-                // If we were really targetting a region, and couldn't find a position above
-                if (pTargRegion != null) { // Then fallback to the default build position
-                    desiredPosition = centerPosition;
-                }
+            // If we were really targetting a region, and couldn't find a position above
+            if (pTargRegion != null) { // Then fallback to the default build position
+                desiredPosition = centerPosition;
             }
         }
 
@@ -161,7 +159,7 @@ class BuildingPlacer {
                 //if ( !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
                 //}
-            break;
+                break;
             case Terran_Missile_Turret:  // @TODO
             case Protoss_Photon_Cannon:
                 //reserveTurretPlacement();
@@ -170,7 +168,7 @@ class BuildingPlacer {
                 //if ( creep || !GetBunkerPlacement() ){
                 //reserveTurretPlacement();
                 // }
-            break;
+                break;
             default:
                 if (!type.isResourceDepot()) {
                     ReserveDefault(reserve, type, desiredPosition, game);
@@ -195,7 +193,7 @@ class BuildingPlacer {
     }
 
     private static void RemoveDisconnected(final PlacementReserve reserve, final TilePosition desiredPosition, final Game game) {
-        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE)).divide(2);
+        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
 
         // Assign 0 to all locations that aren't connected
         reserve.iterate((pr, x, y) -> {
@@ -206,7 +204,7 @@ class BuildingPlacer {
     }
 
     private static void ReserveGroundHeight(final PlacementReserve reserve, final TilePosition desiredPosition, final Game game) {
-        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE)).divide(2);
+        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
 
         // Exclude locations with a different ground height, but restore a backup in case there are no more build locations
         reserve.backup();
@@ -447,11 +445,15 @@ class BuildingPlacer {
         }
 
         void backup() {
-            System.arraycopy(data, 0, save, 0, data.length);
+            for (int i = 0; i < MAX_RANGE; i++) {
+                System.arraycopy(data[i], 0, save[i], 0, MAX_RANGE);
+            }
         }
 
         void restore() {
-            System.arraycopy(save, 0, data, 0, save.length);
+            for (int i = 0; i < MAX_RANGE; i++) {
+                System.arraycopy(save[i], 0, data[i], 0, MAX_RANGE);
+            }
         }
 
         void restoreIfInvalid() {

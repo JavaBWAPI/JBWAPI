@@ -5,18 +5,11 @@ import sun.nio.ch.DirectBuffer;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
  */
 class WrappedBuffer {
-    private static final Charset charSet = StandardCharsets.ISO_8859_1;
-    private static final CharsetEncoder enc = charSet.newEncoder();
-
     private final ByteBuffer buffer;
     private final long address;
     private final Unsafe unsafe;
@@ -32,8 +25,7 @@ class WrappedBuffer {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
             return (Unsafe) theUnsafe.get(null);
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -72,23 +64,26 @@ class WrappedBuffer {
     }
 
     String getString(final int offset, final int maxLen) {
-        final byte[] buf = new byte[maxLen];
-
-        unsafe.copyMemory(null, address + offset, buf, Unsafe.ARRAY_BYTE_BASE_OFFSET, maxLen);
-
-        int len = 0;
-        while (len < maxLen && buf[len] != 0) {
-            ++len;
+        char[] buf = new char[maxLen];
+        long pos = offset + address;
+        for (int i = 0; i < maxLen; i++) {
+            byte b = unsafe.getByte(pos);
+            if (b == 0) break;
+            buf[i] = (char) (b & 0xff);
+            pos++;
         }
-        return new String(buf, 0, len, charSet);
+        return new String(buf, 0, (int) (pos - offset - address));
     }
 
     void putString(final int offset, final int maxLen, final String string) {
         if (string.length() + 1 >= maxLen) {
             throw new StringIndexOutOfBoundsException();
         }
-        buffer.position(offset);
-        enc.encode(CharBuffer.wrap(string), buffer, true);
-        buffer.put((byte) 0);
+        long pos = offset + address;
+        for (int i = 0; i < string.length(); i++) {
+            unsafe.putByte(pos, (byte) string.charAt(i));
+            pos++;
+        }
+        unsafe.putByte(pos, (byte) 0);
     }
 }

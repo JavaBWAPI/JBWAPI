@@ -1,7 +1,7 @@
 package bwapi;
 
 
-public class Position extends Point {
+public class Position extends Point<Position> {
 
     public static final int SIZE_IN_PIXELS = 1;
     public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
@@ -13,29 +13,8 @@ public class Position extends Point {
         super(x, y, SIZE_IN_PIXELS);
     }
 
-  Position(ClientData.Position position) {
-    this(position.getX(), position.getY());
-  }
-
-  private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
-        int max = Math.abs(x1 - x2);
-        int min = Math.abs(y1 - y2);
-        if (max < min) {
-            final int temp = min;
-            min = max;
-            max = temp;
-        }
-
-        if (min <= (max >> 2)) {
-            return max;
-        }
-
-        final int minCalc = (3 * min) >> 3;
-        return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
-    }
-
-    public int getApproxDistance(final Position position) {
-        return getApproxDistance(x, y, position.x, position.y);
+    Position(ClientData.Position position) {
+        this(position.getX(), position.getY());
     }
 
     public TilePosition toTilePosition() {
@@ -60,9 +39,5 @@ public class Position extends Point {
 
     public Position multiply(final int multiplier) {
         return new Position(x * multiplier, y * multiplier);
-    }
-
-    public double getDistance(final Position position) {
-        return getDistance(position.x, position.y);
     }
 }

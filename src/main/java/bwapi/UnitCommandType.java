@@ -1,5 +1,10 @@
 package bwapi;
 
+/**
+ * A representation of a unit command in BWAPI. This is used by bots to
+ * notify BWAPI which commands to use. BWAPI filters commands accordingly and then converts
+ * them to Broodwar commands, which differ in complexity.
+ */
 public enum UnitCommandType {
     Attack_Move(0),
     Attack_Unit(1),

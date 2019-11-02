@@ -1,20 +1,24 @@
 package bwapi;
 
+/**
+ * Convenience class that extends all methods in {@link BWEventListener}.
+ * Not all of the methods need an implementation.
+ */
 public class DefaultBWListener implements BWEventListener {
 
     public void onStart() {
     }
 
-    public void onEnd(final boolean b) {
+    public void onEnd(final boolean isWinner) {
     }
 
     public void onFrame() {
     }
 
-    public void onSendText(final String s) {
+    public void onSendText(final String text) {
     }
 
-    public void onReceiveText(final Player player, final String s) {
+    public void onReceiveText(final Player player, final String text) {
     }
 
     public void onPlayerLeft(final Player player) {
@@ -47,7 +51,7 @@ public class DefaultBWListener implements BWEventListener {
     public void onUnitRenegade(final Unit unit) {
     }
 
-    public void onSaveGame(final String s) {
+    public void onSaveGame(final String text) {
     }
 
     public void onUnitComplete(final Unit unit) {

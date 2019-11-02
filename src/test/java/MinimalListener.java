@@ -1,5 +1,5 @@
-import bwapi.DefaultBWListener;
 import bwapi.BWClient;
+import bwapi.DefaultBWListener;
 import bwapi.Game;
 import bwapi.Player;
 

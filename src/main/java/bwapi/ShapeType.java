@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Used in {@link UnitCommand}
+ */
 enum ShapeType {
     None(0),
     Text(1),
@@ -21,6 +24,6 @@ enum ShapeType {
     final int id;
 
     ShapeType(final int id) {
-      this.id = id;
+        this.id = id;
     }
 }

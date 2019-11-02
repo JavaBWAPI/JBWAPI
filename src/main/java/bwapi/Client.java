@@ -45,7 +45,7 @@ class Client {
             + 4 // LastKeepAliveTime
             ;
     private static final List<Integer> SUPPORTED_BWAPI_VERSIONS = Arrays.asList(10003);
-    private static final int MAX_COUNT = 19999;
+    static final int MAX_COUNT = 19999;
 
     private static final int maxNumGames = 8;
     private static final int gameTableSize = GAME_SIZE * maxNumGames;
@@ -69,6 +69,13 @@ class Client {
             }
         }
         throw new Exception("All servers busy!");
+    }
+
+    /**
+     * For test purposes only
+     */
+    Client(ByteBuffer buffer) {
+        data = new ClientData(buffer).new GameData(0);
     }
 
     public GameData data() {
@@ -124,7 +131,7 @@ class Client {
 
     int addString(final String s) {
         int stringCount = data.getStringCount();
-        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
+        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many strings!");
         data.setStringCount(stringCount + 1);
         data.setStrings(stringCount, s);
         return stringCount;

@@ -6,7 +6,7 @@ class EventHandler implements Client.EventHandler {
     private final Game game;
     private final Client client;
 
-    public EventHandler(final BWEventListener eventListener, final Client client) {
+    EventHandler(final BWEventListener eventListener, final Client client) {
         this.eventListener = eventListener;
         this.game = new Game(client);
         this.client = client;
@@ -49,8 +49,6 @@ class EventHandler implements Client.EventHandler {
                 game.unitCreate(event.getV1());
                 u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
-                u.updateType(frames);
-                u.updatePlayer(frames);
                 eventListener.onUnitDiscover(u);
                 break;
             case UnitEvade:
@@ -62,8 +60,6 @@ class EventHandler implements Client.EventHandler {
                 game.unitShow(event.getV1());
                 u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
-                u.updateType(frames);
-                u.updatePlayer(frames);
                 eventListener.onUnitShow(u);
                 break;
             case UnitHide:
@@ -75,8 +71,6 @@ class EventHandler implements Client.EventHandler {
                 game.unitCreate(event.getV1());
                 u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
-                u.updateType(frames);
-                u.updatePlayer(frames);
                 eventListener.onUnitCreate(u);
                 break;
             case UnitDestroy:
@@ -87,19 +81,15 @@ class EventHandler implements Client.EventHandler {
             case UnitMorph:
                 u = game.getUnit(event.getV1());
                 u.updatePosition(frames);
-                u.updateType(frames);
-                u.updatePlayer(frames);
                 eventListener.onUnitMorph(u);
                 break;
             case UnitRenegade:
                 u = game.getUnit(event.getV1());
-                u.updatePlayer(frames);
                 eventListener.onUnitRenegade(u);
                 break;
             case UnitComplete:
                 game.unitCreate(event.getV1());
                 u = game.getUnit(event.getV1());
-                u.updatePlayer(frames);
                 eventListener.onUnitComplete(u);
                 break;
         }

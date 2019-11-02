@@ -59,7 +59,7 @@ public final class ChokePoint {
         final List<WalkPosition> geometry,
         final Neutral blockingNeutral) {
         if (geometry.isEmpty()) {
-            throw new IllegalArgumentException();
+            graph.getMap().asserter.throwIllegalStateException("");
         }
 
         this.graph = graph;
@@ -186,7 +186,7 @@ public final class ChokePoint {
      */
     public WalkPosition getNodePosition(final Node node) {
         if (!(node.ordinal() < Node.NODE_COUNT.ordinal())) {
-            throw new IllegalArgumentException();
+            graph.getMap().asserter.throwIllegalStateException("");
         }
         return this.nodes[node.ordinal()];
     }
@@ -197,7 +197,7 @@ public final class ChokePoint {
      */
     public WalkPosition getNodePositionInArea(final Node node, final Area area) {
         if (!(area.equals(this.areas.getLeft()) || area.equals(this.areas.getRight()))) {
-            throw new IllegalArgumentException();
+            graph.getMap().asserter.throwIllegalStateException("");
         }
         return area.equals(areas.getLeft())
                 ? this.nodesInArea.get(node.ordinal()).getLeft()
@@ -275,7 +275,7 @@ public final class ChokePoint {
 
     void onBlockingNeutralDestroyed(final Neutral pBlocking) {
         if (!(pBlocking != null && pBlocking.isBlocking())) {
-            throw new IllegalStateException();
+            graph.getMap().asserter.throwIllegalStateException("");
         }
 
         if (pBlocking.equals(this.blockingNeutral)) {

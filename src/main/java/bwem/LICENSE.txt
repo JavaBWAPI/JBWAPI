@@ -1,6 +1,6 @@
 // Original work Copyright (c) 2015, 2017, Igor Dimitrijevic 
 // Modified work Copyright (c) 2017-2018 OpenBW Team
-// Modified work Copyright (c) 2018 Jasper
+// Modified work Copyright (c) 2018- JavaBWAPI
 
 // (MIT/X11 License)
 // Copyright (c) 2015, 2017, Igor Dimitrijevic

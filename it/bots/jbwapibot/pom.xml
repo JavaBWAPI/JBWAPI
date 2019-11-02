@@ -9,7 +9,7 @@
   <parent>
     <groupId>jbwapi.it</groupId>
     <artifactId>bots</artifactId>
-    <version>0.7</version>
+    <version>1.0.0</version>
   </parent>
 
   <artifactId>MarineHell</artifactId>
@@ -26,7 +26,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>MarineHell</mainClass>
+              <mainClass>marinehell.MarineHell</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

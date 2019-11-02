@@ -7,6 +7,12 @@ import java.util.List;
 import static bwapi.Order.*;
 
 
+/**
+ * The {@link TechType} (or Technology Type, also referred to as an Ability) represents a Unit's ability
+ * which can be researched with {@link Unit#research} or used with {@link Unit#useTech}.
+ * <p>
+ * In order for a {@link Unit} to use its own specialized ability, it must first be available and researched.
+ */
 public enum TechType {
     Stim_Packs(0),
     Lockdown(1),
@@ -50,11 +56,15 @@ public enum TechType {
 
     /// IMPLEMENTATION
     private static final int[] defaultOreCost =         // Same as default gas cost
-            {100, 200, 200, 100, 0, 150, 0, 200, 100, 150, 100, 100, 0, 100, 0, 200, 100, 100, 0, 200, 150, 150, 150, 0, 100, 200, 0, 200, 0, 100, 100, 100, 200};
+            {100, 200, 200, 100, 0, 150, 0, 200, 100, 150, 100, 100, 0, 100, 0, 200, 100, 100, 0, 200, 150, 150, 150, 0,
+                    100, 200, 0, 200, 0, 100, 100, 100, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private static final int[] defaultTimeCost =
-            {1200, 1500, 1800, 1200, 0, 1200, 0, 1200, 1800, 1500, 1200, 1200, 0, 1200, 0, 1500, 1500, 1200, 0, 1800, 1200, 1800, 1500, 0, 1200, 1200, 0, 1800, 0, 1800, 1800, 1500, 1800};
+            {1200, 1500, 1800, 1200, 0, 1200, 0, 1200, 1800, 1500, 1200, 1200, 0, 1200, 0, 1500, 1500, 1200, 0, 1800,
+                    1200, 1800, 1500, 0, 1200, 1200, 0, 1800, 0, 1800, 1800, 1500, 1800, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0};
     private static final int[] defaultEnergyCost =
-            {0, 100, 100, 0, 50, 0, 100, 75, 150, 25, 25, 0, 0, 150, 100, 150, 0, 75, 75, 75, 100, 150, 100, 0, 50, 125, 0, 150, 0, 50, 75, 100, 0, 0, 1};
+            {0, 100, 100, 0, 50, 0, 100, 75, 150, 25, 25, 0, 0, 150, 100, 150, 0, 75, 75, 75, 100, 150, 100, 0, 50, 125,
+                    0, 150, 0, 50, 75, 100, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private static final UnitType[] whatResearches = {
             UnitType.Terran_Academy, UnitType.Terran_Covert_Ops, UnitType.Terran_Science_Facility, UnitType.Terran_Machine_Shop,
             UnitType.None, UnitType.Terran_Machine_Shop, UnitType.None, UnitType.Terran_Science_Facility, UnitType.Terran_Physics_Lab,
@@ -87,7 +97,7 @@ public enum TechType {
             0, TARG_UNIT, TARG_BOTH, TARG_POS, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, 0, 0, 0,
             TARG_UNIT, TARG_UNIT, TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT, TARG_BOTH, TARG_UNIT,
             TARG_BOTH, TARG_BOTH, TARG_UNIT, TARG_UNIT, TARG_BOTH, 0, TARG_UNIT, TARG_UNIT, TARG_UNIT, TARG_UNIT,
-            TARG_BOTH, 0, 0, TARG_BOTH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TARG_BOTH
+            TARG_BOTH, 0, 0, TARG_BOTH, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, TARG_BOTH, 0
     };
     private static final Order[] techOrders = {
             Order.None, CastLockdown, CastEMPShockwave, PlaceMine, CastScannerSweep, Order.None, CastDefensiveMatrix,
@@ -187,50 +197,125 @@ public enum TechType {
         this.id = id;
     }
 
+    /**
+     * Retrieves the race that is required to research or use the {@link TechType}.
+     * <p>
+     * There is an exception where @Infested_Kerrigan can use @Psi_Storm. This does not
+     * apply to the behavior of this function.
+     *
+     * @return {@link Race} object indicating which race is designed to use this technology type.
+     */
     public Race getRace() {
         return techRaces[id];
     }
 
+    /**
+     * Retrieves the mineral cost of researching this technology.
+     *
+     * @return Amount of minerals needed in order to research this technology.
+     */
     public int mineralPrice() {
         return defaultOreCost[id];
     }
 
+    /**
+     * Retrieves the vespene gas cost of researching this technology.
+     *
+     * @return Amount of vespene gas needed in order to research this technology.
+     */
     public int gasPrice() {
         return mineralPrice();
     }
 
+    /**
+     * Retrieves the number of frames needed to research the tech type.
+     *
+     * @return The time, in frames, it will take for the research to complete.
+     * @see Unit#getRemainingResearchTime
+     */
     public int researchTime() {
         return defaultTimeCost[id];
     }
 
+    /**
+     * Retrieves the amount of energy needed to use this {@link TechType} as an ability.
+     *
+     * @return Energy cost of the ability.
+     * @see Unit#getEnergy
+     */
     public int energyCost() {
         return defaultEnergyCost[id];
     }
 
+    /**
+     * Retrieves the {@link UnitType} that can research this technology.
+     *
+     * @return UnitType that is able to research the technology in the game.
+     * Returns {@link UnitType#None} If the technology/ability is either provided for free or never
+     * available.
+     */
     public UnitType whatResearches() {
         return whatResearches[id];
     }
 
+    /**
+     * Retrieves the Weapon that is attached to this tech type.
+     * A technology's {@link WeaponType} is used to indicate the range and behaviour of the ability
+     * when used by a Unit.
+     *
+     * @return WeaponType containing information about the ability's behavior.
+     * Returns {@link WeaponType#None} If there is no corresponding WeaponType.
+     */
     public WeaponType getWeapon() {
         return techWeapons[id];
     }
 
+    /**
+     * Checks if this ability can be used on other units.
+     *
+     * @return true if the ability can be used on other units, and false if it can not.
+     */
     public boolean targetsUnit() {
         return (techTypeFlags[id] & TARG_UNIT) != 0;
     }
 
+    /**
+     * Checks if this ability can be used on the terrain (ground).
+     *
+     * @return true if the ability can be used on the terrain.
+     */
     public boolean targetsPosition() {
         return (techTypeFlags[id] & TARG_POS) != 0;
     }
 
-    public List<UnitType> whatsUses() {
+    /**
+     * Retrieves the set of all UnitTypes that are capable of using this ability.
+     *
+     * @return Set of UnitTypes that can use this ability when researched.
+     */
+    public List<UnitType> whatUses() {
         return Collections.unmodifiableList(Arrays.asList(techWhatUses[id]));
     }
 
+    /**
+     * Retrieves the {@link Order} that a Unit uses when using this ability.
+     *
+     * @return {@link Order} representing the action a Unit uses to perform this ability
+     */
     public Order getOrder() {
         return techOrders[id];
     }
 
+    /**
+     * Retrieves the {@link UnitType} required to research this technology.
+     * The required unit type must be a completed unit owned by the player researching the
+     * technology.
+     *
+     * @return {@link UnitType} that is needed to research this tech type.
+     * Returns {@link UnitType#None} if no unit is required to research this tech type.
+     * @see Player#completedUnitCount
+     * @since 4.1.2
+     */
     public UnitType requiredUnit() {
         return this == Lurker_Aspect ? UnitType.Zerg_Lair : UnitType.None;
     }

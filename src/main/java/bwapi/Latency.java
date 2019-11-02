@@ -2,6 +2,11 @@ package bwapi;
 
 import java.util.Arrays;
 
+/**
+ * Contains enumeration of known latency values.
+ *
+ * @see Game#getLatency
+ */
 public enum Latency {
 
     SinglePlayer(2),
@@ -12,15 +17,15 @@ public enum Latency {
     BattlenetMedium(19),
     BattlenetHigh(24);
 
-    final int id;
-
-    Latency(final int id) {
-        this.id = id;
-    }
-
     static final Latency[] idToEnum = new Latency[24 + 1];
 
     static {
         Arrays.stream(Latency.values()).forEach(v -> idToEnum[v.id] = v);
+    }
+
+    final int id;
+
+    Latency(final int id) {
+        this.id = id;
     }
 }

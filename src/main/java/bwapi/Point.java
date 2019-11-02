@@ -1,13 +1,13 @@
 package bwapi;
 
-class Point {
+public abstract class Point<T extends Point> implements Comparable<Point> {
     static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;
     public final int y;
     private final int scalar;
 
-    Point(final int x, final int y, final int type) {
+    protected Point(final int x, final int y, final int type) {
         this.x = x;
         this.y = y;
         this.scalar = type;
@@ -29,19 +29,48 @@ class Point {
         return "[" + x + ", " + y + "]";
     }
 
-    protected double getDistance(final int x, final int y) {
-        final int dx = x - this.x;
-        final int dy = y - this.y;
+    public double getDistance(T point) {
+        final int dx = point.x - this.x;
+        final int dy = point.y - this.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    public boolean equals(final Object o) {
-        if (o != null && this.getClass().equals(o.getClass())) {
-            final Point point = (Point) o;
-            return x == point.x && y == point.y;
+    private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
+        int max = Math.abs(x1 - x2);
+        int min = Math.abs(y1 - y2);
+        if (max < min) {
+            final int temp = min;
+            min = max;
+            max = temp;
         }
-        return false;
 
+        if (min <= (max >> 2)) {
+            return max;
+        }
+
+        final int minCalc = (3 * min) >> 3;
+        return (minCalc >> 5) + minCalc + max - (max >> 4) - (max >> 6);
+    }
+
+    public int getApproxDistance(final T point) {
+        return getApproxDistance(x, y, point.x, point.y);
+    }
+
+    public abstract T subtract(T other);
+
+    public abstract T add(T other);
+
+    public abstract T divide(int divisor);
+
+    public abstract T multiply(int multiplier);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point point = (Point) o;
+        return x == point.x &&
+                y == point.y;
     }
 
     /**
@@ -53,7 +82,16 @@ class Point {
                 scalar * y < game.mapPixelHeight();
     }
 
+    @Override
     public int hashCode() {
         return (x << 16) ^ y;
+    }
+
+    @Override
+    public int compareTo(Point o) {
+        if (scalar == o.scalar) {
+            return hashCode() - o.hashCode();
+        }
+        return scalar - o.scalar;
     }
 }

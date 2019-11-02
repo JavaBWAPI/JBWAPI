@@ -2,6 +2,9 @@ package bwapi;
 
 import java.util.Objects;
 
+/**
+ * Client class to connect to the game with.
+ */
 public class BWClient {
     private final BWEventListener eventListener;
 
@@ -14,10 +17,16 @@ public class BWClient {
         this.eventListener = eventListener;
     }
 
+    /**
+     * Get the {@link Game} instance of the currently running game.
+     */
     public Game getGame() {
         return handler == null ? null : handler.getGame();
     }
 
+    /**
+     * Start the game.
+     */
     public void startGame() {
         while (client == null) {
             try {

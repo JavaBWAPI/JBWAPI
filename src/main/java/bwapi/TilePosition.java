@@ -1,6 +1,6 @@
 package bwapi;
 
-public class TilePosition extends Point {
+public class TilePosition extends Point<TilePosition> {
 
     public static final int SIZE_IN_PIXELS = 32;
     public static final TilePosition Invalid = new TilePosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
@@ -38,9 +38,5 @@ public class TilePosition extends Point {
 
     public TilePosition multiply(final int multiplier) {
         return new TilePosition(x * multiplier, y * multiplier);
-    }
-
-    public double getDistance(final TilePosition position) {
-        return getDistance(position.x, position.y);
     }
 }

@@ -20,4 +20,13 @@ public class PointTest {
 
 		assertNotEquals(new TilePosition(1, 1), null);
 	}
+
+	@Test
+	public void pointDistanceAccesibleTest() {
+		TilePosition tp = TilePosition.Origin;
+
+		assertEquals(0, tp.getApproxDistance(tp));
+		assertEquals(0, tp.getDistance(tp), 0.001);
+		assertEquals(0 , tp.getLength(), 0.001);
+	}
 }

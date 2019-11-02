@@ -1,6 +1,6 @@
 package bwapi;
 
-public class WalkPosition extends Point {
+public class WalkPosition extends Point<WalkPosition> {
 
     public static final int SIZE_IN_PIXELS = 8;
     public static final WalkPosition Invalid = new WalkPosition(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);
@@ -34,9 +34,5 @@ public class WalkPosition extends Point {
 
     public WalkPosition multiply(final int multiplier) {
         return new WalkPosition(x * multiplier, y * multiplier);
-    }
-
-    public double getDistance(final WalkPosition position) {
-        return getDistance(position.x, position.y);
     }
 }

@@ -1,5 +1,10 @@
 package bwapi;
 
+/**
+ * An enumeration of keyboard input values.
+ *
+ * @see Game#getKeyState
+ */
 public enum Key {
     K_LBUTTON(1),
     K_RBUTTON(2),
@@ -230,9 +235,9 @@ public enum Key {
     K_PA1(253),
     K_OEM_CLEAR(254);
 
-    final int value;
+    final int id;
 
-    Key(final int value) {
-        this.value = value;
+    Key(final int id) {
+        this.id = id;
     }
 }

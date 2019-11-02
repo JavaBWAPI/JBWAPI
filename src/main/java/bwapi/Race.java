@@ -5,6 +5,16 @@ import java.util.Arrays;
 
 import static bwapi.UnitType.*;
 
+/**
+ * The {@link Race} enum is used to get information about a particular race.
+ * <p>
+ * For example, the default worker and supply provider {@link UnitType}.
+ * <p>
+ * As you should already know, Starcraft has three races: @Terran , @Protoss , and @Zerg .
+ *
+ * @see UnitType#getRace
+ * @see Player#getRace
+ */
 public enum Race {
     Zerg(0),
     Terran(1),
@@ -16,7 +26,6 @@ public enum Race {
     None(7),
     Unknown(8);
 
-    public static final Race[] races = new Race[8 + 1];
     static final UnitType[] workerTypes = {
             Zerg_Drone, Terran_SCV, Protoss_Probe,
             UnitType.None, UnitType.None, UnitType.None, // unused
@@ -43,8 +52,10 @@ public enum Race {
             UnitType.Unknown, UnitType.None, UnitType.Unknown // random, none, unk
     };
 
+    static final Race[] idToEnum = new Race[8 + 1];
+
     static {
-        Arrays.stream(Race.values()).forEach(v -> races[v.id] = v);
+        Arrays.stream(Race.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
     final int id;
@@ -53,29 +64,76 @@ public enum Race {
         this.id = id;
     }
 
+    /**
+     * Retrieves the default worker type for this {@link Race}.
+     * <p>
+     * In Starcraft, workers are the units that are used to construct structures.
+     *
+     * @return {@link UnitType} of the worker that this race uses.
+     */
     public UnitType getWorker() {
         return workerTypes[id];
     }
 
-    // DATA
-
-    //@since 4.2.0
+    /**
+     * Retrieves the default resource depot {@link UnitType} that workers of this race can
+     * construct and return resources to.
+     * <p>
+     * In Starcraft, the center is the very first structure of the Race's technology
+     * tree. Also known as its base of operations or resource depot.
+     *
+     * @return {@link UnitType} of the center that this race uses.
+     * @since 4.2.0
+     */
     public UnitType getResourceDepot() {
         return baseTypes[id];
     }
 
+    /**
+     * Deprecated. Use getResourceDepot instead.
+     *
+     * @deprecated As of 4.2.0 due to naming inconsistency. Use #getResourceDepot instead.
+     * See https://github.com/bwapi/bwapi/issues/621 for more information.
+     */
+    @Deprecated
     public UnitType getCenter() {
         return getResourceDepot();
     }
 
+    /**
+     * Retrieves the default structure UnitType for this Race that is used to harvest gas from @Geysers.
+     * <p>
+     * In Starcraft, you must first construct a structure over a @Geyser in order to
+     * begin harvesting Vespene Gas.
+     *
+     * @return {@link UnitType} of the structure used to harvest gas.
+     */
     public UnitType getRefinery() {
         return refineryTypes[id];
     }
 
+    /**
+     * Retrieves the default transport {@link UnitType} for this race that is used to transport ground
+     * units across the map.
+     * <p>
+     * In Starcraft, transports will allow you to carry ground units over unpassable
+     * terrain.
+     *
+     * @return {@link UnitType} for transportation.
+     */
     public UnitType getTransport() {
         return transportTypes[id];
     }
 
+    /**
+     * Retrieves the default supply provider {@link UnitType} for this race that is used to  construct
+     * units.
+     * <p>
+     * In Starcraft, training, morphing, or warping in units requires that the player
+     * has sufficient supply available for their Race.
+     *
+     * @return {@link UnitType} that provides the player with supply.
+     */
     public UnitType getSupplyProvider() {
         return supplyTypes[id];
     }

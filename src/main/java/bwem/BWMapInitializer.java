@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 class BWMapInitializer extends BWMap {
-    BWMapInitializer(final Game game) {
-        super(game);
+    BWMapInitializer(final Game game, final Asserter asserter) {
+        super(game, asserter);
     }
 
     void initialize() {
@@ -77,7 +77,8 @@ class BWMapInitializer extends BWMap {
         final TileData tileData =
                 new TileData(
                         mapData.getTileSize().getX() * mapData.getTileSize().getY(),
-                        mapData.getWalkSize().getX() * mapData.getWalkSize().getY());
+                        mapData.getWalkSize().getX() * mapData.getWalkSize().getY(),
+                        asserter);
         super.terrainData = new TerrainData(mapData, tileData);
     }
 
@@ -212,7 +213,7 @@ class BWMapInitializer extends BWMap {
                             if (miniTile.isAltitudeMissing()) {
                                 if (updatedHighestAltitude != null
                                         && updatedHighestAltitude.intValue() > altitude.intValue()) {
-                                    throw new IllegalStateException();
+                                    asserter.throwIllegalStateException("");
                                 }
                                 updatedHighestAltitude = altitude;
                                 current.setRight(altitude);
@@ -449,7 +450,7 @@ class BWMapInitializer extends BWMap {
     private List<TempAreaInfo> computeTempAreas(
         final List<Pair<WalkPosition, MiniTile>> miniTilesByDescendingAltitude) {
         final List<TempAreaInfo> tempAreaList = new ArrayList<>();
-        tempAreaList.add(new TempAreaInfo()); // tempAreaList[0] left unused, as AreaIds are > 0
+        tempAreaList.add(new TempAreaInfo(asserter)); // tempAreaList[0] left unused, as AreaIds are > 0
 
         for (final Pair<WalkPosition, MiniTile> current : miniTilesByDescendingAltitude) {
             final WalkPosition pos = new WalkPosition(current.getLeft().getX(), current.getLeft().getY());
@@ -457,7 +458,7 @@ class BWMapInitializer extends BWMap {
 
             final Pair<AreaId, AreaId> neighboringAreas = findNeighboringAreas(pos);
             if (neighboringAreas.getLeft() == null) { // no neighboring area : creates of a new area
-                tempAreaList.add(new TempAreaInfo(new AreaId(tempAreaList.size()), cur, pos));
+                tempAreaList.add(new TempAreaInfo(new AreaId(tempAreaList.size()), cur, pos, asserter));
             } else if (neighboringAreas.getRight()
                     == null) { // one neighboring area : adds cur to the existing area
                 tempAreaList.get(neighboringAreas.getLeft().intValue()).add(cur);
@@ -569,7 +570,7 @@ class BWMapInitializer extends BWMap {
             if (tempArea.isValid()) {
                 if (tempArea.getSize() >= areaMinMiniTiles) {
                     if (!(newAreaId <= tempArea.getId().intValue())) {
-                        throw new IllegalStateException();
+                        asserter.throwIllegalStateException("");
                     }
                     if (newAreaId != tempArea.getId().intValue()) {
                         replaceAreaIds(tempArea.getWalkPositionWithHighestAltitude(), new AreaId(newAreaId));
@@ -620,7 +621,7 @@ class BWMapInitializer extends BWMap {
 
     void onBlockingNeutralDestroyed(Neutral pBlocking) {
         if (!(pBlocking != null && pBlocking.isBlocking())) {
-            throw new IllegalArgumentException();
+            asserter.throwIllegalStateException("");
         }
 
         for (Area pArea : pBlocking.getBlockedAreas())

@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The upgrade type represents a passive upgrade that can be obtained with {@link Unit#upgrade}.
+ */
 public enum UpgradeType {
     Terran_Infantry_Armor(0),
     Terran_Vehicle_Plating(1),
@@ -208,6 +211,12 @@ public enum UpgradeType {
         this.id = id;
     }
 
+    /**
+     * Retrieves the race the upgrade is for.
+     * For example, UpgradeType.Terran_Infantry_Armor.getRace() will return {@link Race#Terran}.
+     *
+     * @return {@link Race} that this upgrade belongs to.
+     */
     public Race getRace() {
         return upgradeRaces[id];
     }
@@ -216,10 +225,23 @@ public enum UpgradeType {
         return mineralPrice(1);
     }
 
+    /**
+     * Returns the mineral price for the upgrade.
+     *
+     * @param level The next upgrade level.
+     *              <p>
+     *              Upgrades start at level 0.
+     * @return The mineral cost of the upgrade for the given level.
+     */
     public int mineralPrice(final int level) {
         return defaultOreCostBase[id] + Math.max(0, level - 1) * mineralPriceFactor();
     }
 
+    /**
+     * The amount that the mineral price increases for each additional upgrade.
+     *
+     * @return The mineral cost added to the upgrade after each level.
+     */
     public int mineralPriceFactor() {
         return defaultOreCostFactor[id];
     }
@@ -228,10 +250,23 @@ public enum UpgradeType {
         return mineralPrice();
     }
 
+    /**
+     * Returns the vespene gas price for the first upgrade.
+     *
+     * @param level The next upgrade level.
+     *              <p>
+     *              Upgrades start at level 0.
+     * @return The gas cost of the upgrade for the given level.
+     */
     public int gasPrice(final int level) {
         return mineralPrice(level);
     }
 
+    /**
+     * Returns the amount that the vespene gas price increases for each additional upgrade.
+     *
+     * @return The gas cost added to the upgrade after each level.
+     */
     public int gasPriceFactor() {
         return mineralPriceFactor();
     }
@@ -240,22 +275,48 @@ public enum UpgradeType {
         return upgradeTime(1);
     }
 
+    /**
+     * Returns the number of frames needed to research the first upgrade.
+     *
+     * @param level The next upgrade level. Upgrades start at level 0.
+     * @return The time cost of the upgrade for the given level.
+     */
     public int upgradeTime(final int level) {
         return defaultTimeCostBase[id] + Math.max(0, level - 1) * upgradeTimeFactor();
     }
 
+    /**
+     * Returns the number of frames that the upgrade time increases for each additional upgrade.
+     *
+     * @return The time cost added to the upgrade after each level.
+     */
     public int upgradeTimeFactor() {
         return defaultTimeCostFactor[id];
     }
 
+    /**
+     * Returns the type of unit that researches the upgrade.
+     *
+     * @return The {@link UnitType} that is used to upgrade this type.
+     */
     public UnitType whatUpgrades() {
         return whatUpgrades[id];
     }
 
+    /**
+     * Returns the set of units that are affected by this upgrade.
+     *
+     * @return Set of unit types that passively use this upgrade type.
+     */
     public List<UnitType> whatUses() {
         return Collections.unmodifiableList(Arrays.asList(upgradeWhatUses[id]));
     }
 
+    /**
+     * Returns the maximum number of times the upgrade can be researched.
+     *
+     * @return Maximum number of times this upgrade can be upgraded.
+     */
     public int maxRepeats() {
         return defaultMaxRepeats[id];
     }
@@ -264,6 +325,13 @@ public enum UpgradeType {
         return whatsRequired(1);
     }
 
+    /**
+     * Returns the type of unit that is required for the upgrade. The player
+     * must have at least one of these units completed in order to start upgrading this upgrade.
+     *
+     * @param level The next upgrade level. Upgrades start at level 0.
+     * @return {@link UnitType} required to obtain this upgrade.
+     */
     public UnitType whatsRequired(final int level) {
         return level >= 1 && level <= 3 ? requirements[level - 1][id] : UnitType.None;
     }
