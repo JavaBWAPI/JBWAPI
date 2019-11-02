@@ -62,6 +62,7 @@ public class Unit implements Comparable<Unit> {
 
     // Don't make non-latcom users pay for latcom in memory usage
     private UnitSelf self = null;
+
     UnitSelf self() {
         if (self == null) {
             self = new UnitSelf();
@@ -384,9 +385,11 @@ public class Unit implements Comparable<Unit> {
      * target.
      */
     public int getDistance(final Position target) {
-        // If this unit does not exist or target is invalid
-        if (!exists() || target == null) {
-            return Integer.MAX_VALUE;
+        if (!exists()) {
+            throw new IllegalArgumentException(("This unit must exist to determine distances."));
+        }
+        if (target == null) {
+            throw new IllegalArgumentException(("Target must not be null."));
         }
         /////// Compute distance
 
@@ -413,9 +416,11 @@ public class Unit implements Comparable<Unit> {
     }
 
     public int getDistance(final Unit target) {
-        // If this unit does not exist or target is invalid
-        if (!exists() || target == null || !target.exists()) {
-            return Integer.MAX_VALUE;
+        if (!exists()) {
+            throw new IllegalArgumentException(("This unit must exist to determine distances."));
+        }
+        if (target == null || !target.exists()) {
+            throw new IllegalArgumentException(("Target unit must exist to be able to determine distances."));
         }
 
         // If target is the same as the source
@@ -1572,6 +1577,7 @@ public class Unit implements Comparable<Unit> {
         }
         return unitData.isGathering();
     }
+
     /**
      * Checks if this unit is currently gathering gas. That is, the unit is
      * either moving to a refinery, waiting to enter a refinery, harvesting from the refinery, or
