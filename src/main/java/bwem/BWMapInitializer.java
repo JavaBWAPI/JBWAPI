@@ -432,7 +432,7 @@ class BWMapInitializer extends BWMap {
         final List<Pair<WalkPosition, MiniTile>> miniTilesByDescendingAltitude =
                 new ArrayList<>();
 
-        for (int y = 0; y < getData().getMapData().getWalkSize().getY(); ++y)
+        for (int y = 0; y < getData().getMapData().getWalkSize().getY(); ++y) {
             for (int x = 0; x < getData().getMapData().getWalkSize().getX(); ++x) {
                 final WalkPosition w = new WalkPosition(x, y);
                 final MiniTile miniTile = getData().getMiniTile(w, CheckMode.NO_CHECK);
@@ -440,6 +440,7 @@ class BWMapInitializer extends BWMap {
                     miniTilesByDescendingAltitude.add(new Pair<>(w, miniTile));
                 }
             }
+        }
 
         miniTilesByDescendingAltitude.sort(MiniTile.BY_ALTITUDE_ORDER);
         Collections.reverse(miniTilesByDescendingAltitude);
@@ -593,7 +594,7 @@ class BWMapInitializer extends BWMap {
     private void setLowestAltitudeInTile(final TilePosition t) {
         Altitude lowestAltitude = new Altitude(Integer.MAX_VALUE);
 
-        for (int dy = 0; dy < 4; ++dy)
+        for (int dy = 0; dy < 4; ++dy) {
             for (int dx = 0; dx < 4; ++dx) {
                 final Altitude altitude =
                         getData()
@@ -605,6 +606,7 @@ class BWMapInitializer extends BWMap {
                     lowestAltitude = altitude;
                 }
             }
+        }
 
         getData().getTile(t).setLowestAltitude(lowestAltitude);
     }
@@ -620,14 +622,18 @@ class BWMapInitializer extends BWMap {
     }
 
     void onBlockingNeutralDestroyed(Neutral pBlocking) {
-        if (!(pBlocking != null && pBlocking.isBlocking())) {
+        if (pBlocking == null) {
+            throw new IllegalStateException();
+        }
+        if (!pBlocking.isBlocking()) {
             asserter.throwIllegalStateException("");
         }
 
-        for (Area pArea : pBlocking.getBlockedAreas())
+        for (Area pArea : pBlocking.getBlockedAreas()) {
             for (ChokePoint cp : pArea.getChokePoints()) {
                 cp.onBlockingNeutralDestroyed(pBlocking);
             }
+        }
 
         // there remains some blocking Neutrals at the same location
         if (getData().getTile(pBlocking.getTopLeft()).getNeutral() != null) {
@@ -637,22 +643,24 @@ class BWMapInitializer extends BWMap {
         // Unblock the miniTiles of pBlocking:
         AreaId newId = pBlocking.getBlockedAreas().iterator().next().getId();
         WalkPosition pBlockingW = pBlocking.getSize().toWalkPosition();
-        for (int dy = 0; dy < pBlockingW.getY(); ++dy)
+        for (int dy = 0; dy < pBlockingW.getY(); ++dy) {
             for (int dx = 0; dx < pBlockingW.getX(); ++dx) {
                 MiniTile miniTile = getData().getMiniTile(
-                                        pBlocking.getTopLeft().toWalkPosition().add(new WalkPosition(dx, dy)));
+                        pBlocking.getTopLeft().toWalkPosition().add(new WalkPosition(dx, dy)));
                 if (miniTile.isWalkable()) {
                     miniTile.replaceBlockedAreaId(newId);
                 }
             }
+        }
 
         // Unblock the Tiles of pBlocking:
-        for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy)
+        for (int dy = 0; dy < pBlocking.getSize().getY(); ++dy) {
             for (int dx = 0; dx < pBlocking.getSize().getX(); ++dx) {
                 getData().getTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)))
                         .resetAreaId();
                 setAreaIdInTile(pBlocking.getTopLeft().add(new TilePosition(dx, dy)));
             }
+        }
 
         if (automaticPathUpdate()) {
             getGraph().computeChokePointDistanceMatrix();
