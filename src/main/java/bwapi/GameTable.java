@@ -35,7 +35,7 @@ class GameTable {
         for (int i = 0; i < MAX_GAME_INSTANCES; i++) {
             int serverProcessID = gameTableFileHandle.getInt(GameInstance.SIZE * i);
             boolean isConnected = gameTableFileHandle.get(GameInstance.SIZE * i + 4) != 0;
-            int lastKeepAliveTime = gameTableFileHandle.getInt(GameInstance.SIZE * i + 4 + 1);
+            int lastKeepAliveTime = gameTableFileHandle.getInt(GameInstance.SIZE * i + 4 + 4);
             gameInstances[i] = new GameInstance(serverProcessID, isConnected, lastKeepAliveTime);
         }
     }
