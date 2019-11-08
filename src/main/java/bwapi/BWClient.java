@@ -7,10 +7,7 @@ import java.util.Objects;
  */
 public class BWClient {
     private final BWEventListener eventListener;
-
-    private Client client;
     private EventHandler handler;
-
 
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
@@ -24,33 +21,31 @@ public class BWClient {
         return handler == null ? null : handler.getGame();
     }
 
+    public void startGame() {
+        startGame(false);
+    }
+
     /**
      * Start the game.
+     *
+     * @param autoContinue automatically continue playing the next game(s). false by default
      */
-    public void startGame() {
-        while (client == null) {
-            try {
-                client = new Client();
-            } catch (final Exception t) {
-                System.err.println("Game table mapping not found.");
-                try {
-                    Thread.sleep(1000);
-                } catch (final Exception ignored) {
-                }
-            }
-        }
-
+    public void startGame(boolean autoContinue) {
+        Client client = new Client();
+        client.reconnect();
         handler = new EventHandler(eventListener, client);
 
-        try {
-            while (!client.data().isInGame()) {
+        do {
+            while (!getGame().isInGame()) {
                 client.update(handler);
             }
-            while (client.data().isInGame()) {
+            while (getGame().isInGame()) {
                 client.update(handler);
+                if (!client.isConnected()) {
+                    System.out.println("Reconnecting...");
+                    client.reconnect();
+                }
             }
-        } catch (final Exception exception) {
-            exception.printStackTrace();
-        }
+        } while (autoContinue);
     }
 }

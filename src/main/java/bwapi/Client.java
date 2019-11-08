@@ -35,41 +35,30 @@ import com.sun.jna.win32.W32APIOptions;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.List;
 
 class Client {
+    interface MappingKernel extends Kernel32 {
+        MappingKernel INSTANCE = Native.load(MappingKernel.class, W32APIOptions.DEFAULT_OPTIONS);
+
+        HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
+    }
+
+    public interface EventHandler {
+        void operation(ClientData.Event event);
+    }
+
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
-    private static final int GAME_SIZE = 4 // ServerProcID
-            + 4 // IsConnected
-            + 4 // LastKeepAliveTime
-            ;
-    private static final List<Integer> SUPPORTED_BWAPI_VERSIONS = Arrays.asList(10003);
+
+    private static final int SUPPORTED_BWAPI_VERSION = 10003;
     static final int MAX_COUNT = 19999;
 
-    private static final int maxNumGames = 8;
-    private static final int gameTableSize = GAME_SIZE * maxNumGames;
-    private RandomAccessFile pipe;
     private ClientData.GameData data;
+    private boolean connected = false;
+    private RandomAccessFile pipeObjectHandle = null;
+    private ByteBuffer mapFileHandle = null;
+    private ByteBuffer gameTableFileHandle = null;
 
-    Client() throws Exception {
-        final ByteBuffer gameList = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, gameTableSize).getByteBuffer(0, GAME_SIZE * 8);
-        gameList.order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < 8; ++i) {
-            final int procID = gameList.getInt(GAME_SIZE * i);
-            final boolean connected = gameList.get(GAME_SIZE * i + 4) != 0;
-
-            if (procID != 0 && !connected) {
-                try {
-                    this.connect(procID);
-                    return;
-                } catch (final Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        }
-        throw new Exception("All servers busy!");
-    }
+    Client() {}
 
     /**
      * For test purposes only
@@ -82,48 +71,167 @@ class Client {
         return data;
     }
 
-    private void connect(final int procID) throws Exception {
-        pipe = new RandomAccessFile("\\\\.\\pipe\\bwapi_pipe_" + procID, "rw");
-
-        byte code = 1;
-        while (code != 2) {
-            code = pipe.readByte();
-        }
-
-        final ByteBuffer sharedMemory = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
-                        .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_" + procID), READ_WRITE,
-                0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        data = new ClientData(sharedMemory).new GameData(0);
-
-        final int clientVersion = data.getClient_version();
-        if (!SUPPORTED_BWAPI_VERSIONS.contains(clientVersion)) {
-            throw new Exception("BWAPI version mismatch, expected one of: " + SUPPORTED_BWAPI_VERSIONS + ", got: " + clientVersion);
-        }
-
-        System.out.println("Connected to BWAPI@" + procID + " with version " + clientVersion + ": " + data.getRevision());
+    boolean isConnected() {
+        return connected;
     }
 
-    void update(final EventHandler handler) throws Exception {
-        byte code = 1;
-        pipe.writeByte(code);
-        while (code != 2) {
-            code = pipe.readByte();
+    void reconnect(){
+        while (!connect()) {
+            sleep(1000);
         }
-        for (int i = 0; i < data.getEventCount(); ++i) {
+    }
+
+    void disconnect() {
+        if (!connected) {
+            return;
+        }
+
+        if (pipeObjectHandle != null ) {
+            try {
+                pipeObjectHandle.close();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            pipeObjectHandle = null;
+        }
+
+        mapFileHandle = null;
+        gameTableFileHandle = null;
+        data = null;
+        connected = false;
+    }
+
+    boolean connect() {
+        if (connected) {
+            System.err.println("Already connected");
+            return true;
+        }
+
+        int serverProcID = -1;
+        int gameTableIndex = -1;
+
+        try {
+            gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
+                    MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
+                    .getByteBuffer(0, GameTable.SIZE);
+            gameTableFileHandle.order(ByteOrder.LITTLE_ENDIAN);
+        }
+        catch (Exception e) {
+            System.err.println("Game table mapping not found.");
+            return false;
+        }
+
+        GameTable gameTable = null;
+        try {
+            gameTable = new GameTable(gameTableFileHandle);
+        }
+        catch (Exception e) {
+            System.err.println("Unable to map Game table.");
+            return false;
+        }
+
+        int latest = 0;
+        for(int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
+            GameInstance gameInstance = gameTable.gameInstances[i];
+            System.out.println(i + " | " + gameInstance.serverProcessID + " | " + gameInstance.isConnected + " | " + gameInstance.lastKeepAliveTime);
+            if (gameInstance.serverProcessID != 0 && !gameInstance.isConnected) {
+                if ( gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest ) {
+                    latest = gameInstance.lastKeepAliveTime;
+                    gameTableIndex = i;
+                }
+            }
+        }
+
+        if (gameTableIndex != -1) {
+            serverProcID = gameTable.gameInstances[gameTableIndex].serverProcessID;
+        }
+
+        if (serverProcID == -1) {
+            System.err.println("No server proc ID");
+            return false;
+        }
+
+        final String sharedMemoryName = "Local\\bwapi_shared_memory_" + serverProcID;
+        final String communicationPipe = "\\\\.\\pipe\\bwapi_pipe_" + serverProcID;
+        try {
+            pipeObjectHandle  = new RandomAccessFile(communicationPipe, "rw");
+        }
+        catch (Exception e) {
+            System.err.println("Unable to open communications pipe: " + communicationPipe);
+            gameTableFileHandle = null;
+            return false;
+        }
+        System.out.println("Connected");
+
+        try {
+            mapFileHandle = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                            .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
+                    0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
+        }
+        catch (Exception e) {
+            System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
+            pipeObjectHandle = null;
+            gameTableFileHandle = null;
+            return false;
+        }
+        try {
+            data = new ClientData(mapFileHandle).new GameData(0);
+        }
+        catch (Exception e) {
+            System.err.println("Unable to map game data.");
+            return false;
+        }
+
+        if (SUPPORTED_BWAPI_VERSION != data.getClient_version()) {
+            System.err.println("Error: Client and Server are not compatible!");
+            System.err.println("Client version: " + SUPPORTED_BWAPI_VERSION);
+            System.err.println("Server version: " + data.getClient_version());
+            disconnect();
+            sleep(2000);
+            return false;
+        }
+        byte code = 1;
+        while (code != 2) {
+            try {
+                code = pipeObjectHandle.readByte();
+            }
+            catch (Exception e) {
+                disconnect();
+                System.err.println("Unable to read pipe object.");
+                return false;
+            }
+        }
+
+        System.out.println("Connection successful");
+        connected = true;
+        return true;
+    }
+
+    void update(final EventHandler handler) {
+        byte code = 1;
+        try {
+            pipeObjectHandle.writeByte(code);
+        }
+        catch (Exception e) {
+            System.err.println("failed, disconnecting");
+            disconnect();
+            return;
+        }
+        while (code != 2) {
+            try {
+                code = pipeObjectHandle.readByte();
+            }
+            catch (Exception e) {
+                System.err.println("failed, disconnecting");
+                disconnect();
+                return;
+            }
+        }
+        for (int i = 0; i < data.getEventCount(); i++) {
             handler.operation(data.getEvents(i));
         }
     }
-
-    interface MappingKernel extends Kernel32 {
-        MappingKernel INSTANCE = Native.load(MappingKernel.class, W32APIOptions.DEFAULT_OPTIONS);
-
-        HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
-    }
-
-    public interface EventHandler {
-        void operation(ClientData.Event event);
-    }
-
 
     String eventString(final int s) {
         return data.getEventStrings(s);
@@ -156,5 +264,13 @@ class Client {
         if (unitCommandCount >= MAX_COUNT) throw new IllegalStateException("Too many unit commands!");
         data.setUnitCommandCount(unitCommandCount + 1);
         return data.getUnitCommands(unitCommandCount);
+    }
+
+    private void sleep(final int millis) {
+        try{
+            Thread.sleep(millis);
+        }
+        catch (Exception ignored) {
+        }
     }
 }
