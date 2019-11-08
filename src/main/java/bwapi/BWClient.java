@@ -46,6 +46,6 @@ public class BWClient {
                     client.reconnect();
                 }
             }
-        } while (autoContinue);
+        } while (autoContinue); // lgtm [java/constant-loop-condition]
     }
 }
