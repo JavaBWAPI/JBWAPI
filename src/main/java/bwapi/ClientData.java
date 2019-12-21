@@ -1,7 +1,7 @@
 package bwapi;
 import java.nio.ByteBuffer;
 final class ClientData {
-    private final WrappedBuffer buffer;
+    final WrappedBuffer buffer;
     ClientData(final ByteBuffer buffer) {
         this.buffer = new WrappedBuffer(buffer);
     }
