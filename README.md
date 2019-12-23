@@ -72,6 +72,32 @@ or if you already have maven installed
 
 `mvn package`
 
+## HelloBot
+
+A simple `Hello World` bot is as easy as:
+
+```Java
+import bwapi.BWClient;
+import bwapi.DefaultBWListener;
+import bwapi.Game;
+
+class HelloBot extends DefaultBWListener {
+	private BWClient bwClient;
+
+	@Override
+	public void onFrame() {
+		Game game = bwClient.getGame();
+		game.drawTextMap(100, 100, "Hello World!");
+	}
+
+	public static void main(String[] args) {
+		HelloBot bot = new HelloBot();
+		bot.bwClient = new BWClient(bot);
+		bot.bwClient.startGame();
+	}
+}
+```
+
 ## Documentation
 
 The API documentation can be found [here](https://javabwapi.github.io/JBWAPI/).
