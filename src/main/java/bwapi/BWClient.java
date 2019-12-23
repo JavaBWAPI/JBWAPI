@@ -37,6 +37,9 @@ public class BWClient {
 
         do {
             while (!getGame().isInGame()) {
+                if (!client.isConnected()) {
+                    return;
+                }
                 client.update(handler);
             }
             while (getGame().isInGame()) {

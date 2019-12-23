@@ -140,7 +140,7 @@ class Client {
         int latest = 0;
         for(int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
             GameInstance gameInstance = gameTable.gameInstances[i];
-            System.out.println(i + " | " + gameInstance.serverProcessID + " | " + gameInstance.isConnected + " | " + gameInstance.lastKeepAliveTime);
+            System.out.println(i + " | " + gameInstance.serverProcessID + " | " + (gameInstance.isConnected ? 1 : 0) + " | " + gameInstance.lastKeepAliveTime);
             if (gameInstance.serverProcessID != 0 && !gameInstance.isConnected) {
                 if ( gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest ) {
                     latest = gameInstance.lastKeepAliveTime;
