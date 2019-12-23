@@ -52,7 +52,8 @@ class Client {
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
     static final int MAX_COUNT = 19999;
 
-    private ClientData.GameData data;
+    private ClientData clientData;
+    private ClientData.GameData gameData;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
     private ByteBuffer mapFileHandle = null;
@@ -64,11 +65,16 @@ class Client {
      * For test purposes only
      */
     Client(ByteBuffer buffer) {
-        data = new ClientData(buffer).new GameData(0);
+        clientData = new ClientData(buffer);
+        gameData = clientData.new GameData(0);
     }
 
-    public GameData data() {
-        return data;
+    ClientData clientData() {
+        return clientData;
+    }
+
+    GameData gameData() {
+        return gameData;
     }
 
     boolean isConnected() {
@@ -98,7 +104,7 @@ class Client {
 
         mapFileHandle = null;
         gameTableFileHandle = null;
-        data = null;
+        gameData = null;
         connected = false;
     }
 
@@ -176,17 +182,18 @@ class Client {
             return false;
         }
         try {
-            data = new ClientData(mapFileHandle).new GameData(0);
+            clientData = new ClientData(mapFileHandle);
+            gameData = clientData.new GameData(0);
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
             return false;
         }
 
-        if (SUPPORTED_BWAPI_VERSION != data.getClient_version()) {
+        if (SUPPORTED_BWAPI_VERSION != gameData.getClient_version()) {
             System.err.println("Error: Client and Server are not compatible!");
             System.err.println("Client version: " + SUPPORTED_BWAPI_VERSION);
-            System.err.println("Server version: " + data.getClient_version());
+            System.err.println("Server version: " + gameData.getClient_version());
             disconnect();
             sleep(2000);
             return false;
@@ -228,42 +235,42 @@ class Client {
                 return;
             }
         }
-        for (int i = 0; i < data.getEventCount(); i++) {
-            handler.operation(data.getEvents(i));
+        for (int i = 0; i < gameData.getEventCount(); i++) {
+            handler.operation(gameData.getEvents(i));
         }
     }
 
     String eventString(final int s) {
-        return data.getEventStrings(s);
+        return gameData.getEventStrings(s);
     }
 
     int addString(final String s) {
-        int stringCount = data.getStringCount();
+        int stringCount = gameData.getStringCount();
         if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many strings!");
-        data.setStringCount(stringCount + 1);
-        data.setStrings(stringCount, s);
+        gameData.setStringCount(stringCount + 1);
+        gameData.setStrings(stringCount, s);
         return stringCount;
     }
 
     Shape addShape() {
-        int shapeCount = data.getShapeCount();
+        int shapeCount = gameData.getShapeCount();
         if (shapeCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
-        data.setShapeCount(shapeCount + 1);
-        return data.getShapes(shapeCount);
+        gameData.setShapeCount(shapeCount + 1);
+        return gameData.getShapes(shapeCount);
     }
 
     Command addCommand() {
-        final int commandCount = data.getCommandCount();
+        final int commandCount = gameData.getCommandCount();
         if (commandCount >= MAX_COUNT) throw new IllegalStateException("Too many commands!");
-        data.setCommandCount(commandCount + 1);
-        return data.getCommands(commandCount);
+        gameData.setCommandCount(commandCount + 1);
+        return gameData.getCommands(commandCount);
     }
 
     ClientData.UnitCommand addUnitCommand() {
-        int unitCommandCount = data.getUnitCommandCount();
+        int unitCommandCount = gameData.getUnitCommandCount();
         if (unitCommandCount >= MAX_COUNT) throw new IllegalStateException("Too many unit commands!");
-        data.setUnitCommandCount(unitCommandCount + 1);
-        return data.getUnitCommands(unitCommandCount);
+        gameData.setUnitCommandCount(unitCommandCount + 1);
+        return gameData.getUnitCommands(unitCommandCount);
     }
 
     private void sleep(final int millis) {

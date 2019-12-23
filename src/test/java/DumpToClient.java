@@ -92,7 +92,7 @@ public class DumpToClient {
             out.println("package bwapi;");
             out.println("import java.nio.ByteBuffer;");
             out.println("final class ClientData {");
-            out.println("    private final WrappedBuffer buffer;");
+            out.println("    final WrappedBuffer buffer;");
             out.println("    ClientData(final ByteBuffer buffer) {");
             out.println("        this.buffer = new WrappedBuffer(buffer);");
             out.println("    }");

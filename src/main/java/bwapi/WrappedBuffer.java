@@ -86,4 +86,8 @@ class WrappedBuffer {
         }
         unsafe.putByte(pos, (byte) 0);
     }
+
+    ByteBuffer getBuffer() {
+        return buffer;
+    }
 }
