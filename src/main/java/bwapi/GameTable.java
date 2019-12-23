@@ -15,7 +15,7 @@ class GameInstance {
             + 4 // LastKeepAliveTime
             ;
 
-    public GameInstance(int serverProcessID, boolean isConnected, int lastKeepAliveTime) {
+    GameInstance(int serverProcessID, boolean isConnected, int lastKeepAliveTime) {
         this.serverProcessID = serverProcessID;
         this.isConnected = isConnected;
         this.lastKeepAliveTime = lastKeepAliveTime;
