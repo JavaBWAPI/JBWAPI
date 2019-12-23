@@ -87,7 +87,7 @@ class HelloBot extends DefaultBWListener {
 	@Override
 	public void onFrame() {
 		Game game = bwClient.getGame();
-		game.drawTextMap(100, 100, "Hello World!");
+		game.drawTextScreen(100, 100, "Hello World!");
 	}
 
 	public static void main(String[] args) {
