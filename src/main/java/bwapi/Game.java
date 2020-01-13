@@ -264,7 +264,7 @@ public class Game {
         observers = playerSet.stream().filter(p -> !p.equals(self) && p.isObserver())
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        latcom = gameData.getHasLatCom();
+        setLatCom(true);
     }
 
     void unitCreate(final int id) {
