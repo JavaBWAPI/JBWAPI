@@ -13,7 +13,7 @@ Also contains a modified version of the pure Java BWEM implementation from [BWAP
 ## Advantages
 
  - No dependency on external DLL's.
- - At least [5x](https://github.com/JavaBWAPI/JBWAPI/issues/17) faster compared to bwmirror for primitives as it directly reads the memory mapped client file. Even faster for bwapi objects as it also avoids type marshalling
+ - At least [5x](https://github.com/JavaBWAPI/JBWAPI/issues/17) faster compared to BWMirror for primitives as it directly reads the memory mapped client file. Even faster for BWAPI objects as it also avoids type marshalling
  - Supports both 32 and 64 bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64 bit Java which bwmirror doesn't support).
  - BWEM instead of BWTA as map analyser.
 
@@ -72,14 +72,12 @@ or if you already have maven installed
 
 `mvn package`
 
-## HelloBot
+## Example
 
-A simple `Hello World` bot is as easy as:
+A simple `Hello World` bot is as easy as
 
 ```Java
-import bwapi.BWClient;
-import bwapi.DefaultBWListener;
-import bwapi.Game;
+import bwapi.*;
 
 class HelloBot extends DefaultBWListener {
 	private BWClient bwClient;
