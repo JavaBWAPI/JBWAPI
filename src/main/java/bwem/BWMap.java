@@ -91,7 +91,7 @@ public abstract class BWMap {
         }
 
         if (atLeastOneFailed) {
-            asserter.throwIllegalStateException("At least one starting location was not assigned to a base.");
+            //asserter.throwIllegalStateException("At least one starting location was not assigned to a base.");
         }
     }
 
