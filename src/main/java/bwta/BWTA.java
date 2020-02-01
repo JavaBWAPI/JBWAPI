@@ -9,6 +9,8 @@ import bwem.Base;
 import bwem.ChokePoint;
 
 import bwem.Area;
+
+import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,14 @@ public class BWTA {
     public static void readMap(final Game game) {
         System.err.println("WARNING: this BWTA is fake and only translates BWTA calls to their respective BWEM calls. Please use BWEM directly if possible.");
         bwem = new BWEM(game);
+    }
+
+    public static void setFailOnError(final boolean value) {
+        bwem.setFailOnError(value);
+    }
+
+    public static void setFailOnErrorStream(OutputStream stream) {
+        bwem.setFailOutputStream(stream);
     }
 
     public static void analyze() {
