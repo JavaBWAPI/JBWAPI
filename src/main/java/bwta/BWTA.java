@@ -4,11 +4,10 @@ import bwapi.Game;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
+import bwem.Area;
 import bwem.BWEM;
 import bwem.Base;
 import bwem.ChokePoint;
-
-import bwem.Area;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -23,17 +22,29 @@ public class BWTA {
     private static List<Chokepoint> chokepoints;
     private static List<BaseLocation> baseLocations;
 
-    public static void readMap(final Game game) {
-        System.err.println("WARNING: this BWTA is fake and only translates BWTA calls to their respective BWEM calls. Please use BWEM directly if possible.");
-        bwem = new BWEM(game);
-    }
-
+    /**
+     * Extension to traditional BWTA interface for JBWAPI
+     * Exposes BWEM's setFailOnError(boolean) method for aggressively asserting errors.
+     *
+     * @param value Whether BWEM should throw an exception on assertion failure.
+     */
     public static void setFailOnError(final boolean value) {
         bwem.setFailOnError(value);
     }
 
+    /**
+     * Extension to traditional BWTA interface for JBWAPI
+     * Exposes BWEM's setFailOnErrorStream(OutputStream) method for specifying error log destination.
+     *
+     * @param stream Where to log BWEM errors.
+     */
     public static void setFailOnErrorStream(OutputStream stream) {
         bwem.setFailOutputStream(stream);
+    }
+
+    public static void readMap(final Game game) {
+        System.err.println("WARNING: this BWTA is fake and only translates BWTA calls to their respective BWEM calls. Please use BWEM directly if possible.");
+        bwem = new BWEM(game);
     }
 
     public static void analyze() {
