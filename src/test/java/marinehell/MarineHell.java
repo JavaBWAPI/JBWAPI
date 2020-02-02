@@ -73,6 +73,9 @@ public class MarineHell extends DefaultBWListener {
 
         int i = 0;
         System.out.printf("Map name: %s; Map file name: %s\n", game.mapName(), game.mapFileName());
+
+        // Add a DrawShape call to ensure this doesn't block
+        game.drawCircleScreen(new Position(200, 200), 3, Color.Black);
     }
 
     @Override
