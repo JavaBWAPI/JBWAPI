@@ -3,40 +3,40 @@ package bwapi;
 import java.util.stream.IntStream;
 
 class UnitSelf {
-    OrderCache order = new OrderCache();
-    IntegerCache targetPositionX = new IntegerCache();
-    IntegerCache targetPositionY = new IntegerCache();
-    IntegerCache orderTargetPositionX = new IntegerCache();
-    IntegerCache orderTargetPositionY = new IntegerCache();
-    IntegerCache target = new IntegerCache();
-    BooleanCache isConstructing = new BooleanCache();
-    BooleanCache isIdle = new BooleanCache();
-    UnitTypeCache buildType = new UnitTypeCache();
-    OrderCache secondaryOrder = new OrderCache();
-    IntegerCache remainingBuildTime = new IntegerCache();
-    IntegerCache buildUnit = new IntegerCache();
-    UnitTypeCache type = new UnitTypeCache();
-    BooleanCache isMorphing = new BooleanCache();
-    BooleanCache isCompleted = new BooleanCache();
-    IntegerCache remainingResearchTime = new IntegerCache();
-    TechTypeCache tech = new TechTypeCache();
-    BooleanCache isTraining = new BooleanCache();
-    IntegerCache remainingTrainTime = new IntegerCache();
-    UpgradeTypeCache upgrade = new UpgradeTypeCache();
-    IntegerCache remainingUpgradeTime = new IntegerCache();
-    BooleanCache isMoving = new BooleanCache();
-    BooleanCache isGathering = new BooleanCache();
-    IntegerCache rallyPositionX = new IntegerCache();
-    IntegerCache rallyPositionY = new IntegerCache();
-    IntegerCache rallyUnit = new IntegerCache();
-    IntegerCache stimTimer = new IntegerCache();
-    IntegerCache orderTarget = new IntegerCache();
+    final OrderCache order = new OrderCache();
+    final IntegerCache targetPositionX = new IntegerCache();
+    final IntegerCache targetPositionY = new IntegerCache();
+    final IntegerCache orderTargetPositionX = new IntegerCache();
+    final IntegerCache orderTargetPositionY = new IntegerCache();
+    final IntegerCache target = new IntegerCache();
+    final BooleanCache isConstructing = new BooleanCache();
+    final BooleanCache isIdle = new BooleanCache();
+    final UnitTypeCache buildType = new UnitTypeCache();
+    final OrderCache secondaryOrder = new OrderCache();
+    final IntegerCache remainingBuildTime = new IntegerCache();
+    final IntegerCache buildUnit = new IntegerCache();
+    final UnitTypeCache type = new UnitTypeCache();
+    final BooleanCache isMorphing = new BooleanCache();
+    final BooleanCache isCompleted = new BooleanCache();
+    final IntegerCache remainingResearchTime = new IntegerCache();
+    final TechTypeCache tech = new TechTypeCache();
+    final BooleanCache isTraining = new BooleanCache();
+    final IntegerCache remainingTrainTime = new IntegerCache();
+    final UpgradeTypeCache upgrade = new UpgradeTypeCache();
+    final IntegerCache remainingUpgradeTime = new IntegerCache();
+    final BooleanCache isMoving = new BooleanCache();
+    final BooleanCache isGathering = new BooleanCache();
+    final IntegerCache rallyPositionX = new IntegerCache();
+    final IntegerCache rallyPositionY = new IntegerCache();
+    final IntegerCache rallyUnit = new IntegerCache();
+    final IntegerCache stimTimer = new IntegerCache();
+    final IntegerCache orderTarget = new IntegerCache();
 
-    UnitTypeCache[] trainingQueue = new UnitTypeCache[5];
+    final UnitTypeCache[] trainingQueue = new UnitTypeCache[5];
 
-    IntegerCache hitPoints = new IntegerCache();
-    IntegerCache trainingQueueCount = new IntegerCache();
-    IntegerCache energy = new IntegerCache();
+    final IntegerCache hitPoints = new IntegerCache();
+    final IntegerCache trainingQueueCount = new IntegerCache();
+    final IntegerCache energy = new IntegerCache();
 
 
     UnitSelf() {

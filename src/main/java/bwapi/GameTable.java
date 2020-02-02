@@ -27,7 +27,7 @@ class GameTable {
     static final int MAX_GAME_INSTANCES = 8;
     static final int SIZE = MAX_GAME_INSTANCES * GameInstance.SIZE;
 
-    GameInstance[] gameInstances;
+    final GameInstance[] gameInstances;
 
     GameTable(final ByteBuffer gameTableFileHandle) {
         gameInstances = new GameInstance[MAX_GAME_INSTANCES];
