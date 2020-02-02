@@ -247,7 +247,7 @@ public class UnitCommand {
     }
 
     public static UnitCommand useTech(final Unit unit, final TechType tech) {
-        return new UnitCommand(unit, Use_Tech, null, -1, -1, 0);
+        return new UnitCommand(unit, Use_Tech, null, -1, -1, tech.id);
     }
 
     public static UnitCommand useTech(final Unit unit, final TechType tech, final Position target) {
