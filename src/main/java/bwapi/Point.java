@@ -1,6 +1,6 @@
 package bwapi;
 
-public abstract class Point<T extends Point> implements Comparable<Point> {
+public abstract class Point<T extends Point<T>> implements Comparable<Point<T>> {
     static final int TILE_WALK_FACTOR = 4; // 32 / 8
 
     public final int x;

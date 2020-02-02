@@ -128,7 +128,7 @@ class Client {
             return false;
         }
 
-        GameTable gameTable = null;
+        GameTable gameTable;
         try {
             gameTable = new GameTable(gameTableFileHandle);
         }

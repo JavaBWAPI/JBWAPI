@@ -16,10 +16,10 @@ class CommandTemp {
         Finish
     }
 
-    UnitCommand command;
+    final UnitCommand command;
     EventType eventType = EventType.Resource;
     Player player = null;
-    Game game;
+    final Game game;
 
     CommandTemp(final UnitCommand command, Game game) {
         this.command = command;
