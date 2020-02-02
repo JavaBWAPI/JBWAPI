@@ -96,17 +96,8 @@ public class Color {
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, new RGBQUAD(255, 255, 255)
     };
 
+    private static boolean rgbInitialized;
     private static final byte[][][] closestColor = new byte[64][64][64];
-
-    static {
-        for (int r = 0; r < 64; ++r) {
-            for (int g = 0; g < 64; ++g) {
-                for (int b = 0; b < 64; ++b) {
-                    closestColor[r][g][b] = (byte) getBestIdFor(r << 2, g << 2, b << 2);
-                }
-            }
-        }
-    }
 
     public final int id;
 
@@ -159,6 +150,16 @@ public class Color {
     }
 
     private static int getRGBIndex(final int red, final int green, final int blue) {
+        if (!rgbInitialized) {
+            rgbInitialized = true;
+            for (int r = 0; r < 64; ++r) {
+                for (int g = 0; g < 64; ++g) {
+                    for (int b = 0; b < 64; ++b) {
+                        closestColor[r][g][b] = (byte) getBestIdFor(r << 2, g << 2, b << 2);
+                    }
+                }
+            }
+        }
         return closestColor[(byte) (red >> 2)][(byte) (green >> 2)][(byte) (blue >> 2)];
     }
 
