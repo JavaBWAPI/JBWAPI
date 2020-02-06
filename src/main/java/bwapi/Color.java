@@ -133,9 +133,9 @@ public class Color {
             if (p.rgbReserved != 0) {
                 continue;
             }
-            final int r = red - (int) p.rgbRed;
-            final int g = green - (int) p.rgbGreen;
-            final int b = blue - (int) p.rgbBlue;
+            final int r = red - p.rgbRed;
+            final int g = green - p.rgbGreen;
+            final int b = blue - p.rgbBlue;
 
             final int distance = r * r + g * g + b * b;
             if (distance < min_dist) {
