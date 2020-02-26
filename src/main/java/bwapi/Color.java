@@ -97,7 +97,7 @@ public class Color {
     };
 
     private static boolean rgbInitialized;
-    private static final byte[][][] closestColor = new byte[64][64][64];
+    private static final int[][][] closestColor = new int[64][64][64];
 
     public final int id;
 
@@ -155,23 +155,23 @@ public class Color {
             for (int r = 0; r < 64; ++r) {
                 for (int g = 0; g < 64; ++g) {
                     for (int b = 0; b < 64; ++b) {
-                        closestColor[r][g][b] = (byte) getBestIdFor(r << 2, g << 2, b << 2);
+                        closestColor[r][g][b] = getBestIdFor(r << 2, g << 2, b << 2);
                     }
                 }
             }
         }
-        return closestColor[(byte) (red >> 2)][(byte) (green >> 2)][(byte) (blue >> 2)];
+        return closestColor[red >> 2][green >> 2][blue >> 2];
     }
 
-    int red() {
+    public int red() {
         return id < 256 ? defaultPalette[id].rgbRed : 0;
     }
 
-    int green() {
+    public int green() {
         return id < 256 ? defaultPalette[id].rgbGreen : 0;
     }
 
-    int blue() {
+    public int blue() {
         return id < 256 ? defaultPalette[id].rgbBlue : 0;
     }
 
@@ -190,20 +190,20 @@ public class Color {
 
     /// BROODWAR COLOR IMPLEMENTATION
     private static class RGBQUAD {
-        final byte rgbRed;
-        final byte rgbGreen;
-        final byte rgbBlue;
-        final byte rgbReserved;
+        final int rgbRed;
+        final int rgbGreen;
+        final int rgbBlue;
+        final int rgbReserved;
 
         RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue) {
             this(rgbRed, rgbGreen, rgbBlue, 0);
         }
 
         RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue, int rgbReserved) {
-            this.rgbRed = (byte) rgbRed;
-            this.rgbGreen = (byte) rgbGreen;
-            this.rgbBlue = (byte) rgbBlue;
-            this.rgbReserved = (byte) rgbReserved;
+            this.rgbRed = rgbRed;
+            this.rgbGreen = rgbGreen;
+            this.rgbBlue = rgbBlue;
+            this.rgbReserved = rgbReserved;
         }
     }
 }
