@@ -76,7 +76,7 @@ class WrappedBuffer {
     }
 
     void putString(final int offset, final int maxLen, final String string) {
-        if (string.length() + 1 >= maxLen) {
+        if (string.length() >= maxLen) {
             throw new StringIndexOutOfBoundsException();
         }
         long pos = offset + address;

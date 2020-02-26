@@ -51,6 +51,7 @@ class Client {
 
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
     static final int MAX_COUNT = 19999;
+    static final int MAX_STRING_SIZE = 1024;
 
     private ClientData clientData;
     private ClientData.GameData gameData;
@@ -244,31 +245,45 @@ class Client {
         return gameData.getEventStrings(s);
     }
 
-    int addString(final String s) {
+    int addString(final String string) {
         int stringCount = gameData.getStringCount();
-        if (stringCount >= MAX_COUNT) throw new IllegalStateException("Too many strings!");
+        if (stringCount >= MAX_COUNT) {
+            throw new IllegalStateException("Too many strings!");
+        }
+
+        //truncate string if its size equals or exceeds 1024
+        final String stringTruncated = string.length() >= MAX_STRING_SIZE
+                ? string.substring(0, MAX_STRING_SIZE - 1)
+                : string;
+
         gameData.setStringCount(stringCount + 1);
-        gameData.setStrings(stringCount, s);
+        gameData.setStrings(stringCount, stringTruncated);
         return stringCount;
     }
 
     Shape addShape() {
         int shapeCount = gameData.getShapeCount();
-        if (shapeCount >= MAX_COUNT) throw new IllegalStateException("Too many shapes!");
+        if (shapeCount >= MAX_COUNT) {
+            throw new IllegalStateException("Too many shapes!");
+        }
         gameData.setShapeCount(shapeCount + 1);
         return gameData.getShapes(shapeCount);
     }
 
     Command addCommand() {
         final int commandCount = gameData.getCommandCount();
-        if (commandCount >= MAX_COUNT) throw new IllegalStateException("Too many commands!");
+        if (commandCount >= MAX_COUNT) {
+            throw new IllegalStateException("Too many commands!");
+        }
         gameData.setCommandCount(commandCount + 1);
         return gameData.getCommands(commandCount);
     }
 
     ClientData.UnitCommand addUnitCommand() {
         int unitCommandCount = gameData.getUnitCommandCount();
-        if (unitCommandCount >= MAX_COUNT) throw new IllegalStateException("Too many unit commands!");
+        if (unitCommandCount >= MAX_COUNT) {
+            throw new IllegalStateException("Too many unit commands!");
+        }
         gameData.setUnitCommandCount(unitCommandCount + 1);
         return gameData.getUnitCommands(unitCommandCount);
     }

@@ -56,31 +56,10 @@ public class BWEMTest {
         mapData.put("(4)Roadrunner.scx", new BWEMMap(26, 12, 35));
     }
 
-
-    Game initGame(String mapName) throws IOException {
-        String location = "src/test/resources/" + mapName + "_frame0_buffer.bin";
-
-        // load bytebuffer
-        byte[] compressedBytes = Files.readAllBytes(Paths.get(location));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InflaterOutputStream zin = new InflaterOutputStream(out);
-        zin.write(compressedBytes);
-        zin.flush();
-        zin.close();
-        byte[] bytes = out.toByteArray();
-        ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
-        buffer.put(bytes);
-
-        Client client = new Client(buffer);
-        Game game = new Game(client);
-        game.init();
-        return game;
-    }
-
     @Test
     public void checkSSCAITMaps() throws IOException {
         for (String mapName : mapData.keySet()) {
-            Game game = initGame(mapName);
+            Game game = GameBuilder.createGame(mapName);
             BWEM bwem = new BWEM(game);
             bwem.initialize();
             assertEquals(new BWEMMap(bwem.getMap()), mapData.get(mapName));
