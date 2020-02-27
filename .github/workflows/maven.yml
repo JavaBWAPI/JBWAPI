@@ -31,7 +31,7 @@ jobs:
         "[ -f /tmp/sc-docker/starcraft.zip ] || cp sc-docker/scbw/local_docker/starcraft.zip /tmp/sc-docker/starcraft.zip"
         scbw.play --install
     - name: Run Integration Test
-    - run: |
+      run: |
         sh mvnw clean install
         sh mvnw -f it/bots/pom.xml package
         for bot in $(ls -d it/bots/*/); do BOTNAME=$(basename $bot); echo "Setting up $BOTNAME"; mkdir -p "$HOME/.scbw/bots/$BOTNAME/AI" "$HOME/.scbw/bots/$BOTNAME/read" "$HOME/.scbw/bots/$BOTNAME/write"; cp it/sc-docker-support/BWAPI.dll "$HOME/.scbw/bots/$BOTNAME"; cp "$bot/target/"*-with-dependencies.jar "$HOME/.scbw/bots/$BOTNAME/AI"; cp "$bot/bot.json" "$HOME/.scbw/bots/$BOTNAME"; done
