@@ -29,7 +29,7 @@ jobs:
         ./build_images.sh
         popd
         scbw.play --install
-    - name: Run Integration Test
+    - name: Run Integration Tests
       run: |
         sh mvnw clean install
         sh mvnw -f it/bots/pom.xml package
