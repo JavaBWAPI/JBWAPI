@@ -12,20 +12,23 @@
 
 package bwem;
 
+import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.WalkPosition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Area {
-    final java.util.Map<Area, List<ChokePoint>> chokePointsByArea = new HashMap<>();
+    final Map<Area, List<ChokePoint>> chokePointsByArea = new HashMap<>();
     final List<Area> accessibleNeighbors = new ArrayList<>();
     final List<ChokePoint> chokePoints = new ArrayList<>();
     final List<Mineral> minerals = new ArrayList<>();
     final List<Geyser> geysers = new ArrayList<>();
     final List<Base> bases = new ArrayList<>();
+    final List<Position> boundaryVertices = new ArrayList<>();
     private final AreaId id;
     private final WalkPosition walkPositionWithHighestAltitude;
     private final int miniTileCount;
@@ -100,39 +103,48 @@ public abstract class Area {
     }
 
     public List<ChokePoint> getChokePoints() {
-        return this.chokePoints;
+        return new ArrayList<>(this.chokePoints);
     }
 
     public List<ChokePoint> getChokePoints(final Area area) {
         final List<ChokePoint> ret = this.chokePointsByArea.get(area);
         if (ret == null) {
             map.asserter.throwIllegalStateException("");
+            return null;
         }
-        return ret;
+        return new ArrayList<>(ret);
     }
 
-    public java.util.Map<Area, List<ChokePoint>> getChokePointsByArea() {
-        return this.chokePointsByArea;
+    public Map<Area, List<ChokePoint>> getChokePointsByArea() {
+        return new HashMap<>(this.chokePointsByArea);
     }
 
     public List<Area> getAccessibleNeighbors() {
-        return this.accessibleNeighbors;
+        return new ArrayList<>(this.accessibleNeighbors);
     }
 
     public boolean isAccessibleFrom(final Area area) {
         return groupId == area.getGroupId();
     }
 
+    public boolean isNeighbouringArea(final Area area) {
+        return chokePointsByArea.containsKey(area);
+    }
+
+    public List<Position> getBoundaryVertices() {
+        return new ArrayList<>(this.boundaryVertices);
+    }
+
     public List<Mineral> getMinerals() {
-        return this.minerals;
+        return new ArrayList<>(this.minerals);
     }
 
     public List<Geyser> getGeysers() {
-        return this.geysers;
+        return new ArrayList<>(this.geysers);
     }
 
     public List<Base> getBases() {
-        return this.bases;
+        return new ArrayList<>(this.bases);
     }
 
     @Override

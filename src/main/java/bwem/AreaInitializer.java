@@ -12,10 +12,7 @@
 
 package bwem;
 
-import bwapi.Pair;
-import bwapi.TilePosition;
-import bwapi.UnitType;
-import bwapi.WalkPosition;
+import bwapi.*;
 import bwem.util.BwemExt;
 import bwem.util.CheckMode;
 import bwem.util.Markable;
@@ -251,6 +248,79 @@ final class AreaInitializer extends Area {
                 }
             }
         }
+    }
+
+    void calcBoundaryVertices() {
+        calcBoundaryVertices(false);
+    }
+
+    /*
+    Inspired by BWEM-Community patch by Jabbo
+    https://github.com/N00byEdge/BWEM-community/pull/32/files
+     */
+    void calcBoundaryVertices(boolean checkNeutrals) {
+        List<Position> vertices = new ArrayList<>();
+        List<WalkPosition> neutrals = new ArrayList<>();
+
+        if (checkNeutrals) {
+            for (final Mineral m : this.minerals) {
+                WalkPosition pos = m.getTopLeft().toWalkPosition();
+                for (int ii = 0; ii < 8; ++ii) {
+                    for (int jj = 0; jj < 4; ++jj) {
+                        neutrals.add(pos.add(new WalkPosition(ii,jj)));
+                    }
+                }
+            }
+            for (Geyser m : this.geysers) {
+                WalkPosition pos = m.getTopLeft().toWalkPosition();
+                for (int ii = 0; ii < 16; ++ii) {
+                    for (int jj = 0; jj < 8; ++jj) {
+                        neutrals.add(pos.add(new WalkPosition(ii, jj)));
+                    }
+                }
+            }
+        }
+        final TilePosition tileSize = map.getData().getMapData().getTileSize();
+        for (int x = 0; x < tileSize.x * 4; ++x) {
+            for (int y = 0; y < tileSize.y * 4; ++y){
+                final WalkPosition wp = new WalkPosition(x, y);
+                if (map.getArea(wp) != this || !map.game.isWalkable(wp) || neutrals.contains(wp)){
+                    continue;
+                }
+
+                final WalkPosition w1 = new WalkPosition(wp.x + 1, wp.y);
+                final WalkPosition w2 = new WalkPosition(wp.x, wp.y + 1);
+                final WalkPosition w3 = new WalkPosition(wp.x - 1, wp.y);
+                final WalkPosition w4 = new WalkPosition(wp.x, wp.y - 1);
+
+                // a tile is 'surrounded' if
+                // 1) in all 4 directions there's a tile position in the current region
+                boolean surrounded = true;
+
+                if (wp.x == 0 || wp.y == 0 || wp.x == tileSize.x * 4 - 1 || wp.y == tileSize.y * 4 - 1
+                        || w1.isValid(map.game) && (map.getArea(w1) != this || neutrals.contains(w1))
+                        || w2.isValid(map.game) && (map.getArea(w2) != this || neutrals.contains(w2))
+                        || w3.isValid(map.game) && (map.getArea(w3) != this || neutrals.contains(w3))
+                        || w4.isValid(map.game) && (map.getArea(w4) != this || neutrals.contains(w4))) {
+                    surrounded = false;
+                }
+
+                // Area
+                // push the tiles that aren't surrounded
+                if (!surrounded) {
+                    vertices.add(wp.toPosition());
+                }
+            }
+        }
+
+        if (vertices.isEmpty()) {
+            return;
+        }
+        final Position current = vertices.get(0);
+        vertices.remove(current);
+        vertices.sort((a, b) -> (int) (a.getDistance(current) - b.getDistance(current)));
+        boundaryVertices.add(current);
+        boundaryVertices.addAll(vertices);
     }
 
     void createBases(final TerrainData terrainData) {

@@ -193,10 +193,10 @@ public final class Graph {
     // ----------------------------------------------------------------------
     // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
     // ----------------------------------------------------------------------
-    private java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>>
+    private Map<Pair<AreaId, AreaId>, List<WalkPosition>>
     createRawFrontierByAreaPairMap(
             final List<Pair<Pair<AreaId, AreaId>, WalkPosition>> rawFrontier) {
-        final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
+        final Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
                 new HashMap<>();
 
         for (final Pair<Pair<AreaId, AreaId>, WalkPosition> raw : rawFrontier) {
@@ -254,7 +254,7 @@ public final class Graph {
         initializeChokePointsMatrix();
 
         // 2) Dispatch the global raw frontier between all the relevant pairs of areas:
-        final java.util.Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
+        final Map<Pair<AreaId, AreaId>, List<WalkPosition>> rawFrontierByAreaPair =
                 createRawFrontierByAreaPairMap(rawFrontier);
 
         // 3) For each pair of areas (A, B):
