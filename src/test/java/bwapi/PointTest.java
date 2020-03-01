@@ -22,7 +22,7 @@ public class PointTest {
 	}
 
 	@Test
-	public void pointDistanceAccesibleTest() {
+	public void pointDistanceAccessibleTest() {
 		TilePosition tp = TilePosition.Origin;
 
 		assertEquals(0, tp.getApproxDistance(tp));

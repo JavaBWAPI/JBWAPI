@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * with {@link #setFailOutputStream} (if you set it to `null` the errors will be completely ignored).
  */
 public final class BWEM {
-    private final BWMap map;
+    private final BWMapInitializer map;
     private final Asserter asserter;
 
     public BWEM(final Game game) {
@@ -47,10 +47,7 @@ public final class BWEM {
      * Initializes and pre-computes all of the internal data.
      */
     public void initialize() {
-        if (!(this.map instanceof BWMapInitializer)) {
-            throw new IllegalStateException("BWEM was not instantiated properly.");
-        }
-        ((BWMapInitializer) this.map).initialize();
+        this.map.initialize();
         this.map.assignStartingLocationsToSuitableBases();
     }
 
@@ -60,5 +57,12 @@ public final class BWEM {
 
     public void setFailOutputStream(OutputStream outputStream) {
         asserter.setFailOutputStream(outputStream);
+    }
+
+    public void calculateAreaBoundaries() {
+        if (!this.map.isInitialized()) {
+            throw new IllegalStateException("BWEM needs to be initialized first.");
+        }
+        this.map.getAreas().forEach(a -> ((AreaInitializer) a).calcBoundaryVertices());
     }
 }

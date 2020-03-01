@@ -48,7 +48,14 @@ public class BWTA {
     }
 
     public static void analyze() {
+        analyze(true);
+    }
+
+    public static void analyze(boolean withPolygons) {
         bwem.initialize();
+        if (withPolygons) {
+            bwem.calculateAreaBoundaries();
+        }
 
         regionMap = new HashMap<>();
         for (final Area a : bwem.getMap().getAreas()) {

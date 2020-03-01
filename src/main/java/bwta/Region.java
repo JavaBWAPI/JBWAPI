@@ -7,16 +7,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Region {
-    private final Area area;
+    final Area area;
     private final Position center;
+    private final Polygon polygon;
 
     Region(final Area area) {
         this.area = area;
         this.center = area.getWalkPositionWithHighestAltitude().toPosition();
+        this.polygon = new Polygon(area);
     }
 
     public Position getCenter() {
         return center;
+    }
+
+    public Polygon getPolygon() {
+        return polygon;
     }
 
     public List<Chokepoint> getChokepoints() {

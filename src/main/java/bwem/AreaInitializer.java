@@ -316,11 +316,25 @@ final class AreaInitializer extends Area {
         if (vertices.isEmpty()) {
             return;
         }
-        final Position current = vertices.get(0);
-        vertices.remove(current);
-        vertices.sort((a, b) -> (int) (a.getDistance(current) - b.getDistance(current)));
+
+        // Sort in greedy fashion, not perfect, but good enough
+        Position current = vertices.get(0);
         boundaryVertices.add(current);
-        boundaryVertices.addAll(vertices);
+        vertices.remove(current);
+        while (!vertices.isEmpty()) {
+            Position closest = null;
+            double distance = Double.MAX_VALUE;
+            for (Position p : vertices) {
+                double d = current.getDistance(p);
+                if (d <= distance) {
+                    closest = p;
+                    distance = d;
+                }
+            }
+            current = closest;
+            boundaryVertices.add(current);
+            vertices.remove(current);
+        }
     }
 
     void createBases(final TerrainData terrainData) {
