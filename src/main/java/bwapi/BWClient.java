@@ -7,10 +7,16 @@ import java.util.Objects;
  */
 public class BWClient {
     private final BWEventListener eventListener;
+    private final boolean debugConnection;
     private EventHandler handler;
 
     public BWClient(final BWEventListener eventListener) {
+        this(eventListener, false);
+    }
+
+    public BWClient(final BWEventListener eventListener, final boolean debugConnection) {
         Objects.requireNonNull(eventListener);
+        this.debugConnection = debugConnection;
         this.eventListener = eventListener;
     }
 
@@ -31,7 +37,7 @@ public class BWClient {
      * @param autoContinue automatically continue playing the next game(s). false by default
      */
     public void startGame(boolean autoContinue) {
-        Client client = new Client();
+        Client client = new Client(debugConnection);
         client.reconnect();
         handler = new EventHandler(eventListener, client);
 
