@@ -24,7 +24,6 @@ public class Player implements Comparable<Player> {
     private final int id;
     private final String name;
     private final PlayerType playerType;
-    private final Force force;
     private final TilePosition startLocation;
 
     private PlayerSelf self = null;
@@ -41,7 +40,6 @@ public class Player implements Comparable<Player> {
         this.id = id;
         this.name = playerData.getName();
         this.playerType = PlayerType.idToEnum[playerData.getType()];
-        this.force = game.getForce(playerData.getForce());
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
     }
 
@@ -108,7 +106,7 @@ public class Player implements Comparable<Player> {
      * @return The {@link Force} object that the player is part of.
      */
     public Force getForce() {
-        return force;
+        return game.getForce(playerData.getForce());
     }
 
     /**
