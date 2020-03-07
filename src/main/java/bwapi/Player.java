@@ -23,7 +23,6 @@ public class Player implements Comparable<Player> {
     private final Game game;
     private final int id;
     private final String name;
-    private final Race race;
     private final PlayerType playerType;
     private final Force force;
     private final TilePosition startLocation;
@@ -41,7 +40,6 @@ public class Player implements Comparable<Player> {
         this.game = game;
         this.id = id;
         this.name = playerData.getName();
-        this.race = Race.idToEnum[playerData.getRace()];
         this.playerType = PlayerType.idToEnum[playerData.getType()];
         this.force = game.getForce(playerData.getForce());
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
@@ -88,7 +86,7 @@ public class Player implements Comparable<Player> {
      * have not been seen.
      */
     public Race getRace() {
-        return race;
+        return Race.idToEnum[playerData.getRace()];
     }
 
     /**
