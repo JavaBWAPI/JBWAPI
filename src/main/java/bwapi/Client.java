@@ -95,7 +95,7 @@ class Client {
     void disconnect() {
         if (debugConnection) {
             System.err.print("Disconnect called by: ");
-            System.err.println(Thread.currentThread().getStackTrace()[2].getMethodName());
+            System.err.println(Thread.currentThread().getStackTrace()[2]);
         }
         if (!connected) {
             return;
@@ -134,9 +134,6 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Game table mapping not found.");
-            if (debugConnection) {
-                e.printStackTrace();
-            }
             return false;
         }
 

@@ -14,6 +14,10 @@ public class BWClient {
         this(eventListener, false);
     }
 
+    /**
+     * @param debugConnection set to `true` for more explicit error messages (might spam the terminal).
+     *                        `false` by default
+     */
     public BWClient(final BWEventListener eventListener, final boolean debugConnection) {
         Objects.requireNonNull(eventListener);
         this.debugConnection = debugConnection;
