@@ -60,7 +60,11 @@ class Client {
     private ByteBuffer mapFileHandle = null;
     private ByteBuffer gameTableFileHandle = null;
 
-    Client() {}
+    private boolean debugConnection = false;
+
+    Client(boolean debugConnection) {
+        this.debugConnection = debugConnection;
+    }
 
     /**
      * For test purposes only
@@ -89,6 +93,10 @@ class Client {
     }
 
     void disconnect() {
+        if (debugConnection) {
+            System.err.print("Disconnect called by: ");
+            System.err.println(Thread.currentThread().getStackTrace()[2].getMethodName());
+        }
         if (!connected) {
             return;
         }
@@ -126,6 +134,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Game table mapping not found.");
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             return false;
         }
 
@@ -135,6 +146,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map Game table.");
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             return false;
         }
 
@@ -166,6 +180,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             gameTableFileHandle = null;
             return false;
         }
@@ -178,6 +195,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             pipeObjectHandle = null;
             gameTableFileHandle = null;
             return false;
@@ -188,6 +208,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             return false;
         }
 
@@ -205,8 +228,11 @@ class Client {
                 code = pipeObjectHandle.readByte();
             }
             catch (Exception e) {
-                disconnect();
                 System.err.println("Unable to read pipe object.");
+                if (debugConnection) {
+                    e.printStackTrace();
+                }
+                disconnect();
                 return false;
             }
         }
@@ -223,6 +249,9 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("failed, disconnecting");
+            if (debugConnection) {
+                e.printStackTrace();
+            }
             disconnect();
             return;
         }
@@ -232,6 +261,9 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("failed, disconnecting");
+                if (debugConnection) {
+                    e.printStackTrace();
+                }
                 disconnect();
                 return;
             }
