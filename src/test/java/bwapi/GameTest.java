@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
@@ -81,5 +84,22 @@ public class GameTest {
 
         // THEN
         assertThat(unitsInRectangle).doesNotContain(dummy);
+    }
+
+    @Test
+    public void ifReplaySelfAndEnemyShouldBeNull() throws IOException {
+        ByteBuffer buffer = GameBuilder.binToBuffer("src/test/resources/" + "(2)Benzene.scx" + "_frame0_buffer.bin");
+
+        Client client = new Client(buffer);
+        // modify the buffer to fake a replay
+        client.gameData().setIsReplay(true);
+
+        Game game = GameBuilder.createGame(client);
+
+        assertThat(game.isReplay());
+        assertThat(game.self() == null);
+        assertThat(game.enemy() == null);
+        assertThat(game.enemies().isEmpty());
+        assertThat(game.allies().isEmpty());
     }
 }
