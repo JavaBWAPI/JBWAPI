@@ -73,8 +73,6 @@ public class Game {
     private int randomSeed;
     private int revision;
     private boolean debug;
-    private Player self;
-    private Player enemy;
     private Player neutral;
     private boolean replay;
     private boolean multiplayer;
@@ -181,8 +179,6 @@ public class Game {
 
         revision = gameData.getRevision();
         debug = gameData.isDebug();
-        self = players[gameData.getSelf()];
-        enemy = players[gameData.getEnemy()];
         neutral = players[gameData.getNeutral()];
         replay = gameData.isReplay();
         multiplayer = gameData.isMultiplayer();
@@ -255,15 +251,20 @@ public class Game {
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
 
+        if (isReplay()) {
+            enemies = Collections.emptyList();
+            allies = Collections.emptyList();
+            observers = Collections.emptyList();
+        }
+        else {
+            enemies = playerSet.stream().filter(p -> !p.equals(self()) && self().isEnemy(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            allies = playerSet.stream().filter(p -> !p.equals(self()) && self().isAlly(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        enemies = playerSet.stream().filter(p -> !p.equals(self) && self.isEnemy(p))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        allies = playerSet.stream().filter(p -> !p.equals(self) && self.isAlly(p))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
-        observers = playerSet.stream().filter(p -> !p.equals(self) && p.isObserver())
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
+            observers = playerSet.stream().filter(p -> !p.equals(self()) && p.isObserver())
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        }
         setLatCom(true);
     }
 
@@ -1678,7 +1679,10 @@ public class Game {
      * @return Player object representing the current player. null if the current game is a replay.
      */
     public Player self() {
-        return self;
+        if (isReplay()) {
+            return null;
+        }
+        return players[gameData.getSelf()];
     }
 
     /**
@@ -1691,7 +1695,10 @@ public class Game {
      * @see #enemies
      */
     public Player enemy() {
-        return enemy;
+        if (isReplay()) {
+            return null;
+        }
+        return players[gameData.getEnemy()];
     }
 
     /**
