@@ -73,6 +73,8 @@ public class Game {
     private int randomSeed;
     private int revision;
     private boolean debug;
+    private Player self;
+    private Player enemy;
     private Player neutral;
     private boolean replay;
     private boolean multiplayer;
@@ -179,8 +181,10 @@ public class Game {
 
         revision = gameData.getRevision();
         debug = gameData.isDebug();
-        neutral = players[gameData.getNeutral()];
         replay = gameData.isReplay();
+        neutral = players[gameData.getNeutral()];
+        self = isReplay() ? null : players[gameData.getSelf()];
+        enemy = isReplay() ? null : players[gameData.getEnemy()];
         multiplayer = gameData.isMultiplayer();
         battleNet = gameData.isBattleNet();
         startLocations = IntStream.range(0, gameData.getStartLocationCount())
@@ -1679,10 +1683,7 @@ public class Game {
      * @return Player object representing the current player. null if the current game is a replay.
      */
     public Player self() {
-        if (isReplay()) {
-            return null;
-        }
-        return players[gameData.getSelf()];
+        return self;
     }
 
     /**
@@ -1695,10 +1696,7 @@ public class Game {
      * @see #enemies
      */
     public Player enemy() {
-        if (isReplay()) {
-            return null;
-        }
-        return players[gameData.getEnemy()];
+        return enemy;
     }
 
     /**
