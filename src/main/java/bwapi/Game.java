@@ -1499,6 +1499,10 @@ public class Game {
         return startLocations;
     }
 
+    private String formatString(final String string, final Text... colors) {
+        return colors.length > 0 ? String.format(string, Arrays.stream(colors).map(c -> c.id).toArray()) : string;
+    }
+
     /**
      * Prints text to the screen as a notification. This function allows text
      * formatting using {@link Text#formatText}.
@@ -1507,8 +1511,9 @@ public class Game {
      *
      * @param string String to print.
      */
-    public void printf(final String string) {
-        addCommand(Printf, client.addString(string), 0);
+    public void printf(final String string, final Text... colors) {
+        final String formatted = formatString(string, colors);
+        addCommand(Printf, client.addString(formatted), 0);
     }
 
     /**
@@ -1739,34 +1744,35 @@ public class Game {
         return observers;
     }
 
-    public void drawText(final CoordinateType ctype, final int x, final int y, final String string) {
-        final int stringId = client.addString(string);
+    public void drawText(final CoordinateType ctype, final int x, final int y, final String string, final Text... colors) {
+        final String formatted = formatString(string, colors);
+        final int stringId = client.addString(formatted);
         addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
     }
 
-    public void drawTextMap(final int x, final int y, final String string) {
-        drawText(CoordinateType.Map, x, y, string);
+    public void drawTextMap(final int x, final int y, final String string, final Text... colors) {
+        drawText(CoordinateType.Map, x, y, string, colors);
     }
 
-    public void drawTextMap(final Position p, final String string) {
-        drawTextMap(p.x, p.y, string);
+    public void drawTextMap(final Position p, final String string, final Text... colors) {
+        drawTextMap(p.x, p.y, string, colors);
     }
 
-    public void drawTextMouse(final int x, final int y, final String string) {
-        drawText(CoordinateType.Mouse, x, y, string);
+    public void drawTextMouse(final int x, final int y, final String string, final Text... colors) {
+        drawText(CoordinateType.Mouse, x, y, string, colors);
     }
 
-    public void drawTextMouse(final Position p, final String string) {
-        drawTextMouse(p.x, p.y, string);
+    public void drawTextMouse(final Position p, final String string, final Text... colors) {
+        drawTextMouse(p.x, p.y, string, colors);
 
     }
 
-    public void drawTextScreen(final int x, final int y, final String string) {
-        drawText(CoordinateType.Screen, x, y, string);
+    public void drawTextScreen(final int x, final int y, final String string, final Text... colors) {
+        drawText(CoordinateType.Screen, x, y, string, colors);
     }
 
-    public void drawTextScreen(final Position p, final String string) {
-        drawTextScreen(p.x, p.y, string);
+    public void drawTextScreen(final Position p, final String string, final Text... colors) {
+        drawTextScreen(p.x, p.y, string, colors);
     }
 
     public void drawBox(final CoordinateType ctype, final int left, final int top, final int right, final int bottom, final Color color) {

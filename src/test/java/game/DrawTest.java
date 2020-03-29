@@ -1,9 +1,6 @@
 package game;
 
-import bwapi.BWClient;
-import bwapi.DefaultBWListener;
-import bwapi.Game;
-import bwapi.Color;
+import bwapi.*;
 
 class DrawTest extends DefaultBWListener {
     final BWClient bwClient;
@@ -30,6 +27,7 @@ class DrawTest extends DefaultBWListener {
         game.drawTriangleScreen(143, 167,407, 167, 275, 350, Color.Purple, true);
 
         game.drawBoxScreen(200, 110, 350, 210, Color.Purple, true);
+        game.drawTextScreen(50, 50, "%cHello %cWorld!", Text.Red, Text.Green);
 
     }
 
