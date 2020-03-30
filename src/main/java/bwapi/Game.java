@@ -103,7 +103,11 @@ public class Game {
 
     Game(Client client) {
         this.client = client;
-        this.gameData = client.data();
+        this.gameData = client.gameData();
+    }
+
+    Client getClient() {
+        return client;
     }
 
     private static boolean hasPower(final int x, final int y, final UnitType unitType, final List<Unit> pylons) {
@@ -177,10 +181,10 @@ public class Game {
 
         revision = gameData.getRevision();
         debug = gameData.isDebug();
-        self = players[gameData.getSelf()];
-        enemy = players[gameData.getEnemy()];
-        neutral = players[gameData.getNeutral()];
         replay = gameData.isReplay();
+        neutral = players[gameData.getNeutral()];
+        self = isReplay() ? null : players[gameData.getSelf()];
+        enemy = isReplay() ? null : players[gameData.getEnemy()];
         multiplayer = gameData.isMultiplayer();
         battleNet = gameData.isBattleNet();
         startLocations = IntStream.range(0, gameData.getStartLocationCount())
@@ -251,16 +255,21 @@ public class Game {
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
 
+        if (isReplay()) {
+            enemies = Collections.emptyList();
+            allies = Collections.emptyList();
+            observers = Collections.emptyList();
+        }
+        else {
+            enemies = playerSet.stream().filter(p -> !p.equals(self()) && self().isEnemy(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            allies = playerSet.stream().filter(p -> !p.equals(self()) && self().isAlly(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 
-        enemies = playerSet.stream().filter(p -> !p.equals(self) && self.isEnemy(p))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        allies = playerSet.stream().filter(p -> !p.equals(self) && self.isAlly(p))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
-        observers = playerSet.stream().filter(p -> !p.equals(self) && p.isObserver())
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
-        latcom = gameData.getHasLatCom();
+            observers = playerSet.stream().filter(p -> !p.equals(self()) && p.isObserver())
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        }
+        setLatCom(true);
     }
 
     void unitCreate(final int id) {

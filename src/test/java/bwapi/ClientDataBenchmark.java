@@ -35,7 +35,7 @@ public class ClientDataBenchmark {
         @Setup(Level.Invocation)
         public void setup() {
             client = new Client(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
-            data = client.data();
+            data = client.gameData();
             game = new Game(client);
             String[] strings = buildStrings();
             for (String s : strings) {
@@ -69,7 +69,7 @@ public class ClientDataBenchmark {
         for (int i = 0; i < Client.MAX_COUNT; i++) {
             s.game.addUnitCommand(0, 1, 2, 3, 4, 5);
         }
-        return s.client.data().getCommandCount();
+        return s.client.gameData().getCommandCount();
     }
 
     @Benchmark
@@ -78,7 +78,7 @@ public class ClientDataBenchmark {
         for (int i = 0; i < Client.MAX_COUNT; i++) {
             s.client.addString(s.strings[i]);
         }
-        return s.client.data().getStringCount();
+        return s.client.gameData().getStringCount();
     }
 
     @Benchmark

@@ -274,7 +274,10 @@ public final class ChokePoint {
     }
 
     void onBlockingNeutralDestroyed(final Neutral pBlocking) {
-        if (!(pBlocking != null && pBlocking.isBlocking())) {
+        if (pBlocking == null) {
+            throw new IllegalStateException();
+        }
+        if (!pBlocking.isBlocking()) {
             graph.getMap().asserter.throwIllegalStateException("");
         }
 

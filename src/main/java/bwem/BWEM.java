@@ -23,7 +23,7 @@ import java.io.OutputStream;
  * By default BWEM throws when an invalid state is encountered.
  * But if you know what you are doing, you can skip these throws by setting
  * {@link #setFailOnError} to `false`.
- * These errors will then be outputted to {@link System.err}, but this can also be changed
+ * These errors will then be outputted to `System.err`, but this can also be changed
  * with {@link #setFailOutputStream} (if you set it to `null` the errors will be completely ignored).
  */
 public final class BWEM {
