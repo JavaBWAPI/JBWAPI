@@ -12,6 +12,18 @@ public class TilePosition extends Point<TilePosition> {
         super(x, y, SIZE_IN_PIXELS);
     }
 
+    public TilePosition(final Position p) {
+        super(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS, SIZE_IN_PIXELS);
+    }
+
+    public TilePosition(final WalkPosition wp) {
+        super(wp.x / WalkPosition.TILE_WALK_FACTOR, wp.y / WalkPosition.TILE_WALK_FACTOR, SIZE_IN_PIXELS);
+    }
+
+    public TilePosition(final TilePosition tp) {
+        super(tp.x, tp.y, SIZE_IN_PIXELS);
+    }
+
     TilePosition(ClientData.Position position) {
         this(position.getX(), position.getY());
     }

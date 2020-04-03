@@ -12,6 +12,18 @@ public class WalkPosition extends Point<WalkPosition> {
         super(x, y, SIZE_IN_PIXELS);
     }
 
+    public WalkPosition(final Position p) {
+        super(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS, SIZE_IN_PIXELS);
+    }
+
+    public WalkPosition(final WalkPosition wp) {
+        super(wp.x, wp.y, SIZE_IN_PIXELS);
+    }
+
+    public WalkPosition(final TilePosition tp) {
+        super(tp.x * TILE_WALK_FACTOR, tp.y * TILE_WALK_FACTOR, SIZE_IN_PIXELS);
+    }
+
     public Position toPosition() {
         return new Position(x * SIZE_IN_PIXELS, y * SIZE_IN_PIXELS);
     }

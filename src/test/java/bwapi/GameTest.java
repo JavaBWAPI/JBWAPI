@@ -1,6 +1,7 @@
 package bwapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -97,8 +98,8 @@ public class GameTest {
         Game game = GameBuilder.createGame(client);
 
         assertThat(game.isReplay());
-        assertThat(game.self() == null);
-        assertThat(game.enemy() == null);
+        assertNull(game.self());
+        assertNull(game.enemy());
         assertThat(game.enemies().isEmpty());
         assertThat(game.allies().isEmpty());
     }
