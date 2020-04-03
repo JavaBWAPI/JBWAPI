@@ -341,8 +341,19 @@ public abstract class BWMap {
         return breadthFirstSearch(start, findCond, visitCond, true);
     }
 
-    private List<Unit> filterPlayerUnits(final Collection<Unit> units,
-        final Player player) {
+    public Tile getTile(final TilePosition tilePosition) {
+        return getData().getTile(tilePosition);
+    }
+
+    public Position getCenter() {
+        return getData().getMapData().getCenter();
+    }
+
+    public List<TilePosition> getStartingLocations() {
+        return getData().getMapData().getStartingLocations();
+    }
+
+    private List<Unit> filterPlayerUnits(final Collection<Unit> units, final Player player) {
         //        return this.units.stream().filter(u -> u instanceof PlayerUnit
         //                && ((PlayerUnit)u).getPlayer().equals(player)).map(u ->
         // (PlayerUnit)u).collect(Collectors.toList());

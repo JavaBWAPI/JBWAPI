@@ -113,7 +113,7 @@ public enum Text {
     /**
      * A bright blue color.
      */
-    Turquoise(3);
+    Turquoise(31);
 
     final byte id;
 
