@@ -13,23 +13,23 @@ public class WalkPosition extends Point<WalkPosition> {
     }
 
     public WalkPosition(final Position p) {
-        super(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS, SIZE_IN_PIXELS);
+        this(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS);
     }
 
     public WalkPosition(final WalkPosition wp) {
-        super(wp.x, wp.y, SIZE_IN_PIXELS);
+        this(wp.x, wp.y);
     }
 
     public WalkPosition(final TilePosition tp) {
-        super(tp.x * TILE_WALK_FACTOR, tp.y * TILE_WALK_FACTOR, SIZE_IN_PIXELS);
+        this(tp.x * TILE_WALK_FACTOR, tp.y * TILE_WALK_FACTOR);
     }
 
     public Position toPosition() {
-        return new Position(x * SIZE_IN_PIXELS, y * SIZE_IN_PIXELS);
+        return new Position(this);
     }
 
     public TilePosition toTilePosition() {
-        return new TilePosition(x / TILE_WALK_FACTOR, y / TILE_WALK_FACTOR);
+        return new TilePosition(this);
     }
 
     public WalkPosition subtract(final WalkPosition other) {

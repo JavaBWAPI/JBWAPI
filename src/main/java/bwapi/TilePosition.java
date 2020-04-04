@@ -13,15 +13,15 @@ public class TilePosition extends Point<TilePosition> {
     }
 
     public TilePosition(final Position p) {
-        super(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS, SIZE_IN_PIXELS);
+        this(p.x / SIZE_IN_PIXELS, p.y / SIZE_IN_PIXELS);
     }
 
     public TilePosition(final WalkPosition wp) {
-        super(wp.x / WalkPosition.TILE_WALK_FACTOR, wp.y / WalkPosition.TILE_WALK_FACTOR, SIZE_IN_PIXELS);
+        this(wp.x / WalkPosition.TILE_WALK_FACTOR, wp.y / WalkPosition.TILE_WALK_FACTOR);
     }
 
     public TilePosition(final TilePosition tp) {
-        super(tp.x, tp.y, SIZE_IN_PIXELS);
+        this(tp.x, tp.y);
     }
 
     TilePosition(ClientData.Position position) {
@@ -29,11 +29,11 @@ public class TilePosition extends Point<TilePosition> {
     }
 
     public Position toPosition() {
-        return new Position(x * SIZE_IN_PIXELS, y * SIZE_IN_PIXELS);
+        return new Position(this);
     }
 
     public WalkPosition toWalkPosition() {
-        return new WalkPosition(x * TILE_WALK_FACTOR, y * TILE_WALK_FACTOR);
+        return new WalkPosition(this);
     }
 
     public TilePosition subtract(final TilePosition other) {
