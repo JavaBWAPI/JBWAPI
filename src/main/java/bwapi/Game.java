@@ -1499,7 +1499,7 @@ public class Game {
         return startLocations;
     }
 
-    private String formatString(final String string, final Text... colors) {
+    static String formatString(final String string, final Text... colors) {
         return colors.length > 0 ? String.format(string, Arrays.stream(colors).map(c -> c.id).toArray()) : string;
     }
 

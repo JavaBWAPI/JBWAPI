@@ -125,12 +125,7 @@ public enum Text {
      * Format text with a textcolor to display on broodwar
      */
     public static String formatText(final String text, final Text format) {
-        final byte[] data = text.getBytes();
-        final int len = text.length();
-        final byte[] formatted = new byte[len + 1];
-        formatted[0] = format.id;
-        System.arraycopy(data, 0, formatted, 1, len);
-        return new String(formatted);
+        return Game.formatString("%c" + text, format);
     }
 
     /**
