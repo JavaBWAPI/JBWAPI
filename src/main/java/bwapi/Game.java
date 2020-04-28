@@ -1524,8 +1524,8 @@ public class Game {
      * @param string String to send.
      * @see #sendTextEx
      */
-    public void sendText(final String string) {
-        addCommand(SendText, client.addString(string), 0);
+    public void sendText(final String string, final Text... colors) {
+        sendTextEx(false, string, colors);
     }
 
     /**
@@ -1536,8 +1536,9 @@ public class Game {
      * @param string   String to send.
      * @see #sendText
      */
-    public void sendTextEx(final boolean toAllies, final String string) {
-        addCommand(SendText, client.addString(string), toAllies ? 1 : 0);
+    public void sendTextEx(final boolean toAllies, final String string, final Text... colors) {
+        final String formatted = formatString(string, colors);
+        addCommand(SendText, client.addString(formatted), toAllies ? 1 : 0);
     }
 
     /**
@@ -1764,7 +1765,6 @@ public class Game {
 
     public void drawTextMouse(final Position p, final String string, final Text... colors) {
         drawTextMouse(p.x, p.y, string, colors);
-
     }
 
     public void drawTextScreen(final int x, final int y, final String string, final Text... colors) {
@@ -1893,7 +1893,6 @@ public class Game {
 
     public void drawTriangleMouse(Position a, Position b, Position c, Color color, boolean isSolid) {
         drawTriangle(CoordinateType.Mouse, a.x, a.y, b.x, b.y, c.x, c.y, color, isSolid);
-
     }
 
     public void drawTriangleScreen(int ax, int ay, int bx, int by, int cx, int cy, Color color) {
@@ -2105,12 +2104,10 @@ public class Game {
 
     public void drawLineMouse(int x1, int y1, int x2, int y2, Color color) {
         drawLine(CoordinateType.Mouse, x1, y1, x2, y2, color);
-
     }
 
     public void drawLineMouse(Position a, Position b, Color color) {
         drawLine(CoordinateType.Mouse, a.x, a.y, b.x, b.y, color);
-
     }
 
     public void drawLineScreen(int x1, int y1, int x2, int y2, Color color) {
