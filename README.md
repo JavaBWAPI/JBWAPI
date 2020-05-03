@@ -35,11 +35,13 @@ Add JitPack as a repository:
 ```
 Add JBWAPI as a dependency:
 ```
-<dependency>
-    <groupId>com.github.JavaBWAPI</groupId>
-    <artifactId>JBWAPI</artifactId>
-    <version>1.4</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.github.JavaBWAPI</groupId>
+        <artifactId>JBWAPI</artifactId>
+        <version>1.4</version>
+    </dependency>
+</dependencies>
 ```
 
 **Gradle**
