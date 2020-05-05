@@ -33,7 +33,7 @@ Add JitPack as a repository:
     </repository>
 </repositories>
 ```
-Add JBWAPI as a dependency:
+Add JBWAPI to your dependencies in `<dependencies></dependencies>`:
 ```
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
