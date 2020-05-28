@@ -53,7 +53,6 @@ public class Unit implements Comparable<Unit> {
     private final Position initialPosition;
     private final TilePosition initialTilePosition;
     private final int id;
-    private final int replayID;
     // variable
     private Position position;
     private int lastPositionUpdate = -1;
@@ -83,7 +82,6 @@ public class Unit implements Comparable<Unit> {
         initialTilePosition = getTilePosition();
 
         this.id = id;
-        replayID = unitData.getReplayID();
     }
 
     private static boolean reallyGatheringGas(final Unit targ, final Player player) {
@@ -136,7 +134,7 @@ public class Unit implements Comparable<Unit> {
      * @see #getID
      */
     public int getReplayID() {
-        return replayID;
+        return unitData.getReplayID();
     }
 
     /**
