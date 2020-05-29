@@ -199,7 +199,7 @@ public enum UpgradeType {
             Race.Protoss, Race.Protoss, Race.Protoss, Race.None, Race.None, Race.Protoss, Race.None, Race.Protoss, Race.None, Race.Terran, Race.Zerg, Race.Zerg, Race.Terran, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.None, Race.Unknown
     };
 
-    public static final UpgradeType[] idToEnum = new UpgradeType[62 + 1];
+    static final UpgradeType[] idToEnum = new UpgradeType[62 + 1];
 
     static {
         Arrays.stream(UpgradeType.values()).forEach(v -> idToEnum[v.id] = v);
