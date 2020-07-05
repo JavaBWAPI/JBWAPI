@@ -1001,7 +1001,7 @@ public class Unit implements Comparable<Unit> {
         if (game.isLatComEnabled() && self().targetPositionX.valid(game.getFrameCount())) {
             return new Position(self().targetPositionX.get(), self().targetPositionY.get());
         }
-        return new Position(unitData.getOrderTargetPositionX(), unitData.getOrderTargetPositionY());
+        return new Position(unitData.getTargetPositionX(), unitData.getTargetPositionY());
     }
 
     /**
