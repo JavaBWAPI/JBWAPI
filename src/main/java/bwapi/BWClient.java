@@ -7,20 +7,10 @@ import java.util.Objects;
  */
 public class BWClient {
     private final BWEventListener eventListener;
-    private final boolean debugConnection;
     private EventHandler handler;
 
     public BWClient(final BWEventListener eventListener) {
-        this(eventListener, false);
-    }
-
-    /**
-     * @param debugConnection set to `true` for more explicit error messages (might spam the terminal).
-     *                        `false` by default
-     */
-    public BWClient(final BWEventListener eventListener, final boolean debugConnection) {
         Objects.requireNonNull(eventListener);
-        this.debugConnection = debugConnection;
         this.eventListener = eventListener;
     }
 
@@ -32,7 +22,8 @@ public class BWClient {
     }
 
     public void startGame() {
-        startGame(false);
+        BWClientConfiguration configuration = new BWClientConfiguration();
+        startGame(configuration);
     }
 
     /**
@@ -40,8 +31,20 @@ public class BWClient {
      *
      * @param autoContinue automatically continue playing the next game(s). false by default
      */
+    @Deprecated
     public void startGame(boolean autoContinue) {
-        Client client = new Client(debugConnection);
+        BWClientConfiguration configuration = new BWClientConfiguration();
+        configuration.autoContinue = autoContinue;
+        startGame(configuration);
+    }
+
+    /**
+     * Start the game.
+     *
+     * @param configuration Settings for playing games with this client.
+     */
+    public void startGame(BWClientConfiguration configuration) {
+        Client client = new Client(configuration);
         client.reconnect();
         handler = new EventHandler(eventListener, client);
 
@@ -59,6 +62,6 @@ public class BWClient {
                     client.reconnect();
                 }
             }
-        } while (autoContinue); // lgtm [java/constant-loop-condition]
+        } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
     }
 }

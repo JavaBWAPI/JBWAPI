@@ -60,10 +60,10 @@ class Client {
     private ByteBuffer mapFileHandle = null;
     private ByteBuffer gameTableFileHandle = null;
 
-    private boolean debugConnection = false;
+    private BWClientConfiguration configuration = new BWClientConfiguration();
 
-    Client(boolean debugConnection) {
-        this.debugConnection = debugConnection;
+    Client(BWClientConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     /**
@@ -93,7 +93,7 @@ class Client {
     }
 
     void disconnect() {
-        if (debugConnection) {
+        if (configuration.debugConnection) {
             System.err.print("Disconnect called by: ");
             System.err.println(Thread.currentThread().getStackTrace()[2]);
         }
@@ -143,7 +143,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map Game table.");
-            if (debugConnection) {
+            if (configuration.debugConnection) {
                 e.printStackTrace();
             }
             return false;
@@ -177,7 +177,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
-            if (debugConnection) {
+            if (configuration.debugConnection) {
                 e.printStackTrace();
             }
             gameTableFileHandle = null;
@@ -192,7 +192,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
-            if (debugConnection) {
+            if (configuration.debugConnection) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -205,7 +205,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
-            if (debugConnection) {
+            if (configuration.debugConnection) {
                 e.printStackTrace();
             }
             return false;
@@ -226,7 +226,7 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
-                if (debugConnection) {
+                if (configuration.debugConnection) {
                     e.printStackTrace();
                 }
                 disconnect();
@@ -246,7 +246,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("failed, disconnecting");
-            if (debugConnection) {
+            if (configuration.debugConnection) {
                 e.printStackTrace();
             }
             disconnect();
@@ -258,7 +258,7 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("failed, disconnecting");
-                if (debugConnection) {
+                if (configuration.debugConnection) {
                     e.printStackTrace();
                 }
                 disconnect();
