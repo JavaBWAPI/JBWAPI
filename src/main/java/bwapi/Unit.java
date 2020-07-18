@@ -970,7 +970,7 @@ public class Unit implements Comparable<Unit> {
      * another unit.
      */
     public Unit getBuildUnit() {
-        if (game.isLatComEnabled() && self().buildType.valid(game.getFrameCount())) {
+        if (game.isLatComEnabled() && self().buildUnit.valid(game.getFrameCount())) {
             return game.getUnit(self().buildUnit.get());
         }
         return game.getUnit(unitData.getBuildUnit());

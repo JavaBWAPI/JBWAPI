@@ -522,7 +522,7 @@ public class Player implements Comparable<Player> {
      */
     public boolean isUpgrading(final UpgradeType upgrade) {
         if (game.isLatComEnabled() && self().isUpgrading[upgrade.id].valid(game.getFrameCount())) {
-            return self().isResearching[upgrade.id].get();
+            return self().isUpgrading[upgrade.id].get();
         }
         return playerData.isUpgrading(upgrade.id);
     }
