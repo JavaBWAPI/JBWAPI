@@ -305,7 +305,7 @@ public class Game {
     }
 
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
-        ClientData.UnitCommand unitCommand = client.addUnitCommand();
+        ClientData.UnitCommand unitCommand = GameDataUtils.addUnitCommand(client.gameData());
         unitCommand.setTid(type);
         unitCommand.setUnitIndex(unit);
         unitCommand.setTargetIndex(target);
@@ -315,14 +315,14 @@ public class Game {
     }
 
     void addCommand(final CommandType type, final int value1, final int value2) {
-        Command command = client.addCommand();
+        Command command = GameDataUtils.addCommand(client.gameData());
         command.setType(type);
         command.setValue1(value1);
         command.setValue2(value2);
     }
 
     void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
-        Shape shape = client.addShape();
+        Shape shape = GameDataUtils.addShape(client.gameData());
         shape.setType(type);
         shape.setCtype(coordType);
         shape.setX1(x1);
@@ -1513,7 +1513,7 @@ public class Game {
      */
     public void printf(final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        addCommand(Printf, client.addString(formatted), 0);
+        addCommand(Printf, GameDataUtils.addString(client.gameData(), formatted), 0);
     }
 
     /**
@@ -1538,7 +1538,7 @@ public class Game {
      */
     public void sendTextEx(final boolean toAllies, final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        addCommand(SendText, client.addString(formatted), toAllies ? 1 : 0);
+        addCommand(SendText, GameDataUtils.addString(client.gameData(), formatted), toAllies ? 1 : 0);
     }
 
     /**
@@ -1747,7 +1747,7 @@ public class Game {
 
     public void drawText(final CoordinateType ctype, final int x, final int y, final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        final int stringId = client.addString(formatted);
+        final int stringId = GameDataUtils.addString(client.gameData(), formatted);
         addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
     }
 
@@ -2363,7 +2363,7 @@ public class Game {
             return false;
         }
 
-        addCommand(CommandType.SetMap, client.addString(mapFileName), 0);
+        addCommand(CommandType.SetMap, GameDataUtils.addString(client.gameData(), mapFileName), 0);
         return true;
     }
 

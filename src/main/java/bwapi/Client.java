@@ -25,9 +25,7 @@ SOFTWARE.
 
 package bwapi;
 
-import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
-import bwapi.ClientData.Shape;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
@@ -48,17 +46,14 @@ class Client {
     }
 
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
-
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
-    static final int MAX_COUNT = 19999;
-    static final int MAX_STRING_SIZE = 1024;
 
     private ClientData clientData;
     private ClientData.GameData gameData;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
-    private ByteBuffer mapFileHandle = null;
     private ByteBuffer gameTableFileHandle = null;
+    private ByteBuffer mapFileHandle = null;
 
     private BWClientConfiguration configuration = new BWClientConfiguration();
 
@@ -70,7 +65,8 @@ class Client {
      * For test purposes only
      */
     Client(ByteBuffer buffer) {
-        clientData = new ClientData(buffer);
+        clientData = new ClientData();
+        clientData.setBuffer(buffer);
         gameData = clientData.new GameData(0);
     }
 
@@ -86,7 +82,7 @@ class Client {
         return connected;
     }
 
-    void reconnect(){
+    void reconnect() {
         while (!connect()) {
             sleep(1000);
         }
@@ -111,8 +107,8 @@ class Client {
             pipeObjectHandle = null;
         }
 
-        mapFileHandle = null;
         gameTableFileHandle = null;
+        mapFileHandle = null;
         gameData = null;
         connected = false;
     }
@@ -126,6 +122,7 @@ class Client {
         int serverProcID = -1;
         int gameTableIndex = -1;
 
+        // Expose the BWAPI list of games from shared memory via a ByteBuffer
         try {
             gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
                     MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
@@ -185,6 +182,7 @@ class Client {
         }
         System.out.println("Connected");
 
+        // Expose the raw game data from shared memory via a ByteBuffer
         try {
             mapFileHandle = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
@@ -200,7 +198,8 @@ class Client {
             return false;
         }
         try {
-            clientData = new ClientData(mapFileHandle);
+            clientData = new ClientData();
+            clientData.setBuffer(mapFileHandle);
             gameData = clientData.new GameData(0);
         }
         catch (Exception e) {
@@ -239,7 +238,7 @@ class Client {
         return true;
     }
 
-    void update(final EventHandler handler) {
+    void update() {
         byte code = 1;
         try {
             pipeObjectHandle.writeByte(code);
@@ -265,60 +264,10 @@ class Client {
                 return;
             }
         }
-        for (int i = 0; i < gameData.getEventCount(); i++) {
-            handler.operation(gameData.getEvents(i));
-        }
-    }
-
-    String eventString(final int s) {
-        return gameData.getEventStrings(s);
-    }
-
-    int addString(final String string) {
-        int stringCount = gameData.getStringCount();
-        if (stringCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many strings!");
-        }
-
-        //truncate string if its size equals or exceeds 1024
-        final String stringTruncated = string.length() >= MAX_STRING_SIZE
-                ? string.substring(0, MAX_STRING_SIZE - 1)
-                : string;
-
-        gameData.setStringCount(stringCount + 1);
-        gameData.setStrings(stringCount, stringTruncated);
-        return stringCount;
-    }
-
-    Shape addShape() {
-        int shapeCount = gameData.getShapeCount();
-        if (shapeCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many shapes!");
-        }
-        gameData.setShapeCount(shapeCount + 1);
-        return gameData.getShapes(shapeCount);
-    }
-
-    Command addCommand() {
-        final int commandCount = gameData.getCommandCount();
-        if (commandCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many commands!");
-        }
-        gameData.setCommandCount(commandCount + 1);
-        return gameData.getCommands(commandCount);
-    }
-
-    ClientData.UnitCommand addUnitCommand() {
-        int unitCommandCount = gameData.getUnitCommandCount();
-        if (unitCommandCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many unit commands!");
-        }
-        gameData.setUnitCommandCount(unitCommandCount + 1);
-        return gameData.getUnitCommands(unitCommandCount);
     }
 
     private void sleep(final int millis) {
-        try{
+        try {
             Thread.sleep(millis);
         }
         catch (Exception ignored) {

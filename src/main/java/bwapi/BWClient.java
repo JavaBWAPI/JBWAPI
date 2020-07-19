@@ -44,6 +44,7 @@ public class BWClient {
      * @param configuration Settings for playing games with this client.
      */
     public void startGame(BWClientConfiguration configuration) {
+        configuration.validate();
         Client client = new Client(configuration);
         client.reconnect();
         handler = new EventHandler(eventListener, client);
@@ -53,10 +54,10 @@ public class BWClient {
                 if (!client.isConnected()) {
                     return;
                 }
-                client.update(handler);
+                client.update();
             }
             while (getGame().isInGame()) {
-                client.update(handler);
+                client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();

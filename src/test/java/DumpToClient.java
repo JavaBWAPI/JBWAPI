@@ -92,9 +92,13 @@ public class DumpToClient {
             out.println("package bwapi;");
             out.println("import java.nio.ByteBuffer;");
             out.println("final class ClientData {");
-            out.println("    final WrappedBuffer buffer;");
-            out.println("    ClientData(final ByteBuffer buffer) {");
+            out.println("    WrappedBuffer buffer;");
+            out.println("    private int bufferOffset = 0;");
+            out.println("    public void setBuffer(ByteBuffer buffer) {");
             out.println("        this.buffer = new WrappedBuffer(buffer);");
+            out.println("    }");
+            out.println("    public void setBufferOffset(int offset) {");
+            out.println("        this.bufferOffset = offset;");
             out.println("    }");
             structs.values().forEach(s -> {
                 out.printf("    class %s {\n", s.name);
@@ -173,9 +177,9 @@ public class DumpToClient {
                             }
                             offset *= v.arraySizes.get(i);
                         }
-                        offsetString = "myOffset + " + v.offset + " + " + String.join(" + ", index);
+                        offsetString = "bufferOffset + myOffset + " + v.offset + " + " + String.join(" + ", index);
                     } else {
-                        offsetString = "myOffset + " + v.offset;
+                        offsetString = "bufferOffset + myOffset + " + v.offset;
                     }
                     String paramString = String.join(", ", params);
                     out.printf("%s) {\n", paramString);
