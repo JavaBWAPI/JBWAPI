@@ -2244,7 +2244,7 @@ public class Game {
 
     /**
      * Sets the number of graphical frames for every logical frame. This
-     * allows the game to run more logical frames per graphical frame, increasing the speed at
+     * allows the game to step more logical frames per graphical frame, increasing the speed at
      * which the game runs.
      *
      * @param frameSkip Number of graphical frames per logical frame. If this value is 0 or less, then it will default to 1.

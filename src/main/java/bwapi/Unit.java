@@ -1019,7 +1019,7 @@ public class Unit implements Comparable<Unit> {
 
     /**
      * Retrieves the secondary Order that the unit is assigned. Secondary
-     * orders are run in the background as a sub-order. An example would be {@link Order#TrainFighter},
+     * orders are step in the background as a sub-order. An example would be {@link Order#TrainFighter},
      * because a @Carrier can move and train fighters at the same time.
      *
      * @return The secondary {@link Order} that the unit is executing.

@@ -22,7 +22,7 @@ public class BWClientConfiguration {
      * and some tournaments enforce frame-wise time limits (at time of writing, 55ms for COG and AIIDE; 85ms for SSCAIT).
      *
      * Asynchronous mode invokes bot event handlers in a separate thread, and if all event handlers haven't returned by a specified period of time, sends an
-     * returns control to StarCraft, allowing the game to proceed while the bot continues to run in the background. This increases the likelihood of meeting
+     * returns control to StarCraft, allowing the game to proceed while the bot continues to step in the background. This increases the likelihood of meeting
      * real-time performance requirements, while not fully guaranteeing it (subject to the whims of the JVM thread scheduler), at a cost of the bot possibly
      * issuing commands later than intended, and a marginally larger memory footprint.
      */

@@ -31,32 +31,35 @@ import java.nio.ByteBuffer;
  * Manages invocation of bot event handlers
  */
 public class BotWrapper {
-    private EventHandler eventHandler;
-    private ByteBuffer sharedMemory;
     private BWClientConfiguration configuration;
-
+    private ByteBuffer sharedMemory;
+    private ClientData.GameData gameData;
+    private EventHandler eventHandler;
     private FrameBuffer frameBuffer;
 
-    public BotWrapper(ByteBuffer sharedMemory, EventHandler eventHandler, BWClientConfiguration configuration) {
-        this.sharedMemory = sharedMemory;
-        this.eventHandler = eventHandler;
+    public BotWrapper(
+            BWClientConfiguration configuration,
+            ByteBuffer sharedMemory,
+            ClientData.GameData gameData,
+            EventHandler eventHandler) {
         this.configuration = configuration;
+        this.sharedMemory = sharedMemory;
+        this.gameData = gameData;
+        this.eventHandler = eventHandler;
 
         if (configuration.async) {
             frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize);
         }
     }
 
-    public void run() {
+    public void step() {
         if (configuration.async) {
             // TODO: Synchronize
             frameBuffer.enqueueFrame();
         } else {
-            /*
             for (int i = 0; i < gameData.getEventCount(); i++) {
                 eventHandler.operation(gameData.getEvents(i));
             }
-            */
         }
     }
 }

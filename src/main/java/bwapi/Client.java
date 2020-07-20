@@ -78,6 +78,10 @@ class Client {
         return gameData;
     }
 
+    ByteBuffer mapFile() {
+        return mapFileHandle;
+    }
+
     boolean isConnected() {
         return connected;
     }

@@ -50,19 +50,28 @@ public class BWClient {
         handler = new EventHandler(eventListener, client);
 
         do {
+            BotWrapper botWrapper;
             while (!getGame().isInGame()) {
                 if (!client.isConnected()) {
                     return;
                 }
                 client.update();
             }
+            botWrapper = new BotWrapper(configuration, client.mapFile(), client.gameData(), handler);
+            botWrapper.step();
             while (getGame().isInGame()) {
                 client.update();
+                botWrapper.step();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }
+
+            // TODO: Before exiting give async bot time to complete onEnd().
+
         } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
+
+
     }
 }
