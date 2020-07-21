@@ -57,18 +57,19 @@ public class BWClient {
                 }
                 client.update();
             }
-            botWrapper = new BotWrapper(configuration, client.mapFile(), client.gameData(), handler);
-            botWrapper.step();
+
+            botWrapper = new BotWrapper(configuration, client.mapFile(), client.clientData(), handler);
+
             while (getGame().isInGame()) {
-                client.update();
                 botWrapper.step();
+                client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }
 
-            // TODO: Before exiting give async bot time to complete onEnd().
+            // TODO: Before exiting give async bot time to complete onEnd(), maybe via thread.join().
 
         } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
 

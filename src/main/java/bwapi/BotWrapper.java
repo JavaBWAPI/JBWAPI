@@ -30,36 +30,59 @@ import java.nio.ByteBuffer;
 /**
  * Manages invocation of bot event handlers
  */
-public class BotWrapper {
-    private BWClientConfiguration configuration;
-    private ByteBuffer sharedMemory;
-    private ClientData.GameData gameData;
-    private EventHandler eventHandler;
-    private FrameBuffer frameBuffer;
+class BotWrapper {
+    private final BWClientConfiguration configuration;
+    private final ByteBuffer sharedMemory;
+    private final ClientData clientData;
+    private final EventHandler eventHandler;
+    private final FrameBuffer frameBuffer;
+    private final Thread botThread;
 
-    public BotWrapper(
+    BotWrapper(
             BWClientConfiguration configuration,
             ByteBuffer sharedMemory,
-            ClientData.GameData gameData,
+            ClientData clientData,
             EventHandler eventHandler) {
         this.configuration = configuration;
         this.sharedMemory = sharedMemory;
-        this.gameData = gameData;
+        this.clientData = clientData;
         this.eventHandler = eventHandler;
 
         if (configuration.async) {
             frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize);
+            botThread = new Thread(() -> {
+                while(true) {
+                    while(frameBuffer.empty()) try {
+                        frameBuffer.wait();
+                    } catch (InterruptedException ignored) {}
+
+                    frameBuffer.dequeueFrame(clientData);
+                    handleEvents();
+                    if (!clientData.new GameData(0).isInGame()) {
+                        return;
+                    }
+                }
+            });
+        } else {
+            frameBuffer = null;
+            botThread = null;
         }
     }
 
-    public void step() {
+    void step() {
         if (configuration.async) {
-            // TODO: Synchronize
-            frameBuffer.enqueueFrame();
+            frameBuffer.enqueueFrame(sharedMemory);
+            frameBuffer.notifyAll();
         } else {
-            for (int i = 0; i < gameData.getEventCount(); i++) {
-                eventHandler.operation(gameData.getEvents(i));
-            }
+            handleEvents();
         }
     }
+
+    private void handleEvents() {
+        for (int i = 0; i < clientData.new GameData(0).getEventCount(); i++) {
+            eventHandler.operation(clientData.new GameData(0).getEvents(i));
+        }
+    }
+
+
 }

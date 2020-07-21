@@ -29,15 +29,10 @@ public class BWClientConfiguration {
     public boolean async = false;
 
     /**
-     * How frequently (in nanoseconds) to poll for the bot's event handlers completing. Acts as a floor on the bot's frame duration.
-     */
-    public int asyncFrameDurationNanosMin = 500;
-
-    /**
      * If JBWAPI detects that this much time (in nanoseconds) has passed since a bot's event handlers began, returns control back to BWAPI.
      * Real-time human play typically uses the "fastest" game speed, which has 42.86ms (42,860ns) between frames.
      */
-    public int asyncFrameDurationNanosMax = 40000;
+    public int asyncFrameDurationNanos = 40000;
 
     /**
      * The maximum number of frames to buffer while waiting on a bot.
@@ -58,11 +53,8 @@ public class BWClientConfiguration {
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
     public void validate() {
-        if (async && asyncFrameDurationNanosMin <= 0) {
-            throw new IllegalArgumentException("asyncFrameDurationNanosMin needs to be a positive number (it's how long JBWAPI waits to poll for a completed frame.");
-        }
-        if (async && asyncFrameDurationNanosMax < 0) {
-            throw new IllegalArgumentException("asyncFrameDurationNanosMax needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
+        if (async && asyncFrameDurationNanos < 0) {
+            throw new IllegalArgumentException("asyncFrameDurationNanos needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
         }
         if (async && asyncFrameBufferSize < 1) {
             throw new IllegalArgumentException("asyncFrameBufferSize needs to be a positive number (There needs to be at least one frame buffer).");
