@@ -26,63 +26,74 @@ SOFTWARE.
 package bwapi;
 
 import java.nio.ByteBuffer;
+import java.util.EventListener;
 
 /**
  * Manages invocation of bot event handlers
  */
 class BotWrapper {
     private final BWClientConfiguration configuration;
-    private final ByteBuffer sharedMemory;
-    private final ClientData clientData;
-    private final EventHandler eventHandler;
+    private final BWEventListener eventListener;
+    private final Game game;
     private final FrameBuffer frameBuffer;
     private final Thread botThread;
 
-    BotWrapper(
-            BWClientConfiguration configuration,
-            ByteBuffer sharedMemory,
-            ClientData clientData,
-            EventHandler eventHandler) {
+    BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener, ByteBuffer dataSource) {
         this.configuration = configuration;
-        this.sharedMemory = sharedMemory;
-        this.clientData = clientData;
-        this.eventHandler = eventHandler;
+        this.eventListener = eventListener;
+
+        ClientData currentClientData = new ClientData();
+        currentClientData.setBuffer(dataSource);
+        game = new Game(currentClientData);
 
         if (configuration.async) {
-            frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize);
+            frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize, dataSource);
             botThread = new Thread(() -> {
                 while(true) {
-                    while(frameBuffer.empty()) try {
-                        frameBuffer.wait();
-                    } catch (InterruptedException ignored) {}
+                    while(frameBuffer.empty()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
 
-                    frameBuffer.dequeueFrame(clientData);
+                    System.out.println("Bot thread: Dequeuing frame. There are " + frameBuffer.framesBuffered() + " frames buffered.");
+                    game.clientData().setBuffer(frameBuffer.dequeueFrame());
+
+                    System.out.println("Bot thread: Handling events.");
                     handleEvents();
-                    if (!clientData.new GameData(0).isInGame()) {
+                    if (!game.clientData().gameData().isInGame()) {
+                        System.out.println("Bot thread: Exiting.");
                         return;
+                    } else {
+                        System.out.println("Bot thread: Handled events.");
                     }
                 }
             });
+            botThread.setName("JBWAPI Bot");
+            botThread.start();
         } else {
             frameBuffer = null;
             botThread = null;
         }
     }
 
+    Game getGame() {
+        return game;
+    }
+
+    boolean botIdle() {
+        // TODO: This returns true if the bot is still processing the newest frame, leaving the bot permanently one frame behind
+        return frameBuffer.empty();
+    }
+
     void step() {
         if (configuration.async) {
-            frameBuffer.enqueueFrame(sharedMemory);
-            frameBuffer.notifyAll();
+            frameBuffer.enqueueFrame();
         } else {
             handleEvents();
         }
     }
 
     private void handleEvents() {
-        for (int i = 0; i < clientData.new GameData(0).getEventCount(); i++) {
-            eventHandler.operation(clientData.new GameData(0).getEvents(i));
+        ClientData.GameData gameData = game.clientData().gameData();
+        for (int i = 0; i < gameData.getEventCount(); i++) {
+            EventHandler.operation(eventListener, game, gameData.getEvents(i));
         }
     }
-
-
 }

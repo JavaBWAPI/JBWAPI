@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class BWClient {
     private final BWEventListener eventListener;
-    private EventHandler handler;
+    private BotWrapper botWrapper;
 
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
@@ -16,9 +16,10 @@ public class BWClient {
 
     /**
      * Get the {@link Game} instance of the currently running game.
+     * When running in asynchronous mode, this is the game from the bot's perspective, eg. potentially a previous frame.
      */
     public Game getGame() {
-        return handler == null ? null : handler.getGame();
+        return botWrapper == null ? null : botWrapper.getGame();
     }
 
     public void startGame() {
@@ -47,21 +48,44 @@ public class BWClient {
         configuration.validate();
         Client client = new Client(configuration);
         client.reconnect();
-        handler = new EventHandler(eventListener, client);
 
         do {
-            BotWrapper botWrapper;
+            long lastUpdateTimestampMillis = 0;
+            System.out.println("Client: Starting game");
             while (!getGame().isInGame()) {
                 if (!client.isConnected()) {
                     return;
                 }
+                System.out.println("Client: connected.");
+                lastUpdateTimestampMillis = System.currentTimeMillis();
                 client.update();
             }
 
-            botWrapper = new BotWrapper(configuration, client.mapFile(), client.clientData(), handler);
+            System.out.println("Client: Creating bot wrapper");
+            BotWrapper botWrapper = new BotWrapper(configuration, eventListener, client.mapFile());
 
             while (getGame().isInGame()) {
+                System.out.println("Client: Stepping bot wrapper");
                 botWrapper.step();
+                System.out.println("Client: Waiting for idle bot or frame duration");
+
+                // Proceed immediately once framebuffer is empty
+                // Otherwise, wait for bot to catch up
+                // TODO: Replace with a wait instead of a sleep
+                // TODO: Respect configuration.asyncWaitOnFrameZero
+                while ( ! botWrapper.botIdle()) {
+                    long frameDuration = System.currentTimeMillis() - lastUpdateTimestampMillis;
+                    if (frameDuration > configuration.asyncFrameDurationMillis && (client.clientData().gameData().getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero)) {
+                        System.out.println("Client: Exceeded frame duration while waiting for bot: " + frameDuration + "ms on frame " + client.clientData().gameData().getFrameCount());
+                        break;
+                    }
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ignored) {}
+                }
+
+                System.out.println("Client: Ending frame. Frames buffered: ");
+                lastUpdateTimestampMillis = System.currentTimeMillis();
                 client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");

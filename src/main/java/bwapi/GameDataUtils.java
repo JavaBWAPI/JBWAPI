@@ -34,10 +34,6 @@ public class GameDataUtils {
     static final int MAX_COUNT = 19999;
     static final int MAX_STRING_SIZE = 1024;
 
-    static String eventString(ClientData.GameData gameData, final int s) {
-        return gameData.getEventStrings(s);
-    }
-
     static int addString(ClientData.GameData gameData, final String string) {
         int stringCount = gameData.getStringCount();
         if (stringCount >= MAX_COUNT) {

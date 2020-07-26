@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 public class GameTest {
 
     private List<Unit> allUnits = new ArrayList<>();
-    private Game sut = new Game(mock(Client.class)) {
+    private Game sut = new Game(mock(ClientData.class)) {
         @Override
         public List<Unit> getAllUnits() {
             return allUnits;
@@ -93,7 +93,7 @@ public class GameTest {
 
         Client client = new Client(buffer);
         // modify the buffer to fake a replay
-        client.gameData().setIsReplay(true);
+        client.clientData().gameData().setIsReplay(true);
 
         Game game = GameBuilder.createGame(client);
 

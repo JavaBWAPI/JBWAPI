@@ -41,15 +41,10 @@ class Client {
         HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
     }
 
-    public interface EventHandler {
-        void operation(ClientData.Event event);
-    }
-
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
 
     private ClientData clientData;
-    private ClientData.GameData gameData;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
     private ByteBuffer gameTableFileHandle = null;
@@ -67,15 +62,10 @@ class Client {
     Client(ByteBuffer buffer) {
         clientData = new ClientData();
         clientData.setBuffer(buffer);
-        gameData = clientData.new GameData(0);
     }
 
     ClientData clientData() {
         return clientData;
-    }
-
-    GameData gameData() {
-        return gameData;
     }
 
     ByteBuffer mapFile() {
@@ -92,7 +82,7 @@ class Client {
         }
     }
 
-    void disconnect() {
+    private void disconnect() {
         if (configuration.debugConnection) {
             System.err.print("Disconnect called by: ");
             System.err.println(Thread.currentThread().getStackTrace()[2]);
@@ -113,7 +103,7 @@ class Client {
 
         gameTableFileHandle = null;
         mapFileHandle = null;
-        gameData = null;
+        clientData = null;
         connected = false;
     }
 
@@ -204,7 +194,6 @@ class Client {
         try {
             clientData = new ClientData();
             clientData.setBuffer(mapFileHandle);
-            gameData = clientData.new GameData(0);
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
@@ -214,10 +203,10 @@ class Client {
             return false;
         }
 
-        if (SUPPORTED_BWAPI_VERSION != gameData.getClient_version()) {
+        if (SUPPORTED_BWAPI_VERSION != clientData.gameData().getClient_version()) {
             System.err.println("Error: Client and Server are not compatible!");
             System.err.println("Client version: " + SUPPORTED_BWAPI_VERSION);
-            System.err.println("Server version: " + gameData.getClient_version());
+            System.err.println("Server version: " + clientData.gameData().getClient_version());
             disconnect();
             sleep(2000);
             return false;

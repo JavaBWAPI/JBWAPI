@@ -27,93 +27,79 @@ package bwapi;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Circular buffer of game states.
  */
-public class FrameBuffer {
+class FrameBuffer {
 
-    private ByteBuffer data;
+    private ByteBuffer dataSource;
     private int size;
     private int stepGame = 0;
     private int stepBot = 0;
+    private ClientData clientData = new ClientData();
+    private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
 
     // Synchronization locks
-    private Object stepCount;
-    private ArrayList<Lock> frameLocks;
+    private Object stepCount = new Object();
 
-    FrameBuffer(int size) {
+    FrameBuffer(int size, ByteBuffer source) {
         this.size = size;
-        data = ByteBuffer.allocateDirect(size * ClientData.GameData.SIZE);
-        while (frameLocks.size() < size) {
-            frameLocks.add(new ReentrantLock());
+        this.dataSource = source;
+        while(dataBuffer.size() < size) {
+            dataBuffer.add(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
         }
     }
 
     /**
      * @return The number of frames currently buffered ahead of the bot's current frame
      */
-    int framesBuffered() {
-        synchronized (stepCount) {
-            return stepGame - stepBot;
-        }
+    synchronized int framesBuffered() {
+        return stepGame - stepBot;
     }
 
     /**
      * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
      */
-    boolean empty() {
-        synchronized (stepCount) {
-            return framesBuffered() <= 0;
-        }
+    synchronized boolean empty() {
+        return framesBuffered() <= 0;
     }
 
     /**
      * @return Whether the frame buffer is full and can not buffer any additional frames.
      * When the frame buffer is full, JBWAPI must wait for the bot to complete a frame before returning control to StarCraft.
      */
-    boolean full() {
-        synchronized (stepCount) {
-            return framesBuffered() >= size - 1;
-        }
+    synchronized boolean full() {
+        return framesBuffered() >= size - 1;
+    }
+
+    synchronized private int indexGame() {
+        return stepGame % size;
+    }
+
+    synchronized private int indexBot() {
+        return stepBot % size;
     }
 
     /**
-     * Copy data from shared memory into the head of the frame buffer.
+     * Copy dataBuffer from shared memory into the head of the frame buffer.
      */
-    void enqueueFrame(ByteBuffer source) {
-        while(full()) try {
-            wait();
-        } catch (InterruptedException ignored) {}
-        synchronized (stepCount) {
-            data.put(source.array(), indexGame() * ClientData.GameData.SIZE, ClientData.GameData.SIZE);
-            ++stepGame;
-        }
-        notifyAll();
+    void enqueueFrame() {
+        while(full()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
+        int indexGame = indexGame();
+        System.out.println("FrameBuffer: Moving game to " + indexGame);
+        dataBuffer.get(indexGame).put(dataSource);
+        ++stepGame;
     }
 
     /**
      * Points the bot to the next frame in the buffer.
      */
-    void dequeueFrame(ClientData clientData) {
-        while(empty()) try {
-            wait();
-        } catch (InterruptedException ignored) {}
-        synchronized (stepCount) {
-            clientData.setBuffer(data);
-            clientData.setBufferOffset(indexBot() * ClientData.GameData.SIZE);
-            ++stepBot;
-        }
-        notifyAll();
-    }
-
-    private int indexGame() {
-        return stepGame % size;
-    }
-
-    private int indexBot() {
-        return stepBot % size;
+    ByteBuffer dequeueFrame() {
+        while(empty()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
+        System.out.println("FrameBuffer: Moving bot to " + indexBot());
+        ByteBuffer output = dataBuffer.get(indexBot());
+        ++stepBot;
+        return output;
     }
 }

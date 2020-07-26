@@ -1,19 +1,7 @@
 package bwapi;
 
-
-class EventHandler implements Client.EventHandler {
-    private final BWEventListener eventListener;
-    private final Game game;
-    private final Client client;
-
-    EventHandler(final BWEventListener eventListener, final Client client) {
-        this.eventListener = eventListener;
-        this.game = new Game(client);
-        this.client = client;
-    }
-
-    @Override
-    public void operation(final ClientData.Event event) {
+class EventHandler {
+    static void operation(BWEventListener eventListener, Game game, final ClientData.Event event) {
         final Unit u;
         final int frames = game.getFrameCount();
         switch (event.getType()) {
@@ -30,10 +18,10 @@ class EventHandler implements Client.EventHandler {
                 break;
             //case 3: //MenuFrame
             case SendText:
-                eventListener.onSendText(GameDataUtils.eventString(client.gameData(), event.getV1()));
+                eventListener.onSendText(game.clientData().gameData().getEventStrings(event.getV1()));
                 break;
             case ReceiveText:
-                eventListener.onReceiveText(game.getPlayer(event.getV1()), GameDataUtils.eventString(client.gameData(), event.getV2()));
+                eventListener.onReceiveText(game.getPlayer(event.getV1()), game.clientData().gameData().getEventStrings(event.getV2()));
                 break;
             case PlayerLeft:
                 eventListener.onPlayerLeft(game.getPlayer(event.getV1()));
@@ -42,7 +30,7 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onNukeDetect(new Position(event.getV1(), event.getV2()));
                 break;
             case SaveGame:
-                eventListener.onSaveGame(GameDataUtils.eventString(client.gameData(), event.getV1()));
+                eventListener.onSaveGame(game.clientData().gameData().getEventStrings(event.getV1()));
                 break;
             case UnitDiscover:
                 game.unitCreate(event.getV1());
@@ -92,9 +80,5 @@ class EventHandler implements Client.EventHandler {
                 eventListener.onUnitComplete(u);
                 break;
         }
-    }
-
-    public Game getGame() {
-        return game;
     }
 }

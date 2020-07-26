@@ -33,7 +33,7 @@ public class GameBuilder {
     }
 
     public static Game createGame(Client client) throws IOException {
-        final Game game = new Game(client);
+        final Game game = new Game(client.clientData());
         game.init();
         return game;
     }

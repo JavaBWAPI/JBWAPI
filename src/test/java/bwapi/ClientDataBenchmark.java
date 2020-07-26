@@ -20,7 +20,7 @@ public class ClientDataBenchmark {
         @Setup(Level.Invocation)
         public void setup() {
             client = new Client(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
-            game = new Game(client);
+            game = new Game(client.clientData());
             strings = buildStrings();
         }
 
@@ -35,11 +35,11 @@ public class ClientDataBenchmark {
         @Setup(Level.Invocation)
         public void setup() {
             client = new Client(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
-            data = client.gameData();
-            game = new Game(client);
+            data = client.clientData().gameData();
+            game = new Game(client.clientData());
             String[] strings = buildStrings();
             for (String s : strings) {
-                GameDataUtils.addString(client.gameData(), s);
+                GameDataUtils.addString(client.clientData().gameData(), s);
             }
         }
     }
@@ -69,16 +69,16 @@ public class ClientDataBenchmark {
         for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
             s.game.addUnitCommand(0, 1, 2, 3, 4, 5);
         }
-        return s.client.gameData().getCommandCount();
+        return s.client.clientData().gameData().getCommandCount();
     }
 
     @Benchmark
     @OperationsPerInvocation(GameDataUtils.MAX_COUNT)
     public int addString(EmptyState s) {
         for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
-            GameDataUtils.addString(s.client.gameData(), s.strings[i]);
+            GameDataUtils.addString(s.client.clientData().gameData(), s.strings[i]);
         }
-        return s.client.gameData().getStringCount();
+        return s.client.clientData().gameData().getStringCount();
     }
 
     @Benchmark

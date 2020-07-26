@@ -36,7 +36,9 @@ public class GameStateDumper extends DefaultBWListener{
     }
 
     private void dumpBuffer(String name) throws IOException {
-        ByteBuffer buf = game.getClient().clientData().buffer.getBuffer();
+        // TODO
+        //ByteBuffer buf = game.getClient().clientData().buffer.getBuffer();
+        ByteBuffer buf = null;
         buf.rewind();
         byte[] bytearr = new byte[buf.remaining()];
         buf.get(bytearr);
