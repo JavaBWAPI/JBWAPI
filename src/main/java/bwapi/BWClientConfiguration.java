@@ -32,7 +32,7 @@ public class BWClientConfiguration {
      * If JBWAPI detects that this much time (in milliseconds) has passed since a bot's event handlers began, returns control back to BWAPI.
      * Real-time human play typically uses the "fastest" game speed, which has 42.86ms (42,860ns) between frames.
      */
-    public int asyncFrameDurationMillis = 40000;
+    public int asyncFrameDurationMillis = 40;
 
     /**
      * The maximum number of frames to buffer while waiting on a bot.

@@ -26,7 +26,6 @@ SOFTWARE.
 package bwapi;
 
 import java.nio.ByteBuffer;
-import java.util.EventListener;
 
 /**
  * Manages invocation of bot event handlers
@@ -35,8 +34,9 @@ class BotWrapper {
     private final BWClientConfiguration configuration;
     private final BWEventListener eventListener;
     private final Game game;
-    private final FrameBuffer frameBuffer;
-    private final Thread botThread;
+    private FrameBuffer frameBuffer = null;
+    private Thread botThread = null;
+    private volatile boolean idle = false;
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener, ByteBuffer dataSource) {
         this.configuration = configuration;
@@ -48,28 +48,12 @@ class BotWrapper {
 
         if (configuration.async) {
             frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize, dataSource);
-            botThread = new Thread(() -> {
-                while(true) {
-                    while(frameBuffer.empty()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
+        }
+    }
 
-                    System.out.println("Bot thread: Dequeuing frame. There are " + frameBuffer.framesBuffered() + " frames buffered.");
-                    game.clientData().setBuffer(frameBuffer.dequeueFrame());
-
-                    System.out.println("Bot thread: Handling events.");
-                    handleEvents();
-                    if (!game.clientData().gameData().isInGame()) {
-                        System.out.println("Bot thread: Exiting.");
-                        return;
-                    } else {
-                        System.out.println("Bot thread: Handled events.");
-                    }
-                }
-            });
-            botThread.setName("JBWAPI Bot");
+    void startBot() {
+        if (configuration.async) {
             botThread.start();
-        } else {
-            frameBuffer = null;
-            botThread = null;
         }
     }
 
@@ -77,14 +61,34 @@ class BotWrapper {
         return game;
     }
 
+    /**
+     * True if the bot has handled all enqueued frames and is waiting for a new frame from StarCraft.
+     */
     boolean botIdle() {
-        // TODO: This returns true if the bot is still processing the newest frame, leaving the bot permanently one frame behind
-        return frameBuffer.empty();
+        return idle || ! configuration.async;
     }
 
     void step() {
         if (configuration.async) {
             frameBuffer.enqueueFrame();
+            if (botThread == null) {
+                botThread = new Thread(() -> {
+                    //noinspection InfiniteLoopStatement
+                    while(true) {
+                        while(frameBuffer.empty()) try {
+                            idle = true;
+                            Thread.sleep(0, 100);
+                        } catch (InterruptedException ignored) {}
+                        idle = false;
+                        System.out.println("Bot thread: Dequeuing frame. There are " + frameBuffer.framesBuffered() + " frames buffered.");
+                        game.clientData().setBuffer(frameBuffer.dequeueFrame());
+                        System.out.println("Bot thread: Handling events.");
+                        handleEvents();
+                        System.out.println("Bot thread: Handled events.");
+                    }});
+                botThread.setName("JBWAPI Bot");
+                botThread.start();
+            }
         } else {
             handleEvents();
         }

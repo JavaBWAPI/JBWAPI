@@ -37,7 +37,6 @@ class FrameBuffer {
     private int size;
     private int stepGame = 0;
     private int stepBot = 0;
-    private ClientData clientData = new ClientData();
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
 
     // Synchronization locks
@@ -86,9 +85,11 @@ class FrameBuffer {
      */
     void enqueueFrame() {
         while(full()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
-        int indexGame = indexGame();
-        System.out.println("FrameBuffer: Moving game to " + indexGame);
-        dataBuffer.get(indexGame).put(dataSource);
+        System.out.println("FrameBuffer: Enqueuing buffer " + indexGame() + " on game step #" + stepGame + " with " + framesBuffered() + " frames buffered.");
+        ByteBuffer dataTarget = dataBuffer.get(indexGame());
+        dataSource.rewind();
+        dataTarget.rewind();
+        dataTarget.put(dataSource);
         ++stepGame;
     }
 
@@ -97,7 +98,7 @@ class FrameBuffer {
      */
     ByteBuffer dequeueFrame() {
         while(empty()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
-        System.out.println("FrameBuffer: Moving bot to " + indexBot());
+        System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
         ByteBuffer output = dataBuffer.get(indexBot());
         ++stepBot;
         return output;
