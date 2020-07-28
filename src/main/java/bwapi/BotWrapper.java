@@ -51,12 +51,6 @@ class BotWrapper {
         }
     }
 
-    void startBot() {
-        if (configuration.async) {
-            botThread.start();
-        }
-    }
-
     Game getGame() {
         return game;
     }
@@ -66,6 +60,13 @@ class BotWrapper {
      */
     boolean botIdle() {
         return idle || ! configuration.async;
+    }
+
+    /**
+     * True if there is a frame buffer with free capacity.
+     */
+    boolean canBuffer() {
+        return configuration.async && ! frameBuffer.full();
     }
 
     void step() {

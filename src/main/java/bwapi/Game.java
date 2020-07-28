@@ -99,6 +99,8 @@ public class Game {
     private Text.Size textSize = Text.Size.Default;
     private boolean latcom = true;
 
+    public final SideEffectQueue sideEffects = new SideEffectQueue();
+
     Game(ClientData clientData) {
         this.clientData = clientData;
     }
@@ -303,37 +305,6 @@ public class Game {
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
-    }
-
-    void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
-        ClientData.UnitCommand unitCommand = GameDataUtils.addUnitCommand(gameData());
-        unitCommand.setTid(type);
-        unitCommand.setUnitIndex(unit);
-        unitCommand.setTargetIndex(target);
-        unitCommand.setX(x);
-        unitCommand.setY(y);
-        unitCommand.setExtra(extra);
-    }
-
-    void addCommand(final CommandType type, final int value1, final int value2) {
-        Command command = GameDataUtils.addCommand(gameData());
-        command.setType(type);
-        command.setValue1(value1);
-        command.setValue2(value2);
-    }
-
-    void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
-        Shape shape = GameDataUtils.addShape(gameData());
-        shape.setType(type);
-        shape.setCtype(coordType);
-        shape.setX1(x1);
-        shape.setY1(y1);
-        shape.setX2(x2);
-        shape.setY2(y2);
-        shape.setExtra1(extra1);
-        shape.setExtra2(extra2);
-        shape.setColor(color);
-        shape.setIsSolid(isSolid);
     }
 
     /**
@@ -2687,5 +2658,26 @@ public class Game {
      */
     public int getRandomSeed() {
         return randomSeed;
+    }
+
+    /**
+     * Convenience method for adding a unit command from raw arguments.
+     */
+    void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
+        sideEffects.enqueue(SideEffect.addUnitCommand(type, unit, target, x, y, extra));
+    }
+
+    /**
+     * Convenience method for adding a game command from raw arguments.
+     */
+    void addCommand(final CommandType type, final int value1, final int value2) {
+        sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
+    }
+
+    /**
+     * Convenience method for adding a shape from raw arguments.
+     */
+    void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
+        sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
     }
 }

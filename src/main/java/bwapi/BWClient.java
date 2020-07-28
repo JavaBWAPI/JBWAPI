@@ -80,7 +80,7 @@ public class BWClient {
                         break;
                     }
                     long frameDurationMillis = System.currentTimeMillis() - lastUpdateTimestampMillis;
-                    if (frameDurationMillis > configuration.asyncFrameDurationMillis && (client.clientData().gameData().getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero)) {
+                    if (botWrapper.frameDurationMillis > configuration.asyncFrameDurationMillis && (client.clientData().gameData().getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero)) {
                         System.out.println("Client: Proceeding because frame " + botWrapper.getGame().getFrameCount() + " lasted " + frameDurationMillis + "ms");
                         break;
                     }
@@ -91,6 +91,7 @@ public class BWClient {
                 long frameDurationMillis = currentTimeMillis - lastUpdateTimestampMillis;
                 lastUpdateTimestampMillis = currentTimeMillis;
                 System.out.println("Client: Ending frame after " + frameDurationMillis + "ms");
+                getGame().sideEffects.flush(client.clientData());
                 client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
@@ -101,7 +102,5 @@ public class BWClient {
             // TODO: Before exiting give async bot time to complete onEnd(), maybe via thread.join().
 
         } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
-
-
     }
 }
