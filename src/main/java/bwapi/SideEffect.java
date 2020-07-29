@@ -42,6 +42,17 @@ class SideEffect {
         return output;
     }
 
+    static SideEffect addCommand(final CommandType type, final String text, final int value2) {
+        SideEffect output = new SideEffect();
+        output.application = (ClientData clientData) -> {
+            ClientData.Command command = GameDataUtils.addCommand(clientData.gameData());
+            command.setType(type);
+            command.setValue1(GameDataUtils.addString(clientData.gameData(), text));
+            command.setValue2(value2);
+        };
+        return output;
+    }
+
     static SideEffect addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
         SideEffect output = new SideEffect();
         output.application = (ClientData clientData) -> {
@@ -53,6 +64,24 @@ class SideEffect {
             shape.setX2(x2);
             shape.setY2(y2);
             shape.setExtra1(extra1);
+            shape.setExtra2(extra2);
+            shape.setColor(color);
+            shape.setIsSolid(isSolid);
+        };
+        return output;
+    }
+
+    static SideEffect addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final String text, final int extra2, final int color, final boolean isSolid) {
+        SideEffect output = new SideEffect();
+        output.application = (ClientData clientData) -> {
+            ClientData.Shape shape = GameDataUtils.addShape(clientData.gameData());
+            shape.setType(type);
+            shape.setCtype(coordType);
+            shape.setX1(x1);
+            shape.setY1(y1);
+            shape.setX2(x2);
+            shape.setY2(y2);
+            shape.setExtra1(GameDataUtils.addString(clientData.gameData(), text));
             shape.setExtra2(extra2);
             shape.setColor(color);
             shape.setIsSolid(isSolid);

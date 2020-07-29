@@ -29,10 +29,10 @@ package bwapi;
  * Static functions for modifying GameData.
  * These functions live outside GameData because GameData is auto-generated.
  */
-public class GameDataUtils {
+class GameDataUtils {
 
     static final int MAX_COUNT = 19999;
-    static final int MAX_STRING_SIZE = 1024;
+    private static final int MAX_STRING_SIZE = 1024;
 
     static int addString(ClientData.GameData gameData, final String string) {
         int stringCount = gameData.getStringCount();

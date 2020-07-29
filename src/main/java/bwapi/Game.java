@@ -1485,7 +1485,7 @@ public class Game {
      */
     public void printf(final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        addCommand(Printf, GameDataUtils.addString(gameData(), formatted), 0);
+        addCommand(Printf, formatted, 0);
     }
 
     /**
@@ -1510,7 +1510,7 @@ public class Game {
      */
     public void sendTextEx(final boolean toAllies, final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        addCommand(SendText, GameDataUtils.addString(gameData(), formatted), toAllies ? 1 : 0);
+        addCommand(SendText, formatted, toAllies ? 1 : 0);
     }
 
     /**
@@ -1719,8 +1719,7 @@ public class Game {
 
     public void drawText(final CoordinateType ctype, final int x, final int y, final String string, final Text... colors) {
         final String formatted = formatString(string, colors);
-        final int stringId = GameDataUtils.addString(gameData(), formatted);
-        addShape(ShapeType.Text, ctype, x, y, 0, 0, stringId, textSize.id, 0, false);
+        addShape(ShapeType.Text, ctype, x, y, 0, 0, formatted, textSize.id, 0, false);
     }
 
     public void drawTextMap(final int x, final int y, final String string, final Text... colors) {
@@ -2335,7 +2334,7 @@ public class Game {
             return false;
         }
 
-        addCommand(CommandType.SetMap, GameDataUtils.addString(gameData(), mapFileName), 0);
+        addCommand(CommandType.SetMap, mapFileName, 0);
         return true;
     }
 
@@ -2674,10 +2673,25 @@ public class Game {
         sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
     }
 
+
+    /**
+     * Convenience method for adding a game command from raw arguments.
+     */
+    void addCommand(final CommandType type, final String value1, final int value2) {
+        sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
+    }
+
     /**
      * Convenience method for adding a shape from raw arguments.
      */
     void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
         sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
+    }
+
+    /**
+     * Convenience method for adding a shape from raw arguments.
+     */
+    void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final String text, final int extra2, final int color, final boolean isSolid) {
+        sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, text, extra2, color, isSolid));
     }
 }

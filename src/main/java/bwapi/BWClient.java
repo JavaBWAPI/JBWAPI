@@ -80,7 +80,7 @@ public class BWClient {
                         break;
                     }
                     long frameDurationMillis = System.currentTimeMillis() - lastUpdateTimestampMillis;
-                    if (botWrapper.frameDurationMillis > configuration.asyncFrameDurationMillis && (client.clientData().gameData().getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero)) {
+                    if (frameDurationMillis > configuration.asyncFrameDurationMillis && (client.clientData().gameData().getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero)) {
                         System.out.println("Client: Proceeding because frame " + botWrapper.getGame().getFrameCount() + " lasted " + frameDurationMillis + "ms");
                         break;
                     }

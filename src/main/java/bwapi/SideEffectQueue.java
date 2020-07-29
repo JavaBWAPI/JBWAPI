@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Queue of intended bot interactions with the game, to be flushed as JBWAPI returns control to StarCraft after a frame.
  */
-public class SideEffectQueue {
+class SideEffectQueue {
 
     private ArrayList<SideEffect> queue = new ArrayList<>();
 
