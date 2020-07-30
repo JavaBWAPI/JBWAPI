@@ -46,15 +46,14 @@ public class BWClient {
      */
     public void startGame(BWClientConfiguration configuration) {
         configuration.validate();
+        botWrapper = new BotWrapper(configuration, eventListener);
         Client client = new Client(configuration);
         client.reconnect();
 
         do {
-            ClientData liveClientData = client.clientData();
-            ClientData.GameData liveGameData = liveClientData.gameData();
             System.out.println("Client: Beginning game loop");
+            ClientData.GameData liveGameData = client.clientData().gameData();
             while (!liveGameData.isInGame()) {
-                botWrapper = null;
                 if (client.isConnected()) {
                     System.out.println("Client: Not in game; Connected.");
                 } else  {
@@ -62,12 +61,13 @@ public class BWClient {
                     return;
                 }
                 client.update();
+                if (liveGameData.isInGame()) {
+                    botWrapper.initialize(client.mapFile());
+                }
             }
             while (liveGameData.isInGame()) {
                 System.out.println("Client: In game on frame " + liveGameData.getFrameCount());
-                if (botWrapper == null) {
-                    botWrapper = new BotWrapper(configuration, eventListener, client.mapFile());
-                }
+
                 botWrapper.step();
 
                 // Proceed immediately once frame buffer is empty
@@ -83,16 +83,14 @@ public class BWClient {
                 }
 
                 System.out.println("Client: Sending commands on frame " + liveGameData.getFrameCount());
-                getGame().sideEffects.flushTo(liveClientData);
+                getGame().sideEffects.flushTo(liveGameData);
                 client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }
-
             // TODO: Before exiting give async bot time to complete onEnd(), maybe via thread.join().
-
         } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
     }
 }

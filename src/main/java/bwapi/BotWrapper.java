@@ -34,29 +34,38 @@ import java.util.concurrent.locks.ReentrantLock;
  * Manages invocation of bot event handlers
  */
 class BotWrapper {
+    private final ClientData liveClientData = new ClientData();
     private final BWClientConfiguration configuration;
     private final BWEventListener eventListener;
-    private final Game game;
-    private FrameBuffer frameBuffer = null;
-    private Thread botThread = null;
+    private final FrameBuffer frameBuffer;
+    private Game game;
+    private Thread botThread;
     private boolean idle = false;
 
     Lock idleLock = new ReentrantLock();
     Condition idleCondition = idleLock.newCondition();
 
-    BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener, ByteBuffer dataSource) {
+    BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
         this.eventListener = eventListener;
-
-        ClientData currentClientData = new ClientData();
-        currentClientData.setBuffer(dataSource);
-        game = new Game(currentClientData);
-
-        if (configuration.async) {
-            frameBuffer = new FrameBuffer(configuration.asyncFrameBufferSize, dataSource);
-        }
+        frameBuffer = configuration.async ? new FrameBuffer(configuration.asyncFrameBufferSize) : null;
     }
 
+    /**
+     * Resets the BotWrapper for a new game.
+     */
+    void initialize(ByteBuffer dataSource) {
+        frameBuffer.initialize(dataSource);
+        game = new Game(liveClientData);
+        liveClientData.setBuffer(dataSource);
+        botThread = null;
+        idle = false;
+    }
+
+    /**
+     * @return The Game object used by the bot
+     * In asynchronous mode this Game object may point at a copy of a previous frame.
+     */
     Game getGame() {
         return game;
     }

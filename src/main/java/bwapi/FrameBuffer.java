@@ -49,12 +49,20 @@ class FrameBuffer {
     final Condition conditionFull = lockCapacity.newCondition();
     final Condition conditionEmpty = lockCapacity.newCondition();
 
-    FrameBuffer(int size, ByteBuffer source) {
+    FrameBuffer(int size) {
         this.size = size;
-        this.dataSource = source;
         while(dataBuffer.size() < size) {
             dataBuffer.add(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
         }
+    }
+
+    /**
+     * Resets for a new game
+     */
+    void initialize(ByteBuffer dataSource) {
+        this.dataSource = dataSource;
+        stepGame = 0;
+        stepBot = 0;
     }
 
     /**
