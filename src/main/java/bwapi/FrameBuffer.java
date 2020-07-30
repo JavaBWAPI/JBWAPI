@@ -27,6 +27,9 @@ package bwapi;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Circular buffer of game states.
@@ -40,7 +43,11 @@ class FrameBuffer {
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
 
     // Synchronization locks
-    private Object stepCount = new Object();
+    private final Lock writeLock = new ReentrantLock();
+    private final Lock readLock = writeLock;
+    final Lock lockCapacity = new ReentrantLock();
+    final Condition conditionFull = lockCapacity.newCondition();
+    final Condition conditionEmpty = lockCapacity.newCondition();
 
     FrameBuffer(int size, ByteBuffer source) {
         this.size = size;
@@ -60,23 +67,33 @@ class FrameBuffer {
     /**
      * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
      */
-    synchronized boolean empty() {
-        return framesBuffered() <= 0;
+    boolean empty() {
+        lockCapacity.lock();
+        try {
+            return framesBuffered() <= 0;
+        }  finally {
+            lockCapacity.unlock();
+        }
     }
 
     /**
      * @return Whether the frame buffer is full and can not buffer any additional frames.
      * When the frame buffer is full, JBWAPI must wait for the bot to complete a frame before returning control to StarCraft.
      */
-    synchronized boolean full() {
-        return framesBuffered() >= size - 1;
+    boolean full() {
+        lockCapacity.lock();
+        try {
+            return framesBuffered() >= size - 1;
+        } finally {
+            lockCapacity.unlock();
+        }
     }
 
-    synchronized private int indexGame() {
+    private int indexGame() {
         return stepGame % size;
     }
 
-    synchronized private int indexBot() {
+    private int indexBot() {
         return stepBot % size;
     }
 
@@ -84,23 +101,69 @@ class FrameBuffer {
      * Copy dataBuffer from shared memory into the head of the frame buffer.
      */
     void enqueueFrame() {
-        while(full()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
-        System.out.println("FrameBuffer: Enqueuing buffer " + indexGame() + " on game step #" + stepGame + " with " + framesBuffered() + " frames buffered.");
-        ByteBuffer dataTarget = dataBuffer.get(indexGame());
-        dataSource.rewind();
-        dataTarget.rewind();
-        dataTarget.put(dataSource);
-        ++stepGame;
+        // In practice we don't particularly expect multiple threads to write to this, but support it just to be safe.
+        writeLock.lock();
+        try {
+            // Wait for the buffer to have space to enqueue
+            lockCapacity.lock();
+            try {
+                while (full()) {
+                    conditionFull.awaitUninterruptibly();
+                }
+             } finally {
+                lockCapacity.unlock();
+            }
+
+            System.out.println("FrameBuffer: Enqueuing buffer " + indexGame() + " on game step #" + stepGame + " with " + framesBuffered() + " frames buffered.");
+            ByteBuffer dataTarget = dataBuffer.get(indexGame());
+            dataSource.rewind();
+            dataTarget.rewind();
+            dataTarget.put(dataSource);
+            ++stepGame;
+
+            // Notify anyone waiting for something to dequeue
+            lockCapacity.lock();
+            try {
+                conditionEmpty.signalAll();
+            } finally {
+                lockCapacity.unlock();
+            }
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
      * Points the bot to the next frame in the buffer.
      */
     ByteBuffer dequeueFrame() {
-        while(empty()) try { Thread.sleep(0, 100); } catch (InterruptedException ignored) {}
-        System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
-        ByteBuffer output = dataBuffer.get(indexBot());
-        ++stepBot;
-        return output;
+        // In practice we don't particularly expect multiple threads to read from this, but support it just to be safe.
+        readLock.lock();
+        try {
+            // Wait for the buffer to have something to dequeue
+            lockCapacity.lock();
+            try {
+                while (empty()) {
+                    conditionEmpty.awaitUninterruptibly();
+                }
+            } finally {
+                lockCapacity.unlock();
+            }
+
+            System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
+            ByteBuffer output = dataBuffer.get(indexBot());
+            ++stepBot;
+
+            // Notify anyone waiting for capacity to enqueue
+            lockCapacity.lock();
+            try {
+                conditionFull.signalAll();
+                return output;
+            } finally {
+                lockCapacity.unlock();
+            }
+        } finally {
+          readLock.unlock();
+        }
     }
 }

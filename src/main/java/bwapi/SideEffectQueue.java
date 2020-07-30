@@ -25,7 +25,7 @@ class SideEffectQueue {
      * @param liveClientData
      * The live game frame's data, using the BWAPI shared memory.
      */
-    synchronized void flush(ClientData liveClientData) {
+    synchronized void flushTo(ClientData liveClientData) {
         queue.forEach(x -> x.apply(liveClientData));
         queue.clear();
     }

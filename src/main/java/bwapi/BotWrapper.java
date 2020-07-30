@@ -26,6 +26,9 @@ SOFTWARE.
 package bwapi;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages invocation of bot event handlers
@@ -36,7 +39,10 @@ class BotWrapper {
     private final Game game;
     private FrameBuffer frameBuffer = null;
     private Thread botThread = null;
-    private volatile boolean idle = false;
+    private boolean idle = false;
+
+    Lock idleLock = new ReentrantLock();
+    Condition idleCondition = idleLock.newCondition();
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener, ByteBuffer dataSource) {
         this.configuration = configuration;
@@ -62,13 +68,6 @@ class BotWrapper {
         return idle || ! configuration.async;
     }
 
-    /**
-     * True if there is a frame buffer with free capacity.
-     */
-    boolean canBuffer() {
-        return configuration.async && ! frameBuffer.full();
-    }
-
     void step() {
         if (configuration.async) {
             frameBuffer.enqueueFrame();
@@ -76,16 +75,42 @@ class BotWrapper {
                 botThread = new Thread(() -> {
                     //noinspection InfiniteLoopStatement
                     while(true) {
-                        while(frameBuffer.empty()) try {
-                            idle = true;
-                            Thread.sleep(0, 100);
-                        } catch (InterruptedException ignored) {}
-                        idle = false;
-                        System.out.println("Bot thread: Dequeuing frame. There are " + frameBuffer.framesBuffered() + " frames buffered.");
+                        // Await non-empty frame buffer
+                        frameBuffer.lockCapacity.lock();
+                        try {
+                            while(frameBuffer.empty()) {
+                                // Signal idleness
+                                idleLock.lock();
+                                try {
+                                    idle = true;
+                                    idleCondition.signalAll();
+                                } finally {
+                                    idleLock.unlock();
+                                }
+                                frameBuffer.conditionEmpty.awaitUninterruptibly();
+                            }
+                        } finally {
+                            frameBuffer.lockCapacity.unlock();
+                        }
+
+                        // Signal non-idleness
+                        idleLock.lock();
+                        try {
+                            idle = false;
+                            idleCondition.signalAll();
+                         } finally {
+                            idleLock.unlock();
+                        }
+
                         game.clientData().setBuffer(frameBuffer.dequeueFrame());
-                        System.out.println("Bot thread: Handling events.");
+                        System.out.println("Bot thread: Handling events while " + frameBuffer.framesBuffered() + " frames behind.");
                         handleEvents();
                         System.out.println("Bot thread: Handled events.");
+
+                        if ( ! game.clientData().gameData().isInGame()) {
+                            System.out.println("Bot thread: Ending because game is over.");
+                            return;
+                        }
                     }});
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
