@@ -47,6 +47,7 @@ public class BWClient {
     public void startGame(BWClientConfiguration configuration) {
         configuration.validate();
         botWrapper = new BotWrapper(configuration, eventListener);
+
         Client client = new Client(configuration);
         client.reconnect();
 

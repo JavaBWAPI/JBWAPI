@@ -69,6 +69,8 @@ class BotWrapper {
      */
     void onFrame() {
         if (configuration.async) {
+            long startNanos = System.nanoTime();
+            long endNanos = startNanos + configuration.asyncFrameDurationNanos;
             if (botThread == null) {
                 System.out.println("Creating bot thread");
                 botThread = createBotThread();
@@ -78,7 +80,16 @@ class BotWrapper {
             frameBuffer.enqueueFrame();
             frameBuffer.lockSize.lock();
             try {
-                while ( ! frameBuffer.empty()) frameBuffer.conditionSize.awaitUninterruptibly();
+                while (frameBuffer.empty()) {
+                    if (configuration.asyncWaitOnFrameZero && liveClientData.gameData().getFrameCount() == 0) {
+                        frameBuffer.conditionSize.await();
+                    } else {
+                        long remainingNanos = endNanos - System.nanoTime();
+                        if (remainingNanos <= 0) break;
+                        frameBuffer.conditionSize.awaitNanos(remainingNanos);
+                    }
+                }
+            } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
             }
