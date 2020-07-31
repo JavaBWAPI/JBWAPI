@@ -26,9 +26,6 @@ SOFTWARE.
 package bwapi;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages invocation of bot event handlers
@@ -40,10 +37,7 @@ class BotWrapper {
     private final FrameBuffer frameBuffer;
     private Game game;
     private Thread botThread;
-    private boolean idle = false;
-
-    Lock idleLock = new ReentrantLock();
-    Condition idleCondition = idleLock.newCondition();
+    private boolean gameOver;
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
@@ -54,12 +48,12 @@ class BotWrapper {
     /**
      * Resets the BotWrapper for a new game.
      */
-    void initialize(ByteBuffer dataSource) {
+    void startNewGame(ByteBuffer dataSource) {
         frameBuffer.initialize(dataSource);
         game = new Game(liveClientData);
         liveClientData.setBuffer(dataSource);
         botThread = null;
-        idle = false;
+        gameOver = false;
     }
 
     /**
@@ -71,68 +65,63 @@ class BotWrapper {
     }
 
     /**
-     * True if the bot has handled all enqueued frames and is waiting for a new frame from StarCraft.
+     * Handles the arrival of a new frame from BWAPI
      */
-    boolean botIdle() {
-        return idle || ! configuration.async;
-    }
-
-    void step() {
+    void onFrame() {
         if (configuration.async) {
-            frameBuffer.enqueueFrame();
             if (botThread == null) {
-                botThread = new Thread(() -> {
-                    //noinspection InfiniteLoopStatement
-                    while(true) {
-                        // Await non-empty frame buffer
-                        frameBuffer.lockCapacity.lock();
-                        try {
-                            while(frameBuffer.empty()) {
-                                // Signal idleness
-                                idleLock.lock();
-                                try {
-                                    idle = true;
-                                    idleCondition.signalAll();
-                                } finally {
-                                    idleLock.unlock();
-                                }
-                                frameBuffer.conditionEmpty.awaitUninterruptibly();
-                            }
-                        } finally {
-                            frameBuffer.lockCapacity.unlock();
-                        }
-
-                        // Signal non-idleness
-                        idleLock.lock();
-                        try {
-                            idle = false;
-                            idleCondition.signalAll();
-                         } finally {
-                            idleLock.unlock();
-                        }
-
-                        game.clientData().setBuffer(frameBuffer.dequeueFrame());
-                        System.out.println("Bot thread: Handling events while " + frameBuffer.framesBuffered() + " frames behind.");
-                        handleEvents();
-                        System.out.println("Bot thread: Handled events.");
-
-                        if ( ! game.clientData().gameData().isInGame()) {
-                            System.out.println("Bot thread: Ending because game is over.");
-                            return;
-                        }
-                    }});
+                System.out.println("Creating bot thread");
+                botThread = createBotThread();
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
+            }
+            frameBuffer.enqueueFrame();
+            frameBuffer.lockSize.lock();
+            try {
+                while ( ! frameBuffer.empty()) frameBuffer.conditionSize.awaitUninterruptibly();
+            } finally {
+                frameBuffer.lockSize.unlock();
             }
         } else {
             handleEvents();
         }
     }
 
+    /**
+     * Allows an asynchronous bot time to finish operation
+     */
+    void endGame() {
+        if (botThread != null) {
+            try {
+                botThread.join();
+            } catch (InterruptedException ignored) {}
+        }
+    }
+
+    private Thread createBotThread() {
+        return new Thread(() -> {
+            while ( ! gameOver) {
+                frameBuffer.lockSize.lock();
+                try { while (frameBuffer.empty()) frameBuffer.conditionSize.awaitUninterruptibly(); } finally { frameBuffer.lockSize.unlock(); }
+
+                game.clientData().setBuffer(frameBuffer.peek());
+                System.out.println("Bot thread: Handling events.");
+                handleEvents();
+                System.out.println("Bot thread: Handled events.");
+                frameBuffer.dequeue();
+            }
+            System.out.println("Bot thread: Ending because game is over.");
+        });
+    }
+
     private void handleEvents() {
         ClientData.GameData gameData = game.clientData().gameData();
         for (int i = 0; i < gameData.getEventCount(); i++) {
-            EventHandler.operation(eventListener, game, gameData.getEvents(i));
+            ClientData.Event event = gameData.getEvents(i);
+            EventHandler.operation(eventListener, game, event);
+            if (event.getType() == EventType.MatchEnd) {
+                gameOver = true;
+            }
         }
     }
 }

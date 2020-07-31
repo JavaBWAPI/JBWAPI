@@ -43,11 +43,10 @@ class FrameBuffer {
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
 
     // Synchronization locks
-    private final Lock writeLock = new ReentrantLock();
-    private final Lock readLock = writeLock;
-    final Lock lockCapacity = new ReentrantLock();
-    final Condition conditionFull = lockCapacity.newCondition();
-    final Condition conditionEmpty = lockCapacity.newCondition();
+    private final Lock lockWrite = new ReentrantLock();
+    private final Lock lockRead = lockWrite;
+    final Lock lockSize = new ReentrantLock();
+    final Condition conditionSize = lockSize.newCondition();
 
     FrameBuffer(int size) {
         this.size = size;
@@ -76,11 +75,11 @@ class FrameBuffer {
      * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
      */
     boolean empty() {
-        lockCapacity.lock();
+        lockSize.lock();
         try {
             return framesBuffered() <= 0;
         }  finally {
-            lockCapacity.unlock();
+            lockSize.unlock();
         }
     }
 
@@ -89,11 +88,11 @@ class FrameBuffer {
      * When the frame buffer is full, JBWAPI must wait for the bot to complete a frame before returning control to StarCraft.
      */
     boolean full() {
-        lockCapacity.lock();
+        lockSize.lock();
         try {
             return framesBuffered() >= size - 1;
         } finally {
-            lockCapacity.unlock();
+            lockSize.unlock();
         }
     }
 
@@ -109,69 +108,50 @@ class FrameBuffer {
      * Copy dataBuffer from shared memory into the head of the frame buffer.
      */
     void enqueueFrame() {
-        // In practice we don't particularly expect multiple threads to write to this, but support it just to be safe.
-        writeLock.lock();
+        lockWrite.lock();
         try {
-            // Wait for the buffer to have space to enqueue
-            lockCapacity.lock();
-            try {
-                while (full()) {
-                    conditionFull.awaitUninterruptibly();
-                }
-             } finally {
-                lockCapacity.unlock();
-            }
-
-            System.out.println("FrameBuffer: Enqueuing buffer " + indexGame() + " on game step #" + stepGame + " with " + framesBuffered() + " frames buffered.");
+            lockSize.lock();
+            try { while (full()) conditionSize.awaitUninterruptibly(); } finally { lockSize.unlock(); };
             ByteBuffer dataTarget = dataBuffer.get(indexGame());
             dataSource.rewind();
             dataTarget.rewind();
             dataTarget.put(dataSource);
-            ++stepGame;
 
-            // Notify anyone waiting for something to dequeue
-            lockCapacity.lock();
+            lockSize.lock();
             try {
-                conditionEmpty.signalAll();
-            } finally {
-                lockCapacity.unlock();
-            }
-        } finally {
-            writeLock.unlock();
-        }
+                ++stepGame;
+                System.out.println("FrameBuffer: Enqueued buffer " + indexGame() + " on game step #" + stepGame);
+                if (framesBuffered() > 0) {
+                    System.out.println("FrameBuffer: There are now " + framesBuffered() + " frames buffered.");
+                }
+                conditionSize.signalAll();
+            } finally { lockSize.unlock(); }
+        } finally { lockWrite.unlock(); }
     }
 
     /**
-     * Points the bot to the next frame in the buffer.
+     * Peeks the frontmost value in the buffer.
      */
-    ByteBuffer dequeueFrame() {
-        // In practice we don't particularly expect multiple threads to read from this, but support it just to be safe.
-        readLock.lock();
+    ByteBuffer peek() {
+        lockSize.lock();
         try {
-            // Wait for the buffer to have something to dequeue
-            lockCapacity.lock();
-            try {
-                while (empty()) {
-                    conditionEmpty.awaitUninterruptibly();
-                }
-            } finally {
-                lockCapacity.unlock();
-            }
+            while(empty()) conditionSize.awaitUninterruptibly();
+            System.out.println("FrameBuffer: Sharing buffer " + indexBot() + " on bot step #" + stepBot);
+            return dataBuffer.get(indexBot());
+        } finally { lockSize.unlock(); }
 
+    }
+
+    /**
+     * Removes the frontmost frame in the buffer.
+     */
+    void dequeue() {
+        lockSize.lock();
+        try {
+            while(empty()) conditionSize.awaitUninterruptibly();
             System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
-            ByteBuffer output = dataBuffer.get(indexBot());
             ++stepBot;
-
-            // Notify anyone waiting for capacity to enqueue
-            lockCapacity.lock();
-            try {
-                conditionFull.signalAll();
-                return output;
-            } finally {
-                lockCapacity.unlock();
-            }
-        } finally {
-          readLock.unlock();
-        }
+            conditionSize.signalAll();
+        } finally { lockSize.unlock(); }
     }
 }

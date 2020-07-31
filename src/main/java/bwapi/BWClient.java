@@ -62,27 +62,13 @@ public class BWClient {
                 }
                 client.update();
                 if (liveGameData.isInGame()) {
-                    botWrapper.initialize(client.mapFile());
+                    botWrapper.startNewGame(client.mapFile());
                 }
             }
             while (liveGameData.isInGame()) {
                 System.out.println("Client: In game on frame " + liveGameData.getFrameCount());
-
-                botWrapper.step();
-
-                // Proceed immediately once frame buffer is empty
-                // Otherwise, wait for bot to catch up
-                botWrapper.idleLock.lock();
-                try {
-                    while ( ! botWrapper.botIdle()) { // and we have time remaining (with optional extra for frame 0) or no room left in frame buffer
-                        System.out.println("Client: Waiting for idle bot on frame " + liveGameData.getFrameCount());
-                        botWrapper.idleCondition.awaitUninterruptibly();
-                    }
-                } finally {
-                    botWrapper.idleLock.unlock();
-                }
-
-                System.out.println("Client: Sending commands on frame " + liveGameData.getFrameCount());
+                botWrapper.onFrame();
+                System.out.println("Client: Sending commands for frame " + liveGameData.getFrameCount());
                 getGame().sideEffects.flushTo(liveGameData);
                 client.update();
                 if (!client.isConnected()) {
@@ -90,7 +76,7 @@ public class BWClient {
                     client.reconnect();
                 }
             }
-            // TODO: Before exiting give async bot time to complete onEnd(), maybe via thread.join().
+            botWrapper.endGame();
         } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
     }
 }
