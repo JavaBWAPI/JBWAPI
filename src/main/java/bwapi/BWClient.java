@@ -52,13 +52,13 @@ public class BWClient {
         client.reconnect();
 
         do {
-            System.out.println("Client: Beginning game loop");
+            //System.out.println("Client: Beginning game loop");
             ClientData.GameData liveGameData = client.clientData().gameData();
             while (!liveGameData.isInGame()) {
                 if (client.isConnected()) {
-                    System.out.println("Client: Not in game; Connected.");
+                    //System.out.println("Client: Not in game; Connected.");
                 } else  {
-                    System.out.println("Client: Not in game; Not connected.");
+                    //System.out.println("Client: Not in game; Not connected.");
                     return;
                 }
                 client.update();
@@ -67,13 +67,13 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                System.out.println("Client: In game on frame " + liveGameData.getFrameCount());
+                //System.out.println("Client: In game on frame " + liveGameData.getFrameCount());
                 botWrapper.onFrame();
-                System.out.println("Client: Sending commands for frame " + liveGameData.getFrameCount());
+                //System.out.println("Client: Sending commands for frame " + liveGameData.getFrameCount());
                 getGame().sideEffects.flushTo(liveGameData);
                 client.update();
                 if (!client.isConnected()) {
-                    System.out.println("Reconnecting...");
+                    //System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }

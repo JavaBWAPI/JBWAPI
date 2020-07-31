@@ -72,7 +72,7 @@ class BotWrapper {
             long startNanos = System.nanoTime();
             long endNanos = startNanos + configuration.asyncFrameDurationNanos;
             if (botThread == null) {
-                System.out.println("Creating bot thread");
+                //System.out.println("Creating bot thread");
                 botThread = createBotThread();
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
@@ -116,12 +116,12 @@ class BotWrapper {
                 try { while (frameBuffer.empty()) frameBuffer.conditionSize.awaitUninterruptibly(); } finally { frameBuffer.lockSize.unlock(); }
 
                 game.clientData().setBuffer(frameBuffer.peek());
-                System.out.println("Bot thread: Handling events.");
+                //System.out.println("Bot thread: Handling events.");
                 handleEvents();
-                System.out.println("Bot thread: Handled events.");
+                //System.out.println("Bot thread: Handled events.");
                 frameBuffer.dequeue();
             }
-            System.out.println("Bot thread: Ending because game is over.");
+            //System.out.println("Bot thread: Ending because game is over.");
         });
     }
 

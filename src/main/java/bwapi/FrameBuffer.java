@@ -120,9 +120,9 @@ class FrameBuffer {
             lockSize.lock();
             try {
                 ++stepGame;
-                System.out.println("FrameBuffer: Enqueued buffer " + indexGame() + " on game step #" + stepGame);
+                //System.out.println("FrameBuffer: Enqueued buffer " + indexGame() + " on game step #" + stepGame);
                 if (framesBuffered() > 0) {
-                    System.out.println("FrameBuffer: There are now " + framesBuffered() + " frames buffered.");
+                    //System.out.println("FrameBuffer: There are now " + framesBuffered() + " frames buffered.");
                 }
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }
@@ -136,7 +136,7 @@ class FrameBuffer {
         lockSize.lock();
         try {
             while(empty()) conditionSize.awaitUninterruptibly();
-            System.out.println("FrameBuffer: Sharing buffer " + indexBot() + " on bot step #" + stepBot);
+            //System.out.println("FrameBuffer: Sharing buffer " + indexBot() + " on bot step #" + stepBot);
             return dataBuffer.get(indexBot());
         } finally { lockSize.unlock(); }
 
@@ -149,7 +149,7 @@ class FrameBuffer {
         lockSize.lock();
         try {
             while(empty()) conditionSize.awaitUninterruptibly();
-            System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
+            //System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
             ++stepBot;
             conditionSize.signalAll();
         } finally { lockSize.unlock(); }
