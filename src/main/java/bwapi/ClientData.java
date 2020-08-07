@@ -1,6 +1,6 @@
 package bwapi;
 import java.nio.ByteBuffer;
-final class ClientData {
+class ClientData {
     private WrappedBuffer buffer;
     private GameData gameData;
     ClientData() {
