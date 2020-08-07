@@ -52,13 +52,9 @@ public class BWClient {
         client.reconnect();
 
         do {
-            //System.out.println("Client: Beginning game loop");
             ClientData.GameData liveGameData = client.clientData().gameData();
             while (!liveGameData.isInGame()) {
-                if (client.isConnected()) {
-                    //System.out.println("Client: Not in game; Connected.");
-                } else  {
-                    //System.out.println("Client: Not in game; Not connected.");
+                if (!client.isConnected()) {
                     return;
                 }
                 client.update();
@@ -67,17 +63,14 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                //System.out.println("Client: In game on frame " + liveGameData.getFrameCount());
                 botWrapper.onFrame();
-                //System.out.println("Client: Sending commands for frame " + liveGameData.getFrameCount());
                 getGame().sideEffects.flushTo(liveGameData);
                 client.update();
                 if (!client.isConnected()) {
-                    //System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }
             botWrapper.endGame();
-        } while (configuration.autoContinue); // lgtm [java/constant-loop-condition]
+        } while (configuration.autoContinue);
     }
 }

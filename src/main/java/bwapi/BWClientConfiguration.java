@@ -50,6 +50,12 @@ public class BWClientConfiguration {
     public boolean asyncWaitOnFrameZero = true;
 
     /**
+     * Enables collection of diagnostics.
+     * When enabled, JBWAPI collects and publishes performance metrics.
+     */
+    public boolean diagnosePerformance = false;
+
+    /**
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
     public void validate() {

@@ -44,7 +44,6 @@ class FrameBuffer {
 
     // Synchronization locks
     private final Lock lockWrite = new ReentrantLock();
-    private final Lock lockRead = lockWrite;
     final Lock lockSize = new ReentrantLock();
     final Condition conditionSize = lockSize.newCondition();
 
@@ -120,36 +119,30 @@ class FrameBuffer {
             lockSize.lock();
             try {
                 ++stepGame;
-                //System.out.println("FrameBuffer: Enqueued buffer " + indexGame() + " on game step #" + stepGame);
-                if (framesBuffered() > 0) {
-                    //System.out.println("FrameBuffer: There are now " + framesBuffered() + " frames buffered.");
-                }
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }
         } finally { lockWrite.unlock(); }
     }
 
     /**
-     * Peeks the frontmost value in the buffer.
+     * Peeks the front-most value in the buffer.
      */
     ByteBuffer peek() {
         lockSize.lock();
         try {
             while(empty()) conditionSize.awaitUninterruptibly();
-            //System.out.println("FrameBuffer: Sharing buffer " + indexBot() + " on bot step #" + stepBot);
             return dataBuffer.get(indexBot());
         } finally { lockSize.unlock(); }
 
     }
 
     /**
-     * Removes the frontmost frame in the buffer.
+     * Removes the front-most frame in the buffer.
      */
     void dequeue() {
         lockSize.lock();
         try {
             while(empty()) conditionSize.awaitUninterruptibly();
-            //System.out.println("FrameBuffer: Dequeuing buffer " + indexBot() + " on bot step #" + stepBot);
             ++stepBot;
             conditionSize.signalAll();
         } finally { lockSize.unlock(); }
