@@ -126,7 +126,7 @@ class BotWrapper {
                     frameBuffer.lockSize.unlock();
                 }
                 game.clientData().setBuffer(frameBuffer.peek());
-                performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered());
+                performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
                 handleEvents();
                 frameBuffer.dequeue();
             }
@@ -134,15 +134,17 @@ class BotWrapper {
     }
 
     private void handleEvents() {
-        performanceMetrics.botResponse.time(() -> {
-            ClientData.GameData gameData = game.clientData().gameData();
-            for (int i = 0; i < gameData.getEventCount(); i++) {
-                ClientData.Event event = gameData.getEvents(i);
-                EventHandler.operation(eventListener, game, event);
-                if (event.getType() == EventType.MatchEnd) {
-                    gameOver = true;
-                }
+        ClientData.GameData gameData = game.clientData().gameData();
+        if (gameData.getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero) {
+            performanceMetrics.botResponse.startTiming();
+        }
+        for (int i = 0; i < gameData.getEventCount(); i++) {
+            ClientData.Event event = gameData.getEvents(i);
+            EventHandler.operation(eventListener, game, event);
+            if (event.getType() == EventType.MatchEnd) {
+                gameOver = true;
             }
-        });
+        }
+        performanceMetrics.botResponse.stopTiming();
     }
 }

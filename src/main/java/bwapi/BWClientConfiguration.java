@@ -53,7 +53,7 @@ public class BWClientConfiguration {
      * Enables collection of diagnostics.
      * When timersEnabled, JBWAPI collects and publishes performance metrics.
      */
-    public boolean diagnosePerformance = false;
+    public boolean collectPerformanceMetrics = false;
 
     /**
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.

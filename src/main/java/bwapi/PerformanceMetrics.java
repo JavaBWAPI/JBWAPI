@@ -58,20 +58,21 @@ public class PerformanceMetrics {
     public PerformanceMetric botIdle;
 
     public PerformanceMetrics(BWClientConfiguration configuration) {
-        timersEnabled = configuration.diagnosePerformance;
+        timersEnabled = configuration.collectPerformanceMetrics;
         final int frameDurationBufferMs = 5;
         final int sideEffectsBufferMs = 1;
         final int realTimeFrameMs = 42;
         totalFrameDuration = new PerformanceMetric("Total frame duration", configuration.asyncFrameDurationMs + frameDurationBufferMs, timersEnabled);
         copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5, timersEnabled);
         intentionallyBlocking = new PerformanceMetric("Intentionally blocking", 0, timersEnabled);
-        frameBufferSize = new PerformanceMetric("Frame buffer size", 0, timersEnabled);
+        frameBufferSize = new PerformanceMetric("Frames buffered", 0, timersEnabled);
         flushSideEffects = new PerformanceMetric("Flush side effects", sideEffectsBufferMs , timersEnabled);
         botResponse = new PerformanceMetric("Bot Responses", configuration.asyncFrameDurationMs, timersEnabled);
         bwapiResponse = new PerformanceMetric("BWAPI Responses", realTimeFrameMs, timersEnabled);
         botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE, timersEnabled);
     }
 
+    @Override
     public String toString() {
         return "Performance metrics:"
                 + "\n" + totalFrameDuration.toString()

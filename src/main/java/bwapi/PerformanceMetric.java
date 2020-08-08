@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 
 public class PerformanceMetric {
     private final String name;
-    private final long maxThreshold;
+    private final long maxAllowed;
     public final boolean timerEnabled;
 
     public double minValue = Long.MAX_VALUE;
@@ -17,9 +17,9 @@ public class PerformanceMetric {
 
     private long timeStarted = 0;
 
-    PerformanceMetric(String name, long maxThreshold, boolean timerEnabled) {
+    PerformanceMetric(String name, long maxAllowed, boolean timerEnabled) {
         this.name = name;
-        this.maxThreshold = maxThreshold;
+        this.maxAllowed = maxAllowed;
         this.timerEnabled = timerEnabled;
     }
 
@@ -40,12 +40,11 @@ public class PerformanceMetric {
     void stopTiming() {
         if (!timerEnabled) return;
         if (timeStarted <= 0) return;
-        // Use nanosecond resolution timer,
-        // and record in units of milliseconds.
+        // Use nanosecond resolution timer, but record in units of milliseconds.
         long timeEnded = System.nanoTime();
         long timeDiff = timeEnded - timeStarted;
         timeStarted = 0;
-        record(timeDiff / 1000d);
+        record(timeDiff / 1000000d);
     }
 
     void record(double value) {
@@ -53,7 +52,7 @@ public class PerformanceMetric {
         maxValue = Math.max(maxValue, value);
         avgValue = (avgValue * samples + value) / (samples + 1d);
         ++samples;
-        if (value > maxThreshold) {
+        if (value > maxAllowed) {
             avgValueExceeding = (avgValueExceeding * samplesExceeding + value) / (samplesExceeding + 1d);
             ++samplesExceeding;
         }
@@ -64,22 +63,24 @@ public class PerformanceMetric {
         DecimalFormat formatter = new DecimalFormat("###,###.#");
         return name
                 + ": "
-                + samples
-                + " averaging "
-                + formatter.format(avgValue)
-                + " ["
-                + formatter.format(minValue)
-                + " - "
-                + formatter.format(maxValue)
-                + "] over "
-                + samples
-                + " samples"
-                + (samplesExceeding > 0
-                    ? ". "
-                        + samplesExceeding
-                        + " violations averaging "
-                        + formatter.format(avgValueExceeding)
-                    : "")
+                + (samples > 0
+                    ? formatter.format(samples)
+                        + " samples averaging "
+                        + formatter.format(avgValue)
+                        + " ["
+                        + formatter.format(minValue)
+                        + " - "
+                        + formatter.format(maxValue)
+                        + "] over "
+                        + samples
+                        + " samples"
+                        + (samplesExceeding > 0
+                            ? ". "
+                                + samplesExceeding
+                                + " violations averaging "
+                                + formatter.format(avgValueExceeding)
+                            : "")
+                    : "No samples")
                 + (interrupted > 0
                     ? ". Interrupted " + interrupted + " times"
                     : "");

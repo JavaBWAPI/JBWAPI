@@ -27,7 +27,7 @@ public class BWClient {
      * Returns JBWAPI performance metrics.
      * Metrics will be mostly empty if metrics collection isn't timersEnabled in the bot configuration
      */
-    public PerformanceMetrics performanceMetrics() {
+    public PerformanceMetrics getPerformanceMetrics() {
         return performanceMetrics;
     }
 
