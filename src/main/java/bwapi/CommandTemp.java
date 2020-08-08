@@ -2,7 +2,7 @@ package bwapi;
 
 /**
  * Latency Compensation:
- * Only need to implement LatCom for current frame, the server updates the next frame already if latcom is enabled.
+ * Only need to implement LatCom for current frame, the server updates the next frame already if latcom is timersEnabled.
  * Use Caches for all internal state that might be affected by latcom, and add the (current) frame, to let Player & Unit
  * check if they need to use the cached/latcom version of the value or the from server (or a combination of both)
  * <p>

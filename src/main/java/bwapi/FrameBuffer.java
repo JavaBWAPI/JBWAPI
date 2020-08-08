@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 class FrameBuffer {
 
     private ByteBuffer dataSource;
+    private PerformanceMetrics performanceMetrics;
     private int size;
     private int stepGame = 0;
     private int stepBot = 0;
@@ -57,8 +58,9 @@ class FrameBuffer {
     /**
      * Resets for a new game
      */
-    void initialize(ByteBuffer dataSource) {
+    void initialize(ByteBuffer dataSource, PerformanceMetrics performanceMetrics) {
         this.dataSource = dataSource;
+        this.performanceMetrics = performanceMetrics;
         stepGame = 0;
         stepBot = 0;
     }
@@ -110,7 +112,13 @@ class FrameBuffer {
         lockWrite.lock();
         try {
             lockSize.lock();
-            try { while (full()) conditionSize.awaitUninterruptibly(); } finally { lockSize.unlock(); };
+            try {
+                while (full()) {
+                    performanceMetrics.intentionallyBlocking.startTiming();
+                    conditionSize.awaitUninterruptibly();
+                }
+                performanceMetrics.intentionallyBlocking.stopTiming();
+            } finally { lockSize.unlock(); };
             ByteBuffer dataTarget = dataBuffer.get(indexGame());
             dataSource.rewind();
             dataTarget.rewind();
@@ -133,7 +141,6 @@ class FrameBuffer {
             while(empty()) conditionSize.awaitUninterruptibly();
             return dataBuffer.get(indexBot());
         } finally { lockSize.unlock(); }
-
     }
 
     /**

@@ -38,6 +38,7 @@ class BotWrapper {
     private Game game;
     private Thread botThread;
     private boolean gameOver;
+    private PerformanceMetrics performanceMetrics;
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
@@ -48,8 +49,9 @@ class BotWrapper {
     /**
      * Resets the BotWrapper for a new game.
      */
-    void startNewGame(ByteBuffer dataSource) {
-        frameBuffer.initialize(dataSource);
+    void startNewGame(ByteBuffer dataSource, PerformanceMetrics performanceMetrics) {
+        frameBuffer.initialize(dataSource, performanceMetrics);
+        this.performanceMetrics = performanceMetrics;
         game = new Game(liveClientData);
         liveClientData.setBuffer(dataSource);
         botThread = null;
@@ -70,16 +72,17 @@ class BotWrapper {
     void onFrame() {
         if (configuration.async) {
             long startNanos = System.nanoTime();
-            long endNanos = startNanos + configuration.asyncFrameDurationNanos;
+            long endNanos = startNanos + configuration.asyncFrameDurationMs * 1000000;
             if (botThread == null) {
                 botThread = createBotThread();
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
             }
-            frameBuffer.enqueueFrame();
+            performanceMetrics.copyingToBuffer.time(frameBuffer::enqueueFrame);
             frameBuffer.lockSize.lock();
             try {
                 while (frameBuffer.empty()) {
+                    performanceMetrics.bwapiResponse.startTiming();
                     if (configuration.asyncWaitOnFrameZero && liveClientData.gameData().getFrameCount() == 0) {
                         frameBuffer.conditionSize.await();
                     } else {
@@ -88,6 +91,7 @@ class BotWrapper {
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
                     }
                 }
+                performanceMetrics.bwapiResponse.stopTiming();
             } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
@@ -112,9 +116,17 @@ class BotWrapper {
         return new Thread(() -> {
             while ( ! gameOver) {
                 frameBuffer.lockSize.lock();
-                try { while (frameBuffer.empty()) frameBuffer.conditionSize.awaitUninterruptibly(); } finally { frameBuffer.lockSize.unlock(); }
-
+                try {
+                    while (frameBuffer.empty()) {
+                        performanceMetrics.botIdle.startTiming();
+                        frameBuffer.conditionSize.awaitUninterruptibly();
+                    }
+                    performanceMetrics.botIdle.stopTiming();
+                } finally {
+                    frameBuffer.lockSize.unlock();
+                }
                 game.clientData().setBuffer(frameBuffer.peek());
+                performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered());
                 handleEvents();
                 frameBuffer.dequeue();
             }
@@ -122,13 +134,15 @@ class BotWrapper {
     }
 
     private void handleEvents() {
-        ClientData.GameData gameData = game.clientData().gameData();
-        for (int i = 0; i < gameData.getEventCount(); i++) {
-            ClientData.Event event = gameData.getEvents(i);
-            EventHandler.operation(eventListener, game, event);
-            if (event.getType() == EventType.MatchEnd) {
-                gameOver = true;
+        performanceMetrics.botResponse.time(() -> {
+            ClientData.GameData gameData = game.clientData().gameData();
+            for (int i = 0; i < gameData.getEventCount(); i++) {
+                ClientData.Event event = gameData.getEvents(i);
+                EventHandler.operation(eventListener, game, event);
+                if (event.getType() == EventType.MatchEnd) {
+                    gameOver = true;
+                }
             }
-        }
+        });
     }
 }

@@ -8,6 +8,7 @@ import java.util.Objects;
 public class BWClient {
     private final BWEventListener eventListener;
     private BotWrapper botWrapper;
+    private PerformanceMetrics performanceMetrics;
 
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
@@ -20,6 +21,14 @@ public class BWClient {
      */
     public Game getGame() {
         return botWrapper == null ? null : botWrapper.getGame();
+    }
+
+    /**
+     * Returns JBWAPI performance metrics.
+     * Metrics will be mostly empty if metrics collection isn't timersEnabled in the bot configuration
+     */
+    public PerformanceMetrics performanceMetrics() {
+        return performanceMetrics;
     }
 
     public void startGame() {
@@ -59,16 +68,21 @@ public class BWClient {
                 }
                 client.update();
                 if (liveGameData.isInGame()) {
-                    botWrapper.startNewGame(client.mapFile());
+                    performanceMetrics = new PerformanceMetrics(configuration);
+                    botWrapper.startNewGame(client.mapFile(), performanceMetrics);
                 }
             }
             while (liveGameData.isInGame()) {
-                botWrapper.onFrame();
-                getGame().sideEffects.flushTo(liveGameData);
-                client.update();
-                if (!client.isConnected()) {
-                    client.reconnect();
-                }
+                performanceMetrics.totalFrameDuration.time(() -> {
+                    botWrapper.onFrame();
+                    performanceMetrics.flushSideEffects.time(() -> {
+                        getGame().sideEffects.flushTo(liveGameData);
+                    });
+                    client.update();
+                    if (!client.isConnected()) {
+                        client.reconnect();
+                    }
+                });
             }
             botWrapper.endGame();
         } while (configuration.autoContinue);

@@ -19,8 +19,8 @@ import static bwapi.UnitType.*;
  * becoming invalid).
  * <p>
  * Every Unit in the game is either accessible or inaccessible. To determine if an AI can access
- * a particular unit, BWAPI checks to see if {@link Flag#CompleteMapInformation} is enabled. So there
- * are two cases to consider - either the flag is enabled, or it is disabled:
+ * a particular unit, BWAPI checks to see if {@link Flag#CompleteMapInformation} is timersEnabled. So there
+ * are two cases to consider - either the flag is timersEnabled, or it is disabled:
  * <p>
  * If {@link Flag#CompleteMapInformation} is disabled, then a unit is accessible if and only if it is visible.
  * <p>
@@ -31,7 +31,7 @@ import static bwapi.UnitType.*;
  * AI must watch for {@link BWEventListener#onUnitDestroy} messages from BWAPI, which is only called for visible units
  * which get destroyed.
  * <p>
- * If {@link Flag#CompleteMapInformation} is enabled, then all units that exist in the game are accessible, and
+ * If {@link Flag#CompleteMapInformation} is timersEnabled, then all units that exist in the game are accessible, and
  * {@link Unit#exists} is accurate for all units. Similarly {@link BWEventListener#onUnitDestroy} messages are generated for all
  * units that get destroyed, not just visible ones.
  * <p>
@@ -128,7 +128,7 @@ public class Unit implements Comparable<Unit> {
     /**
      * Retrieves the unit identifier for this unit as seen in replay data.
      * <p>
-     * This is only available if {@link Flag#CompleteMapInformation} is enabled.
+     * This is only available if {@link Flag#CompleteMapInformation} is timersEnabled.
      *
      * @return An integer containing the replay unit identifier.
      * @see #getID
@@ -1882,7 +1882,7 @@ public class Unit implements Comparable<Unit> {
 
     /**
      * Checks if this unit has been selected in the user interface. This
-     * function is only available if the flag Flag#UserInput is enabled.
+     * function is only available if the flag Flag#UserInput is timersEnabled.
      *
      * @return true if this unit is currently selected, and false if this unit is not selected
      * @see Game#getSelectedUnits
@@ -2046,7 +2046,7 @@ public class Unit implements Comparable<Unit> {
      * @param player The player to check visibility for. If this parameter is omitted, then the BWAPI player obtained from {@link Game#self()} will be used.
      * @return true if this unit is visible to the specified player, and false if it is not.
      * <p>
-     * If the {@link Flag#CompleteMapInformation} flag is enabled, existing units hidden by the
+     * If the {@link Flag#CompleteMapInformation} flag is timersEnabled, existing units hidden by the
      * fog of war will be accessible, but isVisible will still return false.
      * @see #exists
      */

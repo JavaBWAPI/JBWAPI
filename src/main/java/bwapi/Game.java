@@ -329,7 +329,7 @@ public class Game {
 
     /**
      * Retrieves the set of all accessible units.
-     * If {@link Flag#CompleteMapInformation} is enabled, then the set also includes units that are not
+     * If {@link Flag#CompleteMapInformation} is timersEnabled, then the set also includes units that are not
      * visible to the player.
      * <p>
      * Units that are inside refineries are not included in this set.
@@ -624,13 +624,13 @@ public class Game {
     }
 
     /**
-     * Checks if the state of the given flag is enabled or not.
+     * Checks if the state of the given flag is timersEnabled or not.
      * <p>
-     * Flags may only be enabled at the start of the match during the {@link BWEventListener#onStart}
+     * Flags may only be timersEnabled at the start of the match during the {@link BWEventListener#onStart}
      * callback.
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
-     * @return true if the given flag is enabled, false if the flag is disabled.
+     * @return true if the given flag is timersEnabled, false if the flag is disabled.
      * @see Flag
      */
     public boolean isFlagEnabled(final Flag flag) {
@@ -640,7 +640,7 @@ public class Game {
     /**
      * Enables the state of a given flag.
      * <p>
-     * Flags may only be enabled at the start of the match during the {@link BWEventListener#onStart}
+     * Flags may only be timersEnabled at the start of the match during the {@link BWEventListener#onStart}
      * callback.
      *
      * @param flag The {@link Flag} entry describing the flag's effects on BWAPI.
@@ -1640,7 +1640,7 @@ public class Game {
 
     /**
      * Retrieves the set of units that are currently selected by the user outside of
-     * BWAPI. This function requires that{@link Flag#UserInput} be enabled.
+     * BWAPI. This function requires that{@link Flag#UserInput} be timersEnabled.
      *
      * @return A List<Unit> containing the user's selected units. If {@link Flag#UserInput} is disabled,
      * then this set is always empty.
@@ -2163,7 +2163,7 @@ public class Game {
     /**
      * Checks the state of latency compensation.
      *
-     * @return true if latency compensation is enabled, false if it is disabled.
+     * @return true if latency compensation is timersEnabled, false if it is disabled.
      * @see #setLatCom
      */
     public boolean isLatComEnabled() {
@@ -2174,9 +2174,9 @@ public class Game {
      * Changes the state of latency compensation. Latency compensation
      * modifies the state of BWAPI's representation of units to reflect the implications of
      * issuing a command immediately after the command was performed, instead of waiting
-     * consecutive frames for the results. Latency compensation is enabled by default.
+     * consecutive frames for the results. Latency compensation is timersEnabled by default.
      *
-     * @param isEnabled Set whether the latency compensation feature will be enabled (true) or disabled (false).
+     * @param isEnabled Set whether the latency compensation feature will be timersEnabled (true) or disabled (false).
      * @see #isLatComEnabled
      */
     public void setLatCom(final boolean isEnabled) {
@@ -2278,11 +2278,11 @@ public class Game {
     }
 
     /**
-     * Checks if the GUI is enabled.
+     * Checks if the GUI is timersEnabled.
      * <p>
      * The GUI includes all drawing functions of BWAPI, as well as screen updates from Broodwar.
      *
-     * @return true if the GUI is enabled, and everything is visible, false if the GUI is disabled and drawing
+     * @return true if the GUI is timersEnabled, and everything is visible, false if the GUI is disabled and drawing
      * functions are rejected
      * @see #setGUI
      */
@@ -2341,7 +2341,7 @@ public class Game {
     /**
      * Sets the state of the fog of war when watching a replay.
      *
-     * @param reveal The state of the reveal all flag. If false, all fog of war will be enabled. If true,
+     * @param reveal The state of the reveal all flag. If false, all fog of war will be timersEnabled. If true,
      *               then the fog of war will be revealed. It is true by default.
      */
     public boolean setRevealAll(boolean reveal) {

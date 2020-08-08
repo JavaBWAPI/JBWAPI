@@ -21,7 +21,7 @@ import java.util.Objects;
  * represents a new Bullet.
  * <p>
  * If {@link Flag#CompleteMapInformation} is disabled, then a {@link Bullet} is accessible if and only if
- * it is visible. Otherwise if {@link Flag#CompleteMapInformation} is enabled, then all Bullets
+ * it is visible. Otherwise if {@link Flag#CompleteMapInformation} is timersEnabled, then all Bullets
  * in the game are accessible.
  *
  * @see Game#getBullets
@@ -54,7 +54,7 @@ public class Bullet implements Comparable<Bullet> {
      * return value will be false regardless of the Bullet's true existence. This is because
      * absolutely no state information on invisible enemy bullets is made available to the AI.
      * <p>
-     * If {@link Flag#CompleteMapInformation} is enabled, then this function is accurate for all
+     * If {@link Flag#CompleteMapInformation} is timersEnabled, then this function is accurate for all
      * {@link Bullet} information.
      *
      * @return true if the bullet exists or is visible, false if the bullet was destroyed or has gone out of scope.
