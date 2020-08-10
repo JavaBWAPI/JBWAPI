@@ -25,6 +25,7 @@ SOFTWARE.
 
 package bwapi;
 
+import sun.nio.ch.DirectBuffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.concurrent.locks.Condition;
@@ -35,6 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Circular buffer of game states.
  */
 class FrameBuffer {
+    private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
 
     private ByteBuffer dataSource;
     private PerformanceMetrics performanceMetrics;
@@ -51,7 +53,7 @@ class FrameBuffer {
     FrameBuffer(int size) {
         this.size = size;
         while(dataBuffer.size() < size) {
-            dataBuffer.add(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
+            dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
         }
     }
 
@@ -122,9 +124,7 @@ class FrameBuffer {
 
             performanceMetrics.copyingToBuffer.time(() -> {
                 ByteBuffer dataTarget = dataBuffer.get(indexGame());
-                dataSource.rewind();
-                dataTarget.rewind();
-                dataTarget.put(dataSource);
+                copyBuffer(dataSource, dataTarget, BUFFER_SIZE);
             });
 
             lockSize.lock();
@@ -133,6 +133,17 @@ class FrameBuffer {
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }
         } finally { lockWrite.unlock(); }
+    }
+
+    private void copyBufferOld(ByteBuffer source, ByteBuffer dest, int size) {
+        source.rewind();
+        dest.rewind();
+        dest.put(dataSource);
+    }
+    private void copyBuffer(ByteBuffer source, ByteBuffer dest, int size) {
+        long destAddr = ((DirectBuffer)dest).address();
+        long sourceAddr = ((DirectBuffer)source).address();
+        MSVCRT.INSTANCE.memcpy(destAddr, sourceAddr, size);
     }
 
     /**
