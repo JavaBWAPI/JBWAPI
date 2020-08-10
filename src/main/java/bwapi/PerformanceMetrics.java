@@ -46,30 +46,23 @@ public class PerformanceMetrics {
     public PerformanceMetric bwapiResponse;
 
     /**
-     * Whether performance timers have been enabled in the JBWAPI configuration.
-     * Timers are off by default to spare performance.
-     */
-    public final boolean timersEnabled;
-
-    /**
      * Time bot spends idle.
      * Applicable only in asynchronous mode.
      */
     public PerformanceMetric botIdle;
 
     public PerformanceMetrics(BWClientConfiguration configuration) {
-        timersEnabled = configuration.collectPerformanceMetrics;
         final int frameDurationBufferMs = 5;
         final int sideEffectsBufferMs = 1;
         final int realTimeFrameMs = 42;
-        totalFrameDuration = new PerformanceMetric("Total frame duration", configuration.asyncFrameDurationMs + frameDurationBufferMs, timersEnabled);
-        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5, timersEnabled);
-        intentionallyBlocking = new PerformanceMetric("Intentionally blocking", 0, timersEnabled);
-        frameBufferSize = new PerformanceMetric("Frames buffered", 0, timersEnabled);
-        flushSideEffects = new PerformanceMetric("Flush side effects", sideEffectsBufferMs , timersEnabled);
-        botResponse = new PerformanceMetric("Bot Responses", configuration.asyncFrameDurationMs, timersEnabled);
-        bwapiResponse = new PerformanceMetric("BWAPI Responses", realTimeFrameMs, timersEnabled);
-        botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE, timersEnabled);
+        totalFrameDuration = new PerformanceMetric("Total frame duration", configuration.asyncFrameDurationMs + frameDurationBufferMs);
+        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5);
+        intentionallyBlocking = new PerformanceMetric("Intentionally blocking", 0);
+        frameBufferSize = new PerformanceMetric("Frames buffered", 0);
+        flushSideEffects = new PerformanceMetric("Flush side effects", sideEffectsBufferMs );
+        botResponse = new PerformanceMetric("Bot Responses", configuration.asyncFrameDurationMs);
+        bwapiResponse = new PerformanceMetric("BWAPI Responses", realTimeFrameMs);
+        botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE);
     }
 
     @Override

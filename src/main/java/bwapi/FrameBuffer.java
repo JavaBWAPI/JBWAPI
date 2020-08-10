@@ -119,10 +119,13 @@ class FrameBuffer {
                 }
                 performanceMetrics.intentionallyBlocking.stopTiming();
             } finally { lockSize.unlock(); };
-            ByteBuffer dataTarget = dataBuffer.get(indexGame());
-            dataSource.rewind();
-            dataTarget.rewind();
-            dataTarget.put(dataSource);
+
+            performanceMetrics.copyingToBuffer.time(() -> {
+                ByteBuffer dataTarget = dataBuffer.get(indexGame());
+                dataSource.rewind();
+                dataTarget.rewind();
+                dataTarget.put(dataSource);
+            });
 
             lockSize.lock();
             try {

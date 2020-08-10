@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 public class PerformanceMetric {
     private final String name;
     private final long maxAllowed;
-    public final boolean timerEnabled;
 
     public double minValue = Long.MAX_VALUE;
     public double maxValue = Long.MIN_VALUE;
@@ -17,10 +16,9 @@ public class PerformanceMetric {
 
     private long timeStarted = 0;
 
-    PerformanceMetric(String name, long maxAllowed, boolean timerEnabled) {
+    PerformanceMetric(String name, long maxAllowed) {
         this.name = name;
         this.maxAllowed = maxAllowed;
-        this.timerEnabled = timerEnabled;
     }
 
     void time(Runnable runnable) {
@@ -30,7 +28,6 @@ public class PerformanceMetric {
     }
 
     void startTiming() {
-        if (!timerEnabled) return;
         if (timeStarted > 0) {
             ++interrupted;
         }
@@ -38,7 +35,6 @@ public class PerformanceMetric {
     }
 
     void stopTiming() {
-        if (!timerEnabled) return;
         if (timeStarted <= 0) return;
         // Use nanosecond resolution timer, but record in units of milliseconds.
         long timeEnded = System.nanoTime();

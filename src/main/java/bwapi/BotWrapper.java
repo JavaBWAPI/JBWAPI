@@ -78,12 +78,18 @@ class BotWrapper {
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
             }
-            performanceMetrics.copyingToBuffer.time(frameBuffer::enqueueFrame);
+            /*
+            Add a frame to buffer
+                If buffer is full, it will wait until it has capacity
+            Wait for empty buffer OR termination condition
+             */
+            boolean isFrameZero = liveClientData.gameData().getFrameCount() == 0;
+            frameBuffer.enqueueFrame();
+            performanceMetrics.bwapiResponse.startTiming();
             frameBuffer.lockSize.lock();
             try {
-                while (frameBuffer.empty()) {
-                    performanceMetrics.bwapiResponse.startTiming();
-                    if (configuration.asyncWaitOnFrameZero && liveClientData.gameData().getFrameCount() == 0) {
+                while (!frameBuffer.empty()) {
+                    if (configuration.unlimitedFrameZero && isFrameZero) {
                         frameBuffer.conditionSize.await();
                     } else {
                         long remainingNanos = endNanos - System.nanoTime();
@@ -91,10 +97,10 @@ class BotWrapper {
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
                     }
                 }
-                performanceMetrics.bwapiResponse.stopTiming();
             } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
+                performanceMetrics.bwapiResponse.stopTiming();
             }
         } else {
             handleEvents();
@@ -135,7 +141,7 @@ class BotWrapper {
 
     private void handleEvents() {
         ClientData.GameData gameData = game.clientData().gameData();
-        if (gameData.getFrameCount() > 0 || ! configuration.asyncWaitOnFrameZero) {
+        if (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
             performanceMetrics.botResponse.startTiming();
         }
         for (int i = 0; i < gameData.getEventCount(); i++) {

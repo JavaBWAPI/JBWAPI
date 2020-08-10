@@ -8,6 +8,7 @@ import java.util.Objects;
 public class BWClient {
     private final BWEventListener eventListener;
     private BotWrapper botWrapper;
+    private Client client;
     private PerformanceMetrics performanceMetrics;
 
     public BWClient(final BWEventListener eventListener) {
@@ -29,6 +30,13 @@ public class BWClient {
      */
     public PerformanceMetrics getPerformanceMetrics() {
         return performanceMetrics;
+    }
+
+    /**
+     * Number of frames
+     */
+    public int framesBehind() {
+        return botWrapper == null ? 0 : client.clientData().gameData().getFrameCount() - getGame().getFrameCount();
     }
 
     public void startGame() {
@@ -57,7 +65,7 @@ public class BWClient {
         configuration.validate();
         botWrapper = new BotWrapper(configuration, eventListener);
 
-        Client client = new Client(configuration);
+        client = new Client(configuration);
         client.reconnect();
 
         do {
@@ -73,16 +81,16 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                performanceMetrics.totalFrameDuration.time(() -> {
-                    botWrapper.onFrame();
-                    performanceMetrics.flushSideEffects.time(() -> {
-                        getGame().sideEffects.flushTo(liveGameData);
-                    });
-                    client.update();
-                    if (!client.isConnected()) {
-                        client.reconnect();
-                    }
-                });
+                if (liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
+                    performanceMetrics.totalFrameDuration.startTiming();
+                }
+                botWrapper.onFrame();
+                performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
+                client.update();
+                if (!client.isConnected()) {
+                    client.reconnect();
+                }
+                performanceMetrics.totalFrameDuration.stopTiming();
             }
             botWrapper.endGame();
         } while (configuration.autoContinue);
