@@ -142,6 +142,7 @@ public class Game {
     Call this method in EventHander::OnMatchStart
     */
     void init() {
+        System.out.println("Game.init()"); // TODO: REMOVE!
         visibleUnits.clear();
 
         final int forceCount = gameData().getForceCount();

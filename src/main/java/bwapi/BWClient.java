@@ -25,20 +25,25 @@ public class BWClient {
     }
 
     /**
-     * Returns JBWAPI performance metrics.
-     * Metrics will be mostly empty if metrics collection isn't timersEnabled in the bot configuration
+     * @return JBWAPI performance metrics.
      */
+    @SuppressWarnings("unused")
     public PerformanceMetrics getPerformanceMetrics() {
         return performanceMetrics;
     }
 
     /**
-     * Number of frames
+     * @return The number of frames between the one exposed to the bot and the most recent received by JBWAPI.
+     * This tracks the size of the frame buffer except when the game is paused (which results in multiple frames arriving with the same count).
      */
+    @SuppressWarnings("unused")
     public int framesBehind() {
-        return botWrapper == null ? 0 : client.clientData().gameData().getFrameCount() - getGame().getFrameCount();
+        return botWrapper == null ? 0 : Math.max(0, client.clientData().gameData().getFrameCount() - getGame().getFrameCount());
     }
 
+    /**
+     * Start the game with default settings.
+     */
     public void startGame() {
         BWClientConfiguration configuration = new BWClientConfiguration();
         startGame(configuration);
@@ -65,7 +70,9 @@ public class BWClient {
         configuration.validate();
         botWrapper = new BotWrapper(configuration, eventListener);
 
-        client = new Client(configuration);
+        if (client == null) {
+            client = new Client(configuration);
+        }
         client.reconnect();
 
         do {
@@ -94,5 +101,12 @@ public class BWClient {
             }
             botWrapper.endGame();
         } while (configuration.autoContinue);
+    }
+
+    /**
+     * Provides a Client. Intended for test consumers only.
+     */
+    void setClient(Client client) {
+        this.client = client;
     }
 }

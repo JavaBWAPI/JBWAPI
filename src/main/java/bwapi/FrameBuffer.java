@@ -25,6 +25,7 @@ SOFTWARE.
 
 package bwapi;
 
+import com.sun.jna.Platform;
 import sun.nio.ch.DirectBuffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ class FrameBuffer {
     private int stepGame = 0;
     private int stepBot = 0;
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
+    private final String architecture;
 
     // Synchronization locks
     private final Lock lockWrite = new ReentrantLock();
@@ -53,8 +55,10 @@ class FrameBuffer {
     FrameBuffer(int size) {
         this.size = size;
         while(dataBuffer.size() < size) {
+            System.out.println("Allocating " + BUFFER_SIZE / 1024 / 1024 + "mb");
             dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
         }
+        architecture = System.getProperty("sun.arch.data.model");
     }
 
     /**
@@ -124,7 +128,7 @@ class FrameBuffer {
 
             performanceMetrics.copyingToBuffer.time(() -> {
                 ByteBuffer dataTarget = dataBuffer.get(indexGame());
-                copyBuffer(dataSource, dataTarget, BUFFER_SIZE);
+                copyBuffer(dataSource, dataTarget);
             });
 
             lockSize.lock();
@@ -133,17 +137,6 @@ class FrameBuffer {
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }
         } finally { lockWrite.unlock(); }
-    }
-
-    private void copyBufferOld(ByteBuffer source, ByteBuffer dest, int size) {
-        source.rewind();
-        dest.rewind();
-        dest.put(dataSource);
-    }
-    private void copyBuffer(ByteBuffer source, ByteBuffer dest, int size) {
-        long destAddr = ((DirectBuffer)dest).address();
-        long sourceAddr = ((DirectBuffer)source).address();
-        MSVCRT.INSTANCE.memcpy(destAddr, sourceAddr, size);
     }
 
     /**
@@ -167,5 +160,39 @@ class FrameBuffer {
             ++stepBot;
             conditionSize.signalAll();
         } finally { lockSize.unlock(); }
+    }
+
+    void copyBuffer(ByteBuffer source, ByteBuffer destination) {
+        /*
+        The speed at which we copy data into the frame buffer is a major cost of JBWAPI's asynchronous operation.
+        Copy times observed in the wild range from 2.6ms - 12ms.
+
+        The normal Java way to execute this copy is via ByteBuffer.put(), which has reasonably good performance characteristics.
+        Some experiments in 64-bit JRE have shown that using a native memcpy achieves a 35% speedup.
+        Some experiments in 32-bit JRE show no difference in performance.
+
+        So, speculatively, we attempt to do a native memcpy.
+         */
+        long addressSource = ((DirectBuffer) source).address();
+        long addressDestination = ((DirectBuffer) destination).address();
+        try {
+            if (Platform.isWindows()) {
+                if (Platform.is64Bit()) {
+                    MSVCRT.INSTANCE.memcpy(addressDestination, addressSource, FrameBuffer.BUFFER_SIZE);
+                    return;
+                } else {
+                    MSVCRT.INSTANCE.memcpy((int) addressDestination, (int) addressSource, FrameBuffer.BUFFER_SIZE);
+                    return;
+                }
+            }
+        }
+        catch(Exception ignored) {}
+
+        // There's no specific case where we expect to fail above,
+        // but this is a safe fallback regardless,
+        // and serves to document the known-good (and cross-platform, for BWAPI 5) way to executing the copy.
+        source.rewind();
+        destination.rewind();
+        destination.put(dataSource);
     }
 }

@@ -63,6 +63,8 @@
                 <configuration>
                     <parallel>all</parallel> <!-- Run tests in parallel-->
                     <useUnlimitedThreads>true</useUnlimitedThreads>
+                    <argLine>-Xms1g</argLine>
+                    <argLine>-Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>

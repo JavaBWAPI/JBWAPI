@@ -1,53 +1,77 @@
 package bwapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.IntStream;
 
-import net.bytebuddy.implementation.bytecode.Addition;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.FromDataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
-import org.mockito.AdditionalAnswers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.rules.Timeout;
 
 public class SynchronizationTest {
 
-    class Environment {
-        BWClientConfiguration configuration = new BWClientConfiguration();
-        BWEventListener listener = mock(BWEventListener.class);
-        Client client = mock(Client.class);
-
-        Game game;
-        public Environment() {
-            try {
-                game = GameBuilder.createGame();
-            } catch (IOException exception) {
-                throw new RuntimeException(exception);
-            }
-            Mockito.doAnswer(answer -> { stepFrame(); return null; }).when(client).update();
-        }
-
-        public void stepFrame() {
-            game.clientData().gameData().setFrameCount(game.clientData().gameData().getFrameCount() + 1);
+    private void sleepUnchecked(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch(InterruptedException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
     @Test
-    public void synchronizedRuns() {
-        Environment environment = new Environment();
+    public void sync_IfException_ThrowException() throws InterruptedException {
+        SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = false;
+        environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
+        assertThrows(RuntimeException.class, environment::runGame);
     }
 
+    @Test
+    public void async_IfException_ThrowException() throws InterruptedException {
+        // An exception in the bot thread must be re-thrown by the main thread.
+        SynchronizationEnvironment environment = new SynchronizationEnvironment();
+        environment.configuration.async = true;
+        environment.configuration.asyncFrameBufferSize = 3;
+        environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
+        assertThrows(RuntimeException.class, environment::runGame);
+    }
+
+    @Test
+    public void sync_IfDelay_ThenNoBuffer() throws InterruptedException {
+        SynchronizationEnvironment environment = new SynchronizationEnvironment();
+        environment.configuration.async = false;
+        environment.configuration.asyncFrameDurationMs = 1;
+        environment.configuration.asyncFrameBufferSize = 3;
+        IntStream.range(0, 5).forEach(frame -> {
+            environment.onFrame(frame, () -> {
+                sleepUnchecked(5);
+                assertEquals(0, environment.bwClient.framesBehind());
+                assertEquals(frame, environment.bwClient.getGame().getFrameCount());
+                assertEquals(frame, environment.liveGameData().getFrameCount());
+            });
+        });
+
+        environment.runGame();
+    }
+
+    @Test
+    public void async_IfDelay_ThenBuffer() throws InterruptedException {
+        SynchronizationEnvironment environment = new SynchronizationEnvironment();
+        environment.configuration.async = true;
+        environment.configuration.asyncFrameDurationMs = 1;
+        environment.configuration.asyncFrameBufferSize = 3;
+        environment.onFrame(0, () -> {
+            sleepUnchecked(5);
+            assertEquals(2, environment.bwClient.framesBehind());
+            assertEquals(0, environment.bwClient.getGame().getFrameCount());
+            assertEquals(2, environment.liveGameData().getFrameCount());
+        });
+        environment.runGame();
+    }
 }

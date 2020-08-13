@@ -26,6 +26,7 @@ SOFTWARE.
 package bwapi;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages invocation of bot event handlers
@@ -39,6 +40,8 @@ class BotWrapper {
     private Thread botThread;
     private boolean gameOver;
     private PerformanceMetrics performanceMetrics;
+    private Exception lastBotException;
+    private ReentrantLock lastBotExceptionLock = new ReentrantLock();
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
@@ -50,7 +53,9 @@ class BotWrapper {
      * Resets the BotWrapper for a new game.
      */
     void startNewGame(ByteBuffer dataSource, PerformanceMetrics performanceMetrics) {
-        frameBuffer.initialize(dataSource, performanceMetrics);
+        if (configuration.async) {
+            frameBuffer.initialize(dataSource, performanceMetrics);
+        }
         this.performanceMetrics = performanceMetrics;
         game = new Game(liveClientData);
         liveClientData.setBuffer(dataSource);
@@ -80,7 +85,7 @@ class BotWrapper {
             }
             /*
             Add a frame to buffer
-                If buffer is full, it will wait until it has capacity
+            If buffer is full, it will wait until it has capacity
             Wait for empty buffer OR termination condition
              */
             boolean isFrameZero = liveClientData.gameData().getFrameCount() == 0;
@@ -89,6 +94,13 @@ class BotWrapper {
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
+
+                    // Make bot exceptions fall through to the main thread.
+                    Exception lastBotException = getLastBotException();
+                    if (lastBotException != null) {
+                        throw new RuntimeException(lastBotException);
+                    }
+
                     if (configuration.unlimitedFrameZero && isFrameZero) {
                         frameBuffer.conditionSize.await();
                     } else {
@@ -104,6 +116,9 @@ class BotWrapper {
             }
         } else {
             handleEvents();
+            if (lastBotException != null) {
+                throw new RuntimeException(lastBotException);
+            }
         }
     }
 
@@ -116,6 +131,13 @@ class BotWrapper {
                 botThread.join();
             } catch (InterruptedException ignored) {}
         }
+    }
+
+    Exception getLastBotException() {
+        lastBotExceptionLock.lock();
+        Exception output = lastBotException;
+        lastBotExceptionLock.unlock();
+        return output;
     }
 
     private Thread createBotThread() {
@@ -144,12 +166,18 @@ class BotWrapper {
         if (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
             performanceMetrics.botResponse.startTiming();
         }
-        for (int i = 0; i < gameData.getEventCount(); i++) {
-            ClientData.Event event = gameData.getEvents(i);
-            EventHandler.operation(eventListener, game, event);
-            if (event.getType() == EventType.MatchEnd) {
-                gameOver = true;
+        try {
+            for (int i = 0; i < gameData.getEventCount(); i++) {
+                ClientData.Event event = gameData.getEvents(i);
+                EventHandler.operation(eventListener, game, event);
+                if (event.getType() == EventType.MatchEnd) {
+                    gameOver = true;
+                }
             }
+        } catch (Exception exception) {
+            lastBotExceptionLock.lock();
+            lastBotException = exception;
+            lastBotExceptionLock.unlock();
         }
         performanceMetrics.botResponse.stopTiming();
     }
