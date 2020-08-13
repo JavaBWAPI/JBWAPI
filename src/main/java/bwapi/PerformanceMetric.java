@@ -8,6 +8,7 @@ public class PerformanceMetric {
 
     public double minValue = Long.MAX_VALUE;
     public double maxValue = Long.MIN_VALUE;
+    public double lastValue = 0;
     public double avgValue = 0;
     public double avgValueExceeding = 0;
     public int samples = 0;
@@ -44,6 +45,7 @@ public class PerformanceMetric {
     }
 
     void record(double value) {
+        lastValue = value;
         minValue = Math.min(minValue, value);
         maxValue = Math.max(maxValue, value);
         avgValue = (avgValue * samples + value) / (samples + 1d);

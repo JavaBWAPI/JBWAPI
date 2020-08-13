@@ -66,11 +66,12 @@ public class SynchronizationTest {
         environment.configuration.async = true;
         environment.configuration.asyncFrameDurationMs = 1;
         environment.configuration.asyncFrameBufferSize = 3;
+        environment.configuration.logVerbosely = true;
         environment.onFrame(1, () -> {
-            sleepUnchecked(5);
+            sleepUnchecked(50);
             assertEquals("Bot should be observing an old frame", 1, environment.bwClient.getGame().getFrameCount());
-            assertEquals("Bot should be behind the live game", 2, environment.bwClient.framesBehind());
             assertEquals("Client should be as far ahead as the frame buffer allows", 3, environment.liveGameData().getFrameCount());
+            assertEquals("Bot should be behind the live game", 2, environment.bwClient.framesBehind());
         });
         environment.runGame();
     }

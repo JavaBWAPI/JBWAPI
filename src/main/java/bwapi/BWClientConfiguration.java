@@ -51,6 +51,11 @@ public class BWClientConfiguration {
     public int asyncFrameBufferSize = 10;
 
     /**
+     * Toggles verbose logging, particularly of synchronization steps.
+     */
+    public boolean logVerbosely = false;
+
+    /**
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
     public void validate() {
@@ -59,6 +64,12 @@ public class BWClientConfiguration {
         }
         if (async && asyncFrameBufferSize < 1) {
             throw new IllegalArgumentException("asyncFrameBufferSize needs to be a positive number (There needs to be at least one frame buffer).");
+        }
+    }
+
+    public void log(String value) {
+        if (logVerbosely) {
+            System.out.println(value);
         }
     }
 }

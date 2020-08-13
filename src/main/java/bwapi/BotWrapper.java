@@ -76,9 +76,11 @@ class BotWrapper {
      */
     void onFrame() {
         if (configuration.async) {
+            configuration.log("Main: onFrame asynchronous start");
             long startNanos = System.nanoTime();
             long endNanos = startNanos + configuration.asyncFrameDurationMs * 1000000;
             if (botThread == null) {
+                configuration.log("Main: Starting bot thread");
                 botThread = createBotThread();
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
@@ -88,24 +90,29 @@ class BotWrapper {
             If buffer is full, it will wait until it has capacity
             Wait for empty buffer OR termination condition
              */
+            configuration.log("Main: Enqueuing frame");
             boolean isFrameZero = liveClientData.gameData().getFrameCount() == 0;
             frameBuffer.enqueueFrame();
             performanceMetrics.bwapiResponse.startTiming();
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
+                    configuration.log("Main: Waiting for empty frame buffer");
 
                     // Make bot exceptions fall through to the main thread.
                     Throwable lastThrow = getLastBotThrow();
                     if (lastThrow != null) {
+                        configuration.log("Main: Rethrowing bot throwable");
                         throw new RuntimeException(lastThrow);
                     }
 
                     if (configuration.unlimitedFrameZero && isFrameZero) {
+                        configuration.log("Main: Waiting indefinitely on frame 0");
                         frameBuffer.conditionSize.await();
                     } else {
                         long remainingNanos = endNanos - System.nanoTime();
                         if (remainingNanos <= 0) break;
+                        configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot");
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
                     }
                 }
@@ -113,10 +120,14 @@ class BotWrapper {
             } finally {
                 frameBuffer.lockSize.unlock();
                 performanceMetrics.bwapiResponse.stopTiming();
+                configuration.log("Main: onFrame asynchronous end");
             }
         } else {
+            configuration.log("Main: onFrame synchronous start");
             handleEvents();
+            configuration.log("Main: onFrame synchronous end");
         }
+
     }
 
     /**
@@ -139,10 +150,13 @@ class BotWrapper {
 
     private Thread createBotThread() {
         return new Thread(() -> {
+            configuration.log("Bot: Thread started");
             while ( ! gameOver) {
+                configuration.log("Bot: Attempting to handle next frame");
                 frameBuffer.lockSize.lock();
                 try {
                     while (frameBuffer.empty()) {
+                        configuration.log("Bot: Waiting for next frame");
                         performanceMetrics.botIdle.startTiming();
                         frameBuffer.conditionSize.awaitUninterruptibly();
                     }
@@ -150,9 +164,11 @@ class BotWrapper {
                 } finally {
                     frameBuffer.lockSize.unlock();
                 }
+                configuration.log("Bot: Peeking next frame");
                 game.clientData().setBuffer(frameBuffer.peek());
                 performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
                 try {
+                    configuration.log("Bot: Handling frame #" + game.getFrameCount());
                     handleEvents();
                 } finally {
                     // In the case where t
