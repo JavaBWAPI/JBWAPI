@@ -45,7 +45,6 @@ class FrameBuffer {
     private int stepGame = 0;
     private int stepBot = 0;
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
-    private final String architecture;
 
     // Synchronization locks
     private final Lock lockWrite = new ReentrantLock();
@@ -55,10 +54,8 @@ class FrameBuffer {
     FrameBuffer(int size) {
         this.size = size;
         while(dataBuffer.size() < size) {
-            System.out.println("Allocating " + BUFFER_SIZE / 1024 / 1024 + "mb");
             dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
         }
-        architecture = System.getProperty("sun.arch.data.model");
     }
 
     /**

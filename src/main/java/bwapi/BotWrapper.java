@@ -40,8 +40,8 @@ class BotWrapper {
     private Thread botThread;
     private boolean gameOver;
     private PerformanceMetrics performanceMetrics;
-    private Exception lastBotException;
-    private ReentrantLock lastBotExceptionLock = new ReentrantLock();
+    private Throwable lastBotThrow;
+    private ReentrantLock lastBotThrowLock = new ReentrantLock();
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
@@ -96,9 +96,9 @@ class BotWrapper {
                 while (!frameBuffer.empty()) {
 
                     // Make bot exceptions fall through to the main thread.
-                    Exception lastBotException = getLastBotException();
-                    if (lastBotException != null) {
-                        throw new RuntimeException(lastBotException);
+                    Throwable lastThrow = getLastBotThrow();
+                    if (lastThrow != null) {
+                        throw new RuntimeException(lastThrow);
                     }
 
                     if (configuration.unlimitedFrameZero && isFrameZero) {
@@ -116,9 +116,6 @@ class BotWrapper {
             }
         } else {
             handleEvents();
-            if (lastBotException != null) {
-                throw new RuntimeException(lastBotException);
-            }
         }
     }
 
@@ -133,10 +130,10 @@ class BotWrapper {
         }
     }
 
-    Exception getLastBotException() {
-        lastBotExceptionLock.lock();
-        Exception output = lastBotException;
-        lastBotExceptionLock.unlock();
+    Throwable getLastBotThrow() {
+        lastBotThrowLock.lock();
+        Throwable output = lastBotThrow;
+        lastBotThrowLock.unlock();
         return output;
     }
 
@@ -155,8 +152,12 @@ class BotWrapper {
                 }
                 game.clientData().setBuffer(frameBuffer.peek());
                 performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
-                handleEvents();
-                frameBuffer.dequeue();
+                try {
+                    handleEvents();
+                } finally {
+                    // In the case where t
+                    frameBuffer.dequeue();
+                }
             }
         });
     }
@@ -166,19 +167,21 @@ class BotWrapper {
         if (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
             performanceMetrics.botResponse.startTiming();
         }
+        // Populate gameOver before invoking event handlers (in case the bot throws)
+        for (int i = 0; i < gameData.getEventCount(); i++) {
+            gameOver = gameOver || gameData.getEvents(i).getType() == EventType.MatchEnd;
+        }
         try {
             for (int i = 0; i < gameData.getEventCount(); i++) {
-                ClientData.Event event = gameData.getEvents(i);
-                EventHandler.operation(eventListener, game, event);
-                if (event.getType() == EventType.MatchEnd) {
-                    gameOver = true;
-                }
+                EventHandler.operation(eventListener, game, gameData.getEvents(i));
             }
-        } catch (Exception exception) {
-            lastBotExceptionLock.lock();
-            lastBotException = exception;
-            lastBotExceptionLock.unlock();
+        } catch (Throwable throwable) {
+            lastBotThrowLock.lock();
+            lastBotThrow = throwable;
+            lastBotThrowLock.unlock();
+            throw throwable;
+        } finally {
+            performanceMetrics.botResponse.stopTiming();
         }
-        performanceMetrics.botResponse.stopTiming();
     }
 }
