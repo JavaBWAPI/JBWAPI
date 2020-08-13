@@ -39,7 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 class FrameBuffer {
     private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
 
-    private ByteBuffer dataSource;
+    private ByteBuffer liveData;
     private PerformanceMetrics performanceMetrics;
     private int size;
     private int stepGame = 0;
@@ -61,8 +61,8 @@ class FrameBuffer {
     /**
      * Resets for a new game
      */
-    void initialize(ByteBuffer dataSource, PerformanceMetrics performanceMetrics) {
-        this.dataSource = dataSource;
+    void initialize(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
+        this.liveData = liveData;
         this.performanceMetrics = performanceMetrics;
         stepGame = 0;
         stepBot = 0;
@@ -125,7 +125,7 @@ class FrameBuffer {
 
             performanceMetrics.copyingToBuffer.time(() -> {
                 ByteBuffer dataTarget = dataBuffer.get(indexGame());
-                copyBuffer(dataSource, dataTarget);
+                copyBuffer(liveData, dataTarget);
             });
 
             lockSize.lock();
@@ -190,6 +190,6 @@ class FrameBuffer {
         // and serves to document the known-good (and cross-platform, for BWAPI 5) way to executing the copy.
         source.rewind();
         destination.rewind();
-        destination.put(dataSource);
+        destination.put(liveData);
     }
 }

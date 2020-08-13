@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 public class GameTest {
 
     private List<Unit> allUnits = new ArrayList<>();
-    private Game sut = new Game(mock(ClientData.class)) {
+    private Game sut = new Game() {
         @Override
         public List<Unit> getAllUnits() {
             return allUnits;

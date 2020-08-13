@@ -52,13 +52,14 @@ class BotWrapper {
     /**
      * Resets the BotWrapper for a new game.
      */
-    void startNewGame(ByteBuffer dataSource, PerformanceMetrics performanceMetrics) {
+    void startNewGame(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
         if (configuration.async) {
-            frameBuffer.initialize(dataSource, performanceMetrics);
+            frameBuffer.initialize(liveData, performanceMetrics);
         }
         this.performanceMetrics = performanceMetrics;
-        game = new Game(liveClientData);
-        liveClientData.setBuffer(dataSource);
+        game = new Game();
+        game.clientData().setBuffer(liveData);
+        liveClientData.setBuffer(liveData);
         botThread = null;
         gameOver = false;
     }
@@ -90,8 +91,8 @@ class BotWrapper {
             If buffer is full, it will wait until it has capacity
             Wait for empty buffer OR termination condition
              */
-            configuration.log("Main: Enqueuing frame");
-            boolean isFrameZero = liveClientData.gameData().getFrameCount() == 0;
+            int frame = liveClientData.gameData().getFrameCount();
+            configuration.log("Main: Enqueuing frame #" + frame);
             frameBuffer.enqueueFrame();
             performanceMetrics.bwapiResponse.startTiming();
             frameBuffer.lockSize.lock();
@@ -106,8 +107,8 @@ class BotWrapper {
                         throw new RuntimeException(lastThrow);
                     }
 
-                    if (configuration.unlimitedFrameZero && isFrameZero) {
-                        configuration.log("Main: Waiting indefinitely on frame 0");
+                    if (configuration.unlimitedFrameZero && frame == 0) {
+                        configuration.log("Main: Waiting indefinitely on frame " + frame);
                         frameBuffer.conditionSize.await();
                     } else {
                         long remainingNanos = endNanos - System.nanoTime();

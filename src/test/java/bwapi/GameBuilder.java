@@ -23,7 +23,8 @@ public class GameBuilder {
     }
 
     public static Game createGame(Client client) {
-        final Game game = new Game(client.clientData());
+        final Game game = new Game();
+        game.clientData().setBuffer(client.mapFile());
         game.init();
         return game;
     }

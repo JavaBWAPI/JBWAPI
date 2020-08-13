@@ -101,8 +101,8 @@ public class Game {
 
     public final SideEffectQueue sideEffects = new SideEffectQueue();
 
-    Game(ClientData clientData) {
-        this.clientData = clientData;
+    Game() {
+        clientData = new ClientData();
     }
 
     ClientData clientData() {
@@ -142,6 +142,7 @@ public class Game {
     Call this method in EventHander::OnMatchStart
     */
     void init() {
+        System.out.println("Game.init()"); // TODO: REMOVE!
         visibleUnits.clear();
 
         final int forceCount = gameData().getForceCount();
