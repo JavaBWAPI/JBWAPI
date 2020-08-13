@@ -4,7 +4,6 @@ class ClientData {
     private WrappedBuffer buffer;
     private GameData gameData;
     ClientData() {
-        System.out.println("new ClientData()"); // TODO: REMOVE!
         gameData = new GameData(0);
     }
     GameData gameData() {

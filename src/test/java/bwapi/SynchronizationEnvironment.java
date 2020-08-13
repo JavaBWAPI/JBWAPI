@@ -43,15 +43,15 @@ public class SynchronizationEnvironment {
             return null;
         }).when(client).update();
         doAnswer(answer -> {
-            System.out.println("Test: onStart()");
+            configuration.log("Test: onStart()");
             return null;
         }).when(listener).onStart();
         doAnswer(answer -> {
-            System.out.println("Test: onEnd()");
+            configuration.log("Test: onEnd()");
             return null;
         }).when(listener).onEnd(anyBoolean());
         doAnswer(answer -> {
-            System.out.println("Test: onFrame()");
+            configuration.log("Test: onFrame()");
             if (onFrames.containsKey(liveFrame())) {
                 onFrames.get(liveFrame()).run();
             }
@@ -92,7 +92,7 @@ public class SynchronizationEnvironment {
 
     private void clientUpdate() {
         client.clientData().gameData().setFrameCount(liveFrame() + 1);
-        System.out.println("Test: clientUpdate() to liveFrame #" + liveFrame());
+        configuration.log("Test: clientUpdate() to liveFrame #" + liveFrame());
         if (liveFrame() == 0) {
             client.clientData().gameData().setIsInGame(true);
             client.clientData().gameData().setEventCount(2);

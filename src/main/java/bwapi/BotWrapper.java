@@ -151,28 +151,41 @@ class BotWrapper {
 
     private Thread createBotThread() {
         return new Thread(() -> {
-            configuration.log("Bot: Thread started");
-            while ( ! gameOver) {
-                configuration.log("Bot: Attempting to handle next frame");
-                frameBuffer.lockSize.lock();
-                try {
-                    while (frameBuffer.empty()) {
-                        configuration.log("Bot: Waiting for next frame");
-                        performanceMetrics.botIdle.startTiming();
-                        frameBuffer.conditionSize.awaitUninterruptibly();
+            try {
+                configuration.log("Bot: Thread started");
+                while (!gameOver) {
+
+                    configuration.log("Bot: Attempting to handle next frame");
+                    frameBuffer.lockSize.lock();
+                    try {
+                        while (frameBuffer.empty()) {
+                            configuration.log("Bot: Waiting for next frame");
+                            performanceMetrics.botIdle.startTiming();
+                            frameBuffer.conditionSize.awaitUninterruptibly();
+                        }
+                        performanceMetrics.botIdle.stopTiming();
+                    } finally {
+                        frameBuffer.lockSize.unlock();
                     }
-                    performanceMetrics.botIdle.stopTiming();
-                } finally {
-                    frameBuffer.lockSize.unlock();
-                }
-                configuration.log("Bot: Peeking next frame");
-                game.clientData().setBuffer(frameBuffer.peek());
-                performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
-                try {
+
+                    configuration.log("Bot: Peeking next frame");
+                    game.clientData().setBuffer(frameBuffer.peek());
+                    performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
+
                     configuration.log("Bot: Handling frame #" + game.getFrameCount());
                     handleEvents();
-                } finally {
-                    // In the case where t
+                    frameBuffer.dequeue();
+                }
+            } catch (Throwable throwable) {
+                // Record the throw,
+                // Then allow the thread to terminate silently.
+                // The main thread will look for the stored throw.
+                lastBotThrowLock.lock();
+                lastBotThrow = throwable;
+                lastBotThrowLock.unlock();
+
+                // Awaken any threads waiting on bot progress
+                while (!frameBuffer.empty()) {
                     frameBuffer.dequeue();
                 }
             }
@@ -184,21 +197,14 @@ class BotWrapper {
         if (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
             performanceMetrics.botResponse.startTiming();
         }
+
         // Populate gameOver before invoking event handlers (in case the bot throws)
         for (int i = 0; i < gameData.getEventCount(); i++) {
             gameOver = gameOver || gameData.getEvents(i).getType() == EventType.MatchEnd;
         }
-        try {
-            for (int i = 0; i < gameData.getEventCount(); i++) {
-                EventHandler.operation(eventListener, game, gameData.getEvents(i));
-            }
-        } catch (Throwable throwable) {
-            lastBotThrowLock.lock();
-            lastBotThrow = throwable;
-            lastBotThrowLock.unlock();
-            throw throwable;
-        } finally {
-            performanceMetrics.botResponse.stopTiming();
+        for (int i = 0; i < gameData.getEventCount(); i++) {
+            EventHandler.operation(eventListener, game, gameData.getEvents(i));
         }
+        performanceMetrics.botResponse.stopTiming();
     }
 }
