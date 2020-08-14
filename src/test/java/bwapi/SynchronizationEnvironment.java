@@ -63,12 +63,20 @@ public class SynchronizationEnvironment {
         return client.clientData().gameData();
     }
 
+    PerformanceMetrics metrics() {
+        return bwClient.getPerformanceMetrics();
+    }
+
     void onFrame(Integer frame, Runnable runnable) {
         onFrames.put(frame, runnable);
-        onEndFrame = Math.max(onEndFrame, frame + 1);
     }
 
     void runGame() {
+        runGame(10);
+    }
+
+    void runGame(int onEndFrame) {
+        this.onEndFrame = onEndFrame;
         if (configuration.async) {
             final long MEGABYTE = 1024 * 1024;
             long memoryFree = Runtime.getRuntime().freeMemory() / MEGABYTE;
