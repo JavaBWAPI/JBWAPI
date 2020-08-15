@@ -41,6 +41,7 @@ class FrameBuffer {
 
     private ByteBuffer liveData;
     private PerformanceMetrics performanceMetrics;
+    private BWClientConfiguration configuration;
     private int size;
     private int stepGame = 0;
     private int stepBot = 0;
@@ -51,8 +52,9 @@ class FrameBuffer {
     final Lock lockSize = new ReentrantLock();
     final Condition conditionSize = lockSize.newCondition();
 
-    FrameBuffer(int size) {
-        this.size = size;
+    FrameBuffer(BWClientConfiguration configuration) {
+        this.size = configuration.asyncFrameBufferSize;
+        this.configuration = configuration;
         while(dataBuffer.size() < size) {
             dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
         }
@@ -94,7 +96,7 @@ class FrameBuffer {
     boolean full() {
         lockSize.lock();
         try {
-            return framesBuffered() >= size - 1;
+            return framesBuffered() >= size;
         } finally {
             lockSize.unlock();
         }
@@ -117,6 +119,7 @@ class FrameBuffer {
             lockSize.lock();
             try {
                 while (full()) {
+                    configuration.log("Main: Waiting for frame buffer capacity");
                     performanceMetrics.intentionallyBlocking.startTiming();
                     conditionSize.awaitUninterruptibly();
                 }
@@ -130,6 +133,7 @@ class FrameBuffer {
 
             lockSize.lock();
             try {
+                performanceMetrics.frameBufferSize.record(framesBuffered());
                 ++stepGame;
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }

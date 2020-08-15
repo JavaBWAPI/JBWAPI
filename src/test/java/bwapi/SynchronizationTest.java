@@ -39,7 +39,7 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void sync_IfException_ThrowException() throws InterruptedException {
+    public void sync_IfException_ThrowException() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = false;
         environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
@@ -47,7 +47,7 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfException_ThrowException() throws InterruptedException {
+    public void async_IfException_ThrowException() {
         // An exception in the bot thread must be re-thrown by the main thread.
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
@@ -57,10 +57,10 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void sync_IfDelay_ThenNoBuffer() throws InterruptedException {
+    public void sync_IfDelay_ThenNoBuffer() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = false;
-        environment.configuration.asyncFrameDurationMs = 1;
+        environment.configuration.maxFrameDurationMs = 1;
         environment.configuration.asyncFrameBufferSize = 3;
 
         IntStream.range(0, 5).forEach(frame -> {
@@ -76,10 +76,10 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfBotDelay_ThenClientBuffers() throws InterruptedException {
+    public void async_IfBotDelay_ThenClientBuffers() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
-        environment.configuration.asyncFrameDurationMs = 10;
+        environment.configuration.maxFrameDurationMs = 10;
         environment.configuration.asyncFrameBufferSize = 4;
 
         environment.onFrame(1, () -> {
@@ -99,10 +99,10 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfBotDelay_ThenClientStalls() throws InterruptedException {
+    public void async_IfBotDelay_ThenClientStalls() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
-        environment.configuration.asyncFrameDurationMs = 50;
+        environment.configuration.maxFrameDurationMs = 50;
         environment.configuration.asyncFrameBufferSize = 5;
 
         environment.onFrame(1, () -> {
@@ -124,11 +124,11 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfFrameZeroWaitsEnabled_ThenAllowInfiniteTime() throws InterruptedException {
+    public void async_IfFrameZeroWaitsEnabled_ThenAllowInfiniteTime() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
         environment.configuration.unlimitedFrameZero = true;
-        environment.configuration.asyncFrameDurationMs = 5;
+        environment.configuration.maxFrameDurationMs = 5;
         environment.configuration.asyncFrameBufferSize = 2;
 
         environment.onFrame(0, () -> {
@@ -142,11 +142,11 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfFrameZeroWaitsDisabled_ThenClientBuffers() throws InterruptedException {
+    public void async_IfFrameZeroWaitsDisabled_ThenClientBuffers() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
         environment.configuration.unlimitedFrameZero = false;
-        environment.configuration.asyncFrameDurationMs = 5;
+        environment.configuration.maxFrameDurationMs = 5;
         environment.configuration.asyncFrameBufferSize = 2;
 
         environment.onFrame(0, () -> {
@@ -175,8 +175,37 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_MeasurePerformance_FrameBufferSize() {
+    public void async_MeasurePerformance_FrameBufferSizeAndFramesBehind() {
+        SynchronizationEnvironment environment = new SynchronizationEnvironment();
+        environment.configuration.async = true;
+        environment.configuration.unlimitedFrameZero = true;
+        environment.configuration.asyncFrameBufferSize = 3;
+        environment.configuration.maxFrameDurationMs = 20;
+        environment.configuration.logVerbosely = true;
+        
+        environment.onFrame(5, () -> {
+            assertWithin("5: Frame buffer average", 0, environment.metrics().frameBufferSize.avgValue, 0.1);
+            assertWithin("5: Frame buffer minimum", 0, environment.metrics().frameBufferSize.minValue, 0.1);
+            assertWithin("5: Frame buffer maximum", 0, environment.metrics().frameBufferSize.maxValue, 0.1);
+            assertWithin("5: Frame buffer previous", 0, environment.metrics().frameBufferSize.lastValue, 0.1);
+            assertWithin("5: Frames behind average", 0, environment.metrics().framesBehind.avgValue, 0.1);
+            assertWithin("5: Frames behind minimum", 0, environment.metrics().framesBehind.minValue, 0.1);
+            assertWithin("5: Frames behind maximum", 0, environment.metrics().framesBehind.maxValue, 0.1);
+            assertWithin("5: Frames behind previous", 0, environment.metrics().framesBehind.lastValue, 0.1);
+            sleepUnchecked(200);
+        });
+        environment.onFrame(6, () -> {
+            assertWithin("6: Frame buffer average", 1 / 6.0 + 2 / 7.0, environment.metrics().frameBufferSize.avgValue, 0.1);
+            assertWithin("6: Frame buffer minimum", 0, environment.metrics().frameBufferSize.minValue, 0.1);
+            assertWithin("6: Frame buffer maximum", 2, environment.metrics().frameBufferSize.maxValue, 0.1);
+            assertWithin("6: Frame buffer previous", 2, environment.metrics().frameBufferSize.lastValue, 0.1);
+            assertWithin("6: Frames behind average", 1 / 6.0, environment.metrics().framesBehind.avgValue, 0.1);
+            assertWithin("6: Frames behind minimum", 0, environment.metrics().framesBehind.minValue, 0.1);
+            assertWithin("6: Frames behind maximum", 1, environment.metrics().framesBehind.maxValue, 0.1);
+            assertWithin("6: Frames behind previous", 1, environment.metrics().framesBehind.lastValue, 0.1);
+        });
 
+        environment.runGame(8);
     }
 
     @Test
@@ -191,7 +220,7 @@ public class SynchronizationTest {
     private final static long MS_MARGIN = 10;
 
     @Test
-    public void async_MeasurePerformance_BotResponse() {
+    public void MeasurePerformance_BotResponse() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
 
         // Frame zero appears to take an extra 60ms, so let's disable timing for it

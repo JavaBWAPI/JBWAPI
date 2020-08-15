@@ -86,7 +86,7 @@ public class PerformanceMetric {
             avgValueExceeding = (avgValueExceeding * samplesExceeding + value) / (samplesExceeding + 1d);
             ++samplesExceeding;
         }
-        System.out.println(name + " #" + samples + " = " + value); // TODO: REMOVE
+        System.out.println("Metric: " + name + " (n=" + samples + "): " + value); // TODO: REMOVE
     }
 
     /**

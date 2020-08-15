@@ -52,8 +52,9 @@ public class SynchronizationEnvironment {
         }).when(listener).onEnd(anyBoolean());
         doAnswer(answer -> {
             configuration.log("Test: onFrame()");
-            if (onFrames.containsKey(liveFrame())) {
-                onFrames.get(liveFrame()).run();
+            int botFrame = bwClient.getGame().getFrameCount();
+            if (onFrames.containsKey(botFrame)) {
+                onFrames.get(botFrame).run();
             }
             return null;
         }).when(listener).onFrame();

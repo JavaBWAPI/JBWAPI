@@ -26,6 +26,14 @@ public class BWClientConfiguration {
     public boolean unlimitedFrameZero = true;
 
     /**
+     * The maximum amount of time the bot is supposed to spend on a single frame.
+     * In asynchronous mode, JBWAPI will attempt to let the bot use up to this much time to process all frames before returning control to BWAPI.
+     * In synchronous mode, JBWAPI is not empowered to prevent the bot to exceed this amount, but will record overruns in performance metrics.
+     * Real-time human play typically uses the "fastest" game speed, which has 42.86ms (42,860ns) between frames.
+     */
+    public int maxFrameDurationMs = 40;
+
+    /**
      * Runs the bot in asynchronous mode. Asynchronous mode helps attempt to ensure that the bot adheres to real-time performance constraints.
      *
      * Humans playing StarCraft (and some tournaments) expect bots to return commands within a certain period of time; ~42ms for humans ("fastesT" game speed),
@@ -37,12 +45,6 @@ public class BWClientConfiguration {
      * issuing commands later than intended, and a marginally larger memory footprint.
      */
     public boolean async = false;
-
-    /**
-     * If JBWAPI detects that this much time (in nanoseconds) has passed since a bot's event handlers began, returns control back to BWAPI.
-     * Real-time human play typically uses the "fastest" game speed, which has 42.86ms (42,860ns) between frames.
-     */
-    public int asyncFrameDurationMs = 40;
 
     /**
      * The maximum number of frames to buffer while waiting on a bot.
@@ -59,8 +61,8 @@ public class BWClientConfiguration {
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
     public void validate() {
-        if (async && asyncFrameDurationMs < 0) {
-            throw new IllegalArgumentException("asyncFrameDurationMs needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
+        if (async && maxFrameDurationMs < 0) {
+            throw new IllegalArgumentException("maxFrameDurationMs needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
         }
         if (async && asyncFrameBufferSize < 1) {
             throw new IllegalArgumentException("asyncFrameBufferSize needs to be a positive number (There needs to be at least one frame buffer).");

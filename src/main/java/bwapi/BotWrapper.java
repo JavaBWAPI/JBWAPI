@@ -46,7 +46,7 @@ class BotWrapper {
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
         this.eventListener = eventListener;
-        frameBuffer = configuration.async ? new FrameBuffer(configuration.asyncFrameBufferSize) : null;
+        frameBuffer = configuration.async ? new FrameBuffer(configuration) : null;
     }
 
     /**
@@ -79,7 +79,7 @@ class BotWrapper {
         if (configuration.async) {
             configuration.log("Main: onFrame asynchronous start");
             long startNanos = System.nanoTime();
-            long endNanos = startNanos + configuration.asyncFrameDurationMs * 1000000;
+            long endNanos = startNanos + configuration.maxFrameDurationMs * 1000000;
             if (botThread == null) {
                 configuration.log("Main: Starting bot thread");
                 botThread = createBotThread();
@@ -98,7 +98,6 @@ class BotWrapper {
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
-                    configuration.log("Main: Waiting for empty frame buffer");
 
                     // Make bot exceptions fall through to the main thread.
                     Throwable lastThrow = getLastBotThrow();
@@ -108,12 +107,15 @@ class BotWrapper {
                     }
 
                     if (configuration.unlimitedFrameZero && frame == 0) {
-                        configuration.log("Main: Waiting indefinitely on frame " + frame);
+                        configuration.log("Main: Waiting indefinitely on frame #" + frame);
                         frameBuffer.conditionSize.await();
                     } else {
                         long remainingNanos = endNanos - System.nanoTime();
-                        if (remainingNanos <= 0) break;
-                        configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot");
+                        if (remainingNanos <= 0) {
+                            configuration.log("Main: Out of time in frame #" + frame);
+                            break;
+                        }
+                        configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot on frame #" + frame);
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
                     }
                 }
@@ -155,11 +157,11 @@ class BotWrapper {
                 configuration.log("Bot: Thread started");
                 while (!gameOver) {
 
-                    configuration.log("Bot: Attempting to handle next frame");
+                    configuration.log("Bot: Ready for another frame");
                     frameBuffer.lockSize.lock();
                     try {
                         while (frameBuffer.empty()) {
-                            configuration.log("Bot: Waiting for next frame");
+                            configuration.log("Bot: Waiting for a frame");
                             performanceMetrics.botIdle.startTiming();
                             frameBuffer.conditionSize.awaitUninterruptibly();
                         }
@@ -170,10 +172,11 @@ class BotWrapper {
 
                     configuration.log("Bot: Peeking next frame");
                     game.clientData().setBuffer(frameBuffer.peek());
-                    performanceMetrics.frameBufferSize.record(frameBuffer.framesBuffered() - 1);
 
                     configuration.log("Bot: Handling frame #" + game.getFrameCount());
                     handleEvents();
+
+                    configuration.log("Bot: Events done. Dequeuing frame #" + game.getFrameCount());
                     frameBuffer.dequeue();
                 }
             } catch (Throwable throwable) {
@@ -198,6 +201,10 @@ class BotWrapper {
         // Populate gameOver before invoking event handlers (in case the bot throws)
         for (int i = 0; i < gameData.getEventCount(); i++) {
             gameOver = gameOver || gameData.getEvents(i).getType() == EventType.MatchEnd;
+        }
+
+        if (configuration.async) {
+            performanceMetrics.framesBehind.record(frameBuffer.framesBuffered() - 1);
         }
 
         performanceMetrics.botResponse.timeIf(
