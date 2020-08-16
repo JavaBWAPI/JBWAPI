@@ -19,9 +19,8 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            client = new Client(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
             game = new Game();
-            game.clientData().setBuffer(client.mapFile());
+            game.clientData().setBuffer(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
             strings = buildStrings();
         }
 
@@ -35,10 +34,9 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            client = new Client(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
             data = client.clientData().gameData();
             game = new Game();
-            game.clientData().setBuffer(client.mapFile());
+            game.clientData().setBuffer(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
             String[] strings = buildStrings();
             for (String s : strings) {
                 GameDataUtils.addString(client.clientData().gameData(), s);

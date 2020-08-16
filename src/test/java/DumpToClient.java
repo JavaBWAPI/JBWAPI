@@ -91,7 +91,7 @@ public class DumpToClient {
         try (PrintWriter out = new PrintWriter(sw)) {
             out.println("package bwapi;");
             out.println("import java.nio.ByteBuffer;");
-            out.println("class ClientData {");
+            out.println("final class ClientData {");
             out.println("    private WrappedBuffer buffer;");
             out.println("    private GameData gameData;");
             out.println("    ClientData() {");

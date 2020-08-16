@@ -22,7 +22,6 @@ class FrameBuffer {
     private int stepBot = 0;
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
 
-    // Synchronization locks
     private final Lock lockWrite = new ReentrantLock();
     final Lock lockSize = new ReentrantLock();
     final Condition conditionSize = lockSize.newCondition();
