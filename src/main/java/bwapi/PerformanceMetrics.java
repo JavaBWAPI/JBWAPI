@@ -1,7 +1,7 @@
 package bwapi;
 
 /**
- * When performance diagnostics are timersEnabled, collects various performance metrics.
+ * Collects various performance metrics.
  */
 public class PerformanceMetrics {
 

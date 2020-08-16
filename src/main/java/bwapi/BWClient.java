@@ -27,7 +27,6 @@ public class BWClient {
     /**
      * @return JBWAPI performance metrics.
      */
-    @SuppressWarnings("unused")
     public PerformanceMetrics getPerformanceMetrics() {
         return performanceMetrics;
     }
@@ -36,9 +35,15 @@ public class BWClient {
      * @return The number of frames between the one exposed to the bot and the most recent received by JBWAPI.
      * This tracks the size of the frame buffer except when the game is paused (which results in multiple frames arriving with the same count).
      */
-    @SuppressWarnings("unused")
     public int framesBehind() {
         return botWrapper == null ? 0 : Math.max(0, client.clientData().gameData().getFrameCount() - getGame().getFrameCount());
+    }
+
+    /**
+     * For internal test use.
+     */
+    Client getClient() {
+        return client;
     }
 
     /**

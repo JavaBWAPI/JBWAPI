@@ -10,7 +10,10 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SynchronizationEnvironment {
+/**
+ * Mocks BWAPI and a bot listener, for synchronization tests.
+ */
+class SynchronizationEnvironment {
     BWClientConfiguration configuration;
     BWClient bwClient;
     private BWEventListener listener;
