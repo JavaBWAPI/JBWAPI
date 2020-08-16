@@ -20,12 +20,8 @@ public class GameBuilder {
 
     public static Game createGame(String mapName) throws IOException {
         final ByteBuffer buffer = binToBuffer(RESOURCES + mapName + "_frame0_buffer.bin");
-        return createGame(new Client(buffer));
-    }
-
-    public static Game createGame(Client client) {
         final Game game = new Game();
-        game.clientData().setBuffer(client.mapFile());
+        game.clientData().setBuffer(buffer);
         game.init();
         return game;
     }

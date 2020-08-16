@@ -89,13 +89,16 @@ public class GameTest {
 
     @Test
     public void ifReplaySelfAndEnemyShouldBeNull() throws IOException {
-        ByteBuffer buffer = GameBuilder.binToBuffer("src/test/resources/" + "(2)Benzene.scx" + "_frame0_buffer.bin");
+        ByteBuffer buffer = GameBuilder.binToBuffer(GameBuilder.DEFAULT_BUFFER_PATH);
 
-        Client client = new Client(buffer);
         // modify the buffer to fake a replay
-        client.clientData().gameData().setIsReplay(true);
+        ClientData clientData = new ClientData();
+        clientData.setBuffer(buffer);
+        clientData.gameData().setIsReplay(true);
 
-        Game game = GameBuilder.createGame(client);
+        Game game = new Game();
+        game.clientData().setBuffer(buffer);
+        game.init();
 
         assertThat(game.isReplay());
         assertNull(game.self());

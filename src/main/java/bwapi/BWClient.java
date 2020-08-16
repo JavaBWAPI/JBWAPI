@@ -93,14 +93,15 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                if (liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero) {
-                    performanceMetrics.totalFrameDuration.startTiming();
-                }
-                botWrapper.onFrame();
-                performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
-                performanceMetrics.totalFrameDuration.stopTiming();
+                performanceMetrics.totalFrameDuration.timeIf(
+                    liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero,
+                    () -> {
+                        botWrapper.onFrame();
+                        performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
+                    });
                 performanceMetrics.bwapiResponse.time(client::update);
                 if (!client.isConnected()) {
+                    System.out.println("Reconnecting...");
                     client.reconnect();
                 }
             }
