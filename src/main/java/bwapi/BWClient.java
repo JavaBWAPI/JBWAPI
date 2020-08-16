@@ -93,11 +93,11 @@ public class BWClient {
                 }
                 botWrapper.onFrame();
                 performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
-                client.update();
+                performanceMetrics.totalFrameDuration.stopTiming();
+                performanceMetrics.bwapiResponse.time(client::update);
                 if (!client.isConnected()) {
                     client.reconnect();
                 }
-                performanceMetrics.totalFrameDuration.stopTiming();
             }
             botWrapper.endGame();
         } while (configuration.autoContinue);

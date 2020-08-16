@@ -57,12 +57,19 @@ public class PerformanceMetrics {
      */
     public PerformanceMetric botIdle;
 
+    private BWClientConfiguration configuration;
+
     public PerformanceMetrics(BWClientConfiguration configuration) {
+        this.configuration = configuration;
+        reset();
+    }
+
+    void reset() {
         final int frameDurationBufferMs = 5;
         final int sideEffectsBufferMs = 1;
         final int realTimeFrameMs = 42;
         totalFrameDuration = new PerformanceMetric("Total frame duration", configuration.maxFrameDurationMs + frameDurationBufferMs);
-        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5);
+        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 15);
         intentionallyBlocking = new PerformanceMetric("Intentionally blocking", 0);
         frameBufferSize = new PerformanceMetric("Frames buffered", 0);
         framesBehind = new PerformanceMetric("Frames behind", 0);
@@ -82,6 +89,7 @@ public class PerformanceMetrics {
                 + "\n" + framesBehind.toString()
                 + "\n" + flushSideEffects.toString()
                 + "\n" + botResponse.toString()
-                + "\n" + bwapiResponse.toString();
+                + "\n" + bwapiResponse.toString()
+                + "\n" + botIdle.toString();
     }
 }

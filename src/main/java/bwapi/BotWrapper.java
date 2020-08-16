@@ -90,11 +90,10 @@ class BotWrapper {
             Add a frame to buffer
             If buffer is full, it will wait until it has capacity
             Wait for empty buffer OR termination condition
-             */
+            */
             int frame = liveClientData.gameData().getFrameCount();
             configuration.log("Main: Enqueuing frame #" + frame);
             frameBuffer.enqueueFrame();
-            performanceMetrics.bwapiResponse.startTiming();
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
@@ -122,7 +121,6 @@ class BotWrapper {
             } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
-                performanceMetrics.bwapiResponse.stopTiming();
                 configuration.log("Main: onFrame asynchronous end");
             }
         } else {
@@ -158,17 +156,17 @@ class BotWrapper {
                 while (!gameOver) {
 
                     configuration.log("Bot: Ready for another frame");
-                    frameBuffer.lockSize.lock();
-                    try {
-                        while (frameBuffer.empty()) {
-                            configuration.log("Bot: Waiting for a frame");
-                            performanceMetrics.botIdle.startTiming();
-                            frameBuffer.conditionSize.awaitUninterruptibly();
+                    performanceMetrics.botIdle.time(() -> {
+                        frameBuffer.lockSize.lock();
+                        try {
+                            while (frameBuffer.empty()) {
+                                configuration.log("Bot: Waiting for a frame");
+                                frameBuffer.conditionSize.awaitUninterruptibly();
+                            }
+                        } finally {
+                            frameBuffer.lockSize.unlock();
                         }
-                        performanceMetrics.botIdle.stopTiming();
-                    } finally {
-                        frameBuffer.lockSize.unlock();
-                    }
+                    });
 
                     configuration.log("Bot: Peeking next frame");
                     game.clientData().setBuffer(frameBuffer.peek());

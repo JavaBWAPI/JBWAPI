@@ -4,15 +4,11 @@ import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sun.javafx.fxml.expression.Expression.greaterThan;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.hamcrest.MatcherAssert.*;
 
 public class SynchronizationEnvironment {
     BWClientConfiguration configuration;
@@ -20,6 +16,7 @@ public class SynchronizationEnvironment {
     private BWEventListener listener;
     private Client client;
     private int onEndFrame;
+    private long bwapiDelayMs;
     private Map<Integer, Runnable> onFrames;
 
     SynchronizationEnvironment() {
@@ -29,6 +26,7 @@ public class SynchronizationEnvironment {
         bwClient = new BWClient(listener);
         bwClient.setClient(client);
         onEndFrame = -1;
+        bwapiDelayMs = 0;
         onFrames = new HashMap<>();
 
         when(client.mapFile()).thenReturn(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
@@ -72,6 +70,10 @@ public class SynchronizationEnvironment {
         onFrames.put(frame, runnable);
     }
 
+    void setBwapiDelayMs(long milliseconds) {
+        bwapiDelayMs = milliseconds;
+    }
+
     void runGame() {
         runGame(10);
     }
@@ -99,7 +101,8 @@ public class SynchronizationEnvironment {
         return client.clientData().gameData().getFrameCount();
     }
 
-    private void clientUpdate() {
+    private void clientUpdate() throws InterruptedException{
+        Thread.sleep(bwapiDelayMs);
         client.clientData().gameData().setFrameCount(liveFrame() + 1);
         configuration.log("Test: clientUpdate() to liveFrame #" + liveFrame());
         if (liveFrame() == 0) {
