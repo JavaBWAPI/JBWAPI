@@ -8,11 +8,10 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
- * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
+ * Wrapper around offheap memory that uses sun.misc.Unsafe to for fast access.
  */
 class WrappedBuffer {
-    private final Pointer pointer;
-    private final int size;
+    private final ByteBuffer buffer;
     private final long address;
 
     private static Unsafe unsafe;
@@ -33,8 +32,7 @@ class WrappedBuffer {
     }
 
     WrappedBuffer(final Pointer pointer, final int size) {
-        this.pointer = pointer;
-        this.size = size;
+        this.buffer = pointer.getByteBuffer(0, size);
         this.address = Pointer.nativeValue(pointer);
     }
 
@@ -83,11 +81,8 @@ class WrappedBuffer {
     }
 
     void putString(final int offset, final int maxLen, final String string) {
-        if (string.length() >= maxLen) {
-            throw new StringIndexOutOfBoundsException();
-        }
         long pos = offset + address;
-        for (int i = 0; i < string.length(); i++) {
+        for (int i = 0; i < Math.min(string.length(), maxLen - 1); i++) {
             unsafe.putByte(pos, (byte) string.charAt(i));
             pos++;
         }
@@ -95,6 +90,6 @@ class WrappedBuffer {
     }
 
     ByteBuffer getBuffer() {
-        return pointer.getByteBuffer(0, size);
+        return buffer;
     }
 }

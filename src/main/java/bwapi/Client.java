@@ -34,8 +34,6 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
 
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 class Client {
     interface MappingKernel extends Kernel32 {
@@ -59,7 +57,7 @@ class Client {
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
     private WrappedBuffer mapFileHandle = null;
-    private ByteBuffer gameTableFileHandle = null;
+    private WrappedBuffer gameTableFileHandle = null;
 
     private boolean debugConnection = false;
 
@@ -128,9 +126,10 @@ class Client {
         int gameTableIndex = -1;
 
         try {
-            gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
-                    MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
-                    .getByteBuffer(0, GameTable.SIZE);
+            final Pointer gameTableView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                            .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE,
+                    0, 0, GameTable.SIZE);
+            gameTableFileHandle = new WrappedBuffer(gameTableView, GameTable.SIZE);
         }
         catch (Exception e) {
             System.err.println("Game table mapping not found.");
@@ -281,13 +280,8 @@ class Client {
             throw new IllegalStateException("Too many strings!");
         }
 
-        //truncate string if its size equals or exceeds 1024
-        final String stringTruncated = string.length() >= MAX_STRING_SIZE
-                ? string.substring(0, MAX_STRING_SIZE - 1)
-                : string;
-
         gameData.setStringCount(stringCount + 1);
-        gameData.setStrings(stringCount, stringTruncated);
+        gameData.setStrings(stringCount, string);
         return stringCount;
     }
 
