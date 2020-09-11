@@ -29,6 +29,7 @@ import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -57,7 +58,7 @@ class Client {
     private ClientData.GameData gameData;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
-    private ByteBuffer mapFileHandle = null;
+    private WrappedBuffer mapFileHandle = null;
     private ByteBuffer gameTableFileHandle = null;
 
     private boolean debugConnection = false;
@@ -69,8 +70,8 @@ class Client {
     /**
      * For test purposes only
      */
-    Client(ByteBuffer buffer) {
-        clientData = new ClientData(buffer);
+    Client(final WrappedBuffer memory) {
+        clientData = new ClientData(memory);
         gameData = clientData.new GameData(0);
     }
 
@@ -130,7 +131,6 @@ class Client {
             gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
                     MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
                     .getByteBuffer(0, GameTable.SIZE);
-            gameTableFileHandle.order(ByteOrder.LITTLE_ENDIAN);
         }
         catch (Exception e) {
             System.err.println("Game table mapping not found.");
@@ -186,9 +186,10 @@ class Client {
         System.out.println("Connected");
 
         try {
-            mapFileHandle = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+            final Pointer mapFileView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
-                    0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
+                    0, 0, GameData.SIZE);
+            mapFileHandle = new WrappedBuffer(mapFileView, GameData.SIZE);
         }
         catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);

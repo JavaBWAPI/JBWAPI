@@ -1,14 +1,5 @@
 package bwapi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -16,6 +7,15 @@ import org.junit.experimental.theories.FromDataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @RunWith(Theories.class)
 public class GameTest {
@@ -89,7 +89,7 @@ public class GameTest {
 
     @Test
     public void ifReplaySelfAndEnemyShouldBeNull() throws IOException {
-        ByteBuffer buffer = GameBuilder.binToBuffer("src/test/resources/" + "(2)Benzene.scx" + "_frame0_buffer.bin");
+        WrappedBuffer buffer = GameBuilder.binToBuffer("src/test/resources/" + "(2)Benzene.scx" + "_frame0_buffer.bin");
 
         Client client = new Client(buffer);
         // modify the buffer to fake a replay

@@ -1,7 +1,8 @@
 package bwapi;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
 import sun.misc.Unsafe;
-import sun.nio.ch.DirectBuffer;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -10,25 +11,31 @@ import java.nio.ByteBuffer;
  * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
  */
 class WrappedBuffer {
-    private final ByteBuffer buffer;
+    private final Pointer pointer;
+    private final int size;
     private final long address;
-    private final Unsafe unsafe;
 
-    WrappedBuffer(final ByteBuffer byteBuffer) {
-        unsafe = getTheUnsafe();
-        buffer = byteBuffer;
-        address = ((DirectBuffer) buffer).address();
-    }
-
-    private static Unsafe getTheUnsafe() {
+    private static Unsafe unsafe;
+    static {
         try {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            return (Unsafe) theUnsafe.get(null);
+            unsafe = (Unsafe) theUnsafe.get(null);
+
         } catch (final Exception e) {
             e.printStackTrace();
-            return null;
+            System.exit(-1);
         }
+    }
+
+    WrappedBuffer(final int size) {
+        this(new Memory(size), size);
+    }
+
+    WrappedBuffer(final Pointer pointer, final int size) {
+        this.pointer = pointer;
+        this.size = size;
+        this.address = Pointer.nativeValue(pointer);
     }
 
     byte getByte(final int offset) {
@@ -64,7 +71,7 @@ class WrappedBuffer {
     }
 
     String getString(final int offset, final int maxLen) {
-        char[] buf = new char[maxLen];
+        final char[] buf = new char[maxLen];
         long pos = offset + address;
         for (int i = 0; i < maxLen; i++) {
             byte b = unsafe.getByte(pos);
@@ -88,6 +95,6 @@ class WrappedBuffer {
     }
 
     ByteBuffer getBuffer() {
-        return buffer;
+        return pointer.getByteBuffer(0, size);
     }
 }
