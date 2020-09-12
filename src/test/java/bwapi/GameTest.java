@@ -20,8 +20,8 @@ import static org.mockito.Mockito.mock;
 @RunWith(Theories.class)
 public class GameTest {
 
-    private List<Unit> allUnits = new ArrayList<>();
-    private Game sut = new Game(mock(Client.class)) {
+    private final List<Unit> allUnits = new ArrayList<>();
+    private final Game sut = new Game(mock(Client.class)) {
         @Override
         public List<Unit> getAllUnits() {
             return allUnits;
@@ -30,24 +30,24 @@ public class GameTest {
     private Unit dummy;
 
     @DataPoints("overlapping")
-    public static final Pair[] overlapping = {
-        new Pair<>(new Position(15, 35), new Position(20, 40)),
-        new Pair<>(new Position(15, 32), new Position(25, 38)),
-        new Pair<>(new Position(15, 28), new Position(25, 42)),
-        new Pair<>(new Position(5, 35), new Position(15, 40)),
-        new Pair<>(new Position(0, 32), new Position(15, 38)),
-        new Pair<>(new Position(0, 28), new Position(15, 42)),
-        new Pair<>(new Position(12, 25), new Position(22, 35)),
-        new Pair<>(new Position(15, 38), new Position(28, 42)),
-        new Pair<>(new Position(5, 20), new Position(25, 45))
+    public static final Pair<?, ?>[] overlapping = {
+            new Pair<>(new Position(15, 35), new Position(20, 40)),
+            new Pair<>(new Position(15, 32), new Position(25, 38)),
+            new Pair<>(new Position(15, 28), new Position(25, 42)),
+            new Pair<>(new Position(5, 35), new Position(15, 40)),
+            new Pair<>(new Position(0, 32), new Position(15, 38)),
+            new Pair<>(new Position(0, 28), new Position(15, 42)),
+            new Pair<>(new Position(12, 25), new Position(22, 35)),
+            new Pair<>(new Position(15, 38), new Position(28, 42)),
+            new Pair<>(new Position(5, 20), new Position(25, 45))
     };
 
     @DataPoints("non-overlapping")
-    public static final Pair[] nonOverlapping = {
-        new Pair<>(new Position(0, 0), new Position(200, 20)),
-        new Pair<>(new Position(50, 0), new Position(55, 200)),
-        new Pair<>(new Position(0, 0), new Position(5, 200)),
-        new Pair<>(new Position(0, 45), new Position(20, 50))
+    public static final Pair<?, ?>[] nonOverlapping = {
+            new Pair<>(new Position(0, 0), new Position(200, 20)),
+            new Pair<>(new Position(50, 0), new Position(55, 200)),
+            new Pair<>(new Position(0, 0), new Position(5, 200)),
+            new Pair<>(new Position(0, 45), new Position(20, 50))
     };
 
     @Before
@@ -61,13 +61,13 @@ public class GameTest {
 
     @Theory
     public void shouldFindOverlappingUnits(
-        @FromDataPoints("overlapping") Pair<Position, Position> rect) {
+            @FromDataPoints("overlapping") Pair<Position, Position> rect) {
         // GIVEN
         allUnits.add(dummy);
 
         // WHEN
         List<Unit> unitsInRectangle = sut
-            .getUnitsInRectangle(rect.getLeft(), rect.getRight(), unused -> true);
+                .getUnitsInRectangle(rect.getLeft(), rect.getRight(), unused -> true);
 
         // THEN
         assertThat(unitsInRectangle).contains(dummy);
@@ -75,13 +75,13 @@ public class GameTest {
 
     @Theory
     public void shouldNotFindNonOverlappingUnits(
-        @FromDataPoints("non-overlapping") Pair<Position, Position> rect) {
+            @FromDataPoints("non-overlapping") Pair<Position, Position> rect) {
         // GIVEN
         allUnits.add(dummy);
 
         // WHEN
         List<Unit> unitsInRectangle = sut
-            .getUnitsInRectangle(rect.getLeft(), rect.getRight(), unused -> true);
+                .getUnitsInRectangle(rect.getLeft(), rect.getRight(), unused -> true);
 
         // THEN
         assertThat(unitsInRectangle).doesNotContain(dummy);

@@ -8,13 +8,14 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
- * Wrapper around offheap memory that uses sun.misc.Unsafe to for fast access.
+ * Wrapper around offheap memory that uses sun.misc.Unsafe for fast access.
  */
 class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
 
     private static Unsafe unsafe;
+
     static {
         try {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
