@@ -836,7 +836,7 @@ public class Unit implements Comparable<Unit> {
      */
     public List<UnitType> getTrainingQueue() {
         return IntStream.range(0, getTrainingQueueCount())
-                .mapToObj(i -> game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount()) ?
+                .mapToObj(i -> game.isLatComEnabled() && self().trainingQueueCount.valid(game.getFrameCount()) ?
                         self().trainingQueue[i].get() :
                         UnitType.idToEnum[unitData.getTrainingQueue(i)])
                 .collect(Collectors.toList());

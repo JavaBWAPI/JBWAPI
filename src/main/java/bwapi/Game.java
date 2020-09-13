@@ -312,6 +312,7 @@ public class Game {
         unitCommand.setX(x);
         unitCommand.setY(y);
         unitCommand.setExtra(extra);
+        System.out.println("added UnitCommand: " + unitCommand.getTid());
     }
 
     void addCommand(final CommandType type, final int value1, final int value2) {

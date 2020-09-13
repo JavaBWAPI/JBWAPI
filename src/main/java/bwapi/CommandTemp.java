@@ -1,5 +1,7 @@
 package bwapi;
 
+import java.util.Arrays;
+
 /**
  * Latency Compensation:
  * Only need to implement LatCom for current frame, the server updates the next frame already if latcom is enabled.
@@ -722,8 +724,11 @@ class CommandTemp {
                 }
 
                 // Happens on RLF + 1, we want to pretend this happens on RLF.
+                System.out.println("getTrainingQueueCount: " + unit.getTrainingQueueCount());
+                System.out.println("before: " + Arrays.toString(unit.self().trainingQueue) + ", " + unit.self().trainingQueueCount);
                 unit.self().trainingQueue[unit.getTrainingQueueCount()].set(unitType, frame);
                 unit.self().trainingQueueCount.setOrAdd(+1, frame);
+                System.out.println("after: " + Arrays.toString(unit.self().trainingQueue) + ", " + unit.self().trainingQueueCount);
                 player.self().supplyUsed[unitType.getRace().id]
                         .setOrAdd(unitType.supplyRequired(), frame);
 

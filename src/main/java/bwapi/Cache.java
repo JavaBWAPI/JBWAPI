@@ -17,6 +17,11 @@ class Cache<T> {
     T get() {
         return obj;
     }
+
+    @Override
+    public String toString() {
+        return obj != null ? obj.toString() : "null";
+    }
 }
 
 class IntegerCache extends Cache<Integer> {
