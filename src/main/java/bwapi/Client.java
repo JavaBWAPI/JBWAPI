@@ -29,12 +29,11 @@ import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
 import bwapi.ClientData.Shape;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
 
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 class Client {
     interface MappingKernel extends Kernel32 {
@@ -51,14 +50,13 @@ class Client {
 
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
     static final int MAX_COUNT = 19999;
-    static final int MAX_STRING_SIZE = 1024;
 
     private ClientData clientData;
     private ClientData.GameData gameData;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
-    private ByteBuffer mapFileHandle = null;
-    private ByteBuffer gameTableFileHandle = null;
+    private WrappedBuffer mapFileHandle = null;
+    private WrappedBuffer gameTableFileHandle = null;
 
     private boolean debugConnection = false;
 
@@ -69,7 +67,7 @@ class Client {
     /**
      * For test purposes only
      */
-    Client(ByteBuffer buffer) {
+    Client(final WrappedBuffer buffer) {
         clientData = new ClientData(buffer);
         gameData = clientData.new GameData(0);
     }
@@ -86,7 +84,7 @@ class Client {
         return connected;
     }
 
-    void reconnect(){
+    void reconnect() {
         while (!connect()) {
             sleep(1000);
         }
@@ -101,11 +99,10 @@ class Client {
             return;
         }
 
-        if (pipeObjectHandle != null ) {
+        if (pipeObjectHandle != null) {
             try {
                 pipeObjectHandle.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -127,12 +124,11 @@ class Client {
         int gameTableIndex = -1;
 
         try {
-            gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
-                    MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
-                    .getByteBuffer(0, GameTable.SIZE);
-            gameTableFileHandle.order(ByteOrder.LITTLE_ENDIAN);
-        }
-        catch (Exception e) {
+            final Pointer gameTableView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                            .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE,
+                    0, 0, GameTable.SIZE);
+            gameTableFileHandle = new WrappedBuffer(gameTableView, GameTable.SIZE);
+        } catch (Exception e) {
             System.err.println("Game table mapping not found.");
             return false;
         }
@@ -140,8 +136,7 @@ class Client {
         GameTable gameTable;
         try {
             gameTable = new GameTable(gameTableFileHandle);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Unable to map Game table.");
             if (debugConnection) {
                 e.printStackTrace();
@@ -150,11 +145,11 @@ class Client {
         }
 
         int latest = 0;
-        for(int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
+        for (int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
             GameInstance gameInstance = gameTable.gameInstances[i];
             System.out.println(i + " | " + gameInstance.serverProcessID + " | " + (gameInstance.isConnected ? 1 : 0) + " | " + gameInstance.lastKeepAliveTime);
             if (gameInstance.serverProcessID != 0 && !gameInstance.isConnected) {
-                if ( gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest ) {
+                if (gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest) {
                     latest = gameInstance.lastKeepAliveTime;
                     gameTableIndex = i;
                 }
@@ -173,9 +168,8 @@ class Client {
         final String sharedMemoryName = "Local\\bwapi_shared_memory_" + serverProcID;
         final String communicationPipe = "\\\\.\\pipe\\bwapi_pipe_" + serverProcID;
         try {
-            pipeObjectHandle  = new RandomAccessFile(communicationPipe, "rw");
-        }
-        catch (Exception e) {
+            pipeObjectHandle = new RandomAccessFile(communicationPipe, "rw");
+        } catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
             if (debugConnection) {
                 e.printStackTrace();
@@ -186,11 +180,11 @@ class Client {
         System.out.println("Connected");
 
         try {
-            mapFileHandle = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+            final Pointer mapFileView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
-                    0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        }
-        catch (Exception e) {
+                    0, 0, GameData.SIZE);
+            mapFileHandle = new WrappedBuffer(mapFileView, GameData.SIZE);
+        } catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
             if (debugConnection) {
                 e.printStackTrace();
@@ -202,8 +196,7 @@ class Client {
         try {
             clientData = new ClientData(mapFileHandle);
             gameData = clientData.new GameData(0);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Unable to map game data.");
             if (debugConnection) {
                 e.printStackTrace();
@@ -223,8 +216,7 @@ class Client {
         while (code != 2) {
             try {
                 code = pipeObjectHandle.readByte();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
                 if (debugConnection) {
                     e.printStackTrace();
@@ -243,8 +235,7 @@ class Client {
         byte code = 1;
         try {
             pipeObjectHandle.writeByte(code);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("failed, disconnecting");
             if (debugConnection) {
                 e.printStackTrace();
@@ -255,8 +246,7 @@ class Client {
         while (code != 2) {
             try {
                 code = pipeObjectHandle.readByte();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("failed, disconnecting");
                 if (debugConnection) {
                     e.printStackTrace();
@@ -280,13 +270,8 @@ class Client {
             throw new IllegalStateException("Too many strings!");
         }
 
-        //truncate string if its size equals or exceeds 1024
-        final String stringTruncated = string.length() >= MAX_STRING_SIZE
-                ? string.substring(0, MAX_STRING_SIZE - 1)
-                : string;
-
         gameData.setStringCount(stringCount + 1);
-        gameData.setStrings(stringCount, stringTruncated);
+        gameData.setStrings(stringCount, string);
         return stringCount;
     }
 
@@ -318,10 +303,9 @@ class Client {
     }
 
     private void sleep(final int millis) {
-        try{
+        try {
             Thread.sleep(millis);
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
         }
     }
 }

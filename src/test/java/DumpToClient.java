@@ -90,11 +90,12 @@ public class DumpToClient {
         StringWriter sw = new StringWriter();
         try (PrintWriter out = new PrintWriter(sw)) {
             out.println("package bwapi;");
-            out.println("import java.nio.ByteBuffer;");
+            out.println("");
             out.println("final class ClientData {");
             out.println("    final WrappedBuffer buffer;");
-            out.println("    ClientData(final ByteBuffer buffer) {");
-            out.println("        this.buffer = new WrappedBuffer(buffer);");
+            out.println("");
+            out.println("    ClientData(final WrappedBuffer buffer) {");
+            out.println("        this.buffer = buffer;");
             out.println("    }");
             structs.values().forEach(s -> {
                 out.printf("    class %s {\n", s.name);

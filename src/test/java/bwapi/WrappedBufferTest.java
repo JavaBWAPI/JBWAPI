@@ -2,12 +2,10 @@ package bwapi;
 
 import org.junit.Test;
 
-import java.nio.ByteBuffer;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WrappedBufferTest {
-    private WrappedBuffer sut = new WrappedBuffer(ByteBuffer.allocateDirect(1024));
+    private final WrappedBuffer sut = new WrappedBuffer(1024);
 
     @Test
     public void shouldGetAndSetStrings() {
