@@ -110,7 +110,9 @@ public class PerformanceMetric {
                         + (samplesExceeding > 0
                             ? ". "
                                 + samplesExceeding
-                                + " violations averaging "
+                                + " values over "
+                                + maxAllowed
+                                + " averaging "
                                 + formatter.format(avgValueExceeding)
                             : "")
                     : "No samples")
