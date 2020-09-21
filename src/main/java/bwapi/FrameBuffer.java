@@ -17,7 +17,7 @@ class FrameBuffer {
     private ByteBuffer liveData;
     private PerformanceMetrics performanceMetrics;
     private BWClientConfiguration configuration;
-    private int size;
+    private int capacity;
     private int stepGame = 0;
     private int stepBot = 0;
     private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
@@ -27,9 +27,9 @@ class FrameBuffer {
     final Condition conditionSize = lockSize.newCondition();
 
     FrameBuffer(BWClientConfiguration configuration) {
-        this.size = configuration.asyncFrameBufferSize;
+        this.capacity = configuration.asyncFrameBufferCapacity;
         this.configuration = configuration;
-        while(dataBuffer.size() < size) {
+        while(dataBuffer.size() < capacity) {
             dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
         }
     }
@@ -52,15 +52,22 @@ class FrameBuffer {
     }
 
     /**
-     * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
+     * @return Number of frames currently stored in the buffer
      */
-    boolean empty() {
+    int size() {
         lockSize.lock();
         try {
-            return framesBuffered() <= 0;
+            return framesBuffered();
         }  finally {
             lockSize.unlock();
         }
+    }
+
+    /**
+     * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
+     */
+    boolean empty() {
+        return size() <= 0;
     }
 
     /**
@@ -70,18 +77,18 @@ class FrameBuffer {
     boolean full() {
         lockSize.lock();
         try {
-            return framesBuffered() >= size;
+            return framesBuffered() >= capacity;
         } finally {
             lockSize.unlock();
         }
     }
 
     private int indexGame() {
-        return stepGame % size;
+        return stepGame % capacity;
     }
 
     private int indexBot() {
-        return stepBot % size;
+        return stepBot % capacity;
     }
 
     /**

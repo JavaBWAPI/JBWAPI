@@ -57,6 +57,18 @@ public class PerformanceMetrics {
      */
     public PerformanceMetric botIdle;
 
+    public PerformanceMetric frameDuration5;
+    public PerformanceMetric frameDuration10;
+    public PerformanceMetric frameDuration15;
+    public PerformanceMetric frameDuration20;
+    public PerformanceMetric frameDuration25;
+    public PerformanceMetric frameDuration30;
+    public PerformanceMetric frameDuration35;
+    public PerformanceMetric frameDuration40;
+    public PerformanceMetric frameDuration45;
+    public PerformanceMetric frameDuration50;
+    public PerformanceMetric frameDuration55;
+
     private BWClientConfiguration configuration;
 
     public PerformanceMetrics(BWClientConfiguration configuration) {
@@ -65,18 +77,28 @@ public class PerformanceMetrics {
     }
 
     void reset() {
-        final int frameDurationBufferMs = 5;
         final int sideEffectsBufferMs = 1;
         final int realTimeFrameMs = 42;
-        totalFrameDuration = new PerformanceMetric("Total frame duration", configuration.maxFrameDurationMs + frameDurationBufferMs);
-        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 15);
-        intentionallyBlocking = new PerformanceMetric("Intentionally blocking", 0);
+        totalFrameDuration = new PerformanceMetric("JBWAPI frame duration", configuration.maxFrameDurationMs + 5);
+        copyingToBuffer = new PerformanceMetric("Time copying to buffer", configuration.maxFrameDurationMs + 5);
+        intentionallyBlocking = new PerformanceMetric("Blocking with full buffer", 0);
         frameBufferSize = new PerformanceMetric("Frames buffered", 0);
-        framesBehind = new PerformanceMetric("Frames behind", 0);
-        flushSideEffects = new PerformanceMetric("Flush side effects", sideEffectsBufferMs );
-        botResponse = new PerformanceMetric("Bot responses", configuration.maxFrameDurationMs);
-        bwapiResponse = new PerformanceMetric("BWAPI responses", realTimeFrameMs);
+        framesBehind = new PerformanceMetric("Frames behind real-time", 0);
+        flushSideEffects = new PerformanceMetric("Flushing side effects", sideEffectsBufferMs );
+        botResponse = new PerformanceMetric("Bot event handlers", configuration.maxFrameDurationMs);
+        bwapiResponse = new PerformanceMetric("Responses from BWAPI", realTimeFrameMs);
         botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE);
+        frameDuration5 = new PerformanceMetric("JBWAPI frame @  5ms", 5);
+        frameDuration10 = new PerformanceMetric("JBWAPI frame @ 10ms", 10);
+        frameDuration15 = new PerformanceMetric("JBWAPI frame @ 15ms", 15);
+        frameDuration20 = new PerformanceMetric("JBWAPI frame @ 20ms", 20);
+        frameDuration25 = new PerformanceMetric("JBWAPI frame @ 25ms", 25);
+        frameDuration30 = new PerformanceMetric("JBWAPI frame @ 30ms", 30);
+        frameDuration35 = new PerformanceMetric("JBWAPI frame @ 35ms", 35);
+        frameDuration40 = new PerformanceMetric("JBWAPI frame @ 40ms", 40);
+        frameDuration45 = new PerformanceMetric("JBWAPI frame @ 45ms", 45);
+        frameDuration50 = new PerformanceMetric("JBWAPI frame @ 50ms", 50);
+        frameDuration55 = new PerformanceMetric("JBWAPI frame @ 55ms", 55);
     }
 
     @Override
@@ -90,6 +112,17 @@ public class PerformanceMetrics {
                 + "\n" + flushSideEffects.toString()
                 + "\n" + botResponse.toString()
                 + "\n" + bwapiResponse.toString()
-                + "\n" + botIdle.toString();
+                + "\n" + botIdle.toString()
+                + "\n" + frameDuration5.toString()
+                + "\n" + frameDuration10.toString()
+                + "\n" + frameDuration15.toString()
+                + "\n" + frameDuration20.toString()
+                + "\n" + frameDuration25.toString()
+                + "\n" + frameDuration30.toString()
+                + "\n" + frameDuration35.toString()
+                + "\n" + frameDuration40.toString()
+                + "\n" + frameDuration45.toString()
+                + "\n" + frameDuration50.toString()
+                + "\n" + frameDuration55.toString();
     }
 }

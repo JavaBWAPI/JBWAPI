@@ -50,7 +50,16 @@ public class BWClientConfiguration {
      * The maximum number of frames to buffer while waiting on a bot.
      * Each frame buffered adds about 33 megabytes to JBWAPI's memory footprint.
      */
-    public int asyncFrameBufferSize = 10;
+    public int asyncFrameBufferCapacity = 10;
+
+    /**
+     * Enables thread-unsafe async mode.
+     * In this mode, the bot is allowed to read directly from shared memory until shared memory has been copied into the frame buffer,
+     * at wihch point the bot switches to using the frame buffer.
+     * This should enhance performance by allowing the bot to act while the frame is copied, but poses unidentified risk due to
+     * the non-thread-safe switc from shared memory reads to frame buffer reads.
+     */
+    public boolean asyncUnsafe = false;
 
     /**
      * Toggles verbose logging, particularly of synchronization steps.
@@ -64,8 +73,8 @@ public class BWClientConfiguration {
         if (async && maxFrameDurationMs < 0) {
             throw new IllegalArgumentException("maxFrameDurationMs needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
         }
-        if (async && asyncFrameBufferSize < 1) {
-            throw new IllegalArgumentException("asyncFrameBufferSize needs to be a positive number (There needs to be at least one frame buffer).");
+        if (async && asyncFrameBufferCapacity < 1) {
+            throw new IllegalArgumentException("asyncFrameBufferCapacity needs to be a positive number (There needs to be at least one frame buffer).");
         }
     }
 

@@ -86,7 +86,7 @@ class SynchronizationEnvironment {
         if (configuration.async) {
             final long MEGABYTE = 1024 * 1024;
             long memoryFree = Runtime.getRuntime().freeMemory() / MEGABYTE;
-            long memoryRequired = configuration.asyncFrameBufferSize * ClientData.GameData.SIZE / MEGABYTE;
+            long memoryRequired = configuration.asyncFrameBufferCapacity * ClientData.GameData.SIZE / MEGABYTE;
             assertTrue(
                     "Unit test needs to be run with sufficient memory to allocate frame buffer. Has "
                             + memoryFree

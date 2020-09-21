@@ -11,12 +11,15 @@ class BotWrapper {
     private final BWClientConfiguration configuration;
     private final BWEventListener eventListener;
     private final FrameBuffer frameBuffer;
-    private Game game;
+    private ByteBuffer liveData;
+    private Game botGame;
     private Thread botThread;
     private boolean gameOver;
     private PerformanceMetrics performanceMetrics;
     private Throwable lastBotThrow;
     private ReentrantLock lastBotThrowLock = new ReentrantLock();
+    private ReentrantLock unsafeReadReadyLock = new ReentrantLock();
+    private boolean unsafeReadReady = false;
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
@@ -25,16 +28,17 @@ class BotWrapper {
     }
 
     /**
-     * Resets the BotWrapper for a new game.
+     * Resets the BotWrapper for a new botGame.
      */
     void startNewGame(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
         if (configuration.async) {
             frameBuffer.initialize(liveData, performanceMetrics);
         }
         this.performanceMetrics = performanceMetrics;
-        game = new Game();
-        game.clientData().setBuffer(liveData);
+        botGame = new Game();
+        botGame.clientData().setBuffer(liveData);
         liveClientData.setBuffer(liveData);
+        this.liveData = liveData;
         botThread = null;
         gameOver = false;
     }
@@ -44,7 +48,25 @@ class BotWrapper {
      * In asynchronous mode this Game object may point at a copy of a previous frame.
      */
     Game getGame() {
-        return game;
+        return botGame;
+    }
+
+    private boolean isUnsafeReadReady() {
+        unsafeReadReadyLock.lock();
+        try { return unsafeReadReady; }
+        finally { unsafeReadReadyLock.unlock(); }
+    }
+
+    private void setUnsafeReadReady(boolean value) {
+        unsafeReadReadyLock.lock();
+        try { unsafeReadReady = value; }
+        finally { unsafeReadReadyLock.unlock(); }
+        frameBuffer.lockSize.lock();
+        try {
+            frameBuffer.conditionSize.signalAll();
+        } finally {
+            frameBuffer.lockSize.unlock();
+        }
     }
 
     /**
@@ -61,17 +83,44 @@ class BotWrapper {
                 botThread.setName("JBWAPI Bot");
                 botThread.start();
             }
-            /*
-            Add a frame to buffer
-            If buffer is full, it will wait until it has capacity
-            Wait for empty buffer OR termination condition
-            */
+
+            // Unsafe mode:
+            // If the frame buffer is empty (meaning the bot must be idle)
+            // allow the bot to read directly from shared memory while we copy it over
+            if (configuration.asyncUnsafe) {
+                frameBuffer.lockSize.lock();
+                try {
+                    if (frameBuffer.empty()) {
+                        configuration.log("Main: Putting bot on live data");
+                        botGame.clientData().setBuffer(liveData);
+                        setUnsafeReadReady(true);
+                    } else {
+                        setUnsafeReadReady(false);
+                    }
+                } finally {
+                    frameBuffer.lockSize.unlock();
+                }
+            }
+
+            // Add a frame to buffer
+            // If buffer is full, will wait until it has capacity.
+            // Then wait for the buffer to empty or to run out of time in the frame.
             int frame = liveClientData.gameData().getFrameCount();
             configuration.log("Main: Enqueuing frame #" + frame);
             frameBuffer.enqueueFrame();
+            configuration.log("Main: Enqueued frame #" + frame);
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
+                    // Unsafe mode: Move the bot off of live data onto the frame buffer
+                    // This is the unsafe step!
+                    // We don't synchronize on calls which access the buffer
+                    // (to avoid tens of thousands of synchronized calls per frame)
+                    // so there's no guarantee of safety here.
+                    if (configuration.asyncUnsafe && frameBuffer.size() == 1) {
+                        configuration.log("Main: Weaning bot off live data");
+                        botGame.clientData().setBuffer(frameBuffer.peek());
+                    }
 
                     // Make bot exceptions fall through to the main thread.
                     Throwable lastThrow = getLastBotThrow();
@@ -130,26 +179,35 @@ class BotWrapper {
                 configuration.log("Bot: Thread started");
                 while (!gameOver) {
 
+                    boolean doUnsafeRead = false;
                     configuration.log("Bot: Ready for another frame");
-                    performanceMetrics.botIdle.time(() -> {
-                        frameBuffer.lockSize.lock();
-                        try {
-                            while (frameBuffer.empty()) {
-                                configuration.log("Bot: Waiting for a frame");
-                                frameBuffer.conditionSize.awaitUninterruptibly();
-                            }
-                        } finally {
-                            frameBuffer.lockSize.unlock();
+                    performanceMetrics.botIdle.startTiming();
+                    frameBuffer.lockSize.lock();
+                    try {
+                        doUnsafeRead = isUnsafeReadReady();
+                        while ( ! doUnsafeRead && frameBuffer.empty()) {
+                            configuration.log("Bot: Waiting for a frame");
+                            frameBuffer.conditionSize.awaitUninterruptibly();
+                            doUnsafeRead = isUnsafeReadReady();
                         }
-                    });
+                    } finally {
+                        frameBuffer.lockSize.unlock();
+                    }
+                    performanceMetrics.botIdle.stopTiming();
 
-                    configuration.log("Bot: Peeking next frame");
-                    game.clientData().setBuffer(frameBuffer.peek());
+                    if (doUnsafeRead) {
+                        configuration.log("Bot: Reading live frame");
+                        setUnsafeReadReady(false);
+                        // TODO: Maybe we should point it at live data from here?
+                    } else {
+                        configuration.log("Bot: Peeking next frame from buffer");
+                        botGame.clientData().setBuffer(frameBuffer.peek());
+                    }
 
-                    configuration.log("Bot: Handling frame #" + game.getFrameCount());
+                    configuration.log("Bot: Handling events on frame #" + botGame.getFrameCount());
                     handleEvents();
 
-                    configuration.log("Bot: Events done. Dequeuing frame #" + game.getFrameCount());
+                    configuration.log("Bot: Events handled. Dequeuing frame #" + botGame.getFrameCount());
                     frameBuffer.dequeue();
                 }
             } catch (Throwable throwable) {
@@ -169,7 +227,7 @@ class BotWrapper {
     }
 
     private void handleEvents() {
-        ClientData.GameData gameData = game.clientData().gameData();
+        ClientData.GameData gameData = botGame.clientData().gameData();
 
         // Populate gameOver before invoking event handlers (in case the bot throws)
         for (int i = 0; i < gameData.getEventCount(); i++) {
@@ -184,7 +242,7 @@ class BotWrapper {
             ! gameOver && (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero),
             () -> {
                 for (int i = 0; i < gameData.getEventCount(); i++) {
-                    EventHandler.operation(eventListener, game, gameData.getEvents(i));
+                    EventHandler.operation(eventListener, botGame, gameData.getEvents(i));
                 }
             });
     }
