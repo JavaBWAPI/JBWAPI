@@ -94,24 +94,12 @@ public class BWClient {
             }
             while (liveGameData.isInGame()) {
                 boolean timeFrame = liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero;
-                performanceMetrics.frameDuration5.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration10.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration15.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration20.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration25.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration30.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration35.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration40.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration45.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration50.timeIf(timeFrame, () ->
-                performanceMetrics.frameDuration55.timeIf(timeFrame, () ->
                 performanceMetrics.totalFrameDuration.timeIf(
                     timeFrame,
                     () -> {
                         botWrapper.onFrame();
                         performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
-                    })
-                )))))))))));
+                    });
                 performanceMetrics.bwapiResponse.time(client::update);
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");

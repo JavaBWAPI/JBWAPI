@@ -108,7 +108,11 @@ class BotWrapper {
             int frame = liveClientData.gameData().getFrameCount();
             configuration.log("Main: Enqueuing frame #" + frame);
             frameBuffer.enqueueFrame();
+
             configuration.log("Main: Enqueued frame #" + frame);
+            if (frame > 0) {
+                performanceMetrics.clientIdle.startTiming();
+            }
             frameBuffer.lockSize.lock();
             try {
                 while (!frameBuffer.empty()) {
@@ -140,11 +144,14 @@ class BotWrapper {
                         }
                         configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot on frame #" + frame);
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
+                        long excessNanos = Math.max(0, (System.nanoTime() - endNanos) / 1000000);
+                        performanceMetrics.excessSleep.record(excessNanos);
                     }
                 }
             } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
+                performanceMetrics.clientIdle.stopTiming();
                 configuration.log("Main: onFrame asynchronous end");
             }
         } else {
@@ -152,7 +159,6 @@ class BotWrapper {
             handleEvents();
             configuration.log("Main: onFrame synchronous end");
         }
-
     }
 
     /**
@@ -235,7 +241,7 @@ class BotWrapper {
         }
 
         if (configuration.async) {
-            performanceMetrics.framesBehind.record(frameBuffer.framesBuffered() - 1);
+            performanceMetrics.framesBehind.record(Math.max(1, frameBuffer.framesBuffered()) - 1);
         }
 
         performanceMetrics.botResponse.timeIf(

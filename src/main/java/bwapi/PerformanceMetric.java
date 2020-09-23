@@ -1,28 +1,56 @@
 package bwapi;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 /**
  * Aggregates labeled time series data.
  */
 public class PerformanceMetric {
+    class RunningTotal {
+        int samples = 0;
+        double mean = 0d;
+        double min = Long.MAX_VALUE;
+        double max = Long.MIN_VALUE;
+        void record(double value) {
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+            mean = (mean * samples + value) / (samples + 1d);
+            ++samples;
+        }
+    }
+    class Threshold {
+        double threshold;
+        RunningTotal runningTotal = new RunningTotal();
+        Threshold(double value) {
+            threshold = value;
+        }
+        void record(double value) {
+            if (value >= threshold) {
+                runningTotal.record(value);
+            }
+        }
+        public String toString() {
+            if (runningTotal.samples <= 0) {
+                return "";
+            }
+            DecimalFormat formatter = new DecimalFormat("###,###.#");
+            return "\n>= " + formatter.format(threshold) + ": " + runningTotal.samples + " samples averaging " + formatter.format(runningTotal.mean) + ").";
+        }
+    }
+
     private final String name;
-    private final long maxAllowed;
-
-    public double minValue = Long.MAX_VALUE;
-    public double maxValue = Long.MIN_VALUE;
-    public double lastValue = 0;
-    public double avgValue = 0;
-    public double avgValueExceeding = 0;
-    public int samples = 0;
-    public int samplesExceeding = 0;
     public int interrupted = 0;
-
     private long timeStarted = 0;
 
-    PerformanceMetric(String name, long maxAllowed) {
+    RunningTotal runningTotal = new RunningTotal();
+    private ArrayList<Threshold> thresholds = new ArrayList<>();
+
+    PerformanceMetric(String name, double... thresholds) {
         this.name = name;
-        this.maxAllowed = maxAllowed;
+        for (double threshold : thresholds) {
+            this.thresholds.add(new Threshold(threshold));
+        }
     }
 
     /**
@@ -77,15 +105,8 @@ public class PerformanceMetric {
      * Manually records a specific value.
      */
     void record(double value) {
-        lastValue = value;
-        minValue = Math.min(minValue, value);
-        maxValue = Math.max(maxValue, value);
-        avgValue = (avgValue * samples + value) / (samples + 1d);
-        ++samples;
-        if (value > maxAllowed) {
-            avgValueExceeding = (avgValueExceeding * samplesExceeding + value) / (samplesExceeding + 1d);
-            ++samplesExceeding;
-        }
+        runningTotal.record(value);
+        thresholds.forEach(threshold -> threshold.record(value));
     }
 
     /**
@@ -93,31 +114,28 @@ public class PerformanceMetric {
      */
     @Override
     public String toString() {
+        if (runningTotal.samples <= 0) {
+            return name + ": No samples.";
+        }
         DecimalFormat formatter = new DecimalFormat("###,###.#");
-        return name
+        String output = name
                 + ": "
-                + (samples > 0
-                    ? formatter.format(samples)
-                        + " samples averaging "
-                        + formatter.format(avgValue)
-                        + " ["
-                        + formatter.format(minValue)
-                        + " - "
-                        + formatter.format(maxValue)
-                        + "] over "
-                        + samples
-                        + " samples"
-                        + (samplesExceeding > 0
-                            ? ". "
-                                + samplesExceeding
-                                + " values over "
-                                + maxAllowed
-                                + " averaging "
-                                + formatter.format(avgValueExceeding)
-                            : "")
-                    : "No samples")
-                + (interrupted > 0
-                    ? ". Interrupted " + interrupted + " times"
-                    : "");
+                + formatter.format(runningTotal.samples)
+                    + " samples averaging "
+                    + formatter.format(runningTotal.mean)
+                    + " ["
+                    + formatter.format(runningTotal.min)
+                    + " - "
+                    + formatter.format(runningTotal.max)
+                    + "] over "
+                    + runningTotal.samples
+                    + " samples. ";
+        for (Threshold threshold : thresholds) {
+            output += threshold.toString();
+        }
+        if (interrupted > 0) {
+            output += "\n\tInterrupted " + interrupted + " times";
+        }
+        return output;
     }
 }
