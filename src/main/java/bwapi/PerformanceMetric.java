@@ -9,10 +9,12 @@ import java.util.ArrayList;
 public class PerformanceMetric {
     class RunningTotal {
         int samples = 0;
+        double last = 0d;
         double mean = 0d;
         double min = Long.MAX_VALUE;
         double max = Long.MIN_VALUE;
         void record(double value) {
+            last = value;
             min = Math.min(min, value);
             max = Math.max(max, value);
             mean = (mean * samples + value) / (samples + 1d);
@@ -35,7 +37,7 @@ public class PerformanceMetric {
                 return "";
             }
             DecimalFormat formatter = new DecimalFormat("###,###.#");
-            return "\n>= " + formatter.format(threshold) + ": " + runningTotal.samples + " samples averaging " + formatter.format(runningTotal.mean) + ").";
+            return "\n>= " + formatter.format(threshold) + ": " + runningTotal.samples + " samples averaging " + formatter.format(runningTotal.mean);
         }
     }
 

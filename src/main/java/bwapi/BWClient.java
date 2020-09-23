@@ -1,5 +1,7 @@
 package bwapi;
 
+import com.sun.jna.platform.win32.Kernel32;
+
 import java.util.Objects;
 
 /**
@@ -10,10 +12,12 @@ public class BWClient {
     private BotWrapper botWrapper;
     private Client client;
     private PerformanceMetrics performanceMetrics;
+    private TimerResolutionThread timerResolutionThread;
 
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
         this.eventListener = eventListener;
+        this.timerResolutionThread = new TimerResolutionThread();
     }
 
     /**
@@ -75,6 +79,10 @@ public class BWClient {
         configuration.validate();
         botWrapper = new BotWrapper(configuration, eventListener);
 
+        // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
+        // If BWAPI doesn't get priority, it may not detect completion of a frame on our end in timely fashion.
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+
         if (client == null) {
             client = new Client(configuration);
         }
@@ -94,12 +102,29 @@ public class BWClient {
             }
             while (liveGameData.isInGame()) {
                 boolean timeFrame = liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero;
+
+                long ticksBefore = Kernel32.INSTANCE.GetTickCount();
                 performanceMetrics.totalFrameDuration.timeIf(
                     timeFrame,
                     () -> {
                         botWrapper.onFrame();
                         performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
                     });
+                long ticksAfter = Kernel32.INSTANCE.GetTickCount();
+                if (timeFrame) {
+                    long deltaTicks = ticksAfter - ticksBefore;
+                    long deltaMillis = (long) performanceMetrics.totalFrameDuration.runningTotal.last;
+                    long delta = deltaMillis - deltaTicks;
+                    if (Math.abs(delta) > 1000) {
+                        System.out.println("Got weird tick delta: " + ticksAfter + ", " + ticksBefore + ", " + deltaTicks + ", " + deltaMillis + ", " + delta);
+                        performanceMetrics.weirdTimeDelta.record(1);
+                    } else if (delta > 0) {
+                        performanceMetrics.positiveTimeDelta.record(delta);
+                    } else if (delta < 0) {
+                        performanceMetrics.negativeTimeDelta.record(-delta);
+                    }
+                }
+
                 performanceMetrics.bwapiResponse.time(client::update);
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");

@@ -69,6 +69,21 @@ public class PerformanceMetrics {
      */
     PerformanceMetric excessSleep;
 
+    /**
+     * Instances of System.nanoTime() measuring a longer frame duration with respect to WinAPI's GetTickCount.
+     */
+    PerformanceMetric positiveTimeDelta;
+
+    /**
+     * Instances of System.nanoTime() measuring a shorter frame duration with respect to WinAPI's GetTickCount.
+     */
+    PerformanceMetric negativeTimeDelta;
+
+    /**
+     * When Kernel32.INSTANCE.GetTickCount() returns at least one inexplicable value
+     */
+    PerformanceMetric weirdTimeDelta;
+
     private BWClientConfiguration configuration;
 
     PerformanceMetrics(BWClientConfiguration configuration) {
@@ -76,7 +91,7 @@ public class PerformanceMetrics {
         reset();
     }
 
-    void reset() {
+    public void reset() {
         totalFrameDuration = new PerformanceMetric("JBWAPI frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5, 10, 15, 20, 25, 30);
         intentionallyBlocking = new PerformanceMetric("Blocking with full buffer", 0);
@@ -88,21 +103,27 @@ public class PerformanceMetrics {
         botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE);
         clientIdle = new PerformanceMetric("Client idling", configuration.maxFrameDurationMs);
         excessSleep = new PerformanceMetric("Excess sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        positiveTimeDelta = new PerformanceMetric("Positive timer delta", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        negativeTimeDelta = new PerformanceMetric("Negative timer delta", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        weirdTimeDelta = new PerformanceMetric("Weird timer delta");
     }
 
     @Override
     public String toString() {
         return "Performance metrics:"
-                + "\n" + totalFrameDuration.toString()
-                + "\n" + copyingToBuffer.toString()
-                + "\n" + intentionallyBlocking.toString()
-                + "\n" + frameBufferSize.toString()
-                + "\n" + framesBehind.toString()
-                + "\n" + flushSideEffects.toString()
-                + "\n" + botResponse.toString()
-                + "\n" + bwapiResponse.toString()
-                + "\n" + botIdle.toString()
-                + "\n" + clientIdle.toString()
-                + "\n" + excessSleep.toString();
+            + "\n" + totalFrameDuration.toString()
+            + "\n" + copyingToBuffer.toString()
+            + "\n" + intentionallyBlocking.toString()
+            + "\n" + frameBufferSize.toString()
+            + "\n" + framesBehind.toString()
+            + "\n" + flushSideEffects.toString()
+            + "\n" + botResponse.toString()
+            + "\n" + bwapiResponse.toString()
+            + "\n" + botIdle.toString()
+            + "\n" + clientIdle.toString()
+            + "\n" + excessSleep.toString()
+            + "\n" + positiveTimeDelta.toString()
+            + "\n" + negativeTimeDelta.toString()
+            + "\n" + weirdTimeDelta.toString();
     }
 }

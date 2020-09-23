@@ -4,7 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 /**
- * JNI interface for access the native MSVC implementation of memcpy.
+ * JNI interface for accessing native MSVC code.
  */
 interface MSVCRT extends Library {
     MSVCRT INSTANCE = Native.load("msvcrt.dll", MSVCRT.class);
