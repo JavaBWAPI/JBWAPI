@@ -247,9 +247,13 @@ class Client {
         while (code != 2) {
             try {
                 code = pipeObjectHandle.readByte();
+                /*
                 if (code != 2) {
-                    Thread.sleep(0, 1);
+                    try {
+                        Thread.sleep(0, 1);
+                    } catch (InterruptedException ignored) {}
                 }
+                */
             }
             catch (Exception e) {
                 System.err.println("failed, disconnecting");

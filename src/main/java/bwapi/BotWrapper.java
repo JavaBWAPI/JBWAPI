@@ -82,7 +82,7 @@ class BotWrapper {
                 botThread = createBotThread();
                 botThread.setName("JBWAPI Bot");
                 // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
-                botThread.setPriority(Thread.MIN_PRIORITY);
+                botThread.setPriority(3);
                 botThread.start();
             }
 

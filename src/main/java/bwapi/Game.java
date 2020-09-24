@@ -1,8 +1,6 @@
 package bwapi;
 
-import bwapi.ClientData.Command;
 import bwapi.ClientData.GameData;
-import bwapi.ClientData.Shape;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +16,7 @@ import static bwapi.UnitType.*;
  * game state information from Starcraft Broodwar. Game state information includes all units,
  * resources, players, forces, bullets, terrain, fog of war, regions, etc.
  */
-public class Game {
+public final class Game {
     private static final int[][] damageRatio = {
             // Ind, Sml, Med, Lrg, Non, Unk
             {0, 0, 0, 0, 0, 0}, // Independent
@@ -99,7 +97,7 @@ public class Game {
     private Text.Size textSize = Text.Size.Default;
     private boolean latcom = true;
 
-    public final SideEffectQueue sideEffects = new SideEffectQueue();
+    final SideEffectQueue sideEffects = new SideEffectQueue();
 
     Game() {
         clientData = new ClientData();
@@ -565,7 +563,7 @@ public class Game {
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      * @see MouseButton
      */
-    public boolean getMouseState(final MouseButton button) {
+    final public boolean getMouseState(final MouseButton button) {
         return gameData().getMouseState(button.id);
     }
 
@@ -577,7 +575,7 @@ public class Game {
      * and false if it was not. Returns false always if {@link Flag#UserInput} is disabled.
      * @see Key
      */
-    public boolean getKeyState(final Key key) {
+    final public boolean getKeyState(final Key key) {
         return gameData().getKeyState(key.id);
     }
 
@@ -633,7 +631,7 @@ public class Game {
      * @return true if the given flag is enabled, false if the flag is disabled.
      * @see Flag
      */
-    public boolean isFlagEnabled(final Flag flag) {
+    final public boolean isFlagEnabled(final Flag flag) {
         return gameData().getFlags(flag.id);
     }
 
@@ -864,11 +862,11 @@ public class Game {
      * @param walkY The y coordinate of the mini-tile, in mini-tile units (8 pixels).
      * @return true if the mini-tile is walkable and false if it is impassable for ground units.
      */
-    public boolean isWalkable(final int walkX, final int walkY) {
+    final public boolean isWalkable(final int walkX, final int walkY) {
         return isWalkable(new WalkPosition(walkX, walkY));
     }
 
-    public boolean isWalkable(final WalkPosition position) {
+    final public boolean isWalkable(final WalkPosition position) {
         if (!position.isValid(this)) {
             return false;
         }
@@ -900,7 +898,7 @@ public class Game {
         return groundHeight[position.x][position.y];
     }
 
-    public boolean isBuildable(final int tileX, final int tileY) {
+    final public boolean isBuildable(final int tileX, final int tileY) {
         return isBuildable(tileX, tileY, false);
     }
 
@@ -916,19 +914,24 @@ public class Game {
      * If includeBuildings was provided, then it will return false if a structure is currently
      * occupying the tile.
      */
-    public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
-        return isBuildable(new TilePosition(tileX, tileY), includeBuildings);
+    final public boolean isBuildable(final int tileX, final int tileY, final boolean includeBuildings) {
+        return isValidTile(tileX, tileY) && buildable[tileX][tileY] && (!includeBuildings || !gameData().isOccupied(tileX, tileY));
     }
 
-    public boolean isBuildable(final TilePosition position) {
+    final public boolean isBuildable(final TilePosition position) {
         return isBuildable(position, false);
     }
 
-    public boolean isBuildable(final TilePosition position, final boolean includeBuildings) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return buildable[position.x][position.y] && (!includeBuildings || !gameData().isOccupied(position.x, position.y));
+    boolean isValidPosition(final int x, final int y) {
+        return x >= 0 && y >= 0 && x < mapPixelWidth && y < mapPixelHeight;
+    }
+
+    boolean isValidTile(final int x, final int y) {
+        return x >= 0 && y >= 0 && x < mapWidth && y < mapHeight;
+    }
+
+    final public boolean isBuildable(final TilePosition position, final boolean includeBuildings) {
+        return isBuildable(position.x, position.y, includeBuildings);
     }
 
     /**
@@ -940,15 +943,12 @@ public class Game {
      * the value is true. If the given tile is concealed by the fog of war, then this value will
      * be false.
      */
-    public boolean isVisible(final int tileX, final int tileY) {
-        return isVisible(new TilePosition(tileX, tileY));
+    final public boolean isVisible(final int tileX, final int tileY) {
+        return isValidTile(tileX, tileY) && gameData().isVisible(tileX, tileY);
     }
 
-    public boolean isVisible(final TilePosition position) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return gameData().isVisible(position.x, position.y);
+    final public boolean isVisible(final TilePosition position) {
+        return isVisible(position.x, position.y);
     }
 
     /**
@@ -961,15 +961,12 @@ public class Game {
      * @return true if the player has explored the given tile position (partially revealed fog), false if the tile position was never explored (completely black fog).
      * @see #isVisible
      */
-    public boolean isExplored(final int tileX, final int tileY) {
-        return isExplored(new TilePosition(tileX, tileY));
+    final public boolean isExplored(final int tileX, final int tileY) {
+        return isValidTile(tileX, tileY) && gameData().isExplored(tileX, tileY);
     }
 
-    public boolean isExplored(final TilePosition position) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return gameData().isExplored(position.x, position.y);
+    final public boolean isExplored(final TilePosition position) {
+        return isExplored(position.x, position.y);
     }
 
     /**
@@ -979,18 +976,15 @@ public class Game {
      * @param tileY The y tile coordinate to check.
      * @return true if the given tile has creep on it, false if the given tile does not have creep, or if it is concealed by the fog of war.
      */
-    public boolean hasCreep(final int tileX, final int tileY) {
-        return hasCreep(new TilePosition(tileX, tileY));
+    final public boolean hasCreep(final int tileX, final int tileY) {
+        return isValidTile(tileX, tileY) && gameData().getHasCreep(tileX, tileY);
     }
 
-    public boolean hasCreep(final TilePosition position) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return gameData().getHasCreep(position.x, position.y);
+    final public boolean hasCreep(final TilePosition position) {
+        return hasCreep(position.x, position.y);
     }
 
-    public boolean hasPowerPrecise(final int x, final int y) {
+    final public boolean hasPowerPrecise(final int x, final int y) {
         return hasPowerPrecise(new Position(x, y));
     }
 
@@ -1003,41 +997,38 @@ public class Game {
      * @param unitType Checks if the given {@link UnitType} requires power or not. If ommitted, then it will assume that the position requires power for any unit type.
      * @return true if the type at the given position will have power, false if the type at the given position will be unpowered.
      */
-    public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
-        return hasPowerPrecise(new Position(x, y), unitType);
+    final public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
+        return isValidPosition(x, y) && hasPower(x, y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toList()));
     }
 
-    public boolean hasPowerPrecise(final Position position) {
-        return hasPowerPrecise(position, UnitType.None);
+    final public boolean hasPowerPrecise(final Position position) {
+        return hasPowerPrecise(position.x, position.y, UnitType.None);
     }
 
-    public boolean hasPowerPrecise(final Position position, final UnitType unitType) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return hasPower(position.x, position.y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toList()));
+    final public boolean hasPowerPrecise(final Position position, final UnitType unitType) {
+        return hasPowerPrecise(position.x, position.y, unitType);
     }
 
-    public boolean hasPower(final int tileX, final int tileY) {
+    final public boolean hasPower(final int tileX, final int tileY) {
         return hasPower(new TilePosition(tileX, tileY));
     }
 
-    public boolean hasPower(final int tileX, final int tileY, final UnitType unitType) {
+    final public boolean hasPower(final int tileX, final int tileY, final UnitType unitType) {
         return hasPower(new TilePosition(tileX, tileY), unitType);
     }
 
-    public boolean hasPower(final TilePosition position) {
+    final public boolean hasPower(final TilePosition position) {
         return hasPower(position.x, position.y, UnitType.None);
     }
 
-    public boolean hasPower(final TilePosition position, final UnitType unitType) {
+    final public boolean hasPower(final TilePosition position, final UnitType unitType) {
         if (unitType.id >= 0 && unitType.id < UnitType.None.id) {
             return hasPowerPrecise(position.x * 32 + unitType.tileWidth() * 16, position.y * 32 + unitType.tileHeight() * 16, unitType);
         }
         return hasPowerPrecise(position.x * 32, position.y * 32, UnitType.None);
     }
 
-    public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight) {
+    final public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight) {
         return hasPower(tileX, tileY, tileWidth, tileHeight, UnitType.Unknown);
     }
 
@@ -1050,23 +1041,23 @@ public class Game {
      * @param unitType Checks if the given UnitType will be powered if placed at the given tile position. If omitted, then only the immediate tile position is checked for power, and the function will assume that the location requires power for any unit type.
      * @return true if the type at the given tile position will receive power, false if the type will be unpowered at the given tile position.
      */
-    public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
+    final public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight, final UnitType unitType) {
         return hasPowerPrecise(tileX * 32 + tileWidth * 16, tileY * 32 + tileHeight * 16, unitType);
     }
 
-    public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight) {
+    final public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight) {
         return hasPower(position.x, position.y, tileWidth, tileHeight);
     }
 
-    public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType) {
+    final public boolean hasPower(final TilePosition position, final int tileWidth, final int tileHeight, final UnitType unitType) {
         return hasPower(position.x, position.y, tileWidth, tileHeight, unitType);
     }
 
-    public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
+    final public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder) {
         return canBuildHere(position, type, builder, false);
     }
 
-    public boolean canBuildHere(final TilePosition position, final UnitType type) {
+    final public boolean canBuildHere(final TilePosition position, final UnitType type) {
         return canBuildHere(position, type, null);
     }
 
@@ -1090,7 +1081,7 @@ public class Game {
      * @return true indicating that the structure can be placed at the given tile position, and
      * false if something may be obstructing the build location.
      */
-    public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
+    final public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
         // lt = left top, rb = right bottom
         final TilePosition lt = builder != null && type.isAddon() ?
                 position.add(new TilePosition(4, 1)) : // addon build offset
@@ -1205,7 +1196,7 @@ public class Game {
         return true;
     }
 
-    public boolean canMake(final UnitType type) {
+    final public boolean canMake(final UnitType type) {
         return canMake(type, null);
     }
 
@@ -1220,7 +1211,7 @@ public class Game {
      * only true if builder can make the type. Otherwise it will return false, indicating
      * that the unit type can not be made.
      */
-    public boolean canMake(final UnitType type, final Unit builder) {
+    final public boolean canMake(final UnitType type, final Unit builder) {
         final Player pSelf = self();
         // Error checking
         if (pSelf == null) {
@@ -1330,11 +1321,11 @@ public class Game {
                 (builder.getAddon() != null && builder.getAddon().getType() == addon);
     }
 
-    public boolean canResearch(final TechType type, final Unit unit) {
+    final public boolean canResearch(final TechType type, final Unit unit) {
         return canResearch(type, unit, true);
     }
 
-    public boolean canResearch(final TechType type) {
+    final public boolean canResearch(final TechType type) {
         return canResearch(type, null);
     }
 
@@ -1350,7 +1341,7 @@ public class Game {
      * only true if unit can research the type. Otherwise it will return false, indicating
      * that the technology can not be researched.
      */
-    public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
+    final public boolean canResearch(final TechType type, final Unit unit, final boolean checkCanIssueCommandType) {
         final Player self = self();
         // Error checking
         if (self == null) {
@@ -1394,11 +1385,11 @@ public class Game {
 
     }
 
-    public boolean canUpgrade(final UpgradeType type, final Unit unit) {
+    final public boolean canUpgrade(final UpgradeType type, final Unit unit) {
         return canUpgrade(type, unit, true);
     }
 
-    public boolean canUpgrade(final UpgradeType type) {
+    final public boolean canUpgrade(final UpgradeType type) {
         return canUpgrade(type, null);
     }
 
@@ -1414,7 +1405,7 @@ public class Game {
      * only true if unit can upgrade the type. Otherwise it will return false, indicating
      * that the upgrade can not be upgraded.
      */
-    public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
+    final public boolean canUpgrade(final UpgradeType type, final Unit unit, final boolean checkCanIssueCommandType) {
         final Player self = self();
         if (self == null) {
             return false;
@@ -1518,7 +1509,7 @@ public class Game {
      *
      * @return true if the client is in a game, and false if it is not.
      */
-    public boolean isInGame() {
+    final public boolean isInGame() {
         return gameData().isInGame();
     }
 
@@ -1528,7 +1519,7 @@ public class Game {
      * @return true if the client is in a multiplayer game, and false if it is a single player
      * game, a replay, or some other state.
      */
-    public boolean isMultiplayer() {
+    final public boolean isMultiplayer() {
         return multiplayer;
     }
 
@@ -1538,7 +1529,7 @@ public class Game {
      *
      * @return true if the client is in a multiplayer Battle.net game and false if it is not.
      */
-    public boolean isBattleNet() {
+    final public boolean isBattleNet() {
         return battleNet;
     }
 
@@ -1550,7 +1541,7 @@ public class Game {
      * @see #pauseGame
      * @see #resumeGame
      */
-    public boolean isPaused() {
+    final public boolean isPaused() {
         return gameData().isPaused();
     }
 
@@ -1559,7 +1550,7 @@ public class Game {
      *
      * @return true if the client is watching a replay and false otherwise
      */
-    public boolean isReplay() {
+    final public boolean isReplay() {
         return replay;
     }
 
@@ -1632,7 +1623,7 @@ public class Game {
      * @return true if any one of the units in the List<Unit> were capable of executing the
      * command, and false if none of the units were capable of executing the command.
      */
-    public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
+    final public boolean issueCommand(final Collection<Unit> units, final UnitCommand command) {
         return units.stream()
                 .map(u -> u.issueCommand(command))
                 .reduce(false, (a, b) -> a | b);
@@ -2156,7 +2147,7 @@ public class Game {
      *
      * @return true if the BWAPI module is a DEBUG build, and false if it is a RELEASE build.
      */
-    public boolean isDebug() {
+    final public boolean isDebug() {
         return debug;
     }
 
@@ -2166,7 +2157,7 @@ public class Game {
      * @return true if latency compensation is enabled, false if it is disabled.
      * @see #setLatCom
      */
-    public boolean isLatComEnabled() {
+    final public boolean isLatComEnabled() {
         return latcom;
     }
 
@@ -2235,7 +2226,7 @@ public class Game {
      *                      allied players have eliminated their opponents. Otherwise, the game will only end if
      *                      no other players are remaining in the game. This value is true by default.
      */
-    public boolean setAlliance(Player player, boolean allied, boolean alliedVictory) {
+    final public boolean setAlliance(Player player, boolean allied, boolean alliedVictory) {
         if (self() == null || isReplay() || player == null || player.equals(self())) {
             return false;
         }
@@ -2244,11 +2235,11 @@ public class Game {
         return true;
     }
 
-    public boolean setAlliance(Player player, boolean allied) {
+    final public boolean setAlliance(Player player, boolean allied) {
         return setAlliance(player, allied, true);
     }
 
-    public boolean setAlliance(Player player) {
+    final public boolean setAlliance(Player player) {
         return setAlliance(player, true);
     }
 
@@ -2264,7 +2255,7 @@ public class Game {
      *                of the target player will be shown, otherwise the target player will be hidden. This
      *                value is true by default.
      */
-    public boolean setVision(Player player, boolean enabled) {
+    final public boolean setVision(Player player, boolean enabled) {
         if (player == null) {
             return false;
         }
@@ -2329,7 +2320,7 @@ public class Game {
      * does not have permission from the tournament module, failed to find the map specified, or received an invalid
      * parameter.
      */
-    public boolean setMap(final String mapFileName) {
+    final public boolean setMap(final String mapFileName) {
         if (mapFileName == null || mapFileName.length() >= 260 || mapFileName.charAt(0) == 0) {
             return false;
         }
@@ -2344,7 +2335,7 @@ public class Game {
      * @param reveal The state of the reveal all flag. If false, all fog of war will be enabled. If true,
      *               then the fog of war will be revealed. It is true by default.
      */
-    public boolean setRevealAll(boolean reveal) {
+    final public boolean setRevealAll(boolean reveal) {
         if (!isReplay()) {
             return false;
         }
@@ -2352,7 +2343,7 @@ public class Game {
         return true;
     }
 
-    public boolean setRevealAll() {
+    final public boolean setRevealAll() {
         return setRevealAll(true);
     }
 
@@ -2372,7 +2363,7 @@ public class Game {
      * @return true if there is a path between the two positions, and false if there is not.
      * @see Unit#hasPath
      */
-    public boolean hasPath(final Position source, final Position destination) {
+    final public boolean hasPath(final Position source, final Position destination) {
         if (source == null || destination == null) {
             return false;
         }

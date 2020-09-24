@@ -17,7 +17,7 @@ public class BWClient {
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
         this.eventListener = eventListener;
-        this.timerResolutionThread = new TimerResolutionThread();
+        //this.timerResolutionThread = new TimerResolutionThread();
     }
 
     /**
@@ -81,7 +81,7 @@ public class BWClient {
 
         // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
         // If BWAPI doesn't get priority, it may not detect completion of a frame on our end in timely fashion.
-        Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+        Thread.currentThread().setPriority(4);
 
         if (client == null) {
             client = new Client(configuration);
