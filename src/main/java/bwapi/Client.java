@@ -45,15 +45,14 @@ class Client {
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
 
     private ClientData clientData;
+    private BWClient bwClient;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
     private ByteBuffer gameTableFileHandle = null;
     private ByteBuffer mapFileHandle = null;
 
-    private BWClientConfiguration configuration = new BWClientConfiguration();
-
-    Client(BWClientConfiguration configuration) {
-        this.configuration = configuration;
+    Client(BWClient bwClient) {
+        this.bwClient = bwClient;
     }
 
     /**
@@ -83,7 +82,7 @@ class Client {
     }
 
     private void disconnect() {
-        if (configuration.debugConnection) {
+        if (bwClient.getConfiguration().debugConnection) {
             System.err.print("Disconnect called by: ");
             System.err.println(Thread.currentThread().getStackTrace()[2]);
         }
@@ -134,7 +133,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map Game table.");
-            if (configuration.debugConnection) {
+            if (bwClient.getConfiguration().debugConnection) {
                 e.printStackTrace();
             }
             return false;
@@ -168,7 +167,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
-            if (configuration.debugConnection) {
+            if (bwClient.getConfiguration().debugConnection) {
                 e.printStackTrace();
             }
             gameTableFileHandle = null;
@@ -184,7 +183,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
-            if (configuration.debugConnection) {
+            if (bwClient.getConfiguration().debugConnection) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -197,7 +196,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
-            if (configuration.debugConnection) {
+            if (bwClient.getConfiguration().debugConnection) {
                 e.printStackTrace();
             }
             return false;
@@ -218,7 +217,7 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
-                if (configuration.debugConnection) {
+                if (bwClient.getConfiguration().debugConnection) {
                     e.printStackTrace();
                 }
                 disconnect();
@@ -232,18 +231,21 @@ class Client {
     }
 
     void update() {
+        // Indicate that we are done with the current frame
         byte code = 1;
         try {
             pipeObjectHandle.writeByte(code);
+            bwClient.getPerformanceMetrics().endToEndFrameDuration.stopTiming();
         }
         catch (Exception e) {
             System.err.println("failed, disconnecting");
-            if (configuration.debugConnection) {
+            if (bwClient.getConfiguration().debugConnection) {
                 e.printStackTrace();
             }
             disconnect();
             return;
         }
+        // Wait for BWAPI to indicate that a new frame is ready
         while (code != 2) {
             try {
                 code = pipeObjectHandle.readByte();
@@ -257,7 +259,7 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("failed, disconnecting");
-                if (configuration.debugConnection) {
+                if (bwClient.getConfiguration().debugConnection) {
                     e.printStackTrace();
                 }
                 disconnect();

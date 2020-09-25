@@ -6,11 +6,20 @@ package bwapi;
 public class PerformanceMetrics {
 
     /**
-     * Total duration of the frame from JBWAPI's perspective.
-     * Likely to be at least a little bit of an undercount,
+     * Total duration of the frame from JBWAPI's perspective,
+     * exclusive of time modifying shared memory to indicate frame completion.
+     * Likely to be at least a little bit of an undercount from the perspective of BWAPI,
      * given that the tournament module is timing a superset of JBWAPI's execution time.
      */
-    PerformanceMetric totalFrameDuration;
+    PerformanceMetric jbwapiFrameDuration;
+
+    /**
+     * Total duration of the frame from JBWAPI's perspective,
+     * inclusive of time modifying shared memory to indicate frame completion.
+     * Likely to be at least a little bit of an undercount from the perspective of BWAPI,
+     * given that the tournament module is timing a superset of JBWAPI's execution time.
+     */
+    PerformanceMetric endToEndFrameDuration;
 
     /**
      * Time spent copying game data from system pipe shared memory to a frame buffer.
@@ -92,7 +101,8 @@ public class PerformanceMetrics {
     }
 
     public void reset() {
-        totalFrameDuration = new PerformanceMetric("JBWAPI frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        jbwapiFrameDuration = new PerformanceMetric("JBWAPI frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        endToEndFrameDuration = new PerformanceMetric("End-to-end frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5, 10, 15, 20, 25, 30);
         intentionallyBlocking = new PerformanceMetric("Blocking with full buffer", 0);
         frameBufferSize = new PerformanceMetric("Frames buffered", 0, 1);
@@ -111,7 +121,8 @@ public class PerformanceMetrics {
     @Override
     public String toString() {
         return "Performance metrics:"
-            + "\n" + totalFrameDuration.toString()
+            + "\n" + jbwapiFrameDuration.toString()
+            + "\n" + endToEndFrameDuration.toString()
             + "\n" + copyingToBuffer.toString()
             + "\n" + intentionallyBlocking.toString()
             + "\n" + frameBufferSize.toString()

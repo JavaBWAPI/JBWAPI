@@ -8,6 +8,7 @@ import java.util.Objects;
  * Client class to connect to the game with.
  */
 public class BWClient {
+    private BWClientConfiguration configuration = new BWClientConfiguration();
     private final BWEventListener eventListener;
     private BotWrapper botWrapper;
     private Client client;
@@ -33,6 +34,13 @@ public class BWClient {
      */
     public PerformanceMetrics getPerformanceMetrics() {
         return performanceMetrics;
+    }
+
+    /**
+     * @return The current configuration
+     */
+    public BWClientConfiguration getConfiguration() {
+        return configuration;
     }
 
     /**
@@ -73,10 +81,12 @@ public class BWClient {
     /**
      * Start the game.
      *
-     * @param configuration Settings for playing games with this client.
+     * @param gameConfiguration Settings for playing games with this client.
      */
-    public void startGame(BWClientConfiguration configuration) {
-        configuration.validate();
+    public void startGame(BWClientConfiguration gameConfiguration) {
+        gameConfiguration.validate();
+        this.configuration = gameConfiguration;
+        this.performanceMetrics = new PerformanceMetrics(configuration);
         botWrapper = new BotWrapper(configuration, eventListener);
 
         // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
@@ -87,7 +97,7 @@ public class BWClient {
         }
 
         if (client == null) {
-            client = new Client(configuration);
+            client = new Client(this);
         }
         client.reconnect();
 
@@ -107,7 +117,8 @@ public class BWClient {
                 boolean timeFrame = liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero;
 
                 long ticksBefore = Kernel32.INSTANCE.GetTickCount();
-                performanceMetrics.totalFrameDuration.timeIf(
+                performanceMetrics.endToEndFrameDuration.startTiming();
+                performanceMetrics.jbwapiFrameDuration.timeIf(
                     timeFrame,
                     () -> {
                         botWrapper.onFrame();
@@ -116,7 +127,7 @@ public class BWClient {
                 long ticksAfter = Kernel32.INSTANCE.GetTickCount();
                 if (timeFrame) {
                     long deltaTicks = ticksAfter - ticksBefore;
-                    long deltaMillis = (long) performanceMetrics.totalFrameDuration.runningTotal.last;
+                    long deltaMillis = (long) performanceMetrics.jbwapiFrameDuration.runningTotal.last;
                     long delta = deltaMillis - deltaTicks;
                     if (Math.abs(delta) > 1000) {
                         System.out.println("Got weird tick delta: " + ticksAfter + ", " + ticksBefore + ", " + deltaTicks + ", " + deltaMillis + ", " + delta);
