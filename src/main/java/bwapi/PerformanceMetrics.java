@@ -26,8 +26,22 @@ public class PerformanceMetrics {
     /**
      * Duration of a frame cycle originating at
      * the time when JBWAPI observes a new frame in shared memory.
+     * Uses GetTickCount() instead of System.nanoRime()
+     */
+    PerformanceMetric frameDurationReceiveToSentGTC;
+
+    /**
+     * Duration of a frame cycle originating at
+     * the time when JBWAPI observes a new frame in shared memory.
      */
     PerformanceMetric frameDurationReceiveToReceive;
+
+    /**
+     * Duration of a frame cycle originating at
+     * the time when JBWAPI observes a new frame in shared memory.
+     * Uses GetTickCount() instead of System.nanoRime()
+     */
+    PerformanceMetric frameDurationReceiveToReceiveGTC;
 
     /**
      * Time spent copying game data from system pipe shared memory to a frame buffer.
@@ -110,6 +124,31 @@ public class PerformanceMetrics {
      */
     PerformanceMetric negativeTimeDelta;
 
+    /**
+     * The number of events sent by BWAPI each frame.
+     * Might help diagnosing issues related to https://github.com/bwapi/bwapi/issues/860 and https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
+     */
+    PerformanceMetric numberOfEvents;
+
+    /**
+     * The number of events sent by BWAPI each frame,
+     * multiplied by the duration of time spent on that frame (receive-to-sent).
+     * Might help diagnosing issues related to:
+     * - https://github.com/bwapi/bwapi/issues/860
+     * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
+     */
+    PerformanceMetric numberOfEventsTimesDurationReceiveToSent;
+
+    /**
+     * The number of events sent by BWAPI each frame,
+     * multiplied by the duration of time spent on that frame (receive-to-sent),
+     * and using GetTickCount() instead of System.nanoTime().
+     * Might help diagnosing issues related to:
+     * - https://github.com/bwapi/bwapi/issues/860
+     * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
+     */
+    PerformanceMetric numberOfEventsTimesDurationReceiveToSentGTC;
+
     private BWClientConfiguration configuration;
     private ArrayList<PerformanceMetric> performanceMetrics = new ArrayList<>();
 
@@ -120,9 +159,11 @@ public class PerformanceMetrics {
 
     public void reset() {
         performanceMetrics.clear();
-        frameDurationReceiveToSend = new PerformanceMetric(this, "Frame duration: Receiving 'frame ready' -> before sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        frameDurationReceiveToSent = new PerformanceMetric(this, "Frame duration: Receiving 'frame ready' -> after sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        frameDurationReceiveToReceive = new PerformanceMetric(this, "Frame duration: From BWAPI receive to BWAPI receive", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToSend = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> before sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToSent = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> after sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToSentGTC = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> after sending 'frame done' (Using GetTickCount())", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85).useGetTickCount();
+        frameDurationReceiveToReceive = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> receiving next 'frame ready'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToReceiveGTC = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> receiving next 'frame ready' (Using GetTickCount())", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85).useGetTickCount();
         communicationSendToReceive = new PerformanceMetric(this, "BWAPI duration: Before sending 'frame done' -> After receiving 'frame ready'", 1, 3, 5, 10, 15, 20, 30);
         communicationSendToSent = new PerformanceMetric(this, "BWAPI duration: Before sending 'frame done' -> After sending 'frame done'", 1, 3, 5, 10, 15, 20, 30);
         communicationListenToReceive = new PerformanceMetric(this, "BWAPI duration: Before listening for 'frame ready' -> After receiving 'frame ready'", 1, 3, 5, 10, 15, 20, 30);
@@ -137,6 +178,9 @@ public class PerformanceMetrics {
         excessSleep = new PerformanceMetric(this, "Excess duration of client sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         positiveTimeDelta = new PerformanceMetric(this, "Positive timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         negativeTimeDelta = new PerformanceMetric(this, "Negative timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        numberOfEvents = new PerformanceMetric(this, "Number of events received from BWAPI", 1, 2, 3, 4, 5, 6, 8, 10, 15, 20);
+        numberOfEventsTimesDurationReceiveToSent = new PerformanceMetric(this, "Number of events received from BWAPI, multiplied by the receive-to-sent duration of that frame", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        numberOfEventsTimesDurationReceiveToSentGTC = new PerformanceMetric(this, "Number of events received from BWAPI, multiplied by the receive-to-sent duration of that frame (Using GetTickCount())", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
     }
 
     void addMetric(PerformanceMetric performanceMetric) {
@@ -154,3 +198,4 @@ public class PerformanceMetrics {
         return outputBuilder.toString();
     }
 }
+

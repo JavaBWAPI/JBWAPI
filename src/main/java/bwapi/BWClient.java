@@ -114,7 +114,7 @@ public class BWClient {
                 if (!client.isConnected()) {
                     return;
                 }
-                client.update();
+                client.sendFrameReceiveFrame();
                 if (liveGameData.isInGame()) {
                     performanceMetrics = new PerformanceMetrics(configuration);
                     botWrapper.startNewGame(client.mapFile(), performanceMetrics);
@@ -140,7 +140,7 @@ public class BWClient {
                     }
                 }
 
-                client.update();
+                client.sendFrameReceiveFrame();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();
