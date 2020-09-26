@@ -130,9 +130,7 @@ public class PerformanceMetric {
                     + formatter.format(runningTotal.min)
                     + " - "
                     + formatter.format(runningTotal.max)
-                    + "] over "
-                    + runningTotal.samples
-                    + " samples. ";
+                    + "]";
         for (Threshold threshold : thresholds) {
             output += threshold.toString();
         }
