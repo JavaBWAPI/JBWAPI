@@ -42,17 +42,18 @@ public class PerformanceMetric {
     }
 
     private final String name;
-    public int interrupted = 0;
     private long timeStarted = 0;
+    public int interrupted = 0;
 
     RunningTotal runningTotal = new RunningTotal();
     private ArrayList<Threshold> thresholds = new ArrayList<>();
 
-    PerformanceMetric(String name, double... thresholds) {
+    PerformanceMetric(PerformanceMetrics metrics, String name, double... thresholds) {
         this.name = name;
         for (double threshold : thresholds) {
             this.thresholds.add(new Threshold(threshold));
         }
+        metrics.addMetric(this);
     }
 
     /**
@@ -121,7 +122,7 @@ public class PerformanceMetric {
         }
         DecimalFormat formatter = new DecimalFormat("###,###.#");
         String output = name
-                + ": "
+                + ":\n"
                 + formatter.format(runningTotal.samples)
                     + " samples averaging "
                     + formatter.format(runningTotal.mean)

@@ -1,25 +1,33 @@
 package bwapi;
 
+import java.util.ArrayList;
+
 /**
  * Collects various performance metrics.
  */
 public class PerformanceMetrics {
 
     /**
-     * Total duration of the frame from JBWAPI's perspective,
-     * exclusive of time modifying shared memory to indicate frame completion.
-     * Likely to be at least a little bit of an undercount from the perspective of BWAPI,
-     * given that the tournament module is timing a superset of JBWAPI's execution time.
+     * Duration of the frame cycle steps measured by BWAPI,
+     * from receiving a frame to BWAPI
+     * to sending commands back
+     * *exclusive* of the time spent sending commands back.
      */
-    PerformanceMetric jbwapiFrameDuration;
+    PerformanceMetric frameDurationReceiveToSend;
 
     /**
-     * Total duration of the frame from JBWAPI's perspective,
-     * inclusive of time modifying shared memory to indicate frame completion.
-     * Likely to be at least a little bit of an undercount from the perspective of BWAPI,
-     * given that the tournament module is timing a superset of JBWAPI's execution time.
+     * Duration of the frame cycle steps measured by BWAPI,
+     * from receiving a frame to BWAPI
+     * to sending commands back
+     * *inclusive* of the time spent sending commands back.
      */
-    PerformanceMetric endToEndFrameDuration;
+    PerformanceMetric frameDurationReceiveToSent;
+
+    /**
+     * Duration of a frame cycle originating at
+     * the time when JBWAPI observes a new frame in shared memory.
+     */
+    PerformanceMetric frameDurationReceiveToReceive;
 
     /**
      * Time spent copying game data from system pipe shared memory to a frame buffer.
@@ -56,9 +64,23 @@ public class PerformanceMetrics {
     PerformanceMetric botResponse;
 
     /**
-     * Time spent waiting for a response from BWAPI; is likely reflective of the performance of any opponent bots.
+     * Time spent waiting for a response from BWAPI,
+     * inclusive of the time spent sending the signal to BWAPI
+     * and the time spent waiting for and receiving it.
      */
-    PerformanceMetric bwapiResponse;
+    PerformanceMetric communicationSendToReceive;
+
+    /**
+     * Time spent sending the "frame complete" signal to BWAPI.
+     * Significant durations would indicate something blocking writes to shared memory.
+     */
+    PerformanceMetric communicationSendToSent;
+
+    /**
+     * Time spent waiting for a "frame ready" signal from BWAPI.
+     * This time likely additional response time spent by other bots and StarCraft itself.
+     */
+    PerformanceMetric communicationListenToReceive;
 
     /**
      * Time bot spends idle.
@@ -79,21 +101,17 @@ public class PerformanceMetrics {
     PerformanceMetric excessSleep;
 
     /**
-     * Instances of System.nanoTime() measuring a longer frame duration with respect to WinAPI's GetTickCount.
+     * Instances of System.nanoTime() measuring a longer frame duration with respect to WinAPI's GetTickCount  which BWAPI uses up to 4.4.
      */
     PerformanceMetric positiveTimeDelta;
 
     /**
-     * Instances of System.nanoTime() measuring a shorter frame duration with respect to WinAPI's GetTickCount.
+     * Instances of System.nanoTime() measuring a shorter frame duration with respect to WinAPI's GetTickCount which BWAPI uses up to 4.4.
      */
     PerformanceMetric negativeTimeDelta;
 
-    /**
-     * When Kernel32.INSTANCE.GetTickCount() returns at least one inexplicable value
-     */
-    PerformanceMetric weirdTimeDelta;
-
     private BWClientConfiguration configuration;
+    private ArrayList<PerformanceMetric> performanceMetrics = new ArrayList<>();
 
     PerformanceMetrics(BWClientConfiguration configuration) {
         this.configuration = configuration;
@@ -101,40 +119,38 @@ public class PerformanceMetrics {
     }
 
     public void reset() {
-        jbwapiFrameDuration = new PerformanceMetric("JBWAPI frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        endToEndFrameDuration = new PerformanceMetric("End-to-end frame duration", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        copyingToBuffer = new PerformanceMetric("Time copying to buffer", 5, 10, 15, 20, 25, 30);
-        intentionallyBlocking = new PerformanceMetric("Blocking with full buffer", 0);
-        frameBufferSize = new PerformanceMetric("Frames buffered", 0, 1);
-        framesBehind = new PerformanceMetric("Frames behind real-time", 0, 1);
-        flushSideEffects = new PerformanceMetric("Flushing side effects", 1, 3, 5);
-        botResponse = new PerformanceMetric("Bot event handlers", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        bwapiResponse = new PerformanceMetric("Responses from BWAPI", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        botIdle = new PerformanceMetric("Bot idle", Long.MAX_VALUE);
-        clientIdle = new PerformanceMetric("Client idling", configuration.maxFrameDurationMs);
-        excessSleep = new PerformanceMetric("Excess sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        positiveTimeDelta = new PerformanceMetric("Positive timer delta", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        negativeTimeDelta = new PerformanceMetric("Negative timer delta", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        weirdTimeDelta = new PerformanceMetric("Weird timer delta");
+        performanceMetrics.clear();
+        frameDurationReceiveToSend = new PerformanceMetric(this, "Frame duration: Receiving 'frame ready' -> before sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToSent = new PerformanceMetric(this, "Frame duration: Receiving 'frame ready' -> after sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        frameDurationReceiveToReceive = new PerformanceMetric(this, "Frame duration: From BWAPI receive to BWAPI receive", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        communicationSendToReceive = new PerformanceMetric(this, "BWAPI duration: Before sending 'frame done' -> After receiving 'frame ready'", 1, 3, 5, 10, 15, 20, 30);
+        communicationSendToSent = new PerformanceMetric(this, "BWAPI duration: Before sending 'frame done' -> After sending 'frame done'", 1, 3, 5, 10, 15, 20, 30);
+        communicationListenToReceive = new PerformanceMetric(this, "BWAPI duration: Before listening for 'frame ready' -> After receiving 'frame ready'", 1, 3, 5, 10, 15, 20, 30);
+        copyingToBuffer = new PerformanceMetric(this, "Copying frame to buffer", 5, 10, 15, 20, 25, 30);
+        intentionallyBlocking = new PerformanceMetric(this, "Time holding frame until buffer frees capacity", 0);
+        frameBufferSize = new PerformanceMetric(this, "Frames already buffered when enqueuing a new frame", 0, 1);
+        framesBehind = new PerformanceMetric(this, "Frames behind real-time when handling events", 0, 1);
+        flushSideEffects = new PerformanceMetric(this, "Time flushing side effects", 1, 3, 5);
+        botResponse = new PerformanceMetric(this, "Duration of bot event handlers", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        botIdle = new PerformanceMetric(this, "Time bot spent idle", Long.MAX_VALUE);
+        clientIdle = new PerformanceMetric(this, "Time client spent waiting for bot", configuration.maxFrameDurationMs);
+        excessSleep = new PerformanceMetric(this, "Excess duration of client sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        positiveTimeDelta = new PerformanceMetric(this, "Positive timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+        negativeTimeDelta = new PerformanceMetric(this, "Negative timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
+    }
+
+    void addMetric(PerformanceMetric performanceMetric) {
+        performanceMetrics.add(performanceMetric);
     }
 
     @Override
     public String toString() {
-        return "Performance metrics:"
-            + "\n" + jbwapiFrameDuration.toString()
-            + "\n" + endToEndFrameDuration.toString()
-            + "\n" + copyingToBuffer.toString()
-            + "\n" + intentionallyBlocking.toString()
-            + "\n" + frameBufferSize.toString()
-            + "\n" + framesBehind.toString()
-            + "\n" + flushSideEffects.toString()
-            + "\n" + botResponse.toString()
-            + "\n" + bwapiResponse.toString()
-            + "\n" + botIdle.toString()
-            + "\n" + clientIdle.toString()
-            + "\n" + excessSleep.toString()
-            + "\n" + positiveTimeDelta.toString()
-            + "\n" + negativeTimeDelta.toString()
-            + "\n" + weirdTimeDelta.toString();
+        StringBuilder outputBuilder = new StringBuilder();
+        outputBuilder.append("Performance metrics:");
+        performanceMetrics.forEach(metric -> {
+            outputBuilder.append("\n");
+            outputBuilder.append(metric.toString());
+        });
+        return outputBuilder.toString();
     }
 }

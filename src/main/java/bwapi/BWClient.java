@@ -44,6 +44,13 @@ public class BWClient {
     }
 
     /**
+     * @return Whether the current frame should be subject to timing.
+     */
+    boolean doTime() {
+        return ! configuration.unlimitedFrameZero || (client.isConnected() && client.clientData().gameData().getFrameCount() > 0);
+    }
+
+    /**
      * @return The number of frames between the one exposed to the bot and the most recent received by JBWAPI.
      * This tracks the size of the frame buffer except when the game is paused (which results in multiple frames arriving with the same count).
      */
@@ -114,32 +121,26 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                boolean timeFrame = liveGameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero;
-
                 long ticksBefore = Kernel32.INSTANCE.GetTickCount();
-                performanceMetrics.endToEndFrameDuration.startTiming();
-                performanceMetrics.jbwapiFrameDuration.timeIf(
-                    timeFrame,
-                    () -> {
-                        botWrapper.onFrame();
-                        performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
-                    });
+
+                botWrapper.onFrame();
+                performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
+                performanceMetrics.frameDurationReceiveToSend.stopTiming();
                 long ticksAfter = Kernel32.INSTANCE.GetTickCount();
-                if (timeFrame) {
+
+                // Measure differential between JVM timer and WinAPI's GetTickCount, used by BWAPI 4.4 and below
+                if (doTime()) {
                     long deltaTicks = ticksAfter - ticksBefore;
-                    long deltaMillis = (long) performanceMetrics.jbwapiFrameDuration.runningTotal.last;
+                    long deltaMillis = (long) performanceMetrics.frameDurationReceiveToSend.runningTotal.last;
                     long delta = deltaMillis - deltaTicks;
-                    if (Math.abs(delta) > 1000) {
-                        System.out.println("Got weird tick delta: " + ticksAfter + ", " + ticksBefore + ", " + deltaTicks + ", " + deltaMillis + ", " + delta);
-                        performanceMetrics.weirdTimeDelta.record(1);
-                    } else if (delta > 0) {
+                    if (delta > 0) {
                         performanceMetrics.positiveTimeDelta.record(delta);
                     } else if (delta < 0) {
                         performanceMetrics.negativeTimeDelta.record(-delta);
                     }
                 }
 
-                performanceMetrics.bwapiResponse.time(client::update);
+                client.update();
                 if (!client.isConnected()) {
                     System.out.println("Reconnecting...");
                     client.reconnect();
