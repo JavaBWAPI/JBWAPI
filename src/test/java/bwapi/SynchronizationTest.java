@@ -284,4 +284,18 @@ public class SynchronizationTest {
         });
         environment.runGame(3);
     }
+
+    @Test
+    public void async_DisablesLatencyCompensation() {
+        SynchronizationEnvironment environmentSync = new SynchronizationEnvironment();
+        environmentSync.configuration.withAsync(false);
+        environmentSync.onFrame(1, () -> { assertTrue(environmentSync.bwClient.getGame().isLatComEnabled()); });
+        environmentSync.runGame(2);
+
+        SynchronizationEnvironment environmentAsync = new SynchronizationEnvironment();
+        environmentAsync.configuration.withAsync(true).withAsyncFrameBufferCapacity(2);
+        environmentAsync.onFrame(1, () -> { assertFalse(environmentAsync.bwClient.getGame().isLatComEnabled()); });
+        environmentAsync.onFrame(2, () -> { assertThrows(IllegalStateException.class, () -> environmentAsync.bwClient.getGame().setLatCom(true)); });
+        environmentAsync.runGame(3);
+    }
 }

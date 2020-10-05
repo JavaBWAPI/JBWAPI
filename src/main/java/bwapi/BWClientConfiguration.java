@@ -75,6 +75,8 @@ public class BWClientConfiguration {
      * returns control to StarCraft, allowing the game to proceed while the bot continues to step in the background. This increases the likelihood of meeting
      * real-time performance requirements, while not fully guaranteeing it (subject to the whims of the JVM thread scheduler), at a cost of the bot possibly
      * issuing commands later than intended, and a marginally larger memory footprint.
+     *
+     * Asynchronous mode is not compatible with latency compensation. Enabling asynchronous mode automatically disables latency compensation.
      */
     public BWClientConfiguration withAsync(boolean value) {
         throwIfLocked();

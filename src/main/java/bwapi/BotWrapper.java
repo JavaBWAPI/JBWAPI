@@ -36,6 +36,7 @@ class BotWrapper {
         }
         this.performanceMetrics = performanceMetrics;
         botGame = new Game();
+        botGame.setConfiguration(configuration);
         botGame.botClientData().setBuffer(liveData);
         liveClientData.setBuffer(liveData);
         this.liveData = liveData;

@@ -95,12 +95,17 @@ public final class Game {
     // USER DEFINED
 
     private Text.Size textSize = Text.Size.Default;
+    private BWClientConfiguration configuration = new BWClientConfiguration();
     private boolean latcom = true;
 
     final SideEffectQueue sideEffects = new SideEffectQueue();
 
     Game() {
         clientData = new ClientData();
+    }
+
+    void setConfiguration(BWClientConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     ClientData botClientData() {
@@ -270,7 +275,7 @@ public final class Game {
             observers = playerSet.stream().filter(p -> !p.equals(self()) && p.isObserver())
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
-        setLatCom(true);
+        setLatCom(!configuration.getAsync());
     }
 
     void unitCreate(final int id) {
@@ -2171,6 +2176,9 @@ public final class Game {
      * @see #isLatComEnabled
      */
     public void setLatCom(final boolean isEnabled) {
+        if (isEnabled && configuration.getAsync()) {
+            throw new IllegalStateException("Latency compensation is not compatible with JBWAPI asynchronous mode.");
+        }
         //update shared memory
         gameData().setHasLatCom(isEnabled);
         //update internal memory
@@ -2654,35 +2662,49 @@ public final class Game {
      * Convenience method for adding a unit command from raw arguments.
      */
     void addUnitCommand(final int type, final int unit, final int target, final int x, final int y, final int extra) {
-        sideEffects.enqueue(SideEffect.addUnitCommand(type, unit, target, x, y, extra));
+        enqueueOrDo(SideEffect.addUnitCommand(type, unit, target, x, y, extra));
     }
 
     /**
      * Convenience method for adding a game command from raw arguments.
      */
     void addCommand(final CommandType type, final int value1, final int value2) {
-        sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
+        enqueueOrDo(SideEffect.addCommand(type, value1, value2));
     }
 
     /**
      * Convenience method for adding a game command from raw arguments.
      */
     void addCommand(final CommandType type, final String value1, final int value2) {
-        sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
+        enqueueOrDo(SideEffect.addCommand(type, value1, value2));
     }
 
     /**
      * Convenience method for adding a shape from raw arguments.
      */
     void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final int extra1, final int extra2, final int color, final boolean isSolid) {
-        sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
+        enqueueOrDo(SideEffect.addShape(type, coordType, x1, y1, x2, y2, extra1, extra2, color, isSolid));
     }
 
     /**
      * Convenience method for adding a shape from raw arguments.
      */
     void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final String text, final int extra2, final int color, final boolean isSolid) {
-        sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, text, extra2, color, isSolid));
+        enqueueOrDo(SideEffect.addShape(type, coordType, x1, y1, x2, y2, text, extra2, color, isSolid));
+    }
+
+    /**
+     * Applies a side effect, either immediately (if operating synchronously)
+     * or by enqueuing it for later execution (if operating asynchronously).
+     *
+     * @param sideEffect
+     */
+    void enqueueOrDo(SideEffect sideEffect) {
+        if (configuration.getAsync()) {
+            sideEffects.enqueue(sideEffect);
+        } else {
+            sideEffect.apply(gameData());
+        }
     }
 
     void setAllUnits(List<Unit> units) {
