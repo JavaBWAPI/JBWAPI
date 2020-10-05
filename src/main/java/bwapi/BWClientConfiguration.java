@@ -13,7 +13,7 @@ public class BWClientConfiguration {
         debugConnection = value;
         return this;
     }
-    boolean getDebugConnection() {
+    public boolean getDebugConnection() {
         return debugConnection;
     }
     private boolean debugConnection;
@@ -26,7 +26,7 @@ public class BWClientConfiguration {
         autoContinue = value;
         return this;
     }
-    boolean getAutoContinue() {
+    public boolean getAutoContinue() {
         return autoContinue;
     }
     private boolean autoContinue = false;
@@ -44,7 +44,7 @@ public class BWClientConfiguration {
         unlimitedFrameZero = value;
         return this;
     }
-    boolean getUnlimitedFrameZero() {
+    public boolean getUnlimitedFrameZero() {
         return unlimitedFrameZero;
     }
     private boolean unlimitedFrameZero = true;
@@ -60,7 +60,7 @@ public class BWClientConfiguration {
         maxFrameDurationMs = value;
         return this;
     }
-    int getMaxFrameDurationMs() {
+    public int getMaxFrameDurationMs() {
         return maxFrameDurationMs;
     }
     private int maxFrameDurationMs = 40;
@@ -83,7 +83,7 @@ public class BWClientConfiguration {
         async = value;
         return this;
     }
-    boolean getAsync() {
+    public boolean getAsync() {
         return async;
     }
     private boolean async = false;
@@ -97,7 +97,7 @@ public class BWClientConfiguration {
         asyncFrameBufferCapacity = size;
         return this;
     }
-    int getAsyncFrameBufferCapacity() {
+    public int getAsyncFrameBufferCapacity() {
         return asyncFrameBufferCapacity;
     }
     private int asyncFrameBufferCapacity = 10;
@@ -114,7 +114,7 @@ public class BWClientConfiguration {
         asyncUnsafe = value;
         return this;
     }
-    boolean getAsyncUnsafe() {
+    public boolean getAsyncUnsafe() {
         return asyncUnsafe;
     }
     private boolean asyncUnsafe = false;
@@ -127,7 +127,7 @@ public class BWClientConfiguration {
         logVerbosely = value;
         return this;
     }
-    boolean getLogVerbosely() {
+    public boolean getLogVerbosely() {
         return logVerbosely;
     }
     private boolean logVerbosely = false;
