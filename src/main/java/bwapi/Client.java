@@ -234,10 +234,10 @@ class Client {
         final PerformanceMetrics metrics = bwClient.getPerformanceMetrics();
 
         // Tell BWAPI that we are done with the current frame
-        metrics.frameDurationReceiveToSend.stopTiming();
+        metrics.getFrameDurationReceiveToSend().stopTiming();
         if (bwClient.doTime()) {
-            metrics.communicationSendToReceive.startTiming();
-            metrics.communicationSendToSent.startTiming();
+            metrics.getCommunicationSendToReceive().startTiming();
+            metrics.getCommunicationSendToSent().startTiming();
         }
         try {
             // 1 is the "frame done" signal to BWAPI
@@ -251,19 +251,19 @@ class Client {
             disconnect();
             return;
         }
-        metrics.communicationSendToSent.stopTiming();
-        metrics.frameDurationReceiveToSent.stopTiming();
-        metrics.frameDurationReceiveToSentGTC.stopTiming();
+        metrics.getCommunicationSendToSent().stopTiming();
+        metrics.getFrameDurationReceiveToSent().stopTiming();
+        metrics.getFrameDurationReceiveToSentGTC().stopTiming();
         if (bwClient.doTime()) {
             final int eventCount = clientData.gameData().getEventCount();
-            metrics.numberOfEvents.record(eventCount);
-            metrics.numberOfEventsTimesDurationReceiveToSent.record(eventCount * metrics.frameDurationReceiveToSent.runningTotal.last);
-            metrics.numberOfEventsTimesDurationReceiveToSentGTC.record(eventCount * metrics.frameDurationReceiveToSentGTC.runningTotal.last);
+            metrics.getNumberOfEvents().record(eventCount);
+            metrics.getNumberOfEventsTimesDurationReceiveToSent().record(eventCount * metrics.getFrameDurationReceiveToSent().getRunningTotal().getLast());
+            metrics.getNumberOfEventsTimesDurationReceiveToSentGTC().record(eventCount * metrics.getFrameDurationReceiveToSentGTC().getRunningTotal().getLast());
         }
 
         // Listen for BWAPI to indicate that a new frame is ready
         if (bwClient.doTime()) {
-            metrics.communicationListenToReceive.startTiming();
+            metrics.getCommunicationListenToReceive().startTiming();
         }
         boolean frameReady = false;
         while (!frameReady) {
@@ -279,19 +279,19 @@ class Client {
                 break;
             }
         }
-        metrics.communicationListenToReceive.stopTiming();
-        metrics.communicationSendToReceive.stopTiming();
+        metrics.getCommunicationListenToReceive().stopTiming();
+        metrics.getCommunicationSendToReceive().stopTiming();
 
         if (bwClient.doTime()) {
-            metrics.frameDurationReceiveToSend.startTiming();
-            metrics.frameDurationReceiveToSent.startTiming();
-            metrics.frameDurationReceiveToSentGTC.startTiming();
+            metrics.getFrameDurationReceiveToSend().startTiming();
+            metrics.getFrameDurationReceiveToSent().startTiming();
+            metrics.getFrameDurationReceiveToSentGTC().startTiming();
         }
-        metrics.frameDurationReceiveToReceive.stopTiming();
-        metrics.frameDurationReceiveToReceiveGTC.stopTiming();
+        metrics.getFrameDurationReceiveToReceive().stopTiming();
+        metrics.getFrameDurationReceiveToReceiveGTC().stopTiming();
         if (bwClient.doTime()) {
-            metrics.frameDurationReceiveToReceive.startTiming();
-            metrics.frameDurationReceiveToReceiveGTC.startTiming();
+            metrics.getFrameDurationReceiveToReceive().startTiming();
+            metrics.getFrameDurationReceiveToReceiveGTC().startTiming();
         }
     }
 

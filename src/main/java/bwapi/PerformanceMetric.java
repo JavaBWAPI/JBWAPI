@@ -9,18 +9,33 @@ import java.util.ArrayList;
  * Aggregates labeled time series data.
  */
 public class PerformanceMetric {
-    class RunningTotal {
-        int samples = 0;
-        double last = 0d;
-        double mean = 0d;
-        double min = Long.MAX_VALUE;
-        double max = Long.MIN_VALUE;
+    public class RunningTotal {
+        private int samples = 0;
+        private double last = 0d;
+        private double mean = 0d;
+        private double min = Long.MAX_VALUE;
+        private double max = Long.MIN_VALUE;
         void record(double value) {
             last = value;
             min = Math.min(min, value);
             max = Math.max(max, value);
             mean = (mean * samples + value) / (samples + 1d);
             ++samples;
+        }
+        public double getSamples() {
+            return samples;
+        }
+        public double getLast() {
+            return last;
+        }
+        public double getMean() {
+            return mean;
+        }
+        public double getMin() {
+            return min;
+        }
+        public double getMax() {
+            return max;
         }
     }
     class Threshold {
@@ -45,10 +60,10 @@ public class PerformanceMetric {
 
     private final String name;
     private long timeStarted = 0;
-    public int interrupted = 0;
+    private int interrupted = 0;
     private boolean usingGetTickCount = false;
 
-    RunningTotal runningTotal = new RunningTotal();
+    private final RunningTotal runningTotal = new RunningTotal();
     private ArrayList<Threshold> thresholds = new ArrayList<>();
 
     PerformanceMetric(PerformanceMetrics metrics, String name, double... thresholds) {
@@ -57,6 +72,14 @@ public class PerformanceMetric {
             this.thresholds.add(new Threshold(threshold));
         }
         metrics.addMetric(this);
+    }
+
+    public RunningTotal getRunningTotal() {
+        return runningTotal;
+    }
+
+    public int getInterrupted() {
+        return interrupted;
     }
 
     /**

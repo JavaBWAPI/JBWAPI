@@ -101,10 +101,10 @@ class FrameBuffer {
             try {
                 while (full()) {
                     configuration.log("Main: Waiting for frame buffer capacity");
-                    performanceMetrics.intentionallyBlocking.startTiming();
+                    performanceMetrics.getIntentionallyBlocking().startTiming();
                     conditionSize.awaitUninterruptibly();
                 }
-                performanceMetrics.intentionallyBlocking.stopTiming();
+                performanceMetrics.getIntentionallyBlocking().stopTiming();
             } finally { lockSize.unlock(); };
 
             // For the first frame of the game, populate all buffers completely
@@ -115,7 +115,7 @@ class FrameBuffer {
                     copyBuffer(liveData, frameBuffer, true);
                 }
             } else {
-                performanceMetrics.copyingToBuffer.time(() -> {
+                performanceMetrics.getCopyingToBuffer().time(() -> {
                     ByteBuffer dataTarget = dataBuffer.get(indexGame());
                     copyBuffer(liveData, dataTarget, false);
                 });
@@ -123,7 +123,7 @@ class FrameBuffer {
 
             lockSize.lock();
             try {
-                performanceMetrics.frameBufferSize.record(framesBuffered());
+                performanceMetrics.getFrameBufferSize().record(framesBuffered());
                 ++stepGame;
                 conditionSize.signalAll();
             } finally { lockSize.unlock(); }

@@ -124,21 +124,9 @@ public class BWClient {
                 long ticksBefore = Kernel32.INSTANCE.GetTickCount();
 
                 botWrapper.onFrame();
-                performanceMetrics.flushSideEffects.time(() -> getGame().sideEffects.flushTo(liveGameData));
-                performanceMetrics.frameDurationReceiveToSend.stopTiming();
+                performanceMetrics.getFlushSideEffects().time(() -> getGame().sideEffects.flushTo(liveGameData));
+                performanceMetrics.getFrameDurationReceiveToSend().stopTiming();
                 long ticksAfter = Kernel32.INSTANCE.GetTickCount();
-
-                // Measure differential between JVM timer and WinAPI's GetTickCount, used by BWAPI 4.4 and below
-                if (doTime()) {
-                    long deltaTicks = ticksAfter - ticksBefore;
-                    long deltaMillis = (long) performanceMetrics.frameDurationReceiveToSend.runningTotal.last;
-                    long delta = deltaMillis - deltaTicks;
-                    if (delta > 0) {
-                        performanceMetrics.positiveTimeDelta.record(delta);
-                    } else if (delta < 0) {
-                        performanceMetrics.negativeTimeDelta.record(-delta);
-                    }
-                }
 
                 client.sendFrameReceiveFrame();
                 if (!client.isConnected()) {

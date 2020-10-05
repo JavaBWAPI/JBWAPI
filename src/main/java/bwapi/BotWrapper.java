@@ -113,7 +113,7 @@ class BotWrapper {
 
             configuration.log("Main: Enqueued frame #" + frame);
             if (frame > 0) {
-                performanceMetrics.clientIdle.startTiming();
+                performanceMetrics.getClientIdle().startTiming();
             }
             frameBuffer.lockSize.lock();
             try {
@@ -147,13 +147,13 @@ class BotWrapper {
                         configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot on frame #" + frame);
                         frameBuffer.conditionSize.awaitNanos(remainingNanos);
                         long excessNanos = Math.max(0, (System.nanoTime() - endNanos) / 1000000);
-                        performanceMetrics.excessSleep.record(excessNanos);
+                        performanceMetrics.getExcessSleep().record(excessNanos);
                     }
                 }
             } catch(InterruptedException ignored) {
             } finally {
                 frameBuffer.lockSize.unlock();
-                performanceMetrics.clientIdle.stopTiming();
+                performanceMetrics.getClientIdle().stopTiming();
                 configuration.log("Main: onFrame asynchronous end");
             }
         } else {
@@ -189,7 +189,7 @@ class BotWrapper {
 
                     boolean doUnsafeRead = false;
                     configuration.log("Bot: Ready for another frame");
-                    performanceMetrics.botIdle.startTiming();
+                    performanceMetrics.getBotIdle().startTiming();
                     frameBuffer.lockSize.lock();
                     try {
                         doUnsafeRead = isUnsafeReadReady();
@@ -201,7 +201,7 @@ class BotWrapper {
                     } finally {
                         frameBuffer.lockSize.unlock();
                     }
-                    performanceMetrics.botIdle.stopTiming();
+                    performanceMetrics.getBotIdle().stopTiming();
 
                     if (doUnsafeRead) {
                         configuration.log("Bot: Reading live frame");
@@ -243,10 +243,10 @@ class BotWrapper {
         }
 
         if (configuration.async) {
-            performanceMetrics.framesBehind.record(Math.max(1, frameBuffer.framesBuffered()) - 1);
+            performanceMetrics.getFramesBehind().record(Math.max(1, frameBuffer.framesBuffered()) - 1);
         }
 
-        performanceMetrics.botResponse.timeIf(
+        performanceMetrics.getBotResponse().timeIf(
             ! gameOver && (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero),
             () -> {
                 for (int i = 0; i < gameData.getEventCount(); i++) {

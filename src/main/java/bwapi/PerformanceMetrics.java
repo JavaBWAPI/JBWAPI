@@ -13,7 +13,10 @@ public class PerformanceMetrics {
      * to sending commands back
      * *exclusive* of the time spent sending commands back.
      */
-    PerformanceMetric frameDurationReceiveToSend;
+    public PerformanceMetric getFrameDurationReceiveToSend() {
+        return frameDurationReceiveToSend;
+    }
+    private PerformanceMetric frameDurationReceiveToSend;
 
     /**
      * Duration of the frame cycle steps measured by BWAPI,
@@ -21,132 +24,181 @@ public class PerformanceMetrics {
      * to sending commands back
      * *inclusive* of the time spent sending commands back.
      */
-    PerformanceMetric frameDurationReceiveToSent;
+    public PerformanceMetric getFrameDurationReceiveToSent() {
+        return frameDurationReceiveToSent;
+    }
+    private PerformanceMetric frameDurationReceiveToSent;
 
     /**
      * Duration of a frame cycle originating at
      * the time when JBWAPI observes a new frame in shared memory.
      * Uses GetTickCount() instead of System.nanoRime()
      */
-    PerformanceMetric frameDurationReceiveToSentGTC;
+    public PerformanceMetric getFrameDurationReceiveToSentGTC() {
+        return frameDurationReceiveToSentGTC;
+    }
+    private PerformanceMetric frameDurationReceiveToSentGTC;
 
     /**
      * Duration of a frame cycle originating at
      * the time when JBWAPI observes a new frame in shared memory.
      */
-    PerformanceMetric frameDurationReceiveToReceive;
+    public PerformanceMetric getFrameDurationReceiveToReceive() {
+        return frameDurationReceiveToReceive;
+    }
+    private PerformanceMetric frameDurationReceiveToReceive;
 
     /**
      * Duration of a frame cycle originating at
      * the time when JBWAPI observes a new frame in shared memory.
      * Uses GetTickCount() instead of System.nanoRime()
      */
-    PerformanceMetric frameDurationReceiveToReceiveGTC;
+    public PerformanceMetric getFrameDurationReceiveToReceiveGTC() {
+        return frameDurationReceiveToReceiveGTC;
+    }
+    private PerformanceMetric frameDurationReceiveToReceiveGTC;
 
     /**
      * Time spent copying game data from system pipe shared memory to a frame buffer.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric copyingToBuffer;
+    public PerformanceMetric getCopyingToBuffer() {
+        return copyingToBuffer;
+    }
+    private PerformanceMetric copyingToBuffer;
 
     /**
      * Time spent intentionally blocking on bot operation due to a full frame buffer.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric intentionallyBlocking;
+    public PerformanceMetric getIntentionallyBlocking() {
+        return intentionallyBlocking;
+    }
+    private PerformanceMetric intentionallyBlocking;
 
     /**
      * Number of frames backed up in the frame buffer, after enqueuing each frame (and not including the newest frame).
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric frameBufferSize;
+    public PerformanceMetric getFrameBufferSize() {
+        return frameBufferSize;
+    }
+    private PerformanceMetric frameBufferSize;
 
     /**
      * Number of frames behind real-time the bot is at the time it handles events.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric framesBehind;
+    public PerformanceMetric getFramesBehind() {
+        return framesBehind;
+    }
+    private PerformanceMetric framesBehind;
 
     /**
      * Time spent applying bot commands to the live frame.
      */
-    PerformanceMetric flushSideEffects;
+    public PerformanceMetric getFlushSideEffects() {
+        return flushSideEffects;
+    }
+    private PerformanceMetric flushSideEffects;
 
     /**
      * Time spent waiting for bot event handlers to complete for a single frame.
      */
-    PerformanceMetric botResponse;
+    public PerformanceMetric getBotResponse() {
+        return botResponse;
+    }
+    private PerformanceMetric botResponse;
 
     /**
      * Time spent waiting for a response from BWAPI,
      * inclusive of the time spent sending the signal to BWAPI
      * and the time spent waiting for and receiving it.
      */
-    PerformanceMetric communicationSendToReceive;
+    public PerformanceMetric getCommunicationSendToReceive() {
+        return communicationSendToReceive;
+    }
+    private PerformanceMetric communicationSendToReceive;
 
     /**
      * Time spent sending the "frame complete" signal to BWAPI.
      * Significant durations would indicate something blocking writes to shared memory.
      */
-    PerformanceMetric communicationSendToSent;
+    public PerformanceMetric getCommunicationSendToSent() {
+        return communicationSendToSent;
+    }
+    private PerformanceMetric communicationSendToSent;
 
     /**
      * Time spent waiting for a "frame ready" signal from BWAPI.
      * This time likely additional response time spent by other bots and StarCraft itself.
      */
-    PerformanceMetric communicationListenToReceive;
+    public PerformanceMetric getCommunicationListenToReceive() {
+        return communicationListenToReceive;
+    }
+    private PerformanceMetric communicationListenToReceive;
 
     /**
      * Time bot spends idle.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric botIdle;
+    public PerformanceMetric getBotIdle() {
+        return botIdle;
+    }
+    private PerformanceMetric botIdle;
 
     /**
      * Time the main thread spends idle, waiting for the bot to finish processing frames.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric clientIdle;
+    public PerformanceMetric getClientIdle() {
+        return clientIdle;
+    }
+    private PerformanceMetric clientIdle;
 
     /**
      * Time the main thread spends oversleeping its timeout target, potentially causing overtime frames.
      * Applicable only in asynchronous mode.
      */
-    PerformanceMetric excessSleep;
-
-    /**
-     * Instances of System.nanoTime() measuring a longer frame duration with respect to WinAPI's GetTickCount  which BWAPI uses up to 4.4.
-     */
-    PerformanceMetric positiveTimeDelta;
-
-    /**
-     * Instances of System.nanoTime() measuring a shorter frame duration with respect to WinAPI's GetTickCount which BWAPI uses up to 4.4.
-     */
-    PerformanceMetric negativeTimeDelta;
+    public PerformanceMetric getExcessSleep() {
+        return excessSleep;
+    }
+    private PerformanceMetric excessSleep;
 
     /**
      * The number of events sent by BWAPI each frame.
-     * Might help diagnosing issues related to https://github.com/bwapi/bwapi/issues/860 and https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
+     * Helps detect use of broken BWAPI 4.4 tournament modules, with respect to:
+     * - https://github.com/bwapi/bwapi/issues/860
+     * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
      */
-    PerformanceMetric numberOfEvents;
+    public PerformanceMetric getNumberOfEvents() {
+        return numberOfEvents;
+    }
+    private PerformanceMetric numberOfEvents;
 
     /**
      * The number of events sent by BWAPI each frame,
      * multiplied by the duration of time spent on that frame (receive-to-sent).
-     * Might help diagnosing issues related to:
+     * Helps detect use of broken BWAPI 4.4 tournament modules, with respect to:
      * - https://github.com/bwapi/bwapi/issues/860
      * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
      */
+    public PerformanceMetric getNumberOfEventsTimesDurationReceiveToSent() {
+        return numberOfEventsTimesDurationReceiveToSent;
+    }
     PerformanceMetric numberOfEventsTimesDurationReceiveToSent;
 
     /**
      * The number of events sent by BWAPI each frame,
      * multiplied by the duration of time spent on that frame (receive-to-sent),
      * and using GetTickCount() instead of System.nanoTime().
-     * Might help diagnosing issues related to:
-     * - https://github.com/bwapi/bwapi/issues/860
-     * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
+     * Helps detect use of broken BWAPI 4.4 tournament modules, with respect to:
+     *      * - https://github.com/bwapi/bwapi/issues/860
+     *      * - https://github.com/davechurchill/StarcraftAITournamentManager/issues/42
      */
+    public PerformanceMetric getNumberOfEventsTimesDurationReceiveToSentGTC() {
+        return numberOfEventsTimesDurationReceiveToSentGTC;
+    }
     PerformanceMetric numberOfEventsTimesDurationReceiveToSentGTC;
 
     private BWClientConfiguration configuration;
@@ -157,6 +209,9 @@ public class PerformanceMetrics {
         reset();
     }
 
+    /**
+     * Clears all tracked data and starts counting from a blank slate.
+     */
     public void reset() {
         performanceMetrics.clear();
         frameDurationReceiveToSend = new PerformanceMetric(this, "Frame duration: After receiving 'frame ready' -> before sending 'frame done'", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
@@ -176,8 +231,6 @@ public class PerformanceMetrics {
         botIdle = new PerformanceMetric(this, "Time bot spent idle", Long.MAX_VALUE);
         clientIdle = new PerformanceMetric(this, "Time client spent waiting for bot", configuration.maxFrameDurationMs);
         excessSleep = new PerformanceMetric(this, "Excess duration of client sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        positiveTimeDelta = new PerformanceMetric(this, "Positive timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
-        negativeTimeDelta = new PerformanceMetric(this, "Negative timer discrepancy compared to BWAPI", 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         numberOfEvents = new PerformanceMetric(this, "Number of events received from BWAPI", 1, 2, 3, 4, 5, 6, 8, 10, 15, 20);
         numberOfEventsTimesDurationReceiveToSent = new PerformanceMetric(this, "Number of events received from BWAPI, multiplied by the receive-to-sent duration of that frame", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         numberOfEventsTimesDurationReceiveToSentGTC = new PerformanceMetric(this, "Number of events received from BWAPI, multiplied by the receive-to-sent duration of that frame (Using GetTickCount())", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);

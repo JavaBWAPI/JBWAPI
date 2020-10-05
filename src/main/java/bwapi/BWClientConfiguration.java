@@ -69,7 +69,7 @@ public class BWClientConfiguration {
     /**
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
-    public void validate() {
+    void validate() {
         if (async && maxFrameDurationMs < 0) {
             throw new IllegalArgumentException("maxFrameDurationMs needs to be a non-negative number (it's how long JBWAPI waits for a bot response before returning control to BWAPI).");
         }
@@ -78,7 +78,7 @@ public class BWClientConfiguration {
         }
     }
 
-    public void log(String value) {
+    void log(String value) {
         if (logVerbosely) {
             System.out.println(value);
         }
