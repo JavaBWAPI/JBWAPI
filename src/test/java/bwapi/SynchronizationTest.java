@@ -116,26 +116,6 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void async_IfUnsafe_ThenBotProceedsImmediately() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.asyncUnsafe = true;
-        environment.configuration.maxFrameDurationMs = 100;
-        environment.configuration.logVerbosely = true;
-
-        environment.onFrame(1, () -> {
-            assertEquals("Bot should be observing frame 1", 1, environment.bwClient.getGame().getFrameCount());
-            assertEquals("Live game should be observing frame 1", 1, environment.liveGameData().getFrameCount());
-            environment.liveGameData().setFps(12345);
-            assertEquals("Bot should be observing live game", 12345, environment.bwClient.getGame().getFPS());
-            sleepUnchecked(50);
-            assertFalse("Bot should be observing frame buffer", 12345 == environment.bwClient.getGame().getFPS());
-        });
-
-        environment.runGame(3);
-    }
-
-    @Test
     public void async_IfFrameZeroWaitsEnabled_ThenAllowInfiniteTime() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration.async = true;
@@ -150,7 +130,7 @@ public class SynchronizationTest {
             assertEquals("Bot should not be behind the live game", 0, environment.bwClient.framesBehind());
         });
 
-        environment.runGame();
+        environment.runGame(2);
     }
 
     @Test
@@ -168,25 +148,7 @@ public class SynchronizationTest {
             assertEquals("Bot should be behind the live game", 2, environment.bwClient.framesBehind());
         });
 
-        environment.runGame();
-    }
-
-    @Test
-    public void async_MeasurePerformance_TotalFrameDuration() {
-        final int frames = 10;
-        final int frameSleep = 20;
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.unlimitedFrameZero = true;
-        environment.configuration.maxFrameDurationMs = frameSleep + 20;
-        IntStream.range(0, frames).forEach(i -> environment.onFrame(i, () -> {
-            sleepUnchecked(frameSleep);
-        }));
-        environment.runGame(frames);
-
-        // Assume copying accounts for almost all the frame time except what the bot uses
-        double meanCopy = environment.metrics().copyingToBuffer.avgValue;
-        assertWithin("Total frame duration: Average", environment.metrics().totalFrameDuration.avgValue, meanCopy + frameSleep, MS_MARGIN);
+        environment.runGame(2);
     }
 
     @Test
@@ -199,10 +161,10 @@ public class SynchronizationTest {
         final double maxObserved = 15;
         final double meanObserved = (minObserved + maxObserved) / 2;
         final double rangeObserved = (maxObserved - minObserved) / 2;
-        assertWithin("Copy to buffer: minimum", environment.metrics().copyingToBuffer.minValue, meanObserved, rangeObserved);
-        assertWithin("Copy to buffer: maximum", environment.metrics().copyingToBuffer.maxValue, meanObserved, rangeObserved);
-        assertWithin("Copy to buffer: average", environment.metrics().copyingToBuffer.avgValue, meanObserved, rangeObserved);
-        assertWithin("Copy to buffer: previous", environment.metrics().copyingToBuffer.lastValue, meanObserved, rangeObserved);
+        assertWithin("Copy to buffer: minimum", environment.metrics().copyingToBuffer.runningTotal.min, meanObserved, rangeObserved);
+        assertWithin("Copy to buffer: maximum", environment.metrics().copyingToBuffer.runningTotal.max, meanObserved, rangeObserved);
+        assertWithin("Copy to buffer: average", environment.metrics().copyingToBuffer.runningTotal.mean, meanObserved, rangeObserved);
+        assertWithin("Copy to buffer: previous", environment.metrics().copyingToBuffer.runningTotal.last, meanObserved, rangeObserved);
     }
 
     @Test
@@ -214,25 +176,25 @@ public class SynchronizationTest {
         environment.configuration.maxFrameDurationMs = 20;
 
         environment.onFrame(5, () -> {
-            assertWithin("5: Frame buffer average", 0, environment.metrics().frameBufferSize.avgValue, 0.1);
-            assertWithin("5: Frame buffer minimum", 0, environment.metrics().frameBufferSize.minValue, 0.1);
-            assertWithin("5: Frame buffer maximum", 0, environment.metrics().frameBufferSize.maxValue, 0.1);
-            assertWithin("5: Frame buffer previous", 0, environment.metrics().frameBufferSize.lastValue, 0.1);
-            assertWithin("5: Frames behind average", 0, environment.metrics().framesBehind.avgValue, 0.1);
-            assertWithin("5: Frames behind minimum", 0, environment.metrics().framesBehind.minValue, 0.1);
-            assertWithin("5: Frames behind maximum", 0, environment.metrics().framesBehind.maxValue, 0.1);
-            assertWithin("5: Frames behind previous", 0, environment.metrics().framesBehind.lastValue, 0.1);
+            assertWithin("5: Frame buffer average", 0, environment.metrics().frameBufferSize.runningTotal.mean, 0.1);
+            assertWithin("5: Frame buffer minimum", 0, environment.metrics().frameBufferSize.runningTotal.min, 0.1);
+            assertWithin("5: Frame buffer maximum", 0, environment.metrics().frameBufferSize.runningTotal.max, 0.1);
+            assertWithin("5: Frame buffer previous", 0, environment.metrics().frameBufferSize.runningTotal.last, 0.1);
+            assertWithin("5: Frames behind average", 0, environment.metrics().framesBehind.runningTotal.mean, 0.1);
+            assertWithin("5: Frames behind minimum", 0, environment.metrics().framesBehind.runningTotal.min, 0.1);
+            assertWithin("5: Frames behind maximum", 0, environment.metrics().framesBehind.runningTotal.max, 0.1);
+            assertWithin("5: Frames behind previous", 0, environment.metrics().framesBehind.runningTotal.last, 0.1);
             sleepUnchecked(200);
         });
         environment.onFrame(6, () -> {
-            assertWithin("6: Frame buffer average", 1 / 6.0 + 2 / 7.0, environment.metrics().frameBufferSize.avgValue, 0.1);
-            assertWithin("6: Frame buffer minimum", 0, environment.metrics().frameBufferSize.minValue, 0.1);
-            assertWithin("6: Frame buffer maximum", 2, environment.metrics().frameBufferSize.maxValue, 0.1);
-            assertWithin("6: Frame buffer previous", 2, environment.metrics().frameBufferSize.lastValue, 0.1);
-            assertWithin("6: Frames behind average", 1 / 6.0, environment.metrics().framesBehind.avgValue, 0.1);
-            assertWithin("6: Frames behind minimum", 0, environment.metrics().framesBehind.minValue, 0.1);
-            assertWithin("6: Frames behind maximum", 1, environment.metrics().framesBehind.maxValue, 0.1);
-            assertWithin("6: Frames behind previous", 1, environment.metrics().framesBehind.lastValue, 0.1);
+            assertWithin("6: Frame buffer average", 1 / 6.0 + 2 / 7.0, environment.metrics().frameBufferSize.runningTotal.mean, 0.1);
+            assertWithin("6: Frame buffer minimum", 0, environment.metrics().frameBufferSize.runningTotal.min, 0.1);
+            assertWithin("6: Frame buffer maximum", 2, environment.metrics().frameBufferSize.runningTotal.max, 0.1);
+            assertWithin("6: Frame buffer previous", 2, environment.metrics().frameBufferSize.runningTotal.last, 0.1);
+            assertWithin("6: Frames behind average", 1 / 6.0, environment.metrics().framesBehind.runningTotal.mean, 0.1);
+            assertWithin("6: Frames behind minimum", 0, environment.metrics().framesBehind.runningTotal.min, 0.1);
+            assertWithin("6: Frames behind maximum", 1, environment.metrics().framesBehind.runningTotal.max, 0.1);
+            assertWithin("6: Frames behind previous", 1, environment.metrics().framesBehind.runningTotal.last, 0.1);
         });
 
         environment.runGame(8);
@@ -256,36 +218,26 @@ public class SynchronizationTest {
             sleepUnchecked(100);
         });
         environment.onFrame(2, () -> {
-            assertWithin("2: Bot response average", 100, environment.metrics().botResponse.avgValue, MS_MARGIN);
-            assertWithin("2: Bot response minimum", 100, environment.metrics().botResponse.minValue, MS_MARGIN);
-            assertWithin("2: Bot response maximum", 100, environment.metrics().botResponse.maxValue, MS_MARGIN);
-            assertWithin("2: Bot response previous", 100, environment.metrics().botResponse.lastValue, MS_MARGIN);
+            assertWithin("2: Bot response average", 100, environment.metrics().botResponse.runningTotal.mean, MS_MARGIN);
+            assertWithin("2: Bot response minimum", 100, environment.metrics().botResponse.runningTotal.min, MS_MARGIN);
+            assertWithin("2: Bot response maximum", 100, environment.metrics().botResponse.runningTotal.max, MS_MARGIN);
+            assertWithin("2: Bot response previous", 100, environment.metrics().botResponse.runningTotal.last, MS_MARGIN);
             sleepUnchecked(300);
         });
         environment.onFrame(3, () -> {
-            assertWithin("3: Bot response average", 200, environment.metrics().botResponse.avgValue, MS_MARGIN);
-            assertWithin("3: Bot response minimum", 100, environment.metrics().botResponse.minValue, MS_MARGIN);
-            assertWithin("3: Bot response maximum", 300, environment.metrics().botResponse.maxValue, MS_MARGIN);
-            assertWithin("3: Bot response previous", 300, environment.metrics().botResponse.lastValue, MS_MARGIN);
+            assertWithin("3: Bot response average", 200, environment.metrics().botResponse.runningTotal.mean, MS_MARGIN);
+            assertWithin("3: Bot response minimum", 100, environment.metrics().botResponse.runningTotal.min, MS_MARGIN);
+            assertWithin("3: Bot response maximum", 300, environment.metrics().botResponse.runningTotal.max, MS_MARGIN);
+            assertWithin("3: Bot response previous", 300, environment.metrics().botResponse.runningTotal.last, MS_MARGIN);
             sleepUnchecked(200);
         });
 
         environment.runGame(4);
 
-        assertWithin("Final: Bot response average", 200, environment.metrics().botResponse.avgValue, MS_MARGIN);
-        assertWithin("Final: Bot response minimum", 100, environment.metrics().botResponse.minValue, MS_MARGIN);
-        assertWithin("Final: Bot response maximum", 300, environment.metrics().botResponse.maxValue, MS_MARGIN);
-        assertWithin("Final: Bot response previous", 200, environment.metrics().botResponse.lastValue, MS_MARGIN);
-    }
-
-    @Test
-    public void MeasurePerformance_BwapiResponse() {
-        final long bwapiDelayMs = 50;
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.setBwapiDelayMs(bwapiDelayMs);
-        environment.runGame();
-        System.out.println(environment.metrics());
-        assertWithin("BWAPI Response: Average", environment.metrics().bwapiResponse.avgValue, bwapiDelayMs, MS_MARGIN);
+        assertWithin("Final: Bot response average", 200, environment.metrics().botResponse.runningTotal.mean, MS_MARGIN);
+        assertWithin("Final: Bot response minimum", 100, environment.metrics().botResponse.runningTotal.min, MS_MARGIN);
+        assertWithin("Final: Bot response maximum", 300, environment.metrics().botResponse.runningTotal.max, MS_MARGIN);
+        assertWithin("Final: Bot response previous", 200, environment.metrics().botResponse.runningTotal.last, MS_MARGIN);
     }
 
     @Test
@@ -298,8 +250,8 @@ public class SynchronizationTest {
         environment.configuration.unlimitedFrameZero = true;
         environment.setBwapiDelayMs(bwapiDelayMs);
         environment.runGame(frames);
-        double expected = environment.metrics().copyingToBuffer.avgValue + bwapiDelayMs;
-        assertWithin("Bot Idle: Average", environment.metrics().botIdle.avgValue, expected, MS_MARGIN);
+        double expected = environment.metrics().copyingToBuffer.runningTotal.mean + bwapiDelayMs;
+        assertWithin("Bot Idle: Average", environment.metrics().botIdle.runningTotal.mean, expected, MS_MARGIN);
     }
 
     @Test
@@ -315,10 +267,10 @@ public class SynchronizationTest {
         });
         environment.onFrame(2, () -> {
             assertWithin(
-                    "2: Intentionally blocking previous",
-                    environment.metrics().intentionallyBlocking.lastValue,
-                    frameDelayMs - environment.configuration.asyncFrameBufferCapacity * environment.configuration.maxFrameDurationMs,
-                    MS_MARGIN);
+                "2: Intentionally blocking previous",
+                environment.metrics().intentionallyBlocking.runningTotal.last,
+                frameDelayMs - environment.configuration.asyncFrameBufferCapacity * environment.configuration.maxFrameDurationMs,
+                MS_MARGIN);
             sleepUnchecked(100);
         });
         environment.runGame(3);

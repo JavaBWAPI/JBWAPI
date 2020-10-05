@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,13 +22,7 @@ import org.junit.runner.RunWith;
 @RunWith(Theories.class)
 public class GameTest {
 
-    private List<Unit> allUnits = new ArrayList<>();
-    private Game sut = new Game() {
-        @Override
-        public List<Unit> getAllUnits() {
-            return allUnits;
-        }
-    };
+    private Game sut = new Game();
     private Unit dummy;
 
     @DataPoints("overlapping")
@@ -63,7 +59,7 @@ public class GameTest {
     public void shouldFindOverlappingUnits(
         @FromDataPoints("overlapping") Pair<Position, Position> rect) {
         // GIVEN
-        allUnits.add(dummy);
+        sut.setAllUnits(Collections.singletonList(dummy));
 
         // WHEN
         List<Unit> unitsInRectangle = sut
@@ -77,7 +73,7 @@ public class GameTest {
     public void shouldNotFindNonOverlappingUnits(
         @FromDataPoints("non-overlapping") Pair<Position, Position> rect) {
         // GIVEN
-        allUnits.add(dummy);
+        sut.setAllUnits(Collections.singletonList(dummy));
 
         // WHEN
         List<Unit> unitsInRectangle = sut

@@ -16,15 +16,15 @@ import static org.mockito.Mockito.when;
 class SynchronizationEnvironment {
     BWClientConfiguration configuration;
     BWClient bwClient;
-    private BWEventListener listener;
     private Client client;
     private int onEndFrame;
     private long bwapiDelayMs;
     private Map<Integer, Runnable> onFrames;
 
     SynchronizationEnvironment() {
+        BWEventListener listener = mock(BWEventListener.class);
+
         configuration = new BWClientConfiguration();
-        listener = mock(BWEventListener.class);
         client = mock(Client.class);
         bwClient = new BWClient(listener);
         bwClient.setClient(client);
@@ -42,7 +42,7 @@ class SynchronizationEnvironment {
         doAnswer(answer -> {
             clientUpdate();
             return null;
-        }).when(client).update();
+        }).when(client).sendFrameReceiveFrame();
         doAnswer(answer -> {
             configuration.log("Test: onStart()");
             return null;
@@ -52,11 +52,12 @@ class SynchronizationEnvironment {
             return null;
         }).when(listener).onEnd(anyBoolean());
         doAnswer(answer -> {
-            configuration.log("Test: onFrame()");
+            configuration.log("Test: onFrame() start");
             int botFrame = bwClient.getGame().getFrameCount();
             if (onFrames.containsKey(botFrame)) {
                 onFrames.get(botFrame).run();
             }
+            configuration.log("Test: onFrame() end");
             return null;
         }).when(listener).onFrame();
     }

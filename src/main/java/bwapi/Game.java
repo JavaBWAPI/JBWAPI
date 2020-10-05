@@ -2664,7 +2664,6 @@ public final class Game {
         sideEffects.enqueue(SideEffect.addCommand(type, value1, value2));
     }
 
-
     /**
      * Convenience method for adding a game command from raw arguments.
      */
@@ -2684,5 +2683,9 @@ public final class Game {
      */
     void addShape(final ShapeType type, final CoordinateType coordType, final int x1, final int y1, final int x2, final int y2, final String text, final int extra2, final int color, final boolean isSolid) {
         sideEffects.enqueue(SideEffect.addShape(type, coordType, x1, y1, x2, y2, text, extra2, color, isSolid));
+    }
+
+    void setAllUnits(List<Unit> units) {
+        allUnits = Collections.unmodifiableList(units);
     }
 }
