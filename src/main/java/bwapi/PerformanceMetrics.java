@@ -229,7 +229,7 @@ public class PerformanceMetrics {
         flushSideEffects = new PerformanceMetric(this, "Time flushing side effects", 1, 3, 5);
         botResponse = new PerformanceMetric(this, "Duration of bot event handlers", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         botIdle = new PerformanceMetric(this, "Time bot spent idle", Long.MAX_VALUE);
-        clientIdle = new PerformanceMetric(this, "Time client spent waiting for bot", configuration.maxFrameDurationMs);
+        clientIdle = new PerformanceMetric(this, "Time client spent waiting for bot", configuration.getMaxFrameDurationMs());
         excessSleep = new PerformanceMetric(this, "Excess duration of client sleep", 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);
         numberOfEvents = new PerformanceMetric(this, "Number of events received from BWAPI", 1, 2, 3, 4, 5, 6, 8, 10, 15, 20);
         numberOfEventsTimesDurationReceiveToSent = new PerformanceMetric(this, "Number of events received from BWAPI, multiplied by the receive-to-sent duration of that frame", 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 85);

@@ -47,7 +47,7 @@ public class BWClient {
      * @return Whether the current frame should be subject to timing.
      */
     boolean doTime() {
-        return ! configuration.unlimitedFrameZero || (client.isConnected() && client.clientData().gameData().getFrameCount() > 0);
+        return ! configuration.getUnlimitedFrameZero() || (client.isConnected() && client.clientData().gameData().getFrameCount() > 0);
     }
 
     /**
@@ -81,7 +81,7 @@ public class BWClient {
     @Deprecated
     public void startGame(boolean autoContinue) {
         BWClientConfiguration configuration = new BWClientConfiguration();
-        configuration.autoContinue = autoContinue;
+        configuration.withAutoContinue(autoContinue);
         startGame(configuration);
     }
 
@@ -99,7 +99,7 @@ public class BWClient {
         // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
         // If BWAPI doesn't get priority, it may not detect completion of a frame on our end in timely fashion.
         Thread.currentThread().setName("JBWAPI Client");
-        if (configuration.async) {
+        if (configuration.getAsync()) {
             Thread.currentThread().setPriority(4);
         }
 
@@ -135,7 +135,7 @@ public class BWClient {
                 }
             }
             botWrapper.endGame();
-        } while (configuration.autoContinue);
+        } while (configuration.getAutoContinue());
     }
 
     /**

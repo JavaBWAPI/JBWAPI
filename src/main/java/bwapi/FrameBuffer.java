@@ -27,7 +27,7 @@ class FrameBuffer {
     final Condition conditionSize = lockSize.newCondition();
 
     FrameBuffer(BWClientConfiguration configuration) {
-        this.capacity = configuration.asyncFrameBufferCapacity;
+        this.capacity = configuration.getAsyncFrameBufferCapacity();
         this.configuration = configuration;
         while(dataBuffer.size() < capacity) {
             dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));

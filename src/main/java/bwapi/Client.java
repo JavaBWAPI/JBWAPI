@@ -82,7 +82,7 @@ class Client {
     }
 
     private void disconnect() {
-        if (bwClient.getConfiguration().debugConnection) {
+        if (bwClient.getConfiguration().getDebugConnection()) {
             System.err.print("Disconnect called by: ");
             System.err.println(Thread.currentThread().getStackTrace()[2]);
         }
@@ -133,7 +133,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map Game table.");
-            if (bwClient.getConfiguration().debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             return false;
@@ -167,7 +167,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
-            if (bwClient.getConfiguration().debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             gameTableFileHandle = null;
@@ -183,7 +183,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
-            if (bwClient.getConfiguration().debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -196,7 +196,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("Unable to map game data.");
-            if (bwClient.getConfiguration().debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             return false;
@@ -217,7 +217,7 @@ class Client {
             }
             catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
-                if (bwClient.getConfiguration().debugConnection) {
+                if (bwClient.getConfiguration().getDebugConnection()) {
                     e.printStackTrace();
                 }
                 disconnect();
@@ -245,7 +245,7 @@ class Client {
         }
         catch (Exception e) {
             System.err.println("failed, disconnecting");
-            if (bwClient.getConfiguration().debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             disconnect();
@@ -272,7 +272,7 @@ class Client {
                 frameReady = pipeObjectHandle.readByte() == 2;
             } catch (Exception e) {
                 System.err.println("failed, disconnecting");
-                if (bwClient.getConfiguration().debugConnection) {
+                if (bwClient.getConfiguration().getDebugConnection()) {
                     e.printStackTrace();
                 }
                 disconnect();

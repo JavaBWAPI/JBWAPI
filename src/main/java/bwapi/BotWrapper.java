@@ -24,14 +24,14 @@ class BotWrapper {
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
         this.configuration = configuration;
         this.eventListener = eventListener;
-        frameBuffer = configuration.async ? new FrameBuffer(configuration) : null;
+        frameBuffer = configuration.getAsync() ? new FrameBuffer(configuration) : null;
     }
 
     /**
      * Resets the BotWrapper for a new botGame.
      */
     void startNewGame(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
-        if (configuration.async) {
+        if (configuration.getAsync()) {
             frameBuffer.initialize(liveData, performanceMetrics);
         }
         this.performanceMetrics = performanceMetrics;
@@ -73,10 +73,10 @@ class BotWrapper {
      * Handles the arrival of a new frame from BWAPI
      */
     void onFrame() {
-        if (configuration.async) {
+        if (configuration.getAsync()) {
             configuration.log("Main: onFrame asynchronous start");
             long startNanos = System.nanoTime();
-            long endNanos = startNanos + configuration.maxFrameDurationMs * 1000000;
+            long endNanos = startNanos + configuration.getMaxFrameDurationMs() * 1000000;
             if (botThread == null) {
                 configuration.log("Main: Starting bot thread");
                 botThread = createBotThread();
@@ -89,7 +89,7 @@ class BotWrapper {
             // Unsafe mode:
             // If the frame buffer is empty (meaning the bot must be idle)
             // allow the bot to read directly from shared memory while we copy it over
-            if (configuration.asyncUnsafe) {
+            if (configuration.getAsyncUnsafe()) {
                 frameBuffer.lockSize.lock();
                 try {
                     if (frameBuffer.empty()) {
@@ -123,7 +123,7 @@ class BotWrapper {
                     // We don't synchronize on calls which access the buffer
                     // (to avoid tens of thousands of synchronized calls per frame)
                     // so there's no guarantee of safety here.
-                    if (configuration.asyncUnsafe && frameBuffer.size() == 1) {
+                    if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
                         configuration.log("Main: Weaning bot off live data");
                         botGame.clientData().setBuffer(frameBuffer.peek());
                     }
@@ -135,7 +135,7 @@ class BotWrapper {
                         throw new RuntimeException(lastThrow);
                     }
 
-                    if (configuration.unlimitedFrameZero && frame == 0) {
+                    if (configuration.getUnlimitedFrameZero() && frame == 0) {
                         configuration.log("Main: Waiting indefinitely on frame #" + frame);
                         frameBuffer.conditionSize.await();
                     } else {
@@ -242,12 +242,12 @@ class BotWrapper {
             gameOver = gameOver || gameData.getEvents(i).getType() == EventType.MatchEnd;
         }
 
-        if (configuration.async) {
+        if (configuration.getAsync()) {
             performanceMetrics.getFramesBehind().record(Math.max(1, frameBuffer.framesBuffered()) - 1);
         }
 
         performanceMetrics.getBotResponse().timeIf(
-            ! gameOver && (gameData.getFrameCount() > 0 || ! configuration.unlimitedFrameZero),
+            ! gameOver && (gameData.getFrameCount() > 0 || ! configuration.getUnlimitedFrameZero()),
             () -> {
                 for (int i = 0; i < gameData.getEventCount(); i++) {
                     EventHandler.operation(eventListener, botGame, gameData.getEvents(i));

@@ -33,7 +33,7 @@ public class SynchronizationTest {
     @Test
     public void sync_IfException_ThrowException() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = false;
+        environment.configuration.withAsync(false);
         environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
         assertThrows(RuntimeException.class, environment::runGame);
     }
@@ -42,8 +42,9 @@ public class SynchronizationTest {
     public void async_IfException_ThrowException() {
         // An exception in the bot thread must be re-thrown by the main thread.
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.asyncFrameBufferCapacity = 3;
+        environment.configuration
+            .withAsync(true)
+            .withAsyncFrameBufferCapacity(3);
         environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
         assertThrows(RuntimeException.class, environment::runGame);
     }
@@ -51,9 +52,10 @@ public class SynchronizationTest {
     @Test
     public void sync_IfDelay_ThenNoBuffer() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = false;
-        environment.configuration.maxFrameDurationMs = 1;
-        environment.configuration.asyncFrameBufferCapacity = 3;
+        environment.configuration
+            .withAsync(false)
+            .withMaxFrameDurationMs(1)
+            .withAsyncFrameBufferCapacity(3);
 
         IntStream.range(0, 5).forEach(frame -> {
             environment.onFrame(frame, () -> {
@@ -70,9 +72,10 @@ public class SynchronizationTest {
     @Test
     public void async_IfBotDelay_ThenClientBuffers() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.maxFrameDurationMs = 10;
-        environment.configuration.asyncFrameBufferCapacity = 4;
+        environment.configuration
+                .withAsync(true)
+                .withMaxFrameDurationMs(10)
+                .withAsyncFrameBufferCapacity(4);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(50);
@@ -93,9 +96,10 @@ public class SynchronizationTest {
     @Test
     public void async_IfBotDelay_ThenClientStalls() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.maxFrameDurationMs = 50;
-        environment.configuration.asyncFrameBufferCapacity = 5;
+        environment.configuration
+                .withAsync(true)
+                .withMaxFrameDurationMs(50)
+                .withAsyncFrameBufferCapacity(5);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(125);
@@ -118,10 +122,11 @@ public class SynchronizationTest {
     @Test
     public void async_IfFrameZeroWaitsEnabled_ThenAllowInfiniteTime() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.unlimitedFrameZero = true;
-        environment.configuration.maxFrameDurationMs = 5;
-        environment.configuration.asyncFrameBufferCapacity = 2;
+        environment.configuration
+            .withAsync(true)
+            .withUnlimitedFrameZero(true)
+            .withMaxFrameDurationMs(5)
+            .withAsyncFrameBufferCapacity(2);
 
         environment.onFrame(0, () -> {
             sleepUnchecked(50);
@@ -136,10 +141,11 @@ public class SynchronizationTest {
     @Test
     public void async_IfFrameZeroWaitsDisabled_ThenClientBuffers() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.unlimitedFrameZero = false;
-        environment.configuration.maxFrameDurationMs = 5;
-        environment.configuration.asyncFrameBufferCapacity = 2;
+        environment.configuration
+                .withAsync(true)
+                .withUnlimitedFrameZero(false)
+                .withMaxFrameDurationMs(5)
+                .withAsyncFrameBufferCapacity(2);
 
         environment.onFrame(0, () -> {
             sleepUnchecked(50);
@@ -155,7 +161,7 @@ public class SynchronizationTest {
     public void async_MeasurePerformance_CopyingToBuffer() {
         // Somewhat lazy test; just verify that we're getting sane values
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
+        environment.configuration.withAsync(true);
         environment.runGame(20);
         final double minObserved = 0.25;
         final double maxObserved = 15;
@@ -170,10 +176,11 @@ public class SynchronizationTest {
     @Test
     public void async_MeasurePerformance_FrameBufferSizeAndFramesBehind() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.unlimitedFrameZero = true;
-        environment.configuration.asyncFrameBufferCapacity = 3;
-        environment.configuration.maxFrameDurationMs = 20;
+        environment.configuration
+            .withAsync(true)
+            .withUnlimitedFrameZero(true)
+            .withAsyncFrameBufferCapacity(3)
+            .withMaxFrameDurationMs(20);
 
         environment.onFrame(5, () -> {
             assertWithin("5: Frame buffer average", 0, environment.metrics().getFrameBufferSize().getRunningTotal().getMean(), 0.1);
@@ -212,7 +219,7 @@ public class SynchronizationTest {
 
         // Frame zero appears to take an extra 60ms, so let's disable timing for it
         // (and also verify that we omit frame zero from performance metrics)
-        environment.configuration.unlimitedFrameZero = true;
+        environment.configuration.withUnlimitedFrameZero(true);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(100);
@@ -245,9 +252,10 @@ public class SynchronizationTest {
         final long bwapiDelayMs = 10;
         final int frames = 10;
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.asyncFrameBufferCapacity = 3;
-        environment.configuration.unlimitedFrameZero = true;
+        environment.configuration
+            .withAsync(true)
+            .withAsyncFrameBufferCapacity(3)
+            .withUnlimitedFrameZero(true);
         environment.setBwapiDelayMs(bwapiDelayMs);
         environment.runGame(frames);
         double expected = environment.metrics().getCopyingToBuffer().getRunningTotal().getMean() + bwapiDelayMs;
@@ -257,10 +265,11 @@ public class SynchronizationTest {
     @Test
     public void async_MeasurePerformance_IntentionallyBlocking() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.async = true;
-        environment.configuration.unlimitedFrameZero = true;
-        environment.configuration.asyncFrameBufferCapacity = 2;
-        environment.configuration.maxFrameDurationMs = 20;
+        environment.configuration
+            .withAsync(true)
+            .withUnlimitedFrameZero(true)
+            .withAsyncFrameBufferCapacity(2)
+            .withMaxFrameDurationMs(20);
         final int frameDelayMs = 100;
         environment.onFrame(1, () -> {
             sleepUnchecked(100);
@@ -269,7 +278,7 @@ public class SynchronizationTest {
             assertWithin(
                 "2: Intentionally blocking previous",
                 environment.metrics().getIntentionallyBlocking().getRunningTotal().getLast(),
-                frameDelayMs - environment.configuration.asyncFrameBufferCapacity * environment.configuration.maxFrameDurationMs,
+                frameDelayMs - environment.configuration.getAsyncFrameBufferCapacity() * environment.configuration.getMaxFrameDurationMs(),
                 MS_MARGIN);
             sleepUnchecked(100);
         });
