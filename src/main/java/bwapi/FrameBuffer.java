@@ -219,13 +219,6 @@ class FrameBuffer {
         // There's no specific case where we expect to fail above,
         // but this is a safe fallback regardless,
         // and serves to document the known-good (and cross-platform, for BWAPI 5) way to executing the copy.
-
-        // TODO: This part was written for ByteBuffer.
-        // Adapt it for WrappedBuffer
-        /*
-        source.rewind();
-        destination.rewind();
-        destination.put(liveData);
-        */
+        destination.copyFrom(source);
     }
 }

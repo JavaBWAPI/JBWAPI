@@ -37,6 +37,12 @@ class WrappedBuffer {
         this.address = Pointer.nativeValue(pointer);
     }
 
+    void copyFrom(WrappedBuffer source) {
+        source.buffer.rewind();
+        buffer.rewind();
+        buffer.put(source.buffer);
+    }
+
     byte getByte(final int offset) {
         return unsafe.getByte(address + offset);
     }
