@@ -13,12 +13,10 @@ public class BWClient {
     private BotWrapper botWrapper;
     private Client client;
     private PerformanceMetrics performanceMetrics;
-    private TimerResolutionThread timerResolutionThread;
 
     public BWClient(final BWEventListener eventListener) {
         Objects.requireNonNull(eventListener);
         this.eventListener = eventListener;
-        //this.timerResolutionThread = new TimerResolutionThread();
     }
 
     /**
