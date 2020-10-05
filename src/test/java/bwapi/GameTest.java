@@ -7,8 +7,6 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -93,7 +91,7 @@ public class GameTest {
         clientData.gameData().setIsReplay(true);
 
         Game game = new Game();
-        game.clientData().setBuffer(buffer);
+        game.botClientData().setBuffer(buffer);
         game.init();
 
         assertThat(game.isReplay());

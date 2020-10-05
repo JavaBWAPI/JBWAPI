@@ -103,7 +103,7 @@ public final class Game {
         clientData = new ClientData();
     }
 
-    ClientData clientData() {
+    ClientData botClientData() {
         return clientData;
     }
 

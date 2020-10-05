@@ -2,13 +2,11 @@ package bwapi;
 
 import org.junit.Test;
 
-import java.nio.ByteBuffer;
 import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class PointTest {
@@ -57,9 +55,9 @@ public class PointTest {
 	@Test
 	public void isValidChecks() {
 		Game game = new Game();
-		game.clientData().setBuffer(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
-		game.clientData().gameData().setMapWidth(256);
-		game.clientData().gameData().setMapHeight(256);
+		game.botClientData().setBuffer(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
+		game.botClientData().gameData().setMapWidth(256);
+		game.botClientData().gameData().setMapHeight(256);
 		game.init();
 
 		assertEquals(256, game.mapHeight());

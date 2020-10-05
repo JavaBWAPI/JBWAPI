@@ -91,7 +91,7 @@ public class BWClient {
      * @param gameConfiguration Settings for playing games with this client.
      */
     public void startGame(BWClientConfiguration gameConfiguration) {
-        gameConfiguration.validate();
+        gameConfiguration.validateAndLock();
         this.configuration = gameConfiguration;
         this.performanceMetrics = new PerformanceMetrics(configuration);
         botWrapper = new BotWrapper(configuration, eventListener);

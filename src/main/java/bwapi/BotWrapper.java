@@ -36,7 +36,7 @@ class BotWrapper {
         }
         this.performanceMetrics = performanceMetrics;
         botGame = new Game();
-        botGame.clientData().setBuffer(liveData);
+        botGame.botClientData().setBuffer(liveData);
         liveClientData.setBuffer(liveData);
         this.liveData = liveData;
         botThread = null;
@@ -76,7 +76,7 @@ class BotWrapper {
         if (configuration.getAsync()) {
             configuration.log("Main: onFrame asynchronous start");
             long startNanos = System.nanoTime();
-            long endNanos = startNanos + configuration.getMaxFrameDurationMs() * 1000000;
+            long endNanos = startNanos + (long) configuration.getMaxFrameDurationMs() * 1000000;
             if (botThread == null) {
                 configuration.log("Main: Starting bot thread");
                 botThread = createBotThread();
@@ -94,7 +94,7 @@ class BotWrapper {
                 try {
                     if (frameBuffer.empty()) {
                         configuration.log("Main: Putting bot on live data");
-                        botGame.clientData().setBuffer(liveData);
+                        botGame.botClientData().setBuffer(liveData);
                         setUnsafeReadReady(true);
                     } else {
                         setUnsafeReadReady(false);
@@ -125,7 +125,7 @@ class BotWrapper {
                     // so there's no guarantee of safety here.
                     if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
                         configuration.log("Main: Weaning bot off live data");
-                        botGame.clientData().setBuffer(frameBuffer.peek());
+                        botGame.botClientData().setBuffer(frameBuffer.peek());
                     }
 
                     // Make bot exceptions fall through to the main thread.
@@ -209,7 +209,7 @@ class BotWrapper {
                         // TODO: Maybe we should point it at live data from here?
                     } else {
                         configuration.log("Bot: Peeking next frame from buffer");
-                        botGame.clientData().setBuffer(frameBuffer.peek());
+                        botGame.botClientData().setBuffer(frameBuffer.peek());
                     }
 
                     configuration.log("Bot: Handling events on frame #" + botGame.getFrameCount());
@@ -235,11 +235,11 @@ class BotWrapper {
     }
 
     private void handleEvents() {
-        ClientData.GameData gameData = botGame.clientData().gameData();
+        ClientData.GameData botGameData = botGame.botClientData().gameData();
 
         // Populate gameOver before invoking event handlers (in case the bot throws)
-        for (int i = 0; i < gameData.getEventCount(); i++) {
-            gameOver = gameOver || gameData.getEvents(i).getType() == EventType.MatchEnd;
+        for (int i = 0; i < botGameData.getEventCount(); i++) {
+            gameOver = gameOver || botGameData.getEvents(i).getType() == EventType.MatchEnd;
         }
 
         if (configuration.getAsync()) {
@@ -247,10 +247,10 @@ class BotWrapper {
         }
 
         performanceMetrics.getBotResponse().timeIf(
-            ! gameOver && (gameData.getFrameCount() > 0 || ! configuration.getUnlimitedFrameZero()),
+            ! gameOver && (botGameData.getFrameCount() > 0 || ! configuration.getUnlimitedFrameZero()),
             () -> {
-                for (int i = 0; i < gameData.getEventCount(); i++) {
-                    EventHandler.operation(eventListener, botGame, gameData.getEvents(i));
+                for (int i = 0; i < botGameData.getEventCount(); i++) {
+                    EventHandler.operation(eventListener, botGame, botGameData.getEvents(i));
                 }
             });
     }

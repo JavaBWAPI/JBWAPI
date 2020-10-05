@@ -18,10 +18,10 @@ class EventHandler {
                 break;
             //case 3: //MenuFrame
             case SendText:
-                eventListener.onSendText(game.clientData().gameData().getEventStrings(event.getV1()));
+                eventListener.onSendText(game.botClientData().gameData().getEventStrings(event.getV1()));
                 break;
             case ReceiveText:
-                eventListener.onReceiveText(game.getPlayer(event.getV1()), game.clientData().gameData().getEventStrings(event.getV2()));
+                eventListener.onReceiveText(game.getPlayer(event.getV1()), game.botClientData().gameData().getEventStrings(event.getV2()));
                 break;
             case PlayerLeft:
                 eventListener.onPlayerLeft(game.getPlayer(event.getV1()));
@@ -30,7 +30,7 @@ class EventHandler {
                 eventListener.onNukeDetect(new Position(event.getV1(), event.getV2()));
                 break;
             case SaveGame:
-                eventListener.onSaveGame(game.clientData().gameData().getEventStrings(event.getV1()));
+                eventListener.onSaveGame(game.botClientData().gameData().getEventStrings(event.getV1()));
                 break;
             case UnitDiscover:
                 game.unitCreate(event.getV1());

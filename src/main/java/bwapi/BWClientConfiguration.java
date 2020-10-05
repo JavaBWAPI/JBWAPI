@@ -9,6 +9,7 @@ public class BWClientConfiguration {
      * Set to `true` for more explicit error messages (which might spam the terminal).
      */
     public BWClientConfiguration withDebugConnection(boolean value) {
+        throwIfLocked();
         debugConnection = value;
         return this;
     }
@@ -21,6 +22,7 @@ public class BWClientConfiguration {
      * When true, restarts the client loop when a game ends, allowing the client to play multiple games without restarting.
      */
     public BWClientConfiguration withAutoContinue(boolean value) {
+        throwIfLocked();
         autoContinue = value;
         return this;
     }
@@ -38,6 +40,7 @@ public class BWClientConfiguration {
      * Asynchronous operation will block until the bot's event handlers are complete.
      */
     public BWClientConfiguration withUnlimitedFrameZero(boolean value) {
+        throwIfLocked();
         unlimitedFrameZero = value;
         return this;
     }
@@ -53,6 +56,7 @@ public class BWClientConfiguration {
      * Real-time human play typically uses the "fastest" game speed, which has 42.86ms (42,860ns) between frames.
      */
     public BWClientConfiguration withMaxFrameDurationMs(int value) {
+        throwIfLocked();
         maxFrameDurationMs = value;
         return this;
     }
@@ -73,6 +77,7 @@ public class BWClientConfiguration {
      * issuing commands later than intended, and a marginally larger memory footprint.
      */
     public BWClientConfiguration withAsync(boolean value) {
+        throwIfLocked();
         async = value;
         return this;
     }
@@ -86,6 +91,7 @@ public class BWClientConfiguration {
      * Each frame buffered adds about 33 megabytes to JBWAPI's memory footprint.
      */
     public BWClientConfiguration withAsyncFrameBufferCapacity(int size) {
+        throwIfLocked();
         asyncFrameBufferCapacity = size;
         return this;
     }
@@ -102,6 +108,7 @@ public class BWClientConfiguration {
      * the non-thread-safe switc from shared memory reads to frame buffer reads.
      */
     public BWClientConfiguration withAsyncUnsafe(boolean value) {
+        throwIfLocked();
         asyncUnsafe = value;
         return this;
     }
@@ -114,6 +121,7 @@ public class BWClientConfiguration {
      * Toggles verbose logging, particularly of synchronization steps.
      */
     public BWClientConfiguration withLogVerbosely(boolean value) {
+        throwIfLocked();
         logVerbosely = value;
         return this;
     }
@@ -125,7 +133,7 @@ public class BWClientConfiguration {
     /**
      * Checks that the configuration is in a valid state. Throws an IllegalArgumentException if it isn't.
      */
-    void validate() {
+    void validateAndLock() {
         if (asyncUnsafe && ! async) {
             throw new IllegalArgumentException("asyncUnsafe mode needs async mode.");
         }
@@ -134,6 +142,14 @@ public class BWClientConfiguration {
         }
         if (async && asyncFrameBufferCapacity < 1) {
             throw new IllegalArgumentException("asyncFrameBufferCapacity needs to be a positive number (There needs to be at least one frame buffer).");
+        }
+        locked = true;
+    }
+    private boolean locked = false;
+
+    void throwIfLocked() {
+        if (locked) {
+            throw new RuntimeException("Configuration can not be modified after the game has started");
         }
     }
 

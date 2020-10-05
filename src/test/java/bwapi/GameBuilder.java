@@ -2,7 +2,6 @@ package bwapi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,7 +20,7 @@ public class GameBuilder {
     public static Game createGame(String mapName) throws IOException {
         final ByteBuffer buffer = binToBuffer(RESOURCES + mapName + "_frame0_buffer.bin");
         final Game game = new Game();
-        game.clientData().setBuffer(buffer);
+        game.botClientData().setBuffer(buffer);
         game.init();
         return game;
     }
