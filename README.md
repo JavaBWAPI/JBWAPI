@@ -38,7 +38,7 @@ Add JBWAPI to your dependencies in `<dependencies></dependencies>`:
 <dependency>
     <groupId>com.github.JavaBWAPI</groupId>
     <artifactId>JBWAPI</artifactId>
-    <version>1.5</version>
+    <version>1.5.1</version>
 </dependency>
 ```
 
@@ -56,7 +56,7 @@ allprojects {
 Add JBWAPI as a dependency:
 ```
 dependencies {
-    implementation 'com.github.JavaBWAPI:JBWAPI:1.5'
+    implementation 'com.github.JavaBWAPI:JBWAPI:1.5.1'
 }
 ```
 

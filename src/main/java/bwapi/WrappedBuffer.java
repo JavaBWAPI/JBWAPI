@@ -1,34 +1,40 @@
 package bwapi;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
 import sun.misc.Unsafe;
-import sun.nio.ch.DirectBuffer;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
- * Wrapper around ByteBuffer that makes use of sun.misc.Unsafe if available.
+ * Wrapper around offheap memory that uses sun.misc.Unsafe for fast access.
  */
 class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
-    private final Unsafe unsafe;
 
-    WrappedBuffer(final ByteBuffer byteBuffer) {
-        unsafe = getTheUnsafe();
-        buffer = byteBuffer;
-        address = ((DirectBuffer) buffer).address();
-    }
+    private static Unsafe unsafe;
 
-    private static Unsafe getTheUnsafe() {
+    static {
         try {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            return (Unsafe) theUnsafe.get(null);
+            unsafe = (Unsafe) theUnsafe.get(null);
+
         } catch (final Exception e) {
             e.printStackTrace();
-            return null;
+            System.exit(-1);
         }
+    }
+
+    WrappedBuffer(final int size) {
+        this(new Memory(size), size);
+    }
+
+    WrappedBuffer(final Pointer pointer, final int size) {
+        this.buffer = pointer.getByteBuffer(0, size);
+        this.address = Pointer.nativeValue(pointer);
     }
 
     byte getByte(final int offset) {
@@ -64,7 +70,7 @@ class WrappedBuffer {
     }
 
     String getString(final int offset, final int maxLen) {
-        char[] buf = new char[maxLen];
+        final char[] buf = new char[maxLen];
         long pos = offset + address;
         for (int i = 0; i < maxLen; i++) {
             byte b = unsafe.getByte(pos);
@@ -76,11 +82,8 @@ class WrappedBuffer {
     }
 
     void putString(final int offset, final int maxLen, final String string) {
-        if (string.length() >= maxLen) {
-            throw new StringIndexOutOfBoundsException();
-        }
         long pos = offset + address;
-        for (int i = 0; i < string.length(); i++) {
+        for (int i = 0; i < Math.min(string.length(), maxLen - 1); i++) {
             unsafe.putByte(pos, (byte) string.charAt(i));
             pos++;
         }
@@ -89,5 +92,9 @@ class WrappedBuffer {
 
     ByteBuffer getBuffer() {
         return buffer;
+    }
+
+    long getAddress() {
+        return address;
     }
 }

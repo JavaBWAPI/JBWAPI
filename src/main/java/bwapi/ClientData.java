@@ -1,5 +1,7 @@
 package bwapi;
-import java.nio.ByteBuffer;
+
+import com.sun.jna.Pointer;
+
 final class ClientData {
     private WrappedBuffer buffer;
     private GameData gameData;
@@ -9,8 +11,11 @@ final class ClientData {
     GameData gameData() {
         return gameData;
     }
-    void setBuffer(ByteBuffer buffer) {
-        this.buffer = new WrappedBuffer(buffer);
+    void setBuffer(WrappedBuffer buffer) {
+        this.buffer = buffer;
+    }
+    void setPointer(Pointer pointer) {
+        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));
     }
     class UnitCommand {
         static final int SIZE = 24;

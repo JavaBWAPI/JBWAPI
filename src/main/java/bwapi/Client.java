@@ -25,14 +25,12 @@ SOFTWARE.
 
 package bwapi;
 
-import bwapi.ClientData.GameData;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.win32.W32APIOptions;
 
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 class Client {
     interface MappingKernel extends Kernel32 {
@@ -48,8 +46,8 @@ class Client {
     private BWClient bwClient;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
-    private ByteBuffer gameTableFileHandle = null;
-    private ByteBuffer mapFileHandle = null;
+    private WrappedBuffer gameTableFileHandle = null;
+    private WrappedBuffer mapFileHandle = null;
 
     Client(BWClient bwClient) {
         this.bwClient = bwClient;
@@ -58,7 +56,7 @@ class Client {
     /**
      * For test purposes only
      */
-    Client(ByteBuffer buffer) {
+    Client(final WrappedBuffer buffer) {
         clientData = new ClientData();
         clientData.setBuffer(buffer);
     }
@@ -67,7 +65,7 @@ class Client {
         return clientData;
     }
 
-    ByteBuffer mapFile() {
+    WrappedBuffer mapFile() {
         return mapFileHandle;
     }
 
@@ -90,11 +88,10 @@ class Client {
             return;
         }
 
-        if (pipeObjectHandle != null ) {
+        if (pipeObjectHandle != null) {
             try {
                 pipeObjectHandle.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -117,12 +114,11 @@ class Client {
 
         // Expose the BWAPI list of games from shared memory via a ByteBuffer
         try {
-            gameTableFileHandle = Kernel32.INSTANCE.MapViewOfFile(
-                    MappingKernel.INSTANCE.OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE, 0, 0, GameTable.SIZE)
-                    .getByteBuffer(0, GameTable.SIZE);
-            gameTableFileHandle.order(ByteOrder.LITTLE_ENDIAN);
-        }
-        catch (Exception e) {
+            final Pointer gameTableView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+                            .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE,
+                    0, 0, GameTable.SIZE);
+            gameTableFileHandle = new WrappedBuffer(gameTableView, GameTable.SIZE);
+        } catch (Exception e) {
             System.err.println("Game table mapping not found.");
             return false;
         }
@@ -130,8 +126,7 @@ class Client {
         GameTable gameTable;
         try {
             gameTable = new GameTable(gameTableFileHandle);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Unable to map Game table.");
             if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
@@ -140,11 +135,11 @@ class Client {
         }
 
         int latest = 0;
-        for(int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
+        for (int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
             GameInstance gameInstance = gameTable.gameInstances[i];
             System.out.println(i + " | " + gameInstance.serverProcessID + " | " + (gameInstance.isConnected ? 1 : 0) + " | " + gameInstance.lastKeepAliveTime);
             if (gameInstance.serverProcessID != 0 && !gameInstance.isConnected) {
-                if ( gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest ) {
+                if (gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest) {
                     latest = gameInstance.lastKeepAliveTime;
                     gameTableIndex = i;
                 }
@@ -163,9 +158,8 @@ class Client {
         final String sharedMemoryName = "Local\\bwapi_shared_memory_" + serverProcID;
         final String communicationPipe = "\\\\.\\pipe\\bwapi_pipe_" + serverProcID;
         try {
-            pipeObjectHandle  = new RandomAccessFile(communicationPipe, "rw");
-        }
-        catch (Exception e) {
+            pipeObjectHandle = new RandomAccessFile(communicationPipe, "rw");
+        } catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
             if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
@@ -177,11 +171,11 @@ class Client {
 
         // Expose the raw game data from shared memory via a ByteBuffer
         try {
-            mapFileHandle = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
+            final Pointer mapFileView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
-                    0, 0, GameData.SIZE).getByteBuffer(0, GameData.SIZE);
-        }
-        catch (Exception e) {
+                    0, 0, ClientData.GameData.SIZE);
+            mapFileHandle = new WrappedBuffer(mapFileView, ClientData.GameData.SIZE);
+        } catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
             if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
@@ -214,8 +208,7 @@ class Client {
         while (code != 2) {
             try {
                 code = pipeObjectHandle.readByte();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
                 if (bwClient.getConfiguration().getDebugConnection()) {
                     e.printStackTrace();
@@ -279,6 +272,7 @@ class Client {
                 break;
             }
         }
+
         metrics.getCommunicationListenToReceive().stopTiming();
         metrics.getCommunicationSendToReceive().stopTiming();
 
@@ -298,8 +292,7 @@ class Client {
     private void sleep(final int millis) {
         try {
             Thread.sleep(millis);
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
         }
     }
 }

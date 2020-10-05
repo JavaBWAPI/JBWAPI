@@ -11,7 +11,7 @@ class BotWrapper {
     private final BWClientConfiguration configuration;
     private final BWEventListener eventListener;
     private final FrameBuffer frameBuffer;
-    private ByteBuffer liveData;
+    private WrappedBuffer liveData;
     private Game botGame;
     private Thread botThread;
     private boolean gameOver;
@@ -30,7 +30,7 @@ class BotWrapper {
     /**
      * Resets the BotWrapper for a new botGame.
      */
-    void startNewGame(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
+    void startNewGame(WrappedBuffer liveData, PerformanceMetrics performanceMetrics) {
         if (configuration.getAsync()) {
             frameBuffer.initialize(liveData, performanceMetrics);
         }

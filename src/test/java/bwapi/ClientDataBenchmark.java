@@ -3,7 +3,6 @@ package bwapi;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.nio.ByteBuffer;
 import java.util.SplittableRandom;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,7 @@ public class ClientDataBenchmark {
         @Setup(Level.Invocation)
         public void setup() {
             game = new Game();
-            game.botClientData().setBuffer(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
+            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
             strings = buildStrings();
         }
 
@@ -36,7 +35,7 @@ public class ClientDataBenchmark {
         public void setup() {
             data = client.liveClientData().gameData();
             game = new Game();
-            game.botClientData().setBuffer(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
+            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
             String[] strings = buildStrings();
             for (String s : strings) {
                 GameDataUtils.addString(client.liveClientData().gameData(), s);

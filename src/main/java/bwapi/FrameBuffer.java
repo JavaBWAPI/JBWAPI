@@ -14,13 +14,13 @@ import java.util.concurrent.locks.ReentrantLock;
 class FrameBuffer {
     private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
 
-    private ByteBuffer liveData;
+    private WrappedBuffer liveData;
     private PerformanceMetrics performanceMetrics;
     private BWClientConfiguration configuration;
     private int capacity;
     private int stepGame = 0;
     private int stepBot = 0;
-    private ArrayList<ByteBuffer> dataBuffer = new ArrayList<>();
+    private ArrayList<WrappedBuffer> dataBuffer = new ArrayList<>();
 
     private final Lock lockWrite = new ReentrantLock();
     final Lock lockSize = new ReentrantLock();
@@ -30,14 +30,14 @@ class FrameBuffer {
         this.capacity = configuration.getAsyncFrameBufferCapacity();
         this.configuration = configuration;
         while(dataBuffer.size() < capacity) {
-            dataBuffer.add(ByteBuffer.allocateDirect(BUFFER_SIZE));
+            dataBuffer.add(new WrappedBuffer(BUFFER_SIZE));
         }
     }
 
     /**
      * Resets for a new game
      */
-    void initialize(ByteBuffer liveData, PerformanceMetrics performanceMetrics) {
+    void initialize(WrappedBuffer liveData, PerformanceMetrics performanceMetrics) {
         this.liveData = liveData;
         this.performanceMetrics = performanceMetrics;
         stepGame = 0;
@@ -111,12 +111,12 @@ class FrameBuffer {
             // This is to ensure all buffers have access to immutable data like regions/walkability/buildability
             // Afterwards, we want to shorten this process by only copying important and mutable data
             if (stepGame == 0) {
-                for (ByteBuffer frameBuffer : dataBuffer) {
+                for (WrappedBuffer frameBuffer : dataBuffer) {
                     copyBuffer(liveData, frameBuffer, true);
                 }
             } else {
                 performanceMetrics.getCopyingToBuffer().time(() -> {
-                    ByteBuffer dataTarget = dataBuffer.get(indexGame());
+                    WrappedBuffer dataTarget = dataBuffer.get(indexGame());
                     copyBuffer(liveData, dataTarget, false);
                 });
             }
@@ -133,7 +133,7 @@ class FrameBuffer {
     /**
      * Peeks the front-most value in the buffer.
      */
-    ByteBuffer peek() {
+    WrappedBuffer peek() {
         lockSize.lock();
         try {
             while(empty()) conditionSize.awaitUninterruptibly();
@@ -160,9 +160,9 @@ class FrameBuffer {
      * @param size Number of bytes to copy
      * @return True if the copy succeeded
      */
-    private boolean tryMemcpyBuffer(ByteBuffer source, ByteBuffer destination, long offset, int size) {
-        long addressSource = ((DirectBuffer) source).address() + offset;
-        long addressDestination = ((DirectBuffer) destination).address() + offset;
+    private boolean tryMemcpyBuffer(WrappedBuffer source, WrappedBuffer destination, long offset, int size) {
+        long addressSource = source.getAddress() + offset;
+        long addressDestination = destination.getAddress() + offset;
         try {
             if (Platform.isWindows()) {
                 if (Platform.is64Bit()) {
@@ -178,7 +178,7 @@ class FrameBuffer {
         return false;
     }
 
-    void copyBuffer(ByteBuffer source, ByteBuffer destination, boolean copyEverything) {
+    void copyBuffer(WrappedBuffer source, WrappedBuffer destination, boolean copyEverything) {
         /*
         The speed at which we copy data into the frame buffer is a major cost of JBWAPI's asynchronous operation.
         Copy times observed in the wild for the complete buffer usually range from 2.6ms - 19ms
@@ -219,8 +219,13 @@ class FrameBuffer {
         // There's no specific case where we expect to fail above,
         // but this is a safe fallback regardless,
         // and serves to document the known-good (and cross-platform, for BWAPI 5) way to executing the copy.
+
+        // TODO: This part was written for ByteBuffer.
+        // Adapt it for WrappedBuffer
+        /*
         source.rewind();
         destination.rewind();
         destination.put(liveData);
+        */
     }
 }

@@ -1,7 +1,5 @@
 package bwapi;
 
-import java.nio.ByteBuffer;
-
 /**
  * https://github.com/bwapi/bwapi/blob/456ad612abc84da4103162ba0bf8ec4f053a4b1d/bwapi/include/BWAPI/Client/GameTable.h
  */
@@ -29,12 +27,12 @@ class GameTable {
 
     final GameInstance[] gameInstances;
 
-    GameTable(final ByteBuffer gameTableFileHandle) {
+    GameTable(final WrappedBuffer gameTableFileHandle) {
         gameInstances = new GameInstance[MAX_GAME_INSTANCES];
 
         for (int i = 0; i < MAX_GAME_INSTANCES; i++) {
             int serverProcessID = gameTableFileHandle.getInt(GameInstance.SIZE * i);
-            boolean isConnected = gameTableFileHandle.get(GameInstance.SIZE * i + 4) != 0;
+            boolean isConnected = gameTableFileHandle.getByte(GameInstance.SIZE * i + 4) != 0;
             int lastKeepAliveTime = gameTableFileHandle.getInt(GameInstance.SIZE * i + 4 + 4);
             gameInstances[i] = new GameInstance(serverProcessID, isConnected, lastKeepAliveTime);
         }

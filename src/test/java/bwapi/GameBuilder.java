@@ -2,7 +2,6 @@ package bwapi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.InflaterOutputStream;
@@ -18,14 +17,14 @@ public class GameBuilder {
     }
 
     public static Game createGame(String mapName) throws IOException {
-        final ByteBuffer buffer = binToBuffer(RESOURCES + mapName + "_frame0_buffer.bin");
+        final WrappedBuffer buffer = binToBuffer(RESOURCES + mapName + "_frame0_buffer.bin");
         final Game game = new Game();
         game.botClientData().setBuffer(buffer);
         game.init();
         return game;
     }
 
-    public static ByteBuffer binToBuffer(String binLocation) throws IOException {
+    public static WrappedBuffer binToBuffer(String binLocation) throws IOException {
         final byte[] compressedBytes = Files.readAllBytes(Paths.get(binLocation));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         final InflaterOutputStream zin = new InflaterOutputStream(out);
@@ -33,12 +32,12 @@ public class GameBuilder {
         zin.flush();
         zin.close();
         final byte[] bytes = out.toByteArray();
-        final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
-        buffer.put(bytes);
+        final WrappedBuffer buffer = new WrappedBuffer(bytes.length);
+        buffer.getBuffer().put(bytes);
         return buffer;
     }
 
-    public static ByteBuffer binToBufferUnchecked(String binLocation) {
+    public static WrappedBuffer binToBufferUnchecked(String binLocation) {
         try {
             return binToBuffer(binLocation);
         } catch(IOException exception) {

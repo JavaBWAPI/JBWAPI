@@ -90,7 +90,7 @@ class DumpToClient {
         StringWriter sw = new StringWriter();
         try (PrintWriter out = new PrintWriter(sw)) {
             out.println("package bwapi;");
-            out.println("import java.nio.ByteBuffer;");
+            out.println("");
             out.println("final class ClientData {");
             out.println("    private WrappedBuffer buffer;");
             out.println("    private GameData gameData;");
@@ -100,9 +100,14 @@ class DumpToClient {
             out.println("    GameData gameData() {");
             out.println("        return gameData;");
             out.println("    }");
-            out.println("    void setBuffer(ByteBuffer buffer) {");
-            out.println("        this.buffer = new WrappedBuffer(buffer);");
+            out.println("    void setBuffer(WrappedBuffer buffer) {");
+            out.println("         this.buffer = buffer;");
             out.println("    }");
+            out.println("    void setPointer(Pointer pointer) {");
+            out.println("        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));");
+            out.println("    }");
+            out.println("");
+
             structs.values().forEach(s -> {
                 out.printf("    class %s {\n", s.name);
                 out.printf("        static final int SIZE = %d;\n", s.size);
