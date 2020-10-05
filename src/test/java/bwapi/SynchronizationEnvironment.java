@@ -33,10 +33,10 @@ class SynchronizationEnvironment {
         onFrames = new HashMap<>();
 
         when(client.mapFile()).thenReturn(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
-        when(client.clientData()).thenReturn(new ClientData());
-        client.clientData().setBuffer(client.mapFile());
-        client.clientData().gameData().setFrameCount(-1);
-        client.clientData().gameData().setIsInGame(false);
+        when(client.liveClientData()).thenReturn(new ClientData());
+        client.liveClientData().setBuffer(client.mapFile());
+        client.liveClientData().gameData().setFrameCount(-1);
+        client.liveClientData().gameData().setIsInGame(false);
 
         when(client.isConnected()).thenReturn(true);
         doAnswer(answer -> {
@@ -63,7 +63,7 @@ class SynchronizationEnvironment {
     }
 
     ClientData.GameData liveGameData() {
-        return client.clientData().gameData();
+        return client.liveClientData().gameData();
     }
 
     PerformanceMetrics metrics() {
@@ -102,28 +102,28 @@ class SynchronizationEnvironment {
     }
 
     private int liveFrame() {
-        return client.clientData().gameData().getFrameCount();
+        return client.liveClientData().gameData().getFrameCount();
     }
 
     private void clientUpdate() throws InterruptedException{
         Thread.sleep(bwapiDelayMs);
-        client.clientData().gameData().setFrameCount(liveFrame() + 1);
+        client.liveClientData().gameData().setFrameCount(liveFrame() + 1);
         configuration.log("Test: clientUpdate() to liveFrame #" + liveFrame());
         if (liveFrame() == 0) {
-            client.clientData().gameData().setIsInGame(true);
-            client.clientData().gameData().setEventCount(2);
-            client.clientData().gameData().getEvents(0).setType(EventType.MatchStart);
-            client.clientData().gameData().getEvents(1).setType(EventType.MatchFrame);
+            client.liveClientData().gameData().setIsInGame(true);
+            client.liveClientData().gameData().setEventCount(2);
+            client.liveClientData().gameData().getEvents(0).setType(EventType.MatchStart);
+            client.liveClientData().gameData().getEvents(1).setType(EventType.MatchFrame);
         } else if (liveFrame() < onEndFrame) {
-            client.clientData().gameData().setIsInGame(true);
-            client.clientData().gameData().setEventCount(1);
-            client.clientData().gameData().getEvents(0).setType(EventType.MatchFrame);
+            client.liveClientData().gameData().setIsInGame(true);
+            client.liveClientData().gameData().setEventCount(1);
+            client.liveClientData().gameData().getEvents(0).setType(EventType.MatchFrame);
         } else if (liveFrame() == onEndFrame) {
-            client.clientData().gameData().setIsInGame(true);
-            client.clientData().gameData().getEvents(0).setType(EventType.MatchEnd);
+            client.liveClientData().gameData().setIsInGame(true);
+            client.liveClientData().gameData().getEvents(0).setType(EventType.MatchEnd);
         } else {
-            client.clientData().gameData().setIsInGame(false);
-            client.clientData().gameData().setEventCount(0);
+            client.liveClientData().gameData().setIsInGame(false);
+            client.liveClientData().gameData().setEventCount(0);
         }
     }
 }

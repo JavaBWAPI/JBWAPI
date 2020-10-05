@@ -63,7 +63,7 @@ class Client {
         clientData.setBuffer(buffer);
     }
 
-    ClientData clientData() {
+    ClientData liveClientData() {
         return clientData;
     }
 

@@ -34,12 +34,12 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            data = client.clientData().gameData();
+            data = client.liveClientData().gameData();
             game = new Game();
             game.botClientData().setBuffer(ByteBuffer.allocateDirect(ClientData.GameData.SIZE));
             String[] strings = buildStrings();
             for (String s : strings) {
-                GameDataUtils.addString(client.clientData().gameData(), s);
+                GameDataUtils.addString(client.liveClientData().gameData(), s);
             }
         }
     }
@@ -69,16 +69,16 @@ public class ClientDataBenchmark {
         for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
             s.game.addUnitCommand(0, 1, 2, 3, 4, 5);
         }
-        return s.client.clientData().gameData().getCommandCount();
+        return s.client.liveClientData().gameData().getCommandCount();
     }
 
     @Benchmark
     @OperationsPerInvocation(GameDataUtils.MAX_COUNT)
     public int addString(EmptyState s) {
         for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
-            GameDataUtils.addString(s.client.clientData().gameData(), s.strings[i]);
+            GameDataUtils.addString(s.client.liveClientData().gameData(), s.strings[i]);
         }
-        return s.client.clientData().gameData().getStringCount();
+        return s.client.liveClientData().gameData().getStringCount();
     }
 
     @Benchmark

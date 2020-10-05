@@ -206,7 +206,6 @@ class BotWrapper {
                     if (doUnsafeRead) {
                         configuration.log("Bot: Reading live frame");
                         setUnsafeReadReady(false);
-                        // TODO: Maybe we should point it at live data from here?
                     } else {
                         configuration.log("Bot: Peeking next frame from buffer");
                         botGame.botClientData().setBuffer(frameBuffer.peek());

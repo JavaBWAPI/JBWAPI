@@ -181,11 +181,12 @@ class FrameBuffer {
     void copyBuffer(ByteBuffer source, ByteBuffer destination, boolean copyEverything) {
         /*
         The speed at which we copy data into the frame buffer is a major cost of JBWAPI's asynchronous operation.
-        Copy times observed in the wild usually range from 2.6ms - 19ms but are prone to large amounts of variance.
+        Copy times observed in the wild for the complete buffer usually range from 2.6ms - 19ms
+        but are prone to large amounts of variance.
 
         The normal Java way to execute this copy is via ByteBuffer.put(), which has reasonably good performance characteristics.
-        Some experiments in 64-bit JRE have shown that using a native memcpy achieves a 35% speedup.
-        Some experiments in 32-bit JRE show no difference in performance.
+        Experiments in 64-bit JRE have shown that using a native memcpy achieves a 35% speedup.
+        Experiments in 32-bit JRE show no difference in performance.
 
         So, speculatively, we attempt to do a native memcpy.
         */
@@ -195,13 +196,17 @@ class FrameBuffer {
                 return;
             }
         } else {
-            int STATICTILES_START = 3447004; // getGroundHeight, isWalkable, isBuildable
-            int STATICTILES_END = 4823260;
-            int REGION_START = 5085404; // getMapTileRegionId, ..., getRegions
-            int REGION_END = 10586480;
-            int STRINGSSHAPES_START = 10962632; // getStringCount, ... getShapes
-            int STRINGSHAPES_END = 32242636;
-            int UNITFINDER_START = 32962644;
+            // After the buffer has been filled the first time,
+            // we can omit copying blocks of data which are unused or which don't change after game start.
+            // These blocks account for *most* of the 33MB shared memory,
+            // so omitting them drastically reduces the copy duration
+            final int STATICTILES_START = 3447004; // getGroundHeight, isWalkable, isBuildable
+            final int STATICTILES_END = 4823260;
+            final int REGION_START = 5085404; // getMapTileRegionId, ..., getRegions
+            final int REGION_END = 10586480;
+            final int STRINGSSHAPES_START = 10962632; // getStringCount, ... getShapes
+            final int STRINGSHAPES_END = 32242636;
+            final int UNITFINDER_START = 32962644;
             if (
                 tryMemcpyBuffer(source, destination, 0, STATICTILES_START)
                 && tryMemcpyBuffer(source, destination, STATICTILES_END, REGION_START - STATICTILES_END)

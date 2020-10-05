@@ -45,7 +45,7 @@ public class BWClient {
      * @return Whether the current frame should be subject to timing.
      */
     boolean doTime() {
-        return ! configuration.getUnlimitedFrameZero() || (client.isConnected() && client.clientData().gameData().getFrameCount() > 0);
+        return ! configuration.getUnlimitedFrameZero() || (client.isConnected() && client.liveClientData().gameData().getFrameCount() > 0);
     }
 
     /**
@@ -53,7 +53,7 @@ public class BWClient {
      * This tracks the size of the frame buffer except when the game is paused (which results in multiple frames arriving with the same count).
      */
     public int framesBehind() {
-        return botWrapper == null ? 0 : Math.max(0, client.clientData().gameData().getFrameCount() - getGame().getFrameCount());
+        return botWrapper == null ? 0 : Math.max(0, client.liveClientData().gameData().getFrameCount() - getGame().getFrameCount());
     }
 
     /**
@@ -107,7 +107,7 @@ public class BWClient {
         client.reconnect();
 
         do {
-            ClientData.GameData liveGameData = client.clientData().gameData();
+            ClientData.GameData liveGameData = client.liveClientData().gameData();
             while (!liveGameData.isInGame()) {
                 if (!client.isConnected()) {
                     return;
