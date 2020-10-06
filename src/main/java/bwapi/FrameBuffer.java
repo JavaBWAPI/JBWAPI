@@ -1,8 +1,7 @@
 package bwapi;
 
-import com.sun.jna.Platform;
-import sun.nio.ch.DirectBuffer;
-import java.nio.ByteBuffer;
+import sun.misc.Unsafe;
+
 import java.util.ArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -13,6 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class FrameBuffer {
     private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
+    private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     private WrappedBuffer liveData;
     private PerformanceMetrics performanceMetrics;
@@ -158,24 +158,11 @@ class FrameBuffer {
      * @param source Address to copy from
      * @param destination Address to copy to
      * @param size Number of bytes to copy
-     * @return True if the copy succeeded
      */
-    private boolean tryMemcpyBuffer(WrappedBuffer source, WrappedBuffer destination, long offset, int size) {
+    private void copyBuffer(WrappedBuffer source, WrappedBuffer destination, long offset, int size) {
         long addressSource = source.getAddress() + offset;
         long addressDestination = destination.getAddress() + offset;
-        try {
-            if (Platform.isWindows()) {
-                if (Platform.is64Bit()) {
-                    MSVCRT.INSTANCE.memcpy(addressDestination, addressSource, size);
-                    return true;
-                } else {
-                    MSVCRT.INSTANCE.memcpy((int) addressDestination, (int) addressSource, size);
-                    return true;
-                }
-            }
-        }
-        catch(Exception ignored) {}
-        return false;
+        unsafe.copyMemory(addressSource, addressDestination, size);
     }
 
     void copyBuffer(WrappedBuffer source, WrappedBuffer destination, boolean copyEverything) {
@@ -185,16 +172,10 @@ class FrameBuffer {
         but are prone to large amounts of variance.
 
         The normal Java way to execute this copy is via ByteBuffer.put(), which has reasonably good performance characteristics.
-        Experiments in 64-bit JRE have shown that using a native memcpy achieves a 35% speedup.
-        Experiments in 32-bit JRE show no difference in performance.
-
-        So, speculatively, we attempt to do a native memcpy.
         */
 
         if (copyEverything) {
-            if (tryMemcpyBuffer(source, destination, 0, FrameBuffer.BUFFER_SIZE)) {
-                return;
-            }
+            copyBuffer(source, destination, 0, FrameBuffer.BUFFER_SIZE);
         } else {
             // After the buffer has been filled the first time,
             // we can omit copying blocks of data which are unused or which don't change after game start.
@@ -207,18 +188,10 @@ class FrameBuffer {
             final int STRINGSSHAPES_START = 10962632; // getStringCount, ... getShapes
             final int STRINGSHAPES_END = 32242636;
             final int UNITFINDER_START = 32962644;
-            if (
-                tryMemcpyBuffer(source, destination, 0, STATICTILES_START)
-                && tryMemcpyBuffer(source, destination, STATICTILES_END, REGION_START - STATICTILES_END)
-                && tryMemcpyBuffer(source, destination, REGION_END, STRINGSSHAPES_START - REGION_END)
-                && tryMemcpyBuffer(source, destination, STRINGSHAPES_END, UNITFINDER_START - STRINGSHAPES_END)) {
-                return;
-            }
+            copyBuffer(source, destination, 0, STATICTILES_START);
+            copyBuffer(source, destination, STATICTILES_END, REGION_START - STATICTILES_END);
+            copyBuffer(source, destination, REGION_END, STRINGSSHAPES_START - REGION_END);
+            copyBuffer(source, destination, STRINGSHAPES_END, UNITFINDER_START - STRINGSHAPES_END);
         }
-
-        // There's no specific case where we expect to fail above,
-        // but this is a safe fallback regardless,
-        // and serves to document the known-good (and cross-platform, for BWAPI 5) way to executing the copy.
-        destination.copyFrom(source);
     }
 }

@@ -60,12 +60,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
-                <configuration>
-                    <parallel>all</parallel> <!-- Run tests in parallel-->
-                    <useUnlimitedThreads>true</useUnlimitedThreads>
-                    <argLine>-Xms1g</argLine>
-                    <argLine>-Xmx1g</argLine>
-                </configuration>
+<!--                <configuration>-->
+<!--                    <parallel>all</parallel> &lt;!&ndash; Run tests in parallel&ndash;&gt;-->
+<!--                    <useUnlimitedThreads>true</useUnlimitedThreads>-->
+<!--                    <argLine>-Xms1g</argLine>-->
+<!--                    <argLine>-Xmx1g</argLine>-->
+<!--                </configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

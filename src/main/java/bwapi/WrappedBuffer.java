@@ -4,7 +4,6 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
@@ -14,19 +13,7 @@ class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
 
-    private static Unsafe unsafe;
-
-    static {
-        try {
-            final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            unsafe = (Unsafe) theUnsafe.get(null);
-
-        } catch (final Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+    private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     WrappedBuffer(final int size) {
         this(new Memory(size), size);
@@ -35,12 +22,6 @@ class WrappedBuffer {
     WrappedBuffer(final Pointer pointer, final int size) {
         this.buffer = pointer.getByteBuffer(0, size);
         this.address = Pointer.nativeValue(pointer);
-    }
-
-    void copyFrom(WrappedBuffer source) {
-        source.buffer.rewind();
-        buffer.rewind();
-        buffer.put(source.buffer);
     }
 
     byte getByte(final int offset) {
