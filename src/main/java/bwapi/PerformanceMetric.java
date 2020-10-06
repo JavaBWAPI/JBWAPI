@@ -61,7 +61,6 @@ public class PerformanceMetric {
     private final String name;
     private long timeStarted = 0;
     private int interrupted = 0;
-    private boolean usingGetTickCount = false;
 
     private final RunningTotal runningTotal = new RunningTotal();
     private ArrayList<Threshold> thresholds = new ArrayList<>();
@@ -105,15 +104,6 @@ public class PerformanceMetric {
         }
     }
 
-    PerformanceMetric useGetTickCount() {
-        usingGetTickCount = true;
-        return this;
-    }
-
-    long getNanoseconds() {
-        return usingGetTickCount ? Kernel32.INSTANCE.GetTickCount() * 1000000L: System.nanoTime();
-    }
-
     /**
      * Manually start timing.
      * The next call to stopTiming() will record the duration in fractional milliseconds.
@@ -122,7 +112,7 @@ public class PerformanceMetric {
         if (timeStarted > 0) {
             ++interrupted;
         }
-        timeStarted = getNanoseconds();
+        timeStarted = System.nanoTime();
     }
 
 
@@ -133,7 +123,7 @@ public class PerformanceMetric {
     void stopTiming() {
         if (timeStarted <= 0) return;
         // Use nanosecond resolution timer, but record in units of milliseconds.
-        long timeEnded = getNanoseconds();
+        long timeEnded = System.nanoTime();
         long timeDiff = timeEnded - timeStarted;
         timeStarted = 0;
         record(timeDiff / 1000000d);

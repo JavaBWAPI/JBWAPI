@@ -119,12 +119,9 @@ public class BWClient {
                 }
             }
             while (liveGameData.isInGame()) {
-                long ticksBefore = Kernel32.INSTANCE.GetTickCount();
-
                 botWrapper.onFrame();
                 performanceMetrics.getFlushSideEffects().time(() -> getGame().sideEffects.flushTo(liveGameData));
                 performanceMetrics.getFrameDurationReceiveToSend().stopTiming();
-                long ticksAfter = Kernel32.INSTANCE.GetTickCount();
 
                 client.sendFrameReceiveFrame();
                 if (!client.isConnected()) {

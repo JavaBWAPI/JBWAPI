@@ -246,12 +246,10 @@ class Client {
         }
         metrics.getCommunicationSendToSent().stopTiming();
         metrics.getFrameDurationReceiveToSent().stopTiming();
-        metrics.getFrameDurationReceiveToSentGTC().stopTiming();
         if (bwClient.doTime()) {
             final int eventCount = clientData.gameData().getEventCount();
             metrics.getNumberOfEvents().record(eventCount);
             metrics.getNumberOfEventsTimesDurationReceiveToSent().record(eventCount * metrics.getFrameDurationReceiveToSent().getRunningTotal().getLast());
-            metrics.getNumberOfEventsTimesDurationReceiveToSentGTC().record(eventCount * metrics.getFrameDurationReceiveToSentGTC().getRunningTotal().getLast());
         }
 
         // Listen for BWAPI to indicate that a new frame is ready
@@ -279,13 +277,10 @@ class Client {
         if (bwClient.doTime()) {
             metrics.getFrameDurationReceiveToSend().startTiming();
             metrics.getFrameDurationReceiveToSent().startTiming();
-            metrics.getFrameDurationReceiveToSentGTC().startTiming();
         }
         metrics.getFrameDurationReceiveToReceive().stopTiming();
-        metrics.getFrameDurationReceiveToReceiveGTC().stopTiming();
         if (bwClient.doTime()) {
             metrics.getFrameDurationReceiveToReceive().startTiming();
-            metrics.getFrameDurationReceiveToReceiveGTC().startTiming();
         }
     }
 
