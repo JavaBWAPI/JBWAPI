@@ -1,6 +1,5 @@
 package bwapi;
 
-import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import sun.misc.Unsafe;
 
@@ -29,7 +28,8 @@ class WrappedBuffer {
     }
 
     WrappedBuffer(final int size) {
-        this(new Memory(size), size);
+        buffer = ByteBuffer.allocateDirect(size);
+        address = UnsafeTools.getAddress(buffer);
     }
 
     WrappedBuffer(final Pointer pointer, final int size) {
@@ -89,6 +89,7 @@ class WrappedBuffer {
         }
         unsafe.putByte(pos, (byte) 0);
     }
+
 
     ByteBuffer getBuffer() {
         return buffer;
