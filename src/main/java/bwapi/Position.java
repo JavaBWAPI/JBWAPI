@@ -1,7 +1,7 @@
 package bwapi;
 
 
-public class Position extends Point<Position> {
+public final class Position extends Point<Position> {
 
     public static final int SIZE_IN_PIXELS = 1;
     public static final Position Invalid = new Position(32000 / SIZE_IN_PIXELS, 32000 / SIZE_IN_PIXELS);

@@ -32,7 +32,8 @@ class SynchronizationEnvironment {
         bwapiDelayMs = 0;
         onFrames = new HashMap<>();
 
-        when(client.mapFile()).thenReturn(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
+        WrappedBuffer newGameState = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        when(client.mapFile()).thenReturn(newGameState);
         when(client.liveClientData()).thenReturn(new ClientData());
         client.liveClientData().setBuffer(client.mapFile());
         client.liveClientData().gameData().setFrameCount(-1);

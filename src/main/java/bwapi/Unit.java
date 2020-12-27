@@ -39,7 +39,7 @@ import static bwapi.UnitType.*;
  * However for units that were owned by the player, {@link #getPlayer} and {@link #getType} will continue to work for units
  * that have been destroyed.
  */
-public class Unit implements Comparable<Unit> {
+public final class Unit implements Comparable<Unit> {
     private static final Set<Order> gatheringGasOrders = EnumSet.of(
             Harvest1, Harvest2, MoveToGas, WaitForGas, HarvestGas, ReturnGas, ResetCollision);
     private static final Set<Order> gatheringMineralOrders = EnumSet.of(

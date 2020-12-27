@@ -6,7 +6,7 @@ import java.util.Objects;
 import static bwapi.TechType.*;
 import static bwapi.UnitCommandType.*;
 
-public class UnitCommand {
+public final class UnitCommand {
     Unit unit;
     UnitCommandType type;
     Unit target = null;

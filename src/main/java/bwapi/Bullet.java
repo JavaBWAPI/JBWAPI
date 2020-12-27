@@ -27,7 +27,7 @@ import java.util.Objects;
  * @see Game#getBullets
  * @see Bullet#exists
  */
-public class Bullet implements Comparable<Bullet> {
+public final class Bullet implements Comparable<Bullet> {
     private final BulletData bulletData;
     private final int id;
     private final Game game;

@@ -18,7 +18,7 @@ import static bwapi.WeaponType.*;
  * @see PlayerType
  * @see Race
  */
-public class Player implements Comparable<Player> {
+public final class Player implements Comparable<Player> {
     private final PlayerData playerData;
     private final Game game;
     private final int id;
