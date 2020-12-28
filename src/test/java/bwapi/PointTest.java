@@ -5,9 +5,8 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 public class PointTest {
 	
@@ -54,10 +53,16 @@ public class PointTest {
 
 	@Test
 	public void isValidChecks() {
-		Game game = mock(Game.class);
-		when(game.mapPixelWidth()).thenReturn(32 * 256);
-		when(game.mapPixelHeight()).thenReturn(32 * 256);
+		Game game = new Game();
+		game.botClientData().setBuffer(GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
+		game.botClientData().gameData().setMapWidth(256);
+		game.botClientData().gameData().setMapHeight(256);
+		game.init();
 
+		assertEquals(256, game.mapHeight());
+		assertEquals(256, game.mapWidth());
+		assertEquals(32 * 256, game.mapPixelHeight());
+		assertEquals(32 * 256, game.mapPixelWidth());
 		assertTrue(new Position(0,0).isValid(game));
 		assertTrue(new Position(1, 1).isValid(game));
 

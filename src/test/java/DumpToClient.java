@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class DumpToClient {
+class DumpToClient {
 
     private static final Pattern VAR_DECL = Pattern.compile(
         "^\\s+(\\d+) \\| +((?:struct )?BWAPI[^:]*::)?(\\S[^\\[]+)\\s([\\[0-9\\]]+)?\\s?(\\S+)$");
@@ -92,16 +92,27 @@ public class DumpToClient {
             out.println("package bwapi;");
             out.println("");
             out.println("final class ClientData {");
-            out.println("    final WrappedBuffer buffer;");
-            out.println("");
-            out.println("    ClientData(final WrappedBuffer buffer) {");
-            out.println("        this.buffer = buffer;");
+            out.println("    private WrappedBuffer buffer;");
+            out.println("    private GameData gameData;");
+            out.println("    ClientData() {");
+            out.println("        gameData = new ClientData.GameData(0);");
             out.println("    }");
+            out.println("    GameData gameData() {");
+            out.println("        return gameData;");
+            out.println("    }");
+            out.println("    void setBuffer(WrappedBuffer buffer) {");
+            out.println("         this.buffer = buffer;");
+            out.println("    }");
+            out.println("    void setPointer(Pointer pointer) {");
+            out.println("        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));");
+            out.println("    }");
+            out.println("");
+
             structs.values().forEach(s -> {
                 out.printf("    class %s {\n", s.name);
                 out.printf("        static final int SIZE = %d;\n", s.size);
                 out.println("        private int myOffset;");
-                out.printf("        public %s(int myOffset) {\n", s.name);
+                out.printf("        %s(int myOffset) {\n", s.name);
                 out.println("          this.myOffset = myOffset;");
                 out.println("        }");
                 s.variables.forEach(v -> {
@@ -265,7 +276,7 @@ public class DumpToClient {
             StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
-    public enum Type {
+    enum Type {
         STRUCT,
         BOOLEAN,
         INT,
@@ -276,7 +287,7 @@ public class DumpToClient {
         ENUM
     }
 
-    public static class Variable {
+    static class Variable {
 
         private final String name;
         private final Type type;
@@ -285,19 +296,19 @@ public class DumpToClient {
         private String enumName;
         private List<Integer> arraySizes = Collections.emptyList();
 
-        public Variable(String name, Type type) {
+        Variable(String name, Type type) {
             this.name = name;
             this.type = type;
         }
     }
 
-    public static class Struct {
+    static class Struct {
 
         final String name;
         int size;
         List<Variable> variables = new ArrayList<>();
 
-        public Struct(String name) {
+        Struct(String name) {
             this.name = name;
         }
     }

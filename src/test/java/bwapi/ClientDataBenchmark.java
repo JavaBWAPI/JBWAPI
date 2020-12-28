@@ -18,8 +18,8 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            client = new Client(new WrappedBuffer(ClientData.GameData.SIZE));
-            game = new Game(client);
+            game = new Game();
+            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
             strings = buildStrings();
         }
 
@@ -33,19 +33,19 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            client = new Client(new WrappedBuffer(ClientData.GameData.SIZE));
-            data = client.gameData();
-            game = new Game(client);
+            data = client.liveClientData().gameData();
+            game = new Game();
+            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
             String[] strings = buildStrings();
             for (String s : strings) {
-                client.addString(s);
+                GameDataUtils.addString(client.liveClientData().gameData(), s);
             }
         }
     }
 
     private static String[] buildStrings() {
         SplittableRandom rnd = new SplittableRandom(987654321L);
-        String[] strings = new String[Client.MAX_COUNT];
+        String[] strings = new String[GameDataUtils.MAX_COUNT];
         for (int i = 0; i < strings.length; i++) {
             strings[i] = rnd.ints(1022, 0, 9)
                     .mapToObj(Integer::toString)
@@ -63,27 +63,27 @@ public class ClientDataBenchmark {
     }
 
     @Benchmark
-    @OperationsPerInvocation(Client.MAX_COUNT)
+    @OperationsPerInvocation(GameDataUtils.MAX_COUNT)
     public int addUnitCommand(EmptyState s) {
-        for (int i = 0; i < Client.MAX_COUNT; i++) {
+        for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
             s.game.addUnitCommand(0, 1, 2, 3, 4, 5);
         }
-        return s.client.gameData().getCommandCount();
+        return s.client.liveClientData().gameData().getCommandCount();
     }
 
     @Benchmark
-    @OperationsPerInvocation(Client.MAX_COUNT)
+    @OperationsPerInvocation(GameDataUtils.MAX_COUNT)
     public int addString(EmptyState s) {
-        for (int i = 0; i < Client.MAX_COUNT; i++) {
-            s.client.addString(s.strings[i]);
+        for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
+            GameDataUtils.addString(s.client.liveClientData().gameData(), s.strings[i]);
         }
-        return s.client.gameData().getStringCount();
+        return s.client.liveClientData().gameData().getStringCount();
     }
 
     @Benchmark
-    @OperationsPerInvocation(Client.MAX_COUNT)
+    @OperationsPerInvocation(GameDataUtils.MAX_COUNT)
     public void getString(FilledWithStrings s, Blackhole blackhole) {
-        for (int i = 0; i < Client.MAX_COUNT; i++) {
+        for (int i = 0; i < GameDataUtils.MAX_COUNT; i++) {
             blackhole.consume(s.data.getStrings(i));
         }
     }

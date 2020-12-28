@@ -1,15 +1,26 @@
 package bwapi;
 
-final class ClientData {
-    final WrappedBuffer buffer;
+import com.sun.jna.Pointer;
 
-    ClientData(final WrappedBuffer buffer) {
+final class ClientData {
+    private WrappedBuffer buffer;
+    private GameData gameData;
+    ClientData() {
+        gameData = new ClientData.GameData(0);
+    }
+    GameData gameData() {
+        return gameData;
+    }
+    void setBuffer(WrappedBuffer buffer) {
         this.buffer = buffer;
+    }
+    void setPointer(Pointer pointer) {
+        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));
     }
     class UnitCommand {
         static final int SIZE = 24;
         private int myOffset;
-        public UnitCommand(int myOffset) {
+        UnitCommand(int myOffset) {
           this.myOffset = myOffset;
         }
         int getTid() {
@@ -58,7 +69,7 @@ final class ClientData {
     class GameData {
         static final int SIZE = 33017048;
         private int myOffset;
-        public GameData(int myOffset) {
+        GameData(int myOffset) {
           this.myOffset = myOffset;
         }
         int getClient_version() {
@@ -614,7 +625,7 @@ final class ClientData {
     class Shape {
         static final int SIZE = 40;
         private int myOffset;
-        public Shape(int myOffset) {
+        Shape(int myOffset) {
           this.myOffset = myOffset;
         }
         ShapeType getType() {
@@ -691,7 +702,7 @@ final class ClientData {
     class Command {
         static final int SIZE = 12;
         private int myOffset;
-        public Command(int myOffset) {
+        Command(int myOffset) {
           this.myOffset = myOffset;
         }
         CommandType getType() {
@@ -719,7 +730,7 @@ final class ClientData {
     class Position {
         static final int SIZE = 8;
         private int myOffset;
-        public Position(int myOffset) {
+        Position(int myOffset) {
           this.myOffset = myOffset;
         }
         int getX() {
@@ -740,7 +751,7 @@ final class ClientData {
     class Event {
         static final int SIZE = 12;
         private int myOffset;
-        public Event(int myOffset) {
+        Event(int myOffset) {
           this.myOffset = myOffset;
         }
         EventType getType() {
@@ -768,7 +779,7 @@ final class ClientData {
     class RegionData {
         static final int SIZE = 1068;
         private int myOffset;
-        public RegionData(int myOffset) {
+        RegionData(int myOffset) {
           this.myOffset = myOffset;
         }
         int getId() {
@@ -866,7 +877,7 @@ final class ClientData {
     class ForceData {
         static final int SIZE = 32;
         private int myOffset;
-        public ForceData(int myOffset) {
+        ForceData(int myOffset) {
           this.myOffset = myOffset;
         }
         String getName() {
@@ -880,7 +891,7 @@ final class ClientData {
     class PlayerData {
         static final int SIZE = 5788;
         private int myOffset;
-        public PlayerData(int myOffset) {
+        PlayerData(int myOffset) {
           this.myOffset = myOffset;
         }
         String getName() {
@@ -1174,7 +1185,7 @@ final class ClientData {
     class BulletData {
         static final int SIZE = 80;
         private int myOffset;
-        public BulletData(int myOffset) {
+        BulletData(int myOffset) {
           this.myOffset = myOffset;
         }
         int getId() {
@@ -1286,7 +1297,7 @@ final class ClientData {
     class unitFinder {
         static final int SIZE = 8;
         private int myOffset;
-        public unitFinder(int myOffset) {
+        unitFinder(int myOffset) {
           this.myOffset = myOffset;
         }
         int getUnitIndex() {
@@ -1307,7 +1318,7 @@ final class ClientData {
     class UnitData {
         static final int SIZE = 336;
         private int myOffset;
-        public UnitData(int myOffset) {
+        UnitData(int myOffset) {
           this.myOffset = myOffset;
         }
         int getClearanceLevel() {

@@ -3,7 +3,6 @@ package bwapi;
 import com.sun.jna.Pointer;
 import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
@@ -13,19 +12,7 @@ class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
 
-    private static Unsafe unsafe;
-
-    static {
-        try {
-            final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            unsafe = (Unsafe) theUnsafe.get(null);
-
-        } catch (final Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+    private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     WrappedBuffer(final int size) {
         buffer = ByteBuffer.allocateDirect(size);
@@ -93,5 +80,9 @@ class WrappedBuffer {
 
     ByteBuffer getBuffer() {
         return buffer;
+    }
+
+    long getAddress() {
+        return address;
     }
 }

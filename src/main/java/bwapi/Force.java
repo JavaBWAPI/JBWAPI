@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * It is not called a team because players on the same force do not necessarily need
  * to be allied at the beginning of a match.
  */
-public class Force implements Comparable<Force> {
+public final class Force implements Comparable<Force> {
     private final Game game;
 
     private final int id;

@@ -1,5 +1,15 @@
 package bwapi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -20,13 +30,7 @@ import static org.mockito.Mockito.mock;
 @RunWith(Theories.class)
 public class GameTest {
 
-    private final List<Unit> allUnits = new ArrayList<>();
-    private final Game sut = new Game(mock(Client.class)) {
-        @Override
-        public List<Unit> getAllUnits() {
-            return allUnits;
-        }
-    };
+    private Game sut = new Game();
     private Unit dummy;
 
     @DataPoints("overlapping")
@@ -63,7 +67,7 @@ public class GameTest {
     public void shouldFindOverlappingUnits(
             @FromDataPoints("overlapping") Pair<Position, Position> rect) {
         // GIVEN
-        allUnits.add(dummy);
+        sut.setAllUnits(Collections.singletonList(dummy));
 
         // WHEN
         List<Unit> unitsInRectangle = sut
@@ -77,7 +81,7 @@ public class GameTest {
     public void shouldNotFindNonOverlappingUnits(
             @FromDataPoints("non-overlapping") Pair<Position, Position> rect) {
         // GIVEN
-        allUnits.add(dummy);
+        sut.setAllUnits(Collections.singletonList(dummy));
 
         // WHEN
         List<Unit> unitsInRectangle = sut
@@ -89,13 +93,16 @@ public class GameTest {
 
     @Test
     public void ifReplaySelfAndEnemyShouldBeNull() throws IOException {
-        WrappedBuffer buffer = GameBuilder.binToBuffer("src/test/resources/" + "(2)Benzene.scx" + "_frame0_buffer.bin");
+        WrappedBuffer buffer = GameBuilder.binToBuffer(GameBuilder.DEFAULT_BUFFER_PATH);
 
-        Client client = new Client(buffer);
         // modify the buffer to fake a replay
-        client.gameData().setIsReplay(true);
+        ClientData clientData = new ClientData();
+        clientData.setBuffer(buffer);
+        clientData.gameData().setIsReplay(true);
 
-        Game game = GameBuilder.createGame(client);
+        Game game = new Game();
+        game.botClientData().setBuffer(buffer);
+        game.init();
 
         assertThat(game.isReplay());
         assertNull(game.self());

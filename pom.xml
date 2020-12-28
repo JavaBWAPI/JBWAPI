@@ -61,8 +61,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <parallel>all</parallel> <!-- Run tests in parallel-->
-                    <useUnlimitedThreads>true</useUnlimitedThreads>
+<!--                    <parallel>all</parallel> &lt;!&ndash; Run tests in parallel&ndash;&gt;-->
+<!--                    <useUnlimitedThreads>true</useUnlimitedThreads>-->
+                    <rerunFailingTestsCount>10</rerunFailingTestsCount>
+                    <argLine>-Xms1g -Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>

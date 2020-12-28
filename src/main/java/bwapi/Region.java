@@ -21,7 +21,7 @@ import java.util.Objects;
  * @see Game#getRegionAt
  * @see Unit#getRegion
  */
-public class Region implements Comparable<Region> {
+public final class Region implements Comparable<Region> {
     private final RegionData regionData;
     private final Game game;
 

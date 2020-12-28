@@ -11,7 +11,7 @@ import java.util.Objects;
  * Starcraft uses a 256 color palette for rendering. Thus, the colors available are
  * limited to this palette.
  */
-public class Color {
+public final class Color {
     /**
      * The default color for Player 1.
      */

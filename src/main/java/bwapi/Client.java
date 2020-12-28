@@ -25,9 +25,6 @@ SOFTWARE.
 
 package bwapi;
 
-import bwapi.ClientData.Command;
-import bwapi.ClientData.GameData;
-import bwapi.ClientData.Shape;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
@@ -42,42 +39,34 @@ class Client {
         HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
     }
 
-    public interface EventHandler {
-        void operation(ClientData.Event event);
-    }
-
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
-
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
-    static final int MAX_COUNT = 19999;
 
     private ClientData clientData;
-    private ClientData.GameData gameData;
+    private BWClient bwClient;
     private boolean connected = false;
     private RandomAccessFile pipeObjectHandle = null;
-    private WrappedBuffer mapFileHandle = null;
     private WrappedBuffer gameTableFileHandle = null;
+    private WrappedBuffer mapFileHandle = null;
 
-    private boolean debugConnection = false;
-
-    Client(boolean debugConnection) {
-        this.debugConnection = debugConnection;
+    Client(BWClient bwClient) {
+        this.bwClient = bwClient;
     }
 
     /**
      * For test purposes only
      */
     Client(final WrappedBuffer buffer) {
-        clientData = new ClientData(buffer);
-        gameData = clientData.new GameData(0);
+        clientData = new ClientData();
+        clientData.setBuffer(buffer);
     }
 
-    ClientData clientData() {
+    ClientData liveClientData() {
         return clientData;
     }
 
-    GameData gameData() {
-        return gameData;
+    WrappedBuffer mapFile() {
+        return mapFileHandle;
     }
 
     boolean isConnected() {
@@ -90,8 +79,8 @@ class Client {
         }
     }
 
-    void disconnect() {
-        if (debugConnection) {
+    private void disconnect() {
+        if (bwClient.getConfiguration().getDebugConnection()) {
             System.err.print("Disconnect called by: ");
             System.err.println(Thread.currentThread().getStackTrace()[2]);
         }
@@ -108,9 +97,9 @@ class Client {
             pipeObjectHandle = null;
         }
 
-        mapFileHandle = null;
         gameTableFileHandle = null;
-        gameData = null;
+        mapFileHandle = null;
+        clientData = null;
         connected = false;
     }
 
@@ -123,6 +112,7 @@ class Client {
         int serverProcID = -1;
         int gameTableIndex = -1;
 
+        // Expose the BWAPI list of games from shared memory via a ByteBuffer
         try {
             final Pointer gameTableView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE,
@@ -138,7 +128,7 @@ class Client {
             gameTable = new GameTable(gameTableFileHandle);
         } catch (Exception e) {
             System.err.println("Unable to map Game table.");
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             return false;
@@ -171,7 +161,7 @@ class Client {
             pipeObjectHandle = new RandomAccessFile(communicationPipe, "rw");
         } catch (Exception e) {
             System.err.println("Unable to open communications pipe: " + communicationPipe);
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             gameTableFileHandle = null;
@@ -179,14 +169,15 @@ class Client {
         }
         System.out.println("Connected");
 
+        // Expose the raw game data from shared memory via a ByteBuffer
         try {
             final Pointer mapFileView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
                             .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
-                    0, 0, GameData.SIZE);
-            mapFileHandle = new WrappedBuffer(mapFileView, GameData.SIZE);
+                    0, 0, ClientData.GameData.SIZE);
+            mapFileHandle = new WrappedBuffer(mapFileView, ClientData.GameData.SIZE);
         } catch (Exception e) {
             System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             pipeObjectHandle = null;
@@ -194,20 +185,21 @@ class Client {
             return false;
         }
         try {
-            clientData = new ClientData(mapFileHandle);
-            gameData = clientData.new GameData(0);
-        } catch (Exception e) {
+            clientData = new ClientData();
+            clientData.setBuffer(mapFileHandle);
+        }
+        catch (Exception e) {
             System.err.println("Unable to map game data.");
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             return false;
         }
 
-        if (SUPPORTED_BWAPI_VERSION != gameData.getClient_version()) {
+        if (SUPPORTED_BWAPI_VERSION != clientData.gameData().getClient_version()) {
             System.err.println("Error: Client and Server are not compatible!");
             System.err.println("Client version: " + SUPPORTED_BWAPI_VERSION);
-            System.err.println("Server version: " + gameData.getClient_version());
+            System.err.println("Server version: " + clientData.gameData().getClient_version());
             disconnect();
             sleep(2000);
             return false;
@@ -218,7 +210,7 @@ class Client {
                 code = pipeObjectHandle.readByte();
             } catch (Exception e) {
                 System.err.println("Unable to read pipe object.");
-                if (debugConnection) {
+                if (bwClient.getConfiguration().getDebugConnection()) {
                     e.printStackTrace();
                 }
                 disconnect();
@@ -231,75 +223,65 @@ class Client {
         return true;
     }
 
-    void update(final EventHandler handler) {
-        byte code = 1;
+    void sendFrameReceiveFrame() {
+        final PerformanceMetrics metrics = bwClient.getPerformanceMetrics();
+
+        // Tell BWAPI that we are done with the current frame
+        metrics.getFrameDurationReceiveToSend().stopTiming();
+        if (bwClient.doTime()) {
+            metrics.getCommunicationSendToReceive().startTiming();
+            metrics.getCommunicationSendToSent().startTiming();
+        }
         try {
-            pipeObjectHandle.writeByte(code);
-        } catch (Exception e) {
+            // 1 is the "frame done" signal to BWAPI
+            pipeObjectHandle.writeByte(1);
+        }
+        catch (Exception e) {
             System.err.println("failed, disconnecting");
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             disconnect();
             return;
         }
-        while (code != 2) {
+        metrics.getCommunicationSendToSent().stopTiming();
+        metrics.getFrameDurationReceiveToSent().stopTiming();
+        if (bwClient.doTime()) {
+            final int eventCount = clientData.gameData().getEventCount();
+            metrics.getNumberOfEvents().record(eventCount);
+            metrics.getNumberOfEventsTimesDurationReceiveToSent().record(eventCount * metrics.getFrameDurationReceiveToSent().getRunningTotal().getLast());
+        }
+
+        // Listen for BWAPI to indicate that a new frame is ready
+        if (bwClient.doTime()) {
+            metrics.getCommunicationListenToReceive().startTiming();
+        }
+        boolean frameReady = false;
+        while (!frameReady) {
             try {
-                code = pipeObjectHandle.readByte();
+                // 2 is the "frame ready" signal from BWAPI
+                frameReady = pipeObjectHandle.readByte() == 2;
             } catch (Exception e) {
                 System.err.println("failed, disconnecting");
-                if (debugConnection) {
+                if (bwClient.getConfiguration().getDebugConnection()) {
                     e.printStackTrace();
                 }
                 disconnect();
-                return;
+                break;
             }
         }
-        for (int i = 0; i < gameData.getEventCount(); i++) {
-            handler.operation(gameData.getEvents(i));
+
+        metrics.getCommunicationListenToReceive().stopTiming();
+        metrics.getCommunicationSendToReceive().stopTiming();
+
+        if (bwClient.doTime()) {
+            metrics.getFrameDurationReceiveToSend().startTiming();
+            metrics.getFrameDurationReceiveToSent().startTiming();
         }
-    }
-
-    String eventString(final int s) {
-        return gameData.getEventStrings(s);
-    }
-
-    int addString(final String string) {
-        int stringCount = gameData.getStringCount();
-        if (stringCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many strings!");
+        metrics.getFrameDurationReceiveToReceive().stopTiming();
+        if (bwClient.doTime()) {
+            metrics.getFrameDurationReceiveToReceive().startTiming();
         }
-
-        gameData.setStringCount(stringCount + 1);
-        gameData.setStrings(stringCount, string);
-        return stringCount;
-    }
-
-    Shape addShape() {
-        int shapeCount = gameData.getShapeCount();
-        if (shapeCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many shapes!");
-        }
-        gameData.setShapeCount(shapeCount + 1);
-        return gameData.getShapes(shapeCount);
-    }
-
-    Command addCommand() {
-        final int commandCount = gameData.getCommandCount();
-        if (commandCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many commands!");
-        }
-        gameData.setCommandCount(commandCount + 1);
-        return gameData.getCommands(commandCount);
-    }
-
-    ClientData.UnitCommand addUnitCommand() {
-        int unitCommandCount = gameData.getUnitCommandCount();
-        if (unitCommandCount >= MAX_COUNT) {
-            throw new IllegalStateException("Too many unit commands!");
-        }
-        gameData.setUnitCommandCount(unitCommandCount + 1);
-        return gameData.getUnitCommands(unitCommandCount);
     }
 
     private void sleep(final int millis) {

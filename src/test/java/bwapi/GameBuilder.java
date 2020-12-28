@@ -8,13 +8,20 @@ import java.util.zip.InflaterOutputStream;
 
 public class GameBuilder {
 
+    private final static String RESOURCES = "src/test/resources/";
+    public final static String DEFAULT_MAP_FILE = "(2)Benzene.scx";
+    public final static String DEFAULT_BUFFER_PATH = RESOURCES + DEFAULT_MAP_FILE + "_frame0_buffer.bin";
+
     public static Game createGame() throws IOException {
-        return createGame("(2)Benzene.scx");
+        return createGame(DEFAULT_MAP_FILE);
     }
 
     public static Game createGame(String mapName) throws IOException {
-        final WrappedBuffer buffer = binToBuffer("src/test/resources/" + mapName + "_frame0_buffer.bin");
-        return createGame(new Client(buffer));
+        final WrappedBuffer buffer = binToBuffer(RESOURCES + mapName + "_frame0_buffer.bin");
+        final Game game = new Game();
+        game.botClientData().setBuffer(buffer);
+        game.init();
+        return game;
     }
 
     public static WrappedBuffer binToBuffer(String binLocation) throws IOException {
@@ -30,9 +37,12 @@ public class GameBuilder {
         return buffer;
     }
 
-    public static Game createGame(Client client) throws IOException {
-        final Game game = new Game(client);
-        game.init();
-        return game;
+    public static WrappedBuffer binToBufferUnchecked(String binLocation) {
+        try {
+            return binToBuffer(binLocation);
+        } catch(IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
+
 }
