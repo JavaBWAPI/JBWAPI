@@ -64,8 +64,7 @@
 <!--                    <parallel>all</parallel> &lt;!&ndash; Run tests in parallel&ndash;&gt;-->
 <!--                    <useUnlimitedThreads>true</useUnlimitedThreads>-->
                     <rerunFailingTestsCount>10</rerunFailingTestsCount>
-                    <argLine>-Xms1g</argLine>
-                    <argLine>-Xmx1g</argLine>
+                    <argLine>-Xms1g -Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>
