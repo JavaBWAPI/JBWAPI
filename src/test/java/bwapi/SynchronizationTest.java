@@ -73,12 +73,12 @@ public class SynchronizationTest {
     public void async_IfBotDelay_ThenClientBuffers() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration
-                .withAsync(true)
-                .withMaxFrameDurationMs(10)
-                .withAsyncFrameBufferCapacity(4);
+            .withAsync(true)
+            .withMaxFrameDurationMs(100)
+            .withAsyncFrameBufferCapacity(4);
 
         environment.onFrame(1, () -> {
-            sleepUnchecked(50);
+            sleepUnchecked(500);
             assertEquals("Bot should be observing an old frame", 1, environment.bwClient.getGame().getFrameCount());
             assertEquals("Client should be as far ahead as the frame buffer allows", 5, environment.liveGameData().getFrameCount());
             assertEquals("Bot should be behind the live game", 4, environment.bwClient.framesBehind());
@@ -97,20 +97,20 @@ public class SynchronizationTest {
     public void async_IfBotDelay_ThenClientStalls() {
         SynchronizationEnvironment environment = new SynchronizationEnvironment();
         environment.configuration
-                .withAsync(true)
-                .withMaxFrameDurationMs(50)
-                .withAsyncFrameBufferCapacity(5);
+            .withAsync(true)
+            .withMaxFrameDurationMs(200)
+            .withAsyncFrameBufferCapacity(5);
 
         environment.onFrame(1, () -> {
-            sleepUnchecked(125);
+            sleepUnchecked(500);
             assertEquals("3: Bot should be observing an old frame", 1, environment.bwClient.getGame().getFrameCount());
             assertEquals("3: Client should have progressed as slowly as possible", 3, environment.liveGameData().getFrameCount());
             assertEquals("3: Bot should be behind the live game by as little as possible", 2, environment.bwClient.framesBehind());
-            sleepUnchecked(50);
+            sleepUnchecked(200);
             assertEquals("4: Bot should be observing an old frame", 1, environment.bwClient.getGame().getFrameCount());
             assertEquals("4: Client should have progressed as slowly as possible", 4, environment.liveGameData().getFrameCount());
             assertEquals("4: Bot should be behind the live game by as little as possible", 3, environment.bwClient.framesBehind());
-            sleepUnchecked(50);
+            sleepUnchecked(200);
             assertEquals("5: Bot should be observing an old frame", 1, environment.bwClient.getGame().getFrameCount());
             assertEquals("5: Client should have progressed as slowly as possible", 5, environment.liveGameData().getFrameCount());
             assertEquals("5: Bot should be behind the live game by as little as possible", 4, environment.bwClient.framesBehind());
@@ -211,7 +211,7 @@ public class SynchronizationTest {
      * Number of milliseconds of leeway to give in potentially noisy performance metrics.
      * Increase if tests are flaky due to variance in execution speed.
      */
-    private final static long MS_MARGIN = 10;
+    private final static long MS_MARGIN = 20;
 
     @Test
     public void MeasurePerformance_BotResponse() {
