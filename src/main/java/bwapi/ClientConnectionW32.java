@@ -8,8 +8,10 @@ import com.sun.jna.win32.W32APIOptions;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UncheckedIOException;
 
+/**
+ * Default Windows BWAPI pipe connection with shared memory.
+ */
 class ClientConnectionW32 implements ClientConnection {
     private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
 
@@ -66,28 +68,12 @@ class ClientConnectionW32 implements ClientConnection {
     }
 
     @Override
-    public void waitForServerReady() throws IOException {
-        byte code = 1;
-        while (code != 2) {
-            try {
-                code = pipeObjectHandle.readByte();
-            } catch (IOException e) {
-                throw new UncheckedIOException("Unable to read pipe object.", e);
-            }
-        }
-    }
-
-    @Override
     public void waitForServerData() throws IOException {
-        byte code = 1;
-        pipeObjectHandle.writeByte(code);
-        while (code != 2) {
-            code = pipeObjectHandle.readByte();
-        }
+        while (pipeObjectHandle.readByte() != 2) ;
     }
 
     @Override
     public void submitClientData() throws IOException {
-        // Noop
+        pipeObjectHandle.writeByte(1);
     }
 }

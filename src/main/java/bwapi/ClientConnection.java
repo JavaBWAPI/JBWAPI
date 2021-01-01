@@ -2,6 +2,9 @@ package bwapi;
 
 import java.io.IOException;
 
+/**
+ * Client - Server connection abstraction
+ */
 interface ClientConnection {
     void disconnect();
 
@@ -10,8 +13,6 @@ interface ClientConnection {
     WrappedBuffer getSharedMemory(int serverProcID);
 
     void connectSharedLock(int serverProcID) throws IOException;
-
-    void waitForServerReady() throws IOException;
 
     void waitForServerData() throws IOException;
 

@@ -178,7 +178,7 @@ class Client {
         }
 
         try {
-            clientConnector.waitForServerReady();
+            clientConnector.waitForServerData();
         } catch (Exception e) {
             System.err.println(e.getMessage());
             if (bwClient.getConfiguration().getDebugConnection()) {
