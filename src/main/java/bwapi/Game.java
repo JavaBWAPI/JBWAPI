@@ -872,10 +872,7 @@ public final class Game {
     }
 
     final public boolean isWalkable(final WalkPosition position) {
-        if (!position.isValid(this)) {
-            return false;
-        }
-        return walkable[position.x][position.y];
+        return position.isValid(this) && walkable[position.x][position.y];
     }
 
     /**
@@ -892,15 +889,12 @@ public final class Game {
      * - 5: Very high ground doodad
      * .
      */
-    public int getGroundHeight(final int tileX, final int tileY) {
-        return getGroundHeight(new TilePosition(tileX, tileY));
+    final public int getGroundHeight(final int tileX, final int tileY) {
+        return isValidTile(tileX, tileY) ? groundHeight[tileX][tileY] : 0;
     }
 
-    public int getGroundHeight(final TilePosition position) {
-        if (!position.isValid(this)) {
-            return 0;
-        }
-        return groundHeight[position.x][position.y];
+    final public int getGroundHeight(final TilePosition position) {
+        return getGroundHeight(position.x, position.y);
     }
 
     final public boolean isBuildable(final int tileX, final int tileY) {
@@ -1014,23 +1008,23 @@ public final class Game {
         return hasPowerPrecise(position.x, position.y, unitType);
     }
 
-    final public boolean hasPower(final int tileX, final int tileY) {
-        return hasPower(new TilePosition(tileX, tileY));
-    }
-
-    final public boolean hasPower(final int tileX, final int tileY, final UnitType unitType) {
-        return hasPower(new TilePosition(tileX, tileY), unitType);
-    }
-
     final public boolean hasPower(final TilePosition position) {
-        return hasPower(position.x, position.y, UnitType.None);
+        return hasPower(position.x, position.y);
+    }
+
+    final public boolean hasPower(final int tileX, final int tileY) {
+        return hasPower(tileX, tileY, UnitType.None);
     }
 
     final public boolean hasPower(final TilePosition position, final UnitType unitType) {
+        return hasPower(position.x, position.y, unitType);
+    }
+
+    final public boolean hasPower(final int tileX, final int tileY, final UnitType unitType) {
         if (unitType.id >= 0 && unitType.id < UnitType.None.id) {
-            return hasPowerPrecise(position.x * 32 + unitType.tileWidth() * 16, position.y * 32 + unitType.tileHeight() * 16, unitType);
+            return hasPowerPrecise(tileX * 32 + unitType.tileWidth() * 16, tileY * 32 + unitType.tileHeight() * 16, unitType);
         }
-        return hasPowerPrecise(position.x * 32, position.y * 32, UnitType.None);
+        return hasPowerPrecise(tileY * 32, tileY * 32, UnitType.None);
     }
 
     final public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight) {
