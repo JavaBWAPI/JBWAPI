@@ -11,7 +11,6 @@ before_install:
   - jdk_switcher use oraclejdk8
 before_script:
   - git clone https://github.com/Bytekeeper/sc-docker.git
-  - cp it/sc-docker-support/*.dockerfile sc-docker/docker/dockerfiles
   - pushd sc-docker
   - pip3 install numpy==1.16.6
   - python3 setup.py bdist_wheel

@@ -25,32 +25,25 @@ SOFTWARE.
 
 package bwapi;
 
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.win32.W32APIOptions;
-
-import java.io.RandomAccessFile;
+import bwapi.ClientData.Command;
+import bwapi.ClientData.GameData;
+import bwapi.ClientData.Shape;
 
 class Client {
-    interface MappingKernel extends Kernel32 {
-        MappingKernel INSTANCE = Native.load(MappingKernel.class, W32APIOptions.DEFAULT_OPTIONS);
-
-        HANDLE OpenFileMapping(int desiredAccess, boolean inherit, String name);
-    }
-
-    private static final int READ_WRITE = 0x1 | 0x2 | 0x4;
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
 
     private ClientData clientData;
+    private ClientData.GameData gameData;
     private BWClient bwClient;
     private boolean connected = false;
-    private RandomAccessFile pipeObjectHandle = null;
-    private WrappedBuffer gameTableFileHandle = null;
-    private WrappedBuffer mapFileHandle = null;
+    private WrappedBuffer mapShm = null;
+    private WrappedBuffer gameTableShm = null;
+    private final ClientConnection clientConnector;
 
     Client(BWClient bwClient) {
         this.bwClient = bwClient;
+        boolean windowsOs = System.getProperty("os.name").toLowerCase().contains("win");
+        clientConnector = windowsOs ? new ClientConnectionW32() : new ClientConnectionPosix();
     }
 
     /**
@@ -59,6 +52,7 @@ class Client {
     Client(final WrappedBuffer buffer) {
         clientData = new ClientData();
         clientData.setBuffer(buffer);
+        clientConnector = null;
     }
 
     ClientData liveClientData() {
@@ -87,18 +81,9 @@ class Client {
         if (!connected) {
             return;
         }
-
-        if (pipeObjectHandle != null) {
-            try {
-                pipeObjectHandle.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            pipeObjectHandle = null;
-        }
-
-        gameTableFileHandle = null;
-        mapFileHandle = null;
+        clientConnector.disconnect();
+        mapShm = null;
+        gameTableShm = null;
         clientData = null;
         connected = false;
     }
@@ -114,18 +99,16 @@ class Client {
 
         // Expose the BWAPI list of games from shared memory via a ByteBuffer
         try {
-            final Pointer gameTableView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
-                            .OpenFileMapping(READ_WRITE, false, "Local\\bwapi_shared_memory_game_list"), READ_WRITE,
-                    0, 0, GameTable.SIZE);
-            gameTableFileHandle = new WrappedBuffer(gameTableView, GameTable.SIZE);
-        } catch (Exception e) {
+            gameTableShm = clientConnector.getGameTable();
+        }
+        catch (Exception e) {
             System.err.println("Game table mapping not found.");
             return false;
         }
 
         GameTable gameTable;
         try {
-            gameTable = new GameTable(gameTableFileHandle);
+            gameTable = new GameTable(this.gameTableShm);
         } catch (Exception e) {
             System.err.println("Unable to map Game table.");
             if (bwClient.getConfiguration().getDebugConnection()) {
@@ -134,13 +117,13 @@ class Client {
             return false;
         }
 
-        int latest = 0;
+        int oldest = Integer.MAX_VALUE;
         for (int i = 0; i < GameTable.MAX_GAME_INSTANCES; i++) {
             GameInstance gameInstance = gameTable.gameInstances[i];
             System.out.println(i + " | " + gameInstance.serverProcessID + " | " + (gameInstance.isConnected ? 1 : 0) + " | " + gameInstance.lastKeepAliveTime);
             if (gameInstance.serverProcessID != 0 && !gameInstance.isConnected) {
-                if (gameTableIndex == -1 || latest == 0 || gameInstance.lastKeepAliveTime < latest) {
-                    latest = gameInstance.lastKeepAliveTime;
+                if (gameTableIndex == -1 || gameInstance.lastKeepAliveTime < oldest) {
+                    oldest = gameInstance.lastKeepAliveTime;
                     gameTableIndex = i;
                 }
             }
@@ -155,46 +138,40 @@ class Client {
             return false;
         }
 
-        final String sharedMemoryName = "Local\\bwapi_shared_memory_" + serverProcID;
-        final String communicationPipe = "\\\\.\\pipe\\bwapi_pipe_" + serverProcID;
         try {
-            pipeObjectHandle = new RandomAccessFile(communicationPipe, "rw");
-        } catch (Exception e) {
-            System.err.println("Unable to open communications pipe: " + communicationPipe);
-            if (bwClient.getConfiguration().getDebugConnection()) {
-                e.printStackTrace();
-            }
-            gameTableFileHandle = null;
-            return false;
-        }
-        System.out.println("Connected");
-
-        // Expose the raw game data from shared memory via a ByteBuffer
-        try {
-            final Pointer mapFileView = Kernel32.INSTANCE.MapViewOfFile(MappingKernel.INSTANCE
-                            .OpenFileMapping(READ_WRITE, false, sharedMemoryName), READ_WRITE,
-                    0, 0, ClientData.GameData.SIZE);
-            mapFileHandle = new WrappedBuffer(mapFileView, ClientData.GameData.SIZE);
-        } catch (Exception e) {
-            System.err.println("Unable to open shared memory mapping: " + sharedMemoryName);
-            if (bwClient.getConfiguration().getDebugConnection()) {
-                e.printStackTrace();
-            }
-            pipeObjectHandle = null;
-            gameTableFileHandle = null;
-            return false;
-        }
-        try {
-            clientData = new ClientData();
-            clientData.setBuffer(mapFileHandle);
+            mapShm = clientConnector.getSharedMemory(serverProcID);
         }
         catch (Exception e) {
+            System.err.println("Unable to open shared memory mapping: " + e.getMessage());
+            if (bwClient.getConfiguration().getDebugConnection()) {
+                e.printStackTrace();
+            }
+            this.gameTableShm = null;
+            return false;
+        }
+        try {
+            clientData = new ClientData(mapShm);
+            gameData = clientData.new GameData(0);
+        } catch (Exception e) {
             System.err.println("Unable to map game data.");
             if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             return false;
         }
+
+
+        try {
+            clientConnector.connectSharedLock(serverProcID);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            if (bwClient.getConfiguration().getDebugConnection()) {
+                e.printStackTrace();
+            }
+            this.gameTableShm = null;
+            return false;
+        }
+        System.out.println("Connected");
 
         if (SUPPORTED_BWAPI_VERSION != clientData.gameData().getClient_version()) {
             System.err.println("Error: Client and Server are not compatible!");
@@ -204,18 +181,16 @@ class Client {
             sleep(2000);
             return false;
         }
-        byte code = 1;
-        while (code != 2) {
-            try {
-                code = pipeObjectHandle.readByte();
-            } catch (Exception e) {
-                System.err.println("Unable to read pipe object.");
-                if (bwClient.getConfiguration().getDebugConnection()) {
-                    e.printStackTrace();
-                }
-                disconnect();
-                return false;
+
+        try {
+            clientConnector.waitForServerReady();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            if (bwClient.getConfiguration().getDebugConnection()) {
+                e.printStackTrace();
             }
+            disconnect();
+            return false;
         }
 
         System.out.println("Connection successful");
@@ -233,8 +208,7 @@ class Client {
             metrics.getCommunicationSendToSent().startTiming();
         }
         try {
-            // 1 is the "frame done" signal to BWAPI
-            pipeObjectHandle.writeByte(1);
+            clientConnector.waitForServerData();
         }
         catch (Exception e) {
             System.err.println("failed, disconnecting");
@@ -256,19 +230,15 @@ class Client {
         if (bwClient.doTime()) {
             metrics.getCommunicationListenToReceive().startTiming();
         }
-        boolean frameReady = false;
-        while (!frameReady) {
-            try {
-                // 2 is the "frame ready" signal from BWAPI
-                frameReady = pipeObjectHandle.readByte() == 2;
-            } catch (Exception e) {
-                System.err.println("failed, disconnecting");
-                if (bwClient.getConfiguration().getDebugConnection()) {
-                    e.printStackTrace();
-                }
-                disconnect();
-                break;
+        try {
+            clientConnector.submitClientData();
+        } catch (Exception e) {
+            System.err.println("failed, disconnecting");
+            if (debugConnection) {
+                e.printStackTrace();
             }
+            disconnect();
+        }
         }
 
         metrics.getCommunicationListenToReceive().stopTiming();
@@ -288,6 +258,7 @@ class Client {
         try {
             Thread.sleep(millis);
         } catch (Exception ignored) {
+            // Not relevant
         }
     }
 }
