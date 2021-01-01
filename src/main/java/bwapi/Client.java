@@ -25,15 +25,10 @@ SOFTWARE.
 
 package bwapi;
 
-import bwapi.ClientData.Command;
-import bwapi.ClientData.GameData;
-import bwapi.ClientData.Shape;
-
 class Client {
     private static final int SUPPORTED_BWAPI_VERSION = 10003;
 
     private ClientData clientData;
-    private ClientData.GameData gameData;
     private BWClient bwClient;
     private boolean connected = false;
     private WrappedBuffer mapShm = null;
@@ -60,7 +55,7 @@ class Client {
     }
 
     WrappedBuffer mapFile() {
-        return mapFileHandle;
+        return mapShm;
     }
 
     boolean isConnected() {
@@ -150,8 +145,8 @@ class Client {
             return false;
         }
         try {
-            clientData = new ClientData(mapShm);
-            gameData = clientData.new GameData(0);
+            clientData = new ClientData();
+            clientData.setBuffer(mapShm);
         } catch (Exception e) {
             System.err.println("Unable to map game data.");
             if (bwClient.getConfiguration().getDebugConnection()) {
@@ -208,15 +203,13 @@ class Client {
             metrics.getCommunicationSendToSent().startTiming();
         }
         try {
-            clientConnector.waitForServerData();
-        }
-        catch (Exception e) {
+            clientConnector.submitClientData();
+        } catch (Exception e) {
             System.err.println("failed, disconnecting");
             if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             disconnect();
-            return;
         }
         metrics.getCommunicationSendToSent().stopTiming();
         metrics.getFrameDurationReceiveToSent().stopTiming();
@@ -231,14 +224,15 @@ class Client {
             metrics.getCommunicationListenToReceive().startTiming();
         }
         try {
-            clientConnector.submitClientData();
-        } catch (Exception e) {
+            clientConnector.waitForServerData();
+        }
+        catch (Exception e) {
             System.err.println("failed, disconnecting");
-            if (debugConnection) {
+            if (bwClient.getConfiguration().getDebugConnection()) {
                 e.printStackTrace();
             }
             disconnect();
-        }
+            return;
         }
 
         metrics.getCommunicationListenToReceive().stopTiming();
