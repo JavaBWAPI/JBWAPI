@@ -2,15 +2,12 @@ dist: focal
 language: python
 python:
   - "3.6"
+jdk: oraclejdk8
 services:
   - docker
 cache:
   directories:
     - /tmp/sc-docker
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
 before_script:
   - git clone https://github.com/Bytekeeper/sc-docker.git
   - pushd sc-docker
