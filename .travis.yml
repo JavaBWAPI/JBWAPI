@@ -10,7 +10,7 @@ cache:
 before_install:
   - jdk_switcher use oraclejdk8
 before_script:
-  - sudo apt-get install libstdc++6
+  - sudo apt-get install -y libstdc++6
   - git clone https://github.com/Bytekeeper/sc-docker.git
   - pushd sc-docker
   - pip3 install numpy==1.16.6
