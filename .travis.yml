@@ -29,6 +29,9 @@ script:
   - set -e
   - scbw.play --headless --bots jbwapibot SittingDuck --timeout 180 --docker_image starcraft:game 2>&1 | grep 'Winner is BotPlayer:jbwapibot:T' || (cat $HOME/.scbw/games/*/logs_0/* && exit 1)
   - pushd it/openbw
+  - mv BROODAT.MPQ BrooDat.mpq
+  - mv patch_rt.mpq Patch_rt.mpq
+  - mv STARDAT.mpq StarDat.mpq
   - chmod u+x BWAPILauncher
   - BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP=~/.scbw/maps/sscai/\(3\)Neo\ Moon\ Glaive.scx ./BWAPILauncher&
   - BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP=~/.scbw/maps/sscai/\(3\)Neo\ Moon\ Glaive.scx ./BWAPILauncher&
