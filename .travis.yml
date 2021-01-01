@@ -31,7 +31,7 @@ script:
   - pushd it/openbw
   - mv BROODAT.MPQ BrooDat.mpq
   - mv patch_rt.mpq Patch_rt.mpq
-  - mv STARDAT.mpq StarDat.mpq
+  - mv STARDAT.MPQ StarDat.mpq
   - chmod u+x BWAPILauncher
   - BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP=~/.scbw/maps/sscai/\(3\)Neo\ Moon\ Glaive.scx ./BWAPILauncher&
   - BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP=~/.scbw/maps/sscai/\(3\)Neo\ Moon\ Glaive.scx ./BWAPILauncher&
