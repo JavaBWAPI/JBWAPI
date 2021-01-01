@@ -2,13 +2,13 @@ dist: focal
 language: python
 python:
   - "3.6"
-jdk: oraclejdk8
 services:
   - docker
 cache:
   directories:
     - /tmp/sc-docker
 before_script:
+  - sudo apt-get install openjdk-8-jdk
   - git clone https://github.com/Bytekeeper/sc-docker.git
   - pushd sc-docker
   - pip3 install numpy==1.16.6
