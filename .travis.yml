@@ -26,10 +26,8 @@ jobs:
       - popd
       - "[ -f /tmp/sc-docker/starcraft.zip ] || cp sc-docker/scbw/local_docker/starcraft.zip /tmp/sc-docker/starcraft.zip"
       - scbw.play --install
-      before_script:
-        - set -e
-        - for bot in $(ls -d it/bots/*/); do BOTNAME=$(basename $bot); echo "Setting up $BOTNAME"; mkdir -p "$HOME/.scbw/bots/$BOTNAME/AI" "$HOME/.scbw/bots/$BOTNAME/read" "$HOME/.scbw/bots/$BOTNAME/write"; cp it/sc-docker-support/BWAPI.dll "$HOME/.scbw/bots/$BOTNAME"; cp "$bot/target/"*-with-dependencies.jar "$HOME/.scbw/bots/$BOTNAME/AI"; cp "$bot/bot.json" "$HOME/.scbw/bots/$BOTNAME"; done
-        - scbw.play --headless --bots jbwapibot SittingDuck --timeout 180 --docker_image starcraft:game 2>&1 | grep 'Winner is BotPlayer:jbwapibot:T' || (cat $HOME/.scbw/games/*/logs_0/* && exit 1)
+      - for bot in $(ls -d it/bots/*/); do BOTNAME=$(basename $bot); echo "Setting up $BOTNAME"; mkdir -p "$HOME/.scbw/bots/$BOTNAME/AI" "$HOME/.scbw/bots/$BOTNAME/read" "$HOME/.scbw/bots/$BOTNAME/write"; cp it/sc-docker-support/BWAPI.dll "$HOME/.scbw/bots/$BOTNAME"; cp "$bot/target/"*-with-dependencies.jar "$HOME/.scbw/bots/$BOTNAME/AI"; cp "$bot/bot.json" "$HOME/.scbw/bots/$BOTNAME"; done
+      - scbw.play --headless --bots jbwapibot SittingDuck --timeout 180 --docker_image starcraft:game 2>&1 | grep 'Winner is BotPlayer:jbwapibot:T' || (cat $HOME/.scbw/games/*/logs_0/* && exit 1)
     - language: java
       jdk: openjdk8
       script:
