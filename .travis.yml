@@ -5,13 +5,13 @@ addons:
       - openjdk-8-jdk
       - python3
       - python3-pip
+      - python3-setuptools
 services:
   - docker
 cache:
   directories:
     - /tmp/sc-docker
 before_script:
-  - sudo apt-get install openjdk-8-jdk
   - git clone https://github.com/Bytekeeper/sc-docker.git
   - pushd sc-docker
   - pip3 install numpy==1.16.6
