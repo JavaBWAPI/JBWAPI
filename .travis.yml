@@ -3,7 +3,7 @@ addons:
   apt:
     packages:
       - openjdk-8-jdk
-      - python3.6
+      - python3
 services:
   - docker
 cache:
