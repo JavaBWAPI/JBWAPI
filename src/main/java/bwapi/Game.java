@@ -325,7 +325,7 @@ public final class Game {
      * Avoids previous O(n^2) implementation which would be costly for
      * lategame carrier fights
      */
-    public List<Unit> getConnected(final Unit unit) {
+    List<Unit> getConnected(final Unit unit) {
         final int frame = getFrameCount();
         if (lastConnectedUnitsUpdate < frame) {
             connectedUnits.clear();
@@ -346,13 +346,13 @@ public final class Game {
         if (!connectedUnits.containsKey(unit)) {
             return Collections.emptyList();
         }
-        return new ArrayList<>(connectedUnits.get(unit));
+        return Collections.unmodifiableList(connectedUnits.get(unit));
     }
 
     /**
      * @see #getConnected
      */
-    public List<Unit> getLoadedUnits(final Unit unit) {
+    List<Unit> getLoadedUnits(final Unit unit) {
         final int frame = getFrameCount();
         if (lastLoadedUnitsUpdate < frame) {
             loadedUnits.clear();
@@ -370,7 +370,7 @@ public final class Game {
         if (!loadedUnits.containsKey(unit)) {
             return Collections.emptyList();
         }
-        return new ArrayList<>(loadedUnits.get(unit));
+        return Collections.unmodifiableList(loadedUnits.get(unit));
     }
 
     /**
