@@ -43,6 +43,11 @@ public final class Game {
     private static final int REGION_DATA_SIZE = 5000;
 
     private final Set<Integer> visibleUnits = new HashSet<>();
+    private final Map<Unit, List<Unit>> connectedUnits = new HashMap<>();
+    private int lastConnectedUnitsUpdate = -1;
+    private final Map<Unit, List<Unit>> loadedUnits = new HashMap<>();
+    private int lastLoadedUnitsUpdate = -1;
+
     private List<Unit> allUnits;
     private final ClientData clientData;
 
@@ -146,6 +151,10 @@ public final class Game {
     */
     void init() {
         visibleUnits.clear();
+        connectedUnits.clear();
+        lastConnectedUnitsUpdate = -1;
+        loadedUnits.clear();
+        lastLoadedUnitsUpdate = -1;
 
         final int forceCount = gameData().getForceCount();
         forces = new Force[forceCount];
@@ -308,6 +317,60 @@ public final class Game {
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
+    }
+
+    /**
+     * Lazily update connectedUnits. Only users of the calls pay for it, and only
+     * pay once per frame.
+     * Avoids previous O(n^2) implementation which would be costly for
+     * lategame carrier fights
+     */
+    public List<Unit> getConnected(final Unit unit) {
+        final int frame = getFrameCount();
+        if (lastConnectedUnitsUpdate < frame) {
+            connectedUnits.clear();
+            for (final Unit u : getAllUnits()) {
+                Unit owner = u.getCarrier();
+                if (owner == null) {
+                    owner = u.getHatchery();
+                }
+                if (owner != null) {
+                    if (!connectedUnits.containsKey(owner)) {
+                        connectedUnits.put(owner, new ArrayList<>());
+                    }
+                    connectedUnits.get(owner).add(u);
+                }
+            }
+            lastConnectedUnitsUpdate = frame;
+        }
+        if (!connectedUnits.containsKey(unit)) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(connectedUnits.get(unit));
+    }
+
+    /**
+     * @see #getConnected
+     */
+    public List<Unit> getLoadedUnits(final Unit unit) {
+        final int frame = getFrameCount();
+        if (lastLoadedUnitsUpdate < frame) {
+            loadedUnits.clear();
+            for (final Unit u : getAllUnits()) {
+                final Unit owner = u.getTransport();
+                if (owner != null) {
+                    if (!loadedUnits.containsKey(owner)) {
+                        loadedUnits.put(owner, new ArrayList<>());
+                    }
+                    loadedUnits.get(owner).add(u);
+                }
+            }
+            lastLoadedUnitsUpdate = frame;
+        }
+        if (!loadedUnits.containsKey(unit)) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(loadedUnits.get(unit));
     }
 
     /**
