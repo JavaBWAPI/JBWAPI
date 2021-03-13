@@ -328,7 +328,7 @@ public final class Game {
     List<Unit> getConnected(final Unit unit) {
         final int frame = getFrameCount();
         if (lastConnectedUnitsUpdate < frame) {
-            connectedUnits.clear();
+            connectedUnits.values().forEach(List::clear);
             for (final Unit u : getAllUnits()) {
                 Unit owner = u.getCarrier();
                 if (owner == null) {
@@ -355,7 +355,7 @@ public final class Game {
     List<Unit> getLoadedUnits(final Unit unit) {
         final int frame = getFrameCount();
         if (lastLoadedUnitsUpdate < frame) {
-            loadedUnits.clear();
+            loadedUnits.values().forEach(List::clear);
             for (final Unit u : getAllUnits()) {
                 final Unit owner = u.getTransport();
                 if (owner != null) {
