@@ -191,7 +191,7 @@ public enum TechType {
         Arrays.stream(TechType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     TechType(final int id) {
         this.id = id;

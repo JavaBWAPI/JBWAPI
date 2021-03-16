@@ -205,7 +205,7 @@ public enum UpgradeType {
         Arrays.stream(UpgradeType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     UpgradeType(final int id) {
         this.id = id;
