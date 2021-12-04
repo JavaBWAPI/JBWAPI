@@ -46,4 +46,5 @@ jobs:
           mvn -f it/bots/pom.xml package 
           
           java -jar it/bots/SittingDuck/target/SittingDuck-*-jar-with-dependencies.jar &
-          java -jar it/bots/jbwapibot/target/MarineHell-*-jar-with-dependencies.jar
+          sleep 3
+          java -jar it/bots/jbwapibot/target/MarineHell-*-jar-with-dependencies.jar | grep "Hello from JBWAPI!" || exit 1
