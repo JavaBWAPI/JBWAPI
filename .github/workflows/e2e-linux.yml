@@ -19,14 +19,13 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Setup e2e-linux env
+      - name: Setup and launch openbw
         run: |
           sudo apt-get update
           sudo apt-get install cmake libsdl2-dev libsdl2-mixer-dev
-          
-          
+
           git clone https://github.com/basil-ladder/openbw
-          git clone https://github.com/basil-ladder/bwapi
+          git clone -b linux-client-support https://github.com/basil-ladder/bwapi
           cd bwapi
           mkdir build
           cd build
@@ -37,5 +36,14 @@ jobs:
           unzip starcraft.zip patch_rt.mpq BROODAT.MPQ STARDAT.MPQ
           mv patch_rt.mpq Patch_rt.mpq && mv BROODAT.MPQ BrooDat.mpq && mv STARDAT.MPQ StarDat.mpq
           unzip starcraft.zip "maps/BroodWar/ICCup/ICCup Destination 1.1.scx"
-          
+
           BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="maps/BroodWar/ICCup/ICCup Destination 1.1.scx" ./bin/BWAPILauncher&
+          BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="maps/BroodWar/ICCup/ICCup Destination 1.1.scx" ./bin/BWAPILauncher&
+
+      - name: Build & Run test bots
+        run: |
+          mvn install -DskipTests
+          mvn -f it/bots/pom.xml package 
+          
+          java -jar it/bots/SittingDuck/target/SittingDuck-*-jar-with-dependencies.jar &
+          java -jar it/bots/jbwapibot/target/MarineHell-*-jar-with-dependencies.jar
