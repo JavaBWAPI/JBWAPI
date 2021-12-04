@@ -16,6 +16,7 @@ Also contains a modified version of the pure Java BWEM implementation from [BWAP
  - At least [5x](https://github.com/JavaBWAPI/JBWAPI/issues/17) faster compared to BWMirror for primitives as it directly reads the memory mapped client file. Even faster for BWAPI objects as it also avoids type marshalling
  - Supports both 32 and 64 bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64 bit Java which bwmirror doesn't support).
  - BWEM instead of BWTA as map analyser.
+ - Supports Linux "natively" using [openbw](https://github.com/JavaBWAPI/JBWAPI/pull/73) !
 
 ## Warnings
  - A fake BWTA is provided for easier porting from BWMirror, but it translates BWTA calls to their respective BWEM calls, so specific Regions/Chokepoints etc. may differ.
