@@ -1,7 +1,5 @@
 package bwapi;
 
-import com.sun.jna.platform.win32.Kernel32;
-
 import java.util.Objects;
 
 /**
