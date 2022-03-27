@@ -115,7 +115,7 @@ public class Unit implements Comparable<Unit> {
      * <p>
      * In the event that this function returns false, there are two cases to consider:
      * 1. You own the unit. This means the unit is dead.
-     * 2. Another player owns the unit. This could either runningTotal that you don't have access
+     * 2. Another player owns the unit. This could either mean that you don't have access
      * to the unit or that the unit has died. You can specifically identify dead units
      * by polling onUnitDestroy.
      * @see #isVisible
