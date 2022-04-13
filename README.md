@@ -16,7 +16,8 @@ Also contains a modified version of the pure Java BWEM implementation from [BWAP
  - At least [5x](https://github.com/JavaBWAPI/JBWAPI/issues/17) faster compared to BWMirror for primitives as it directly reads the memory mapped client file. Even faster for BWAPI objects as it also avoids type marshalling
  - Supports both 32 and 64 bit Java (e.g. [deeplearning4j](https://deeplearning4j.org/) requires 64 bit Java which bwmirror doesn't support).
  - BWEM instead of BWTA as map analyser.
- - Supports Linux "natively" using [openbw](https://github.com/JavaBWAPI/JBWAPI/pull/73) !
+ - Supports Linux "natively" using [openbw](https://github.com/JavaBWAPI/JBWAPI/pull/73), made possible by by [ByteKeeper](https://github.com/Bytekeeper)
+ - `Async` support for realtime tournament constraints, made possible by [dgant](https://github.com/dgant) 
 
 ## Warnings
  - A fake BWTA is provided for easier porting from BWMirror, but it translates BWTA calls to their respective BWEM calls, so specific Regions/Chokepoints etc. may differ.
@@ -106,3 +107,17 @@ You can also ask any further questions on the [SSCAIT Discord](https://discord.g
 ## Tutorial
 
 If you are a just starting out with bot development, it might be helpful to follow the [tutorial](https://github.com/JavaBWAPI/Java-BWAPI-Tutorial/wiki)!
+
+
+## Bots
+
+Some bots using [JBWAPI](https://github.com/JavaBWAPI/JBWAPI) (feel free to make add a `Pull Request` to add yours!)
+
+ - https://github.com/dgant/PurpleWave
+ - https://github.com/Ravaelles/Atlantis
+ - https://github.com/impie66/Kangaroo-Bot
+
+## Linux
+
+If you use Linux you can choose to develop normally and run the `jar` and `starcraft` using [wine](https://www.winehq.org/)`
+or try to use `openbw` by following the following [instructions](./build_with_openbw.md)
