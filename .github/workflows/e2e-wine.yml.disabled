@@ -1,0 +1,50 @@
+name: Test Wine
+
+on:
+  - pull_request
+
+jobs:
+  e2e:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Show versions
+        run: |
+          uname -a
+          python3 --version
+          java -version
+      - name: Setup e2e-windows environment
+        run: |
+          git clone https://github.com/Bytekeeper/sc-docker.git
+          cp it/sc-docker-support/*.dockerfile sc-docker/docker/dockerfiles
+          pushd sc-docker
+          pip3 install numpy==1.16.6 wheel
+          python3 setup.py bdist_wheel
+          pip3 install dist/scbw*.whl
+          cd docker
+          ./build_images.sh
+          popd
+          cp sc-docker/scbw/local_docker/starcraft.zip /tmp/sc-docker/starcraft.zip
+          scbw.play --install
+
+      - name: Test the e2e-windows environment
+        run: |
+          sh mvnw clean install
+          sh mvnw -f it/bots/pom.xml package
+          for bot in $(ls -d it/bots/*/); do BOTNAME=$(basename $bot); echo "Setting up $BOTNAME"; mkdir -p "$HOME/.scbw/bots/$BOTNAME/AI" "$HOME/.scbw/bots/$BOTNAME/read" "$HOME/.scbw/bots/$BOTNAME/write"; cp it/sc-docker-support/BWAPI.dll "$HOME/.scbw/bots/$BOTNAME"; cp "$bot/target/"*-with-dependencies.jar "$HOME/.scbw/bots/$BOTNAME/AI"; cp "$bot/bot.json" "$HOME/.scbw/bots/$BOTNAME"; done
+          scbw.play --headless --bots jbwapibot SittingDuck --timeout 180 --docker_image starcraft:game 2>&1 | grep 'Winner is BotPlayer:jbwapibot:T' || (cat $HOME/.scbw/games/*/logs_0/* && false)
