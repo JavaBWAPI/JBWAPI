@@ -23,6 +23,14 @@ public class BWTA {
     private static List<BaseLocation> baseLocations;
 
     /**
+     * Exposes the BWEM instance.
+     * You might want this even if using the BWTA interface: for example, if using JBWEB, which requires access to BWEM.
+     */
+    public static BWEM getBWEM() {
+        return bwem;
+    }
+
+    /**
      * Extension to traditional BWTA interface for JBWAPI
      * Exposes BWEM's setFailOnError(boolean) method for aggressively asserting errors.
      *
