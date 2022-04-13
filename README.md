@@ -111,7 +111,7 @@ If you are a just starting out with bot development, it might be helpful to foll
 
 ## Bots
 
-Some bots using [JBWAPI](https://github.com/JavaBWAPI/JBWAPI) (feel free to make add a `Pull Request` to add yours!)
+Some bots using [JBWAPI](https://github.com/JavaBWAPI/JBWAPI) (feel free to open a pullrequest to add yours!)
 
  - https://github.com/dgant/PurpleWave
  - https://github.com/Ravaelles/Atlantis
@@ -119,5 +119,5 @@ Some bots using [JBWAPI](https://github.com/JavaBWAPI/JBWAPI) (feel free to make
 
 ## Linux
 
-If you use Linux you can choose to develop normally and run the `jar` and `starcraft` using [wine](https://www.winehq.org/)`
+If you use Linux you can choose to develop normally and run the `jar` and `starcraft` using [wine](https://www.winehq.org/) 
 or try to use `openbw` by following the following [instructions](./build_with_openbw.md)
