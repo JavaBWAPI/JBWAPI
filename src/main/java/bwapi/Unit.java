@@ -840,6 +840,9 @@ public class Unit implements Comparable<Unit> {
 
     /**
      * Retrieves a unit type from a specific index in the queue of units this unit is training.
+     *
+     * This method does not have a direct analog in the BWAPI client API.
+     * It exists as a more performant alternative to getTrainingQueue().
      */
     public UnitType getTrainingQueueAt(int i) {
         if (game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount())) {
@@ -850,6 +853,9 @@ public class Unit implements Comparable<Unit> {
 
     /**
      * Retrieves the number of units in this unit's training queue.
+     *
+     * This method does not have a direct analog in the BWAPI client API.
+     * It exists as a more performant alternative to getTrainingQueue().
      */
     public int getTrainingQueueCount() {
         int count = unitData.getTrainingQueueCount();
