@@ -826,7 +826,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     /**
-     * Retrieves the list of units queued up to be trained.
+     * Retrieves the list of unit types queued up to be trained.
      *
      * @return a List<UnitType> containing all the types that are in this factory's training
      * queue, from oldest to most recent.
@@ -838,6 +838,9 @@ public class Unit implements Comparable<Unit> {
         return IntStream.range(0, getTrainingQueueCount()).mapToObj(this::getTrainingQueueAt).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves a unit type from a specific index in the queue of units this unit is training.
+     */
     public UnitType getTrainingQueueAt(int i) {
         if (game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount())) {
             return self().trainingQueue[i].get();
@@ -845,6 +848,9 @@ public class Unit implements Comparable<Unit> {
         return UnitType.idToEnum[unitData.getTrainingQueue(i)];
     }
 
+    /**
+     * Retrieves the number of units in this unit's training queue.
+     */
     public int getTrainingQueueCount() {
         int count = unitData.getTrainingQueueCount();
         if (game.isLatComEnabled() && self().trainingQueueCount.valid(game.getFrameCount())) {

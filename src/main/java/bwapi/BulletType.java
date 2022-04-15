@@ -59,7 +59,7 @@ public enum BulletType {
         Arrays.stream(BulletType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     BulletType(final int id) {
         this.id = id;
