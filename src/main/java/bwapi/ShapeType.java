@@ -21,7 +21,7 @@ enum ShapeType {
         Arrays.stream(ShapeType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     ShapeType(final int id) {
         this.id = id;

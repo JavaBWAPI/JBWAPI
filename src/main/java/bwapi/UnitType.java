@@ -252,7 +252,7 @@ public enum UnitType {
         Arrays.stream(UnitType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     UnitType(final int id) {
         this.id = id;

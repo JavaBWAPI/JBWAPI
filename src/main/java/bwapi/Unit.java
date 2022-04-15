@@ -826,7 +826,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     /**
-     * Retrieves the list of units queued up to be trained.
+     * Retrieves the list of unit types queued up to be trained.
      *
      * @return a List<UnitType> containing all the types that are in this factory's training
      * queue, from oldest to most recent.
@@ -835,14 +835,29 @@ public class Unit implements Comparable<Unit> {
      * @see #isTraining
      */
     public List<UnitType> getTrainingQueue() {
-        return IntStream.range(0, getTrainingQueueCount())
-                .mapToObj(i -> game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount()) ?
-                        self().trainingQueue[i].get() :
-                        UnitType.idToEnum[unitData.getTrainingQueue(i)])
-                .collect(Collectors.toList());
+        return IntStream.range(0, getTrainingQueueCount()).mapToObj(this::getTrainingQueueAt).collect(Collectors.toList());
     }
 
-    int getTrainingQueueCount() {
+    /**
+     * Retrieves a unit type from a specific index in the queue of units this unit is training.
+     *
+     * This method does not have a direct analog in the BWAPI client API.
+     * It exists as a more performant alternative to getTrainingQueue().
+     */
+    public UnitType getTrainingQueueAt(int i) {
+        if (game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount())) {
+            return self().trainingQueue[i].get();
+        }
+        return UnitType.idToEnum[unitData.getTrainingQueue(i)];
+    }
+
+    /**
+     * Retrieves the number of units in this unit's training queue.
+     *
+     * This method does not have a direct analog in the BWAPI client API.
+     * It exists as a more performant alternative to getTrainingQueue().
+     */
+    public int getTrainingQueueCount() {
         int count = unitData.getTrainingQueueCount();
         if (game.isLatComEnabled() && self().trainingQueueCount.valid(game.getFrameCount())) {
             return count + self().trainingQueueCount.get();
