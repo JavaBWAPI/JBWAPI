@@ -288,7 +288,7 @@ public final class Game {
     }
 
     void unitCreate(final int id) {
-        if (id > units.length) {
+        if (id >= units.length) {
             //rescale unit array if needed
             final Unit[] largerUnitsArray = new Unit[2 * units.length];
             System.arraycopy(units, 0, largerUnitsArray, 0, units.length);
