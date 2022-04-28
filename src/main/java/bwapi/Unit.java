@@ -1172,7 +1172,7 @@ public class Unit implements Comparable<Unit> {
         if (getType().spaceProvided() < 1) {
             return Collections.emptyList();
         }
-        return game.getLoadedUnits(this);
+        return game.loadedUnitsCache.getConnected(this);
     }
 
     /**
@@ -1212,7 +1212,7 @@ public class Unit implements Comparable<Unit> {
         if (getType() != Protoss_Carrier && getType() != Hero_Gantrithor) {
             return Collections.emptyList();
         }
-        return game.getConnected(this);
+        return game.interceptorsCache.getConnected(this);
     }
 
     /**
@@ -1240,7 +1240,7 @@ public class Unit implements Comparable<Unit> {
         if (!getType().producesLarva()) {
             return Collections.emptyList();
         }
-        return game.getConnected(this);
+        return game.larvaCache.getConnected(this);
     }
 
     public List<Unit> getUnitsInRadius(final int radius) {
