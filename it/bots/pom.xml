@@ -9,7 +9,7 @@
 
   <groupId>jbwapi.it</groupId>
   <artifactId>bots</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>jbwapi</groupId>
       <artifactId>jbwapi</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
     </dependency>
   </dependencies>
 </project>
