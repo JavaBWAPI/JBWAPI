@@ -21,7 +21,7 @@ public enum UnitSizeType {
     None(4),
     Unknown(5);
 
-    final int id;
+    public final int id;
 
     UnitSizeType(final int id) {
         this.id = id;

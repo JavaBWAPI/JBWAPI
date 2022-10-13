@@ -6,11 +6,12 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -22,17 +23,19 @@ public class EnumsTest {
     static String ID_VALUE = "id";
 
 
-    static List<Class<?>> getBWAPIEnums() throws ClassNotFoundException {
-        List<Class<?>> enums = new ArrayList<>();
-        for (File file : Objects.requireNonNull(new File(CLASSES_LOCATION).listFiles())) {
-            if (file.isFile()) {
-                Class<?> cls = Class.forName("bwapi." + file.getName().replace(".java", ""));
-                if (cls.isEnum()) {
-                    enums.add(cls);
-                }
-            }
-        }
-        return enums;
+    static List<Class<?>> getBWAPIEnums() {
+        return Arrays.stream(Objects.requireNonNull(new File(CLASSES_LOCATION).listFiles()))
+                .filter(File::isFile)
+                .map(f -> {
+                    try {
+                        return Class.forName("bwapi." + f.getName().replace(".java", ""));
+                    } catch (final ClassNotFoundException exc) {
+                        throw new RuntimeException(exc);
+                    }
+                })
+                .filter(Class::isEnum)
+                .flatMap(e -> Stream.concat(Stream.of(e), Arrays.stream(e.getDeclaredClasses()).filter(Class::isEnum)))
+                .collect(Collectors.toList());
     }
     /*
      * Check, via reflection, that all Enums that have an "idToEnum" array to be of correct lenght
@@ -62,7 +65,7 @@ public class EnumsTest {
     }
 
     @Test
-    public void ensureSimpleGettersReturnNonNullAndDontFail() throws ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+    public void ensureSimpleGettersReturnNonNullAndDontFail() throws InvocationTargetException, IllegalAccessException {
         for (Class<?> cls : getBWAPIEnums()) {
             List<Method> simpleGetters = Arrays.stream(cls.getMethods())
                     .filter(it -> it.getParameterCount() == 0 && it.getReturnType() != Void.TYPE)
@@ -71,11 +74,20 @@ public class EnumsTest {
                 for (Method getter : simpleGetters) {
                     // WHEN
                     Object result = getter.invoke(type);
-
                     // THEN
                     assertThat(result).describedAs("When calling " + getter.getName()).isNotNull();
                 }
             }
+        }
+    }
+
+    @Test
+    public void ensureEnumsExposePublicId() throws NoSuchFieldException {
+        for (Class<?> cls : getBWAPIEnums()) {
+            Field idField = cls.getField(ID_VALUE);
+            assertThat(Modifier.isPublic(idField.getModifiers()))
+                    .describedAs("ID public for class "+ cls)
+                    .isTrue();
         }
     }
 }

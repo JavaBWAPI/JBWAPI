@@ -404,7 +404,7 @@ public enum WeaponType {
             TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None, TechType.None
     };
 
-    final int id;
+    public final int id;
 
     WeaponType(final int id) {
         this.id = id;

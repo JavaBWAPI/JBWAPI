@@ -11,7 +11,7 @@ public enum MouseButton {
     M_MIDDLE(2),
     M_MAX(3);
 
-    final int id;
+    public final int id;
 
     MouseButton(final int id) {
         this.id = id;

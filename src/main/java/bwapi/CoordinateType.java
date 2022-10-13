@@ -29,7 +29,7 @@ public enum CoordinateType {
         Arrays.stream(CoordinateType.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
-    final int id;
+    public final int id;
 
     CoordinateType(final int id) {
         this.id = id;
