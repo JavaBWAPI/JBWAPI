@@ -14,17 +14,17 @@ import static org.mockito.Mockito.when;
  * Mocks BWAPI and a bot listener, for synchronization tests.
  */
 class SynchronizationEnvironment {
-    BWClientConfiguration configuration;
-    BWClient bwClient;
-    private Client client;
+    final BWClientConfiguration configuration;
+    final BWClient bwClient;
+    private final Client client;
     private int onEndFrame;
     private long bwapiDelayMs;
-    private Map<Integer, Runnable> onFrames;
+    private final Map<Integer, Runnable> onFrames;
 
-    SynchronizationEnvironment() {
+    SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration) {
         BWEventListener listener = mock(BWEventListener.class);
 
-        configuration = new BWClientConfiguration();
+        configuration = bwClientConfiguration;
         client = mock(Client.class);
         bwClient = new BWClient(listener);
         bwClient.setClient(client);

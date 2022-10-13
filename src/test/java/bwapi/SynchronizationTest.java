@@ -32,8 +32,10 @@ public class SynchronizationTest {
 
     @Test
     public void sync_IfException_ThrowException() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.withAsync(false);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(false)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
         environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
         assertThrows(RuntimeException.class, environment::runGame);
     }
@@ -41,21 +43,24 @@ public class SynchronizationTest {
     @Test
     public void async_IfException_ThrowException() {
         // An exception in the bot thread must be re-thrown by the main thread.
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withAsyncFrameBufferCapacity(3);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncFrameBufferCapacity(3)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
+
         environment.onFrame(0, () -> { throw new RuntimeException("Simulated bot exception"); });
         assertThrows(RuntimeException.class, environment::runGame);
     }
 
     @Test
     public void sync_IfDelay_ThenNoBuffer() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(false)
-            .withMaxFrameDurationMs(1)
-            .withAsyncFrameBufferCapacity(3);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(false)
+                .withMaxFrameDurationMs(1)
+                .withAsyncFrameBufferCapacity(3)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         IntStream.range(0, 5).forEach(frame -> {
             environment.onFrame(frame, () -> {
@@ -71,11 +76,12 @@ public class SynchronizationTest {
 
     @Test
     public void async_IfBotDelay_ThenClientBuffers() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withMaxFrameDurationMs(100)
-            .withAsyncFrameBufferCapacity(4);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withMaxFrameDurationMs(100)
+                .withAsyncFrameBufferCapacity(4)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(500);
@@ -95,11 +101,12 @@ public class SynchronizationTest {
 
     @Test
     public void async_IfBotDelay_ThenClientStalls() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withMaxFrameDurationMs(200)
-            .withAsyncFrameBufferCapacity(5);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withMaxFrameDurationMs(200)
+                .withAsyncFrameBufferCapacity(5)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(500);
@@ -121,12 +128,13 @@ public class SynchronizationTest {
 
     @Test
     public void async_IfFrameZeroWaitsEnabled_ThenAllowInfiniteTime() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withUnlimitedFrameZero(true)
-            .withMaxFrameDurationMs(5)
-            .withAsyncFrameBufferCapacity(2);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withUnlimitedFrameZero(true)
+                .withMaxFrameDurationMs(5)
+                .withAsyncFrameBufferCapacity(2)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         environment.onFrame(0, () -> {
             sleepUnchecked(50);
@@ -140,12 +148,14 @@ public class SynchronizationTest {
 
     @Test
     public void async_IfFrameZeroWaitsDisabled_ThenClientBuffers() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
                 .withAsync(true)
                 .withUnlimitedFrameZero(false)
                 .withMaxFrameDurationMs(5)
-                .withAsyncFrameBufferCapacity(2);
+                .withAsyncFrameBufferCapacity(2)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
+
 
         environment.onFrame(0, () -> {
             sleepUnchecked(50);
@@ -160,8 +170,10 @@ public class SynchronizationTest {
     @Test
     public void async_MeasurePerformance_CopyingToBuffer() {
         // Somewhat lazy test; just verify that we're getting sane values
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration.withAsync(true);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
         environment.runGame(20);
         final double minObserved = 0.25;
         final double maxObserved = 15;
@@ -175,12 +187,13 @@ public class SynchronizationTest {
 
     @Test
     public void async_MeasurePerformance_FrameBufferSizeAndFramesBehind() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withUnlimitedFrameZero(true)
-            .withAsyncFrameBufferCapacity(3)
-            .withMaxFrameDurationMs(20);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withUnlimitedFrameZero(true)
+                .withAsyncFrameBufferCapacity(3)
+                .withMaxFrameDurationMs(20)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         environment.onFrame(5, () -> {
             assertWithin("5: Frame buffer average", 0, environment.metrics().getFrameBufferSize().getRunningTotal().getMean(), 0.1);
@@ -215,11 +228,12 @@ public class SynchronizationTest {
 
     @Test
     public void MeasurePerformance_BotResponse() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-
         // Frame zero appears to take an extra 60ms, so let's disable timing for it
         // (and also verify that we omit frame zero from performance metrics)
-        environment.configuration.withUnlimitedFrameZero(true);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withUnlimitedFrameZero(true)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
 
         environment.onFrame(1, () -> {
             sleepUnchecked(100);
@@ -251,11 +265,13 @@ public class SynchronizationTest {
     public void MeasurePerformance_BotIdle() {
         final long bwapiDelayMs = 10;
         final int frames = 10;
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withAsyncFrameBufferCapacity(3)
-            .withUnlimitedFrameZero(true);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncFrameBufferCapacity(3)
+                .withUnlimitedFrameZero(true)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
+
         environment.setBwapiDelayMs(bwapiDelayMs);
         environment.runGame(frames);
         double expected = environment.metrics().getCopyingToBuffer().getRunningTotal().getMean() + bwapiDelayMs;
@@ -264,12 +280,14 @@ public class SynchronizationTest {
 
     @Test
     public void async_MeasurePerformance_IntentionallyBlocking() {
-        SynchronizationEnvironment environment = new SynchronizationEnvironment();
-        environment.configuration
-            .withAsync(true)
-            .withUnlimitedFrameZero(true)
-            .withAsyncFrameBufferCapacity(2)
-            .withMaxFrameDurationMs(20);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withUnlimitedFrameZero(true)
+                .withAsyncFrameBufferCapacity(2)
+                .withMaxFrameDurationMs(20)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
+
         final int frameDelayMs = 100;
         environment.onFrame(1, () -> {
             sleepUnchecked(100);
@@ -287,13 +305,18 @@ public class SynchronizationTest {
 
     @Test
     public void async_DisablesLatencyCompensation() {
-        SynchronizationEnvironment environmentSync = new SynchronizationEnvironment();
-        environmentSync.configuration.withAsync(false);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(false)
+                .build();
+        SynchronizationEnvironment environmentSync = new SynchronizationEnvironment(config);
         environmentSync.onFrame(1, () -> { assertTrue(environmentSync.bwClient.getGame().isLatComEnabled()); });
         environmentSync.runGame(2);
 
-        SynchronizationEnvironment environmentAsync = new SynchronizationEnvironment();
-        environmentAsync.configuration.withAsync(true).withAsyncFrameBufferCapacity(2);
+        BWClientConfiguration configAsync = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncFrameBufferCapacity(2)
+                .build();
+        SynchronizationEnvironment environmentAsync = new SynchronizationEnvironment(configAsync);
         environmentAsync.onFrame(1, () -> { assertFalse(environmentAsync.bwClient.getGame().isLatComEnabled()); });
         environmentAsync.onFrame(2, () -> { assertThrows(IllegalStateException.class, () -> environmentAsync.bwClient.getGame().setLatCom(true)); });
         environmentAsync.runGame(3);

@@ -96,7 +96,7 @@ public final class Game {
     // USER DEFINED
 
     private Text.Size textSize = Text.Size.Default;
-    private BWClientConfiguration configuration = new BWClientConfiguration();
+    private BWClientConfiguration configuration = BWClientConfiguration.DEFAULT;
     private boolean latcom = true;
 
     final ConnectedUnitCache loadedUnitsCache = new ConnectedUnitCache(this, Unit::getTransport);
