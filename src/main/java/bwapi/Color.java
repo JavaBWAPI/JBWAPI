@@ -115,7 +115,7 @@ public final class Color {
     };
 
     private static boolean rgbInitialized;
-    private static final int[][][] closestColor = new int[64][64][64];
+    private static final byte[][][] closestColor = new byte[64][64][64];
 
     public final int id;
 
@@ -151,9 +151,9 @@ public final class Color {
             if (p.rgbReserved != 0) {
                 continue;
             }
-            final int r = red - p.rgbRed;
-            final int g = green - p.rgbGreen;
-            final int b = blue - p.rgbBlue;
+            final int r = red - (p.rgbRed & 0xFF);
+            final int g = green - (p.rgbGreen & 0xFF);
+            final int b = blue - (p.rgbBlue & 0xFF);
 
             final int distance = r * r + g * g + b * b;
             if (distance < min_dist) {
@@ -173,24 +173,24 @@ public final class Color {
             for (int r = 0; r < 64; ++r) {
                 for (int g = 0; g < 64; ++g) {
                     for (int b = 0; b < 64; ++b) {
-                        closestColor[r][g][b] = getBestIdFor(r << 2, g << 2, b << 2);
+                        closestColor[r][g][b] = (byte) getBestIdFor(r << 2, g << 2, b << 2);
                     }
                 }
             }
         }
-        return closestColor[red >> 2][green >> 2][blue >> 2];
+        return closestColor[red >> 2][green >> 2][blue >> 2] & 0xFF;
     }
 
     public int red() {
-        return id < 256 ? defaultPalette[id].rgbRed : 0;
+        return id < 256 ? defaultPalette[id].rgbRed & 0xFF : 0;
     }
 
     public int green() {
-        return id < 256 ? defaultPalette[id].rgbGreen : 0;
+        return id < 256 ? defaultPalette[id].rgbGreen & 0xFF : 0;
     }
 
     public int blue() {
-        return id < 256 ? defaultPalette[id].rgbBlue : 0;
+        return id < 256 ? defaultPalette[id].rgbBlue & 0xFF : 0;
     }
 
     @Override
@@ -219,20 +219,20 @@ public final class Color {
 
     /// BROODWAR COLOR IMPLEMENTATION
     private static class RGBQUAD {
-        final int rgbRed;
-        final int rgbGreen;
-        final int rgbBlue;
-        final int rgbReserved;
+        final byte rgbRed;
+        final byte rgbGreen;
+        final byte rgbBlue;
+        final byte rgbReserved;
 
         RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue) {
             this(rgbRed, rgbGreen, rgbBlue, 0);
         }
 
         RGBQUAD(int rgbRed, int rgbGreen, int rgbBlue, int rgbReserved) {
-            this.rgbRed = rgbRed;
-            this.rgbGreen = rgbGreen;
-            this.rgbBlue = rgbBlue;
-            this.rgbReserved = rgbReserved;
+            this.rgbRed = (byte)rgbRed;
+            this.rgbGreen = (byte) rgbGreen;
+            this.rgbBlue = (byte)rgbBlue;
+            this.rgbReserved = (byte)rgbReserved;
         }
     }
 }
