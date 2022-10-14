@@ -114,8 +114,7 @@ public final class Color {
             RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, RGBRESERVE, new RGBQUAD(255, 255, 255)
     };
 
-    private static boolean rgbInitialized;
-    private static final byte[][][] closestColor = new byte[64][64][64];
+    private static byte[][][] closestColor = null;
 
     public final int id;
 
@@ -139,7 +138,10 @@ public final class Color {
      * @param id The index of the color in the 256-color palette.
      */
     public Color(final int id) {
-        this.id = id;
+        // The id is set to 255 if the id is invalid, as in the official BWAPI sources:
+        // https://github.com/bwapi/bwapi/blob/3438abd8e0222f37934ba62b2130c3933b067678/bwapi/include/BWAPI/Color.h#L13
+        // https://github.com/bwapi/bwapi/blob/3438abd8e0222f37934ba62b2130c3933b067678/bwapi/include/BWAPI/Type.h#L66
+        this.id = id < 0 || id > 255 ? 255 : id;
     }
 
     private static int getBestIdFor(final int red, final int green, final int blue) {
@@ -168,8 +170,8 @@ public final class Color {
     }
 
     private static int getRGBIndex(final int red, final int green, final int blue) {
-        if (!rgbInitialized) {
-            rgbInitialized = true;
+        if (closestColor == null) {
+            closestColor = new byte[64][64][64];
             for (int r = 0; r < 64; ++r) {
                 for (int g = 0; g < 64; ++g) {
                     for (int b = 0; b < 64; ++b) {
@@ -182,15 +184,15 @@ public final class Color {
     }
 
     public int red() {
-        return id < 256 ? defaultPalette[id].rgbRed & 0xFF : 0;
+        return defaultPalette[id].rgbRed & 0xFF;
     }
 
     public int green() {
-        return id < 256 ? defaultPalette[id].rgbGreen & 0xFF : 0;
+        return defaultPalette[id].rgbGreen & 0xFF;
     }
 
     public int blue() {
-        return id < 256 ? defaultPalette[id].rgbBlue & 0xFF : 0;
+        return defaultPalette[id].rgbBlue & 0xFF;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Player implements Comparable<Player> {
     private final String name;
     private final PlayerType playerType;
     private final TilePosition startLocation;
-
+    private final Color color;
     private PlayerSelf self = null;
     PlayerSelf self() {
         if (self == null) {
@@ -41,6 +41,7 @@ public class Player implements Comparable<Player> {
         this.name = playerData.getName();
         this.playerType = PlayerType.idToEnum[playerData.getType()];
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
+        this.color = new Color(playerData.getColor());
     }
 
     /**
@@ -533,7 +534,7 @@ public class Player implements Comparable<Player> {
      * @return {@link Color} object that represents the color of the current player.
      */
     public Color getColor() {
-        return new Color(playerData.getColor());
+        return color;
     }
 
     /**
@@ -543,7 +544,7 @@ public class Player implements Comparable<Player> {
      * @return character code to use for text in Broodwar.
      */
     public Text getTextColor() {
-        switch (playerData.getColor()) {
+        switch (color.id) {
             case 111: // red
                 return Text.BrightRed;
             case 165: // blue

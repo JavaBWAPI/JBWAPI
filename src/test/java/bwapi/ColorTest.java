@@ -320,6 +320,12 @@ public class ColorTest {
     }
 
     @Test
+    public void checkColorWithInvalidId() {
+        assertEquals(255, new Color(-1).id);
+        assertEquals(255, new Color(256).id);
+    }
+
+    @Test
     public void toStringTest() {
         assertEquals("Color.Black", Color.Black.toString());
         assertEquals("Color.Black", new Color(0, 0, 0).toString());
