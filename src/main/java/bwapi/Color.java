@@ -1,6 +1,5 @@
 package bwapi;
 
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -61,21 +60,7 @@ public final class Color {
      */
     public final static Color Grey = new Color(74);
 
-    private final static Map<Integer, String> defaultColors = new HashMap<>();
-    static {
-        defaultColors.put(Color.Red.id, "Red");
-        defaultColors.put(Color.Blue.id, "Blue");
-        defaultColors.put(Color.Teal.id, "Teal");
-        defaultColors.put(Color.Purple.id, "Purple");
-        defaultColors.put(Color.Orange.id, "Orange");
-        defaultColors.put(Color.Brown.id, "Brown");
-        defaultColors.put(Color.White.id, "White");
-        defaultColors.put(Color.Yellow.id, "Yellow");
-        defaultColors.put(Color.Green.id, "Green");
-        defaultColors.put(Color.Cyan.id, "Cyan");
-        defaultColors.put(Color.Black.id, "Black");
-        defaultColors.put(Color.Grey.id, "Grey");
-    }
+    private static Map<Integer, String> defaultColors = null;
 
     private static final RGBQUAD RGBRESERVE = new RGBQUAD(0, 0, 0, 0xFF);
 
@@ -210,8 +195,9 @@ public final class Color {
 
     @Override
     public String toString() {
-        if (defaultColors.containsKey(id)) {
-            return "Color." + defaultColors.get(id);
+        String defaultColor = getDefaultColor(id);
+        if (defaultColor != null) {
+            return "Color." + defaultColor;
         }
         return "Color{" +
                 "red=" + red() +
@@ -236,5 +222,24 @@ public final class Color {
             this.rgbBlue = (byte)rgbBlue;
             this.rgbReserved = (byte)rgbReserved;
         }
+    }
+
+    private static String getDefaultColor(final int id) {
+        if (defaultColors == null) {
+            defaultColors = new HashMap<>();
+            defaultColors.put(Color.Red.id, "Red");
+            defaultColors.put(Color.Blue.id, "Blue");
+            defaultColors.put(Color.Teal.id, "Teal");
+            defaultColors.put(Color.Purple.id, "Purple");
+            defaultColors.put(Color.Orange.id, "Orange");
+            defaultColors.put(Color.Brown.id, "Brown");
+            defaultColors.put(Color.White.id, "White");
+            defaultColors.put(Color.Yellow.id, "Yellow");
+            defaultColors.put(Color.Green.id, "Green");
+            defaultColors.put(Color.Cyan.id, "Cyan");
+            defaultColors.put(Color.Black.id, "Black");
+            defaultColors.put(Color.Grey.id, "Grey");
+        }
+        return defaultColors.getOrDefault(id,null);
     }
 }

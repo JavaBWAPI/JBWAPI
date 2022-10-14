@@ -330,6 +330,8 @@ public class ColorTest {
         assertEquals("Color.Black", Color.Black.toString());
         assertEquals("Color.Black", new Color(0, 0, 0).toString());
         assertEquals("Color.Black", new Color(Color.Black.id).toString());
+        assertEquals("Color.Orange", Color.Orange.toString());
+        assertEquals("Color.Purple", Color.Purple.toString());
         assertEquals("Color{red=16, green=16, blue=16}", new Color(16, 16, 16).toString());
     }
 }
