@@ -6,7 +6,7 @@ import java.util.Objects;
  * Client class to connect to the game with.
  */
 public class BWClient {
-    private BWClientConfiguration configuration = new BWClientConfiguration();
+    private BWClientConfiguration configuration;
     private final BWEventListener eventListener;
     private BotWrapper botWrapper;
     private Client client;
@@ -19,7 +19,7 @@ public class BWClient {
 
     /**
      * Get the {@link Game} instance of the currently running game.
-     * When running in asynchronous mode, this is the game from the bot's perspective, eg. potentially a previous frame.
+     * When running in asynchronous mode, this is the game from the bot's perspective, e.g. potentially a previous frame.
      */
     public Game getGame() {
         return botWrapper == null ? null : botWrapper.getGame();
@@ -65,8 +65,7 @@ public class BWClient {
      * Start the game with default settings.
      */
     public void startGame() {
-        BWClientConfiguration configuration = new BWClientConfiguration();
-        startGame(configuration);
+        startGame(BWClientConfiguration.DEFAULT);
     }
 
     /**
@@ -76,9 +75,9 @@ public class BWClient {
      */
     @Deprecated
     public void startGame(boolean autoContinue) {
-        BWClientConfiguration configuration = new BWClientConfiguration();
-        configuration.withAutoContinue(autoContinue);
-        startGame(configuration);
+        startGame(new BWClientConfiguration.Builder()
+                .withAutoContinue(autoContinue)
+                .build());
     }
 
     /**
@@ -87,7 +86,6 @@ public class BWClient {
      * @param gameConfiguration Settings for playing games with this client.
      */
     public void startGame(BWClientConfiguration gameConfiguration) {
-        gameConfiguration.validateAndLock();
         this.configuration = gameConfiguration;
         this.performanceMetrics = new PerformanceMetrics(configuration);
         botWrapper = new BotWrapper(configuration, eventListener);

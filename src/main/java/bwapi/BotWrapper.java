@@ -1,6 +1,5 @@
 package bwapi;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -17,8 +16,8 @@ class BotWrapper {
     private boolean gameOver;
     private PerformanceMetrics performanceMetrics;
     private Throwable lastBotThrow;
-    private ReentrantLock lastBotThrowLock = new ReentrantLock();
-    private ReentrantLock unsafeReadReadyLock = new ReentrantLock();
+    private final ReentrantLock lastBotThrowLock = new ReentrantLock();
+    private final ReentrantLock unsafeReadReadyLock = new ReentrantLock();
     private boolean unsafeReadReady = false;
 
     BotWrapper(BWClientConfiguration configuration, BWEventListener eventListener) {
@@ -76,91 +75,95 @@ class BotWrapper {
     void onFrame() {
         if (configuration.getAsync()) {
             configuration.log("Main: onFrame asynchronous start");
-            long startNanos = System.nanoTime();
-            long endNanos = startNanos + (long) configuration.getMaxFrameDurationMs() * 1000000;
-            if (botThread == null) {
-                configuration.log("Main: Starting bot thread");
-                botThread = createBotThread();
-                botThread.setName("JBWAPI Bot");
-                // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
-                botThread.setPriority(3);
-                botThread.start();
-            }
-
-            // Unsafe mode:
-            // If the frame buffer is empty (meaning the bot must be idle)
-            // allow the bot to read directly from shared memory while we copy it over
-            if (configuration.getAsyncUnsafe()) {
-                frameBuffer.lockSize.lock();
-                try {
-                    if (frameBuffer.empty()) {
-                        configuration.log("Main: Putting bot on live data");
-                        botGame.botClientData().setBuffer(liveData);
-                        setUnsafeReadReady(true);
-                    } else {
-                        setUnsafeReadReady(false);
-                    }
-                } finally {
-                    frameBuffer.lockSize.unlock();
-                }
-            }
-
-            // Add a frame to buffer
-            // If buffer is full, will wait until it has capacity.
-            // Then wait for the buffer to empty or to run out of time in the frame.
-            int frame = liveClientData.gameData().getFrameCount();
-            configuration.log("Main: Enqueuing frame #" + frame);
-            frameBuffer.enqueueFrame();
-
-            configuration.log("Main: Enqueued frame #" + frame);
-            if (frame > 0) {
-                performanceMetrics.getClientIdle().startTiming();
-            }
-            frameBuffer.lockSize.lock();
-            try {
-                while (!frameBuffer.empty()) {
-                    // Unsafe mode: Move the bot off of live data onto the frame buffer
-                    // This is the unsafe step!
-                    // We don't synchronize on calls which access the buffer
-                    // (to avoid tens of thousands of synchronized calls per frame)
-                    // so there's no guarantee of safety here.
-                    if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
-                        configuration.log("Main: Weaning bot off live data");
-                        botGame.botClientData().setBuffer(frameBuffer.peek());
-                    }
-
-                    // Make bot exceptions fall through to the main thread.
-                    Throwable lastThrow = getLastBotThrow();
-                    if (lastThrow != null) {
-                        configuration.log("Main: Rethrowing bot throwable");
-                        throw new RuntimeException(lastThrow);
-                    }
-
-                    if (configuration.getUnlimitedFrameZero() && frame == 0) {
-                        configuration.log("Main: Waiting indefinitely on frame #" + frame);
-                        frameBuffer.conditionSize.await();
-                    } else {
-                        long remainingNanos = endNanos - System.nanoTime();
-                        if (remainingNanos <= 0) {
-                            configuration.log("Main: Out of time in frame #" + frame);
-                            break;
-                        }
-                        configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot on frame #" + frame);
-                        frameBuffer.conditionSize.awaitNanos(remainingNanos);
-                        long excessNanos = Math.max(0, (System.nanoTime() - endNanos) / 1000000);
-                        performanceMetrics.getExcessSleep().record(excessNanos);
-                    }
-                }
-            } catch(InterruptedException ignored) {
-            } finally {
-                frameBuffer.lockSize.unlock();
-                performanceMetrics.getClientIdle().stopTiming();
-                configuration.log("Main: onFrame asynchronous end");
-            }
+            asyncOnFrame();
+            configuration.log("Main: onFrame asynchronous end");
         } else {
             configuration.log("Main: onFrame synchronous start");
             handleEvents();
             configuration.log("Main: onFrame synchronous end");
+        }
+    }
+
+    void asyncOnFrame() {
+        long startNanos = System.nanoTime();
+        long endNanos = startNanos + (long) configuration.getMaxFrameDurationMs() * 1000000;
+        if (botThread == null) {
+            configuration.log("Main: Starting bot thread");
+            botThread = createBotThread();
+            botThread.setName("JBWAPI Bot");
+            // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
+            botThread.setPriority(3);
+            botThread.start();
+        }
+
+        // Unsafe mode:
+        // If the frame buffer is empty (meaning the bot must be idle)
+        // allow the bot to read directly from shared memory while we copy it over
+        if (configuration.getAsyncUnsafe()) {
+            frameBuffer.lockSize.lock();
+            try {
+                if (frameBuffer.empty()) {
+                    configuration.log("Main: Putting bot on live data");
+                    botGame.botClientData().setBuffer(liveData);
+                    setUnsafeReadReady(true);
+                } else {
+                    setUnsafeReadReady(false);
+                }
+            } finally {
+                frameBuffer.lockSize.unlock();
+            }
+        }
+
+        // Add a frame to buffer
+        // If buffer is full, will wait until it has capacity.
+        // Then wait for the buffer to empty or to run out of time in the frame.
+        int frame = liveClientData.gameData().getFrameCount();
+        configuration.log("Main: Enqueuing frame #" + frame);
+        frameBuffer.enqueueFrame();
+
+        configuration.log("Main: Enqueued frame #" + frame);
+        if (frame > 0) {
+            performanceMetrics.getClientIdle().startTiming();
+        }
+        frameBuffer.lockSize.lock();
+        try {
+            while (!frameBuffer.empty()) {
+                // Unsafe mode: Move the bot off of live data onto the frame buffer
+                // This is the unsafe step!
+                // We don't synchronize on calls which access the buffer
+                // (to avoid tens of thousands of synchronized calls per frame)
+                // so there's no guarantee of safety here.
+                if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
+                    configuration.log("Main: Weaning bot off live data");
+                    botGame.botClientData().setBuffer(frameBuffer.peek());
+                }
+
+                // Make bot exceptions fall through to the main thread.
+                Throwable lastThrow = getLastBotThrow();
+                if (lastThrow != null) {
+                    configuration.log("Main: Rethrowing bot throwable");
+                    throw new RuntimeException(lastThrow);
+                }
+
+                if (configuration.getUnlimitedFrameZero() && frame == 0) {
+                    configuration.log("Main: Waiting indefinitely on frame #" + frame);
+                    frameBuffer.conditionSize.await();
+                } else {
+                    long remainingNanos = endNanos - System.nanoTime();
+                    if (remainingNanos <= 0) {
+                        configuration.log("Main: Out of time in frame #" + frame);
+                        break;
+                    }
+                    configuration.log("Main: Waiting " + remainingNanos / 1000000 + "ms for bot on frame #" + frame);
+                    frameBuffer.conditionSize.awaitNanos(remainingNanos);
+                    long excessNanos = Math.max(0, (System.nanoTime() - endNanos) / 1000000);
+                    performanceMetrics.getExcessSleep().record(excessNanos);
+                }
+            }
+        } catch(InterruptedException ignored) {
+        } finally {
+            frameBuffer.lockSize.unlock();
+            performanceMetrics.getClientIdle().stopTiming();
         }
     }
 

@@ -16,11 +16,11 @@ class FrameBuffer {
 
     private WrappedBuffer liveData;
     private PerformanceMetrics performanceMetrics;
-    private BWClientConfiguration configuration;
-    private int capacity;
+    private final BWClientConfiguration configuration;
+    private final int capacity;
     private int stepGame = 0;
     private int stepBot = 0;
-    private ArrayList<WrappedBuffer> dataBuffer = new ArrayList<>();
+    private final ArrayList<WrappedBuffer> dataBuffer = new ArrayList<>();
 
     private final Lock lockWrite = new ReentrantLock();
     final Lock lockSize = new ReentrantLock();

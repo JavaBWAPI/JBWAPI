@@ -5,8 +5,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class PointTest {
 	
@@ -24,7 +22,7 @@ public class PointTest {
 	}
 
 	@Test
-	public void pointDistanceAccesibleTest() {
+	public void pointDistanceAccessibleTest() {
 		TilePosition tp = TilePosition.Origin;
 
 		assertEquals(0, tp.getApproxDistance(tp));

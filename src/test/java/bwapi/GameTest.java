@@ -1,15 +1,5 @@
 package bwapi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -19,18 +9,19 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @RunWith(Theories.class)
 public class GameTest {
 
-    private Game sut = new Game();
+    private final Game sut = new Game();
     private Unit dummy;
 
     @DataPoints("overlapping")
@@ -104,10 +95,10 @@ public class GameTest {
         game.botClientData().setBuffer(buffer);
         game.init();
 
-        assertThat(game.isReplay());
+        assertTrue(game.isReplay());
         assertNull(game.self());
         assertNull(game.enemy());
-        assertThat(game.enemies().isEmpty());
-        assertThat(game.allies().isEmpty());
+        assertTrue(game.enemies().isEmpty());
+        assertTrue(game.allies().isEmpty());
     }
 }
