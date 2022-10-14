@@ -53,7 +53,7 @@ public enum UnitCommandType {
     None(44),
     Unknown(45);
 
-    final int id;
+    public final int id;
 
     UnitCommandType(final int id) {
         this.id = id;

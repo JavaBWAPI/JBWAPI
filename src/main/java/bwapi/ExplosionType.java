@@ -32,7 +32,7 @@ public enum ExplosionType {
     Air_Splash(23),
     Unknown(24);
 
-    final int id;
+    public final int id;
 
     ExplosionType(final int id) {
         this.id = id;

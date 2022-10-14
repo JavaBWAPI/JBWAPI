@@ -115,10 +115,10 @@ public enum Text {
      */
     Turquoise(31);
 
-    final byte id;
+    public final int id;
 
     Text(final int id) {
-        this.id = (byte) id;
+        this.id = id;
     }
 
     /**
@@ -160,7 +160,7 @@ public enum Text {
          */
         Huge(3);
 
-        final int id;
+        public final int id;
 
         Size(final int id) {
             this.id = id;

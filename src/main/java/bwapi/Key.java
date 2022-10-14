@@ -235,7 +235,7 @@ public enum Key {
     K_PA1(253),
     K_OEM_CLEAR(254);
 
-    final int id;
+    public final int id;
 
     Key(final int id) {
         this.id = id;

@@ -16,7 +16,7 @@ public enum Flag {
      */
     UserInput(1);
 
-    final int id;
+    public final int id;
 
     Flag(final int id) {
         this.id = id;

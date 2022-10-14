@@ -24,7 +24,7 @@ public enum DamageType {
     None(5),
     Unknown(6);
 
-    final int id;
+    public final int id;
 
     DamageType(final int id) {
         this.id = id;
