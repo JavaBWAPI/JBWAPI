@@ -29,6 +29,10 @@ class DrawTest extends DefaultBWListener {
         game.drawBoxScreen(200, 110, 350, 210, Color.Purple, true);
         game.drawTextScreen(50, 50, "%cHello %cWorld!", Text.Red, Text.Green);
 
+        Player self = game.self();
+        Player enemy = game.enemy();
+        String out = "%c"+ self.getName() + " (" + self.getRace() + ")%c vs %c" + enemy.getName() + " (" + enemy.getRace() + ")";
+        game.drawTextScreen(20, 20, out, self.getTextColor(), Text.Default, enemy.getTextColor());
     }
 
     public static void main(String[] args) {
