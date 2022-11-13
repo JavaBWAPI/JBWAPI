@@ -1,5 +1,6 @@
 package bwapi;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -22,9 +23,11 @@ public class EnumsTest {
     static String ARRAY_VALUE = "idToEnum";
     static String ID_VALUE = "id";
 
+    static List<Class<?>> BWAPI_ENUMS;
 
-    static List<Class<?>> getBWAPIEnums() {
-        return Arrays.stream(Objects.requireNonNull(new File(CLASSES_LOCATION).listFiles()))
+    @BeforeClass
+    public static void setup() {
+        BWAPI_ENUMS = Arrays.stream(Objects.requireNonNull(new File(CLASSES_LOCATION).listFiles()))
                 .filter(File::isFile)
                 .map(f -> {
                     try {
@@ -42,7 +45,7 @@ public class EnumsTest {
      */
     @Test
     public void checkAllidToEnumsArrayLenghts() throws Exception {
-        for (Class<?> cls : getBWAPIEnums()) {
+        for (Class<?> cls : BWAPI_ENUMS) {
             if (Arrays.stream(cls.getDeclaredFields()).anyMatch(f -> f.getName().equals(ARRAY_VALUE))) {
                 Field field = cls.getDeclaredField(ARRAY_VALUE);
                 assertFalse(field.isAccessible());
@@ -66,7 +69,7 @@ public class EnumsTest {
 
     @Test
     public void ensureSimpleGettersReturnNonNullAndDontFail() throws InvocationTargetException, IllegalAccessException {
-        for (Class<?> cls : getBWAPIEnums()) {
+        for (Class<?> cls : BWAPI_ENUMS) {
             List<Method> simpleGetters = Arrays.stream(cls.getMethods())
                     .filter(it -> it.getParameterCount() == 0 && it.getReturnType() != Void.TYPE)
                     .collect(Collectors.toList());
@@ -83,9 +86,9 @@ public class EnumsTest {
 
     @Test
     public void ensureEnumsExposePublicId() throws NoSuchFieldException {
-        for (Class<?> cls : getBWAPIEnums()) {
-            Field idField = cls.getField(ID_VALUE);
-            assertThat(Modifier.isPublic(idField.getModifiers()))
+        for (Class<?> cls : BWAPI_ENUMS) {
+            int modifiers = cls.getField(ID_VALUE).getModifiers();
+            assertThat(Modifier.isPublic(modifiers) && Modifier.isFinal(modifiers))
                     .describedAs("ID public for class "+ cls)
                     .isTrue();
         }
