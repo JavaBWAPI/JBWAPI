@@ -26,9 +26,24 @@ public class BWEMTest {
             this.chokes = chokes;
         }
 
-        public boolean equals(Object object) {
-            BWEMMap bwemMap = (BWEMMap) object;
-            return areas == bwemMap.areas && bases == bwemMap.bases && chokes == bwemMap.chokes;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BWEMMap bwemMap = (BWEMMap) o;
+
+            if (areas != bwemMap.areas) return false;
+            if (bases != bwemMap.bases) return false;
+            return chokes == bwemMap.chokes;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = areas;
+            result = 31 * result + bases;
+            result = 31 * result + chokes;
+            return result;
         }
     }
 

@@ -3,6 +3,7 @@ package bwapi;
 import org.junit.Test;
 
 import java.util.Random;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 
@@ -130,5 +131,24 @@ public class PointTest {
 			assertEquals(p1.x / 32, tp1.x);
 			assertEquals(p1.y / 32 , tp2.y);
 		}
+	}
+
+	@Test
+	public void testComparablePoint() {
+		TreeSet<Point<?>> points = new TreeSet<>();
+
+		points.add(new Position(0, 1));
+		points.add(new Position(0,0));
+		points.add(new TilePosition(0, 0));
+		points.add(new Position(1, 0));
+		points.add(new WalkPosition(0, 0));
+
+		assertArrayEquals(new Point<?>[]{
+				new Position(0, 0),
+				new Position(0, 1),
+				new Position(1, 0),
+				new WalkPosition(0, 0),
+				new TilePosition(0, 0)
+		}, points.toArray());
 	}
 }
