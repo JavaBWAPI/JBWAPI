@@ -426,4 +426,16 @@ public final class UnitCommand {
     public int hashCode() {
         return Objects.hash(type, target, x, y, extra, unit);
     }
+
+    @Override
+    public String toString() {
+        return "UnitCommand{" +
+                "unit=" + unit +
+                ", type=" + type +
+                ", target=" + target +
+                ", x=" + x +
+                ", y=" + y +
+                ", extra=" + extra +
+                '}';
+    }
 }

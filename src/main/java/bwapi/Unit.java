@@ -470,9 +470,22 @@ public class Unit implements Comparable<Unit> {
      * @see Game#hasPath
      */
     public boolean hasPath(final Position target) {
+        game.setLastError();
+        if (target == null || !target.isValid(game)) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+
         // Return true if this unit is an air unit
-        return isFlying() ||
-                game.hasPath(getPosition(), target) ||
+        if (isFlying()) {
+            return true;
+        }
+        // Return error if this does not exist
+        if (!this.exists()) {
+            return game.setLastError(Error.Unit_Not_Visible);
+        }
+        // Check the center of the unit (most common behaviour)
+        return game.hasPath(getPosition(), target) ||
+                // Otherwise check all four corners of the unit, in case it accidentally fell out of its region
                 game.hasPath(new Position(getLeft(), getTop()), target) ||
                 game.hasPath(new Position(getRight(), getTop()), target) ||
                 game.hasPath(new Position(getLeft(), getBottom()), target) ||
@@ -480,6 +493,15 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean hasPath(final Unit target) {
+        game.setLastError();
+        // Return error if the target is invalid
+        if (target == null) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        // Return error if target does not exist
+        if (!target.exists()) {
+            return game.setLastError(Error.Unit_Not_Visible);
+        }
         return hasPath(target.getPosition());
     }
 
@@ -2908,7 +2930,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canTargetUnit
      */
     public boolean canIssueCommand(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanBuildUnitType, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3066,7 +3090,10 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canTargetUnit
      */
     public boolean canIssueCommandGrouped(UnitCommand command, boolean checkCanUseTechPositionOnPositions, boolean checkCanUseTechUnitOnUnits, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        }
+        if (!canCommand()) {
             return false;
         }
 
@@ -3181,23 +3208,27 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canIssueCommand
      */
     public boolean canCommand() {
-        if (!exists() || !getPlayer().equals(game.self())) {
-            return false;
+        game.setLastError();
+
+        if (!getPlayer().equals(game.self())) {
+            return game.setLastError(Error.Unit_Not_Owned);
+        }
+        if (!exists()) {
+            return game.setLastError(Error.Unit_Does_Not_Exist);
         }
 
         // Global can be ordered check
         if (isLockedDown() || isMaelstrommed() || isStasised() ||
                 !isPowered() || getOrder() == Order.ZergBirth || isLoaded()) {
             if (!getType().producesLarva()) {
-                return false;
-            } else {
-                for (final Unit larva : getLarva()) {
-                    if (larva.canCommand()) {
-                        return true;
-                    }
-                }
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
+            for (final Unit larva : getLarva()) {
+                if (larva.canCommand()) {
+                    return game.setLastError();
+                }
+            }
+            return game.setLastError(Error.Unit_Busy);
         }
 
         final UnitType uType = getType();
@@ -3205,7 +3236,7 @@ public class Unit implements Comparable<Unit> {
                 uType == Terran_Vulture_Spider_Mine ||
                 uType == Spell_Scanner_Sweep ||
                 uType == Special_Map_Revealer) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         if (isCompleted() &&
@@ -3216,9 +3247,12 @@ public class Unit implements Comparable<Unit> {
                         uType == Terran_Nuclear_Missile ||
                         uType.isPowerup() ||
                         (uType.isSpecialBuilding() && !uType.isFlagBeacon()))) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return isCompleted() || uType.isBuilding() || isMorphing();
+        if (!isCompleted() && !uType.isBuilding() && !isMorphing()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return game.setLastError();
     }
 
     public boolean canCommandGrouped() {
@@ -3234,11 +3268,17 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canIssueCommand
      */
     public boolean canCommandGrouped(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        }
+        else if (!canCommand()) {
             return false;
         }
 
-        return !getType().isBuilding() && !getType().isCritter();
+        if (getType().isBuilding() || getType().isCritter()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canIssueCommandType(UnitCommandType ct) {
@@ -3257,7 +3297,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canIssueCommand
      */
     public boolean canIssueCommandType(UnitCommandType ct, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility ) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         switch (ct) {
@@ -3373,7 +3415,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canIssueCommandGrouped
      */
     public boolean canIssueCommandTypeGrouped(UnitCommandType ct, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility ) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3472,19 +3516,25 @@ public class Unit implements Comparable<Unit> {
         return true;
     }
 
-    public boolean canTargetUnit(Unit targetUnit) {
+    public boolean canTargetUnit(final Unit targetUnit) {
         if (targetUnit == null || !targetUnit.exists()) {
+            return game.setLastError(Error.Unit_Does_Not_Exist);
+        }
+        if (!targetUnit.isVisible() && !game.isFlagEnabled(Flag.CompleteMapInformation)) {
             return false;
         }
         final UnitType targetType = targetUnit.getType();
         if (!targetUnit.isCompleted() && !targetType.isBuilding() && !targetUnit.isMorphing() &&
                 targetType != Protoss_Archon && targetType != Protoss_Dark_Archon) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return targetType != Spell_Scanner_Sweep &&
-                targetType != Spell_Dark_Swarm &&
-                targetType != Spell_Disruption_Web &&
-                targetType != Special_Map_Revealer;
+        if (targetType == Spell_Scanner_Sweep ||
+                targetType == Spell_Dark_Swarm ||
+                targetType == Spell_Disruption_Web ||
+                targetType == Special_Map_Revealer) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     /**
@@ -3498,7 +3548,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#isTargetable
      */
     public boolean canTargetUnit(Unit targetUnit, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         return canTargetUnit(targetUnit);
@@ -3509,7 +3561,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttack(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3557,12 +3611,14 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttack(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (target == null) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
         return canAttackUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
     }
@@ -3577,7 +3633,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttackGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3628,7 +3686,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canAttack
      */
     public boolean canAttackGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3639,7 +3699,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3648,7 +3710,7 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (target == null) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
         return canAttackUnitGrouped(target, checkCanTargetUnit, checkCanIssueCommandType, false, false);
     }
@@ -3664,7 +3726,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#attack
      */
     public boolean canAttackMove(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility ) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3687,7 +3751,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canAttackMove
      */
     public boolean canAttackMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3695,7 +3761,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
         final UnitType ut = getType();
-        return ut.canMove() || ut == Terran_Siege_Tank_Siege_Mode || ut == Zerg_Cocoon || ut == Zerg_Lurker_Egg;
+        if (!ut.canMove() && ut != Terran_Siege_Tank_Siege_Mode && ut != Zerg_Cocoon && ut != Zerg_Lurker_Egg) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canAttackUnit() {
@@ -3703,39 +3772,43 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttackUnit(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
-
+            return game.setLastError(Error.Unit_Busy);
         }
         if (ut.groundWeapon() == WeaponType.None && ut.airWeapon() == WeaponType.None) {
             if (ut == Protoss_Carrier || ut == Hero_Gantrithor) {
                 if (getInterceptorCount() <= 0) {
-                    return false;
+                    return game.setLastError(Error.Unable_To_Hit);
                 }
             } else if (ut == Protoss_Reaver || ut == Hero_Warbringer) {
                 if (getScarabCount() <= 0) {
-                    return false;
+                    return game.setLastError(Error.Unable_To_Hit);
                 }
             } else {
-                return false;
+                return game.setLastError(Error.Unable_To_Hit);
             }
         }
         if (ut == Zerg_Lurker) {
             if (!isBurrowed()) {
-                return false;
+                return game.setLastError(Error.Unable_To_Hit);
             }
         } else if (isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Unable_To_Hit);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return getOrder() != Order.ConstructingBuilding;
+        if (getOrder() == Order.ConstructingBuilding) {
+            return game.setLastError(Error.Unable_To_Hit);
+        }
+        return true;
     }
 
     public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -3757,7 +3830,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#attack
      */
     public boolean canAttackUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3769,7 +3844,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
         if (targetUnit.isInvincible()) {
-            return false;
+            return game.setLastError(Error.Unable_To_Hit);
         }
 
         final UnitType type = getType();
@@ -3784,23 +3859,25 @@ public class Unit implements Comparable<Unit> {
                 case Protoss_Reaver:
                 case Hero_Warbringer:
                     if (targetInAir) {
-                        return false;
+                        return game.setLastError(Error.Unable_To_Hit);
                     }
                     break;
                 default:
-                    return false;
+                    return game.setLastError(Error.Unable_To_Hit);
             }
         }
 
         if (!type.canMove() && !isInWeaponRange(targetUnit)) {
-            return false;
+            return game.setLastError(Error.Out_Of_Range);
         }
 
         if (type == Zerg_Lurker && !isInWeaponRange(targetUnit)) {
-            return false;
+            return game.setLastError(Error.Out_Of_Range);
         }
-
-        return !equals(targetUnit);
+        if (this.equals(targetUnit)) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        return true;
     }
 
     public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped) {
@@ -3812,7 +3889,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canAttackUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3820,23 +3899,26 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
         if (!isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         final UnitType ut = getType();
         if (!ut.canMove() && ut != Terran_Siege_Tank_Siege_Mode) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (getType() == Zerg_Lurker) {
             if (!isBurrowed()) {
-                return false;
+                return game.setLastError(Error.Unable_To_Hit);
             }
         } else if (isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Unable_To_Hit);
         }
-        return getOrder() != ConstructingBuilding;
+        if (getOrder() == ConstructingBuilding) {
+            return  game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
@@ -3863,7 +3945,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canAttackUnit
      */
     public boolean canAttackUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandTypeGrouped, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3880,21 +3964,25 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (isInvincible()) {
-            return false;
+            return game.setLastError(Error.Unable_To_Hit);
         }
 
         final UnitType ut = getType();
         if (ut == Zerg_Lurker && !isInWeaponRange(targetUnit)) {
-            return false;
+            return game.setLastError(Error.Out_Of_Range);
         }
 
         if (ut == Zerg_Queen &&
                 (targetUnit.getType() != Terran_Command_Center ||
                         targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0)) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
 
-        return !equals(targetUnit);
+        if (this.equals(targetUnit)) {
+            return game.setLastError(Error.Invalid_Parameter);
+
+        }
+        return true;
     }
 
     public boolean canBuild() {
@@ -3902,20 +3990,25 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canBuild(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (isConstructing() ||
                 !isCompleted() ||
                 (ut.isBuilding() && !isIdle())) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType) {
@@ -3927,7 +4020,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canBuild(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3939,9 +4034,12 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!uType.isBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return getAddon() == null;
+        if (getAddon() != null) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType) {
@@ -3963,7 +4061,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#build
      */
     public boolean canBuild(UnitType uType, TilePosition tilePos, boolean checkTargetUnitType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -3976,7 +4076,7 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!tilePos.isValid(game)) {
-            return false;
+            return game.setLastError(Error.Invalid_Tile_Position);
         }
 
         return game.canBuildHere(tilePos, uType, this, true);
@@ -3987,17 +4087,22 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canBuildAddon(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (isConstructing() || !isCompleted() || isLifted() || (getType().isBuilding() && !isIdle())) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (getAddon() != null) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return getType().canBuildAddon();
+        if (!getType().canBuildAddon()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType) {
@@ -4015,7 +4120,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#buildAddon
      */
     public boolean canBuildAddon(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         if (checkCanIssueCommandType && !canBuildAddon(uType, false)) {
@@ -4025,7 +4132,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
         if (!uType.isAddon()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         return game.canBuildHere(getTilePosition(), uType, this);
     }
@@ -4035,24 +4142,26 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canTrain(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         final UnitType ut = getType();
         if (ut.producesLarva()) {
             if (!isConstructing() && isCompleted()) {
-                return true;
+                return game.setLastError();
             }
             for (final Unit larva : getLarva()) {
                 if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
-                    return true;
+                    return game.setLastError();
                 }
             }
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (isConstructing() || !isCompleted() || isLifted()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (!ut.canProduce() &&
                 ut != Terran_Nuclear_Silo &&
@@ -4061,9 +4170,12 @@ public class Unit implements Comparable<Unit> {
                 ut != Zerg_Creep_Colony &&
                 ut != Zerg_Spire &&
                 ut != Zerg_Larva) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType) {
@@ -4081,7 +4193,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#train
      */
     public boolean canTrain(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4101,10 +4215,10 @@ public class Unit implements Comparable<Unit> {
                     }
                 }
                 if (!foundCommandableLarva) {
-                    return false;
+                    return game.setLastError(Error.Unit_Does_Not_Exist);
                 }
             } else if (isConstructing() || !isCompleted()) {
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
         }
 
@@ -4113,9 +4227,12 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (uType.isAddon() || (uType.isBuilding() && !thisUnit.getType().isBuilding())) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
+        if (uType == Zerg_Larva || uType == Zerg_Egg || uType == Zerg_Cocoon) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canMorph() {
@@ -4123,25 +4240,27 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canMorph(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
         if (ut.producesLarva()) {
             if (!isConstructing() && isCompleted() && (!ut.isBuilding() || isIdle())) {
-                return true;
+                return game.setLastError();
             }
             for (final Unit larva : getLarva()) {
                 if (!larva.isConstructing() && larva.isCompleted() && larva.canCommand()) {
-                    return true;
+                    return game.setLastError();
                 }
             }
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (isConstructing() || !isCompleted() || (ut.isBuilding() && !isIdle())) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (ut != Zerg_Hydralisk &&
@@ -4152,9 +4271,12 @@ public class Unit implements Comparable<Unit> {
                 ut != Zerg_Lair &&
                 ut != Zerg_Hive &&
                 ut != Zerg_Larva) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType) {
@@ -4172,7 +4294,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#morph
      */
     public boolean canMorph(UnitType uType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4192,17 +4316,20 @@ public class Unit implements Comparable<Unit> {
                     }
                 }
                 if (!foundCommandableLarva) {
-                    return false;
+                    return game.setLastError(Error.Unit_Does_Not_Exist);
                 }
             } else if (isConstructing() || !isCompleted() || (getType().isBuilding() && !isIdle())) {
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
         }
 
         if (!game.canMake(uType, thisUnit)) {
             return false;
         }
-        return uType != Zerg_Larva && uType != Zerg_Egg && uType != Zerg_Cocoon;
+        if (uType == Zerg_Larva || uType == Zerg_Egg || uType == Zerg_Cocoon) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canResearch() {
@@ -4210,11 +4337,16 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canResearch(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return !isLifted() && isIdle() && isCompleted();
+        if (isLifted() || !isIdle() || !isCompleted()) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canResearch(TechType type) {
@@ -4229,39 +4361,45 @@ public class Unit implements Comparable<Unit> {
      */
     public boolean canResearch(TechType type, boolean checkCanIssueCommandType) {
         final Player self = game.self();
+        if (self == null) {
+            return game.setLastError(Error.Unit_Not_Owned);
+        }
         if (!getPlayer().equals(self)) {
-            return false;
+            return game.setLastError(Error.Unit_Not_Owned);
         }
 
         if (!getType().isSuccessorOf(type.whatResearches())) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted())) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (self.isResearching(type)) {
-            return false;
+            return game.setLastError(Error.Currently_Researching);
         }
 
         if (self.hasResearched(type)) {
-            return false;
+            return game.setLastError(Error.Already_Researched);
         }
 
         if (!self.isResearchAvailable(type)) {
-            return false;
+            return game.setLastError(Error.Access_Denied);
         }
 
         if (self.minerals() < type.mineralPrice()) {
-            return false;
+            return game.setLastError(Error.Insufficient_Minerals);
         }
 
         if (self.gas() < type.gasPrice()) {
-            return false;
+            return game.setLastError(Error.Insufficient_Gas);
         }
 
-        return self.hasUnitTypeRequirement(type.requiredUnit());
+        if (!self.hasUnitTypeRequirement(type.requiredUnit())) {
+            return game.setLastError(Error.Insufficient_Tech);
+        }
+        return game.setLastError();
     }
 
     public boolean canUpgrade() {
@@ -4269,11 +4407,16 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUpgrade(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return !isLifted() && isIdle() && isCompleted();
+        if (isLifted() && !isIdle() && !isCompleted()) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canUpgrade(UpgradeType type) {
@@ -4289,41 +4432,47 @@ public class Unit implements Comparable<Unit> {
     public boolean canUpgrade(UpgradeType type, boolean checkCanIssueCommandType) {
         final Player self = game.self();
 
+        if (self == null) {
+            return game.setLastError(Error.Unit_Not_Owned);
+        }
+
         if (!getPlayer().equals(self)) {
-            return false;
+            return game.setLastError(Error.Unit_Not_Owned);
         }
 
         if (!getType().isSuccessorOf(type.whatUpgrades())) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         if (checkCanIssueCommandType && (isLifted() || !isIdle() || !isCompleted())) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (!self.hasUnitTypeRequirement(type.whatUpgrades())) {
-            return false;
+            return game.setLastError(Error.Unit_Does_Not_Exist);
         }
 
         final int nextLvl = self.getUpgradeLevel(type) + 1;
 
         if (!self.hasUnitTypeRequirement(type.whatsRequired(nextLvl))) {
-            return false;
+            return game.setLastError(Error.Insufficient_Tech);
         }
 
         if (self.isUpgrading(type)) {
-            return false;
+            return game.setLastError(Error.Currently_Upgrading);
         }
 
         if (self.getUpgradeLevel(type) >= self.getMaxUpgradeLevel(type)) {
-            return false;
+            return game.setLastError(Error.Fully_Upgraded);
         }
 
         if (self.minerals() < type.mineralPrice(nextLvl)) {
-            return false;
+            return game.setLastError(Error.Insufficient_Minerals);
         }
-
-        return self.gas() >= type.gasPrice(nextLvl);
+        if (self.gas() < type.gasPrice(nextLvl)) {
+            return game.setLastError(Error.Insufficient_Gas);
+        }
+        return true;
     }
 
     public boolean canSetRallyPoint() {
@@ -4331,7 +4480,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canSetRallyPoint(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4372,7 +4523,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canSetRallyUnit
      */
     public boolean canSetRallyPoint(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4380,12 +4533,14 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canSetRallyPoint(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (target == null) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
         return canSetRallyUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
     }
@@ -4401,14 +4556,19 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#setRallyPoint
      */
     public boolean canSetRallyPosition(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().canProduce() || !getType().isBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return !isLifted();
+        if (isLifted()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canSetRallyUnit() {
@@ -4416,14 +4576,19 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canSetRallyUnit(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().canProduce() || !getType().isBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return !isLifted();
+        if (isLifted()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -4445,7 +4610,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#setRallyPoint
      */
     public boolean canSetRallyUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4467,35 +4634,40 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#move
      */
     public boolean canMove(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         final UnitType ut = getType();
         if (!ut.isBuilding()) {
             if (!isInterruptible()) {
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
             if (!getType().canMove()) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
             if (isBurrowed()) {
-                return false;
+                return game.setLastError(Error.Incompatible_State);
             }
             if (getOrder() == ConstructingBuilding) {
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
             if (ut == Zerg_Larva) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
         } else {
             if (!ut.isFlyingBuilding()) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
             if (!isLifted()) {
-                return false;
+                return game.setLastError(Error.Incompatible_State);
             }
         }
-        return isCompleted();
+        if (!isCompleted()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canMoveGrouped(boolean checkCommandibilityGrouped) {
@@ -4513,7 +4685,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canMove
      */
     public boolean canMoveGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4522,9 +4696,12 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!getType().canMove()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return isCompleted() || isMorphing();
+        if (!isCompleted() && !isMorphing()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canPatrol() {
@@ -4538,7 +4715,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#patrol
      */
     public boolean canPatrol(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         return canMove(false);
@@ -4559,7 +4738,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canPatrol
      */
     public boolean canPatrolGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4575,7 +4756,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canFollow(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4601,7 +4784,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#follow
      */
     public boolean canFollow(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4613,7 +4798,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return targetUnit != this;
+        if (targetUnit != this) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        return true;
     }
 
     public boolean canGather() {
@@ -4621,30 +4809,35 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canGather(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         final UnitType ut = getType();
 
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (!ut.isWorker()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (getPowerUp() != null) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (isHallucination()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return getOrder() != ConstructingBuilding;
+        if (getOrder() == ConstructingBuilding) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -4666,33 +4859,34 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#gather
      */
     public boolean canGather(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (checkCanIssueCommandType && !canGather(false)) {
             return false;
         }
-
         if (checkCanTargetUnit && !canTargetUnit(targetUnit, false)) {
             return false;
         }
 
         final UnitType uType = targetUnit.getType();
         if (!uType.isResourceContainer() || uType == Resource_Vespene_Geyser) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-
         if (!hasPath(getPosition())) {
-            return false;
+            return game.setLastError(Error.Unreachable_Location);
         }
-
-        return !uType.isRefinery() || getPlayer().equals(game.self());
-
+        if (uType.isRefinery() && !getPlayer().equals(game.self())) {
+            return game.setLastError(Error.Unit_Not_Owned);
+        }
+        return true;
     }
 
     public boolean canReturnCargo() {
@@ -4706,24 +4900,29 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#returnCargo
      */
     public boolean canReturnCargo(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         final UnitType ut = getType();
 
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (!ut.isWorker()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (!isCarryingGas() && !isCarryingMinerals()) {
-            return false;
+            return game.setLastError(Error.Insufficient_Ammo);
         }
         if (isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return getOrder() != ConstructingBuilding;
+        if (getOrder() == ConstructingBuilding) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canHoldPosition() {
@@ -4737,7 +4936,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#holdPosition
      */
     public boolean canHoldPosition(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4745,27 +4946,30 @@ public class Unit implements Comparable<Unit> {
 
         if (!ut.isBuilding()) {
             if (!ut.canMove()) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
             if (isBurrowed() && ut != Zerg_Lurker) {
-                return false;
+                return game.setLastError(Error.Incompatible_State);
             }
             if (getOrder() == ConstructingBuilding) {
-                return false;
+                return game.setLastError(Error.Unit_Busy);
             }
             if (ut == Zerg_Larva) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
         } else {
             if (!ut.isFlyingBuilding()) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
             if (!isLifted()) {
-                return false;
+                return game.setLastError(Error.Incompatible_State);
             }
         }
 
-        return isCompleted();
+        if (!isCompleted()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canStop() {
@@ -4779,24 +4983,29 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#stop
      */
     public boolean canStop(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
 
         final UnitType ut = getType();
 
         if (isBurrowed() && ut != Zerg_Lurker) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return !ut.isBuilding() || isLifted() ||
-                ut == Protoss_Photon_Cannon ||
-                ut == Zerg_Sunken_Colony ||
-                ut == Zerg_Spore_Colony ||
-                ut == Terran_Missile_Turret;
+        if (ut.isBuilding() && !isLifted() &&
+                ut != Protoss_Photon_Cannon &&
+                ut != Zerg_Sunken_Colony &&
+                ut != Zerg_Spore_Colony &&
+                ut != Terran_Missile_Turret) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRepair() {
@@ -4804,23 +5013,28 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRepair(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (getType() != Terran_SCV) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (isHallucination()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return getOrder() != ConstructingBuilding;
+        if (getOrder() == ConstructingBuilding) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -4842,7 +5056,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#repair
      */
     public boolean canRepair(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4856,15 +5072,18 @@ public class Unit implements Comparable<Unit> {
 
         final UnitType targType = targetUnit.getType();
         if (targType.getRace() != Terran || !targType.isMechanical()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (targetUnit.getHitPoints() == targType.maxHitPoints()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (!targetUnit.isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return targetUnit != this;
+        if (targetUnit == this) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        return true;
     }
 
     public boolean canBurrow() {
@@ -4878,7 +5097,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#burrow
      */
     public boolean canBurrow(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4896,14 +5117,19 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unburrow
      */
     public boolean canUnburrow(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isBurrowable()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return isBurrowed() && getOrder() != Unburrowing;
+        if (!isBurrowed() || getOrder() == Unburrowing) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canCloak() {
@@ -4917,7 +5143,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cloak
      */
     public boolean canCloak(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4935,14 +5163,19 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#decloak
      */
     public boolean canDecloak(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (getType().cloakingTech() == TechType.None) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return getSecondaryOrder() == Cloak;
+        if (getSecondaryOrder() != Cloak) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canSiege() {
@@ -4956,7 +5189,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#siege
      */
     public boolean canSiege(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -4974,18 +5209,23 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unsiege
      */
     public boolean canUnsiege(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!isSieged()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         final Order order = getOrder();
         if (order == Sieging || order == Unsieging) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canLift() {
@@ -4999,20 +5239,25 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#lift
      */
     public boolean canLift(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isFlyingBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (isLifted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return isIdle();
+        if (!isIdle()) {
+            return game.setLastError(Error.Unit_Busy);
+        }
+        return true;
     }
 
     public boolean canLand() {
@@ -5020,14 +5265,19 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canLand(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isFlyingBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
-        return isLifted();
+        if (!isLifted()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canLand(TilePosition target, boolean checkCanIssueCommandType) {
@@ -5045,7 +5295,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#land
      */
     public boolean canLand(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5061,28 +5313,33 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canLoad(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
 
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
-            return false;
+            return game.setLastError(Error.Insufficient_Tech);
         }
         if (isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (getOrder() == ConstructingBuilding) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return ut != Zerg_Larva;
+        if (ut == Zerg_Larva) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -5104,7 +5361,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#load
      */
     public boolean canLoad(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5119,47 +5378,47 @@ public class Unit implements Comparable<Unit> {
         final Player self = game.self();
         //target must also be owned by self
         if (!targetUnit.getPlayer().equals(self)) {
-            return false;
+            return game.setLastError(Error.Unit_Not_Owned);
         }
         if (targetUnit.isLoaded() || !targetUnit.isCompleted()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         // verify upgrade for Zerg Overlord
         if (targetUnit.getType() == Zerg_Overlord && self.getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
-            return false;
+            return game.setLastError(Error.Insufficient_Tech);
         }
 
         final int thisUnitSpaceProvided = getType().spaceProvided();
         final int targetSpaceProvided = targetUnit.getType().spaceProvided();
         if (thisUnitSpaceProvided <= 0 && targetSpaceProvided <= 0) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         final Unit unitToBeLoaded = thisUnitSpaceProvided > 0 ? targetUnit : this;
         final UnitType unitToBeLoadedType = unitToBeLoaded.getType();
         if (!unitToBeLoadedType.canMove() || unitToBeLoadedType.isFlyer() || unitToBeLoadedType.spaceRequired() > 8) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         if (!unitToBeLoaded.isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         if (unitToBeLoaded.isBurrowed()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
         final Unit unitThatLoads = thisUnitSpaceProvided > 0 ? this : targetUnit;
 
         if (unitThatLoads.isHallucination()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
         final UnitType unitThatLoadsType = unitThatLoads.getType();
 
         if (unitThatLoadsType == Terran_Bunker) {
             if (!unitToBeLoadedType.isOrganic() || unitToBeLoadedType.getRace() != Terran) {
-                return false;
+                return game.setLastError(Error.Incompatible_UnitType);
             }
             if (!unitToBeLoaded.hasPath(unitThatLoads.getPosition())) {
-                return false;
+                return game.setLastError(Error.Unreachable_Location);
             }
         }
 
@@ -5170,7 +5429,10 @@ public class Unit implements Comparable<Unit> {
                 freeSpace -= requiredSpace;
             }
         }
-        return unitToBeLoadedType.spaceRequired() <= freeSpace;
+        if (unitToBeLoadedType.spaceRequired() > freeSpace) {
+            return game.setLastError(Error.Insufficient_Space);
+        }
+        return true;
     }
 
     public boolean canUnloadWithOrWithoutTarget() {
@@ -5186,25 +5448,30 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unloadAll
      */
     public boolean canUnloadWithOrWithoutTarget(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         final UnitType ut = getType();
         if (!ut.isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
 
         if (getLoadedUnits().isEmpty()) {
-            return false;
+            return game.setLastError(Error.Unit_Does_Not_Exist);
         }
 
         // Check overlord tech
         if (ut == Zerg_Overlord && game.self().getUpgradeLevel(UpgradeType.Ventral_Sacs) == 0) {
-            return false;
+            return game.setLastError(Error.Insufficient_Tech);
         }
 
-        return ut.spaceProvided() > 0;
+        if (ut.spaceProvided() <= 0) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType) {
@@ -5225,7 +5492,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unloadAll
      */
     public boolean canUnloadAtPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5235,10 +5504,11 @@ public class Unit implements Comparable<Unit> {
 
         if (getType() != Terran_Bunker) {
             if (!new WalkPosition(targDropPos.x / 8, targDropPos.y / 8).isValid(game)) {
-                return false;
-            } else return game.isWalkable(targDropPos.x / 8, targDropPos.y / 8);
+                return game.setLastError(Error.Invalid_Tile_Position);
+            } else if (!game.isWalkable(targDropPos.x / 8, targDropPos.y / 8)) {
+                return game.setLastError(Error.Unreachable_Location);
+            }
         }
-
         return true;
     }
 
@@ -5273,7 +5543,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unload
      */
     public boolean canUnload(Unit targetUnit, boolean checkCanTargetUnit, boolean checkPosition, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5290,10 +5562,13 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!targetUnit.isLoaded()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
 
-        return equals(targetUnit.getTransport());
+        if (this.equals(targetUnit.getTransport())) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        return true;
     }
 
     public boolean canUnloadAll() {
@@ -5315,7 +5590,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUnloadAllPosition(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5323,7 +5600,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return getType() != Terran_Bunker;
+        if (getType() == Terran_Bunker) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType) {
@@ -5342,7 +5622,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#unloadAll
      */
     public boolean canUnloadAllPosition(Position targDropPos, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5358,7 +5640,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRightClick(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         return canRightClickPosition(false) || canRightClickUnit(false);
@@ -5398,7 +5682,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canRightClickUnit
      */
     public boolean canRightClick(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5406,12 +5692,14 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRightClick(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (target == null) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
         return canRightClickUnit(target, checkCanTargetUnit, checkCanIssueCommandType, false);
     }
@@ -5425,7 +5713,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRightClickGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5476,7 +5766,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canRightClickUnit
      */
     public boolean canRightClickGrouped(Position target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5496,7 +5788,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
         if (target == null) {
-            return false;
+            return game.setLastError(Error.Invalid_Parameter);
         }
         return canRightClickUnitGrouped(target, checkCanTargetUnit, checkCanIssueCommandTypeGrouped, false, false);
     }
@@ -5512,14 +5804,19 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#rightClick
      */
     public boolean canRightClickPosition(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return canMove(false) || canSetRallyPosition(false);
+        if (!canMove(false) && canSetRallyPosition(false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped) {
@@ -5538,7 +5835,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canRightClick
      */
     public boolean canRightClickPositionGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
@@ -5546,9 +5845,12 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return canMoveGrouped(false, false);
+        if (!canMoveGrouped(false, false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRightClickUnit() {
@@ -5556,17 +5858,22 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRightClickUnit(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return canFollow(false) ||
-                canAttackUnit(false) ||
-                canLoad(false) ||
-                canSetRallyUnit(false);
+        if (!canFollow(false) &&
+                !canAttackUnit(false) &&
+                !canLoad(false) &&
+                !canSetRallyUnit(false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType) {
@@ -5588,7 +5895,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#rightClick
      */
     public boolean canRightClickUnit(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5605,9 +5914,12 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return canFollow(targetUnit, false, true, false) ||
-                canLoad(targetUnit, false, true, false) ||
-                canSetRallyUnit(targetUnit, false, true, false);
+        if (!canFollow(targetUnit, false, true, false) &&
+                !canLoad(targetUnit, false, true, false) &&
+                !canSetRallyUnit(targetUnit, false, true, false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped) {
@@ -5619,7 +5931,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canRightClickUnitGrouped(boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5628,11 +5942,14 @@ public class Unit implements Comparable<Unit> {
         }
 
         if (!isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
-        return canFollow(false) ||
-                canAttackUnitGrouped(false, false) ||
-                canLoad(false);
+        if (!canFollow(false) &&
+                !canAttackUnitGrouped(false, false) &&
+                !canLoad(false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped) {
@@ -5659,7 +5976,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canRightClickUnit
      */
     public boolean canRightClickUnitGrouped(Unit targetUnit, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5678,8 +5997,11 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return canFollow(targetUnit, false, true, false) ||
-                canLoad(targetUnit, false, true, false);
+        if (!canFollow(targetUnit, false, true, false) &&
+               !canLoad(targetUnit, false, true, false)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canHaltConstruction() {
@@ -5693,11 +6015,16 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#haltConstruction
      */
     public boolean canHaltConstruction(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return getOrder() == ConstructingBuilding;
+        if (getOrder() != ConstructingBuilding) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
     //------------------------------------------- CAN CANCEL CONSTRUCTION ------------------------------------
 
@@ -5712,15 +6039,20 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelConstruction
      */
     public boolean canCancelConstruction(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isBuilding()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
-        return !isCompleted() && (getType() != Zerg_Nydus_Canal || getNydusExit() == null);
+        if (isCompleted() || (getType() == Zerg_Nydus_Canal || getNydusExit() != null)) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canCancelAddon() {
@@ -5734,11 +6066,16 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelAddon
      */
     public boolean canCancelAddon(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
         final Unit addon = getAddon();
-        return addon != null && !addon.isCompleted();
+        if (addon == null || addon.isCompleted()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canCancelTrain() {
@@ -5752,11 +6089,16 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelTrain
      */
     public boolean canCancelTrain(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return isTraining();
+        if (!isTraining()) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canCancelTrainSlot() {
@@ -5783,7 +6125,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelTrain
      */
     public boolean canCancelTrainSlot(int slot, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5791,7 +6135,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return isTraining() && slot >= 0 && getTrainingQueue().size() > slot;
+        if (!isTraining() || slot < 0 || getTrainingQueue().size() <= slot) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canCancelMorph() {
@@ -5805,14 +6152,19 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelMorph
      */
     public boolean canCancelMorph(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!isMorphing() || (!isCompleted() && getType() == Zerg_Nydus_Canal && getNydusExit() != null)) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canCancelResearch() {
@@ -5826,11 +6178,16 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelResearch
      */
     public boolean canCancelResearch(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return getOrder() == ResearchTech;
+        if (getOrder() != ResearchTech) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canCancelUpgrade() {
@@ -5844,11 +6201,16 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#cancelUpgrade
      */
     public boolean canCancelUpgrade(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
-        return getOrder() == Upgrade;
+        if (getOrder() != Upgrade) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canUseTechWithOrWithoutTarget() {
@@ -5856,17 +6218,22 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUseTechWithOrWithoutTarget(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isBuilding() && !isInterruptible()) {
-            return false;
+            return game.setLastError(Error.Unit_Busy);
         }
         if (!isCompleted()) {
-            return false;
+            return game.setLastError(Error.Incompatible_State);
         }
-        return !isHallucination();
+        if (isHallucination()) {
+            return game.setLastError(Error.Incompatible_UnitType);
+        }
+        return true;
     }
 
     public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType) {
@@ -5885,7 +6252,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#useTech
      */
     public boolean canUseTechWithOrWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5896,35 +6265,58 @@ public class Unit implements Comparable<Unit> {
         final UnitType ut = getType();
         // researched check
         if (!ut.isHero() && !game.self().hasResearched(tech) && ut != Zerg_Lurker) {
-            return false;
+            return game.setLastError(Error.Insufficient_Tech);
         }
 
         // energy check
         if (getEnergy() < tech.energyCost()) {
-            return false;
+            return game.setLastError(Error.Insufficient_Energy);
         }
         // unit check
         if (tech != TechType.Burrowing && !tech.whatUses().contains(ut)) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
         final Order order = getOrder();
         switch (tech) {
             case Spider_Mines:
-                return getSpiderMineCount() > 0;
+                if (getSpiderMineCount() <= 0) {
+                    return game.setLastError(Error.Insufficient_Ammo);
+                }
+                return true;
             case Tank_Siege_Mode:
-                return !isSieged() && order != Order.Sieging && order != Order.Unsieging;
+                // TODO(jasper) investigate difference between master & develop
+                // https://github.com/bwapi/bwapi/blame/9a84b080df76c951738df27248968b50a655ac2d/bwapi/Shared/Templates.h#L2197
+//                if (isSieged()) {
+//                    return game.setLastError(Error.Incompatible_State);
+//                }
+                if (order == Order.Sieging || order == Order.Unsieging) {
+                    return game.setLastError(Error.Unit_Busy);
+                }
+                return true;
             case Cloaking_Field:
             case Personnel_Cloaking:
-                return getSecondaryOrder() != Cloak;
+                if (getSecondaryOrder() == Cloak) {
+                    return game.setLastError(Error.Insufficient_Ammo);
+                }
+                return true;
             case Burrowing:
-                return ut.isBurrowable() && !isBurrowed() && order != Burrowing && order != Unburrowing;
+                if (!ut.isBurrowable()) {
+                    return game.setLastError(Error.Incompatible_UnitType);
+                }
+                if (isBurrowed() || order == Burrowing || order == Unburrowing) {
+                    return game.setLastError(Error.Incompatible_State);
+                }
+                return true;
             case None:
-                return false;
+                return game.setLastError(Error.Incompatible_TechType);
             case Nuclear_Strike:
-                return getPlayer().completedUnitCount(Terran_Nuclear_Missile) != 0;
+                if (getPlayer().completedUnitCount(Terran_Nuclear_Missile) == 0) {
+                    return game.setLastError(Error.Insufficient_Ammo);
+                }
+                return true;
             case Unknown:
-                return false;
+                return game.setLastError(Error.Incompatible_TechType);
         }
 
         return true;
@@ -5977,7 +6369,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canUseTechPosition
      */
     public boolean canUseTech(TechType tech, Position target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -5985,11 +6379,16 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUseTech(TechType tech, Unit target, boolean checkCanTargetUnit, boolean checkTargetsType, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
+
         if (target == null) {
-            return canUseTechWithoutTarget(tech, checkCanIssueCommandType, false);
+            if (!canUseTechWithoutTarget(tech, checkCanIssueCommandType, false)) {
+                return false;
+            }
         }
         return canUseTechUnit(tech, target, checkCanTargetUnit, checkTargetsType, checkCanIssueCommandType, false);
     }
@@ -6009,7 +6408,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#useTech
      */
     public boolean canUseTechWithoutTarget(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -6020,7 +6421,10 @@ public class Unit implements Comparable<Unit> {
         if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
-        return !tech.targetsUnit() && !tech.targetsPosition() && tech != TechType.None && tech != TechType.Unknown && tech != TechType.Lurker_Aspect;
+        if (tech.targetsUnit() || tech.targetsPosition() || tech == TechType.None || tech == TechType.Unknown || tech == TechType.Lurker_Aspect) {
+            return game.setLastError(Error.Incompatible_TechType);
+        }
+        return true;
     }
 
     public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType) {
@@ -6032,7 +6436,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUseTechUnit(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -6043,7 +6449,10 @@ public class Unit implements Comparable<Unit> {
         if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
-        return tech.targetsUnit();
+        if (!tech.targetsUnit()) {
+            return game.setLastError(Error.Incompatible_TechType);
+        }
+        return true;
     }
 
     public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType) {
@@ -6070,7 +6479,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#useTech
      */
     public boolean canUseTechUnit(TechType tech, Unit targetUnit, boolean checkCanTargetUnit, boolean checkTargetsUnits, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -6091,28 +6502,28 @@ public class Unit implements Comparable<Unit> {
         switch (tech) {
             case Archon_Warp:
                 if (targetType != Protoss_High_Templar) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 if (!getPlayer().equals(targetUnit.getPlayer())) {
-                    return false;
+                    return game.setLastError(Error.Unit_Not_Owned);
                 }
                 break;
 
             case Dark_Archon_Meld:
                 if (targetType != Protoss_Dark_Templar) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_TechType);
                 }
                 if (!getPlayer().equals(targetUnit.getPlayer())) {
-                    return false;
+                    return game.setLastError(Error.Unit_Not_Owned);
                 }
                 break;
 
             case Consume:
                 if (!getPlayer().equals(targetUnit.getPlayer())) {
-                    return false;
+                    return game.setLastError(Error.Unit_Not_Owned);
                 }
                 if (targetType.getRace() != Zerg || targetType == Zerg_Larva) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
 
@@ -6120,31 +6531,31 @@ public class Unit implements Comparable<Unit> {
                 if ((!targetType.isOrganic() && !targetType.isMechanical()) ||
                         targetType.isRobotic() ||
                         targetType.isFlyer()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
 
             case Lockdown:
                 if (!targetType.isMechanical()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
 
             case Healing:
                 if (targetUnit.getHitPoints() == targetType.maxHitPoints()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_State);
                 }
                 if (!targetType.isOrganic() || targetType.isFlyer()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
-                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer())) {
-                    return false;
+                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer())) {
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 break;
 
             case Mind_Control:
                 if (getPlayer().equals(targetUnit.getPlayer())) {
-                    return false;
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 if (targetType == Protoss_Interceptor ||
                         targetType == Terran_Vulture_Spider_Mine ||
@@ -6152,20 +6563,20 @@ public class Unit implements Comparable<Unit> {
                         targetType == Zerg_Cocoon ||
                         targetType == Zerg_Larva ||
                         targetType == Zerg_Egg) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
 
             case Feedback:
                 if (!targetType.isSpellcaster()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
 
             case Infestation:
                 if (targetType != Terran_Command_Center ||
                         targetUnit.getHitPoints() >= 750 || targetUnit.getHitPoints() <= 0) {
-                    return false;
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 break;
         }
@@ -6174,13 +6585,13 @@ public class Unit implements Comparable<Unit> {
             case Archon_Warp:
             case Dark_Archon_Meld:
                 if (!hasPath(targetUnit.getPosition())) {
-                    return false;
+                    return game.setLastError(Error.Unreachable_Location);
                 }
                 if (targetUnit.isHallucination()) {
-                    return false;
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 if (targetUnit.isMaelstrommed()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_State);
                 }
                 // Fall through (don't break).
             case Parasite:
@@ -6197,7 +6608,7 @@ public class Unit implements Comparable<Unit> {
             case Feedback:
             case Yamato_Gun:
                 if (targetUnit.isStasised()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_State);
                 }
                 break;
         }
@@ -6205,7 +6616,7 @@ public class Unit implements Comparable<Unit> {
         switch (tech) {
             case Yamato_Gun:
                 if (targetUnit.isInvincible()) {
-                    return false;
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 break;
 
@@ -6220,18 +6631,21 @@ public class Unit implements Comparable<Unit> {
             case Restoration:
             case Mind_Control:
                 if (targetUnit.isInvincible()) {
-                    return false;
+                    return game.setLastError(Error.Invalid_Parameter);
                 }
                 // Fall through (don't break).
             case Consume:
             case Feedback:
                 if (targetType.isBuilding()) {
-                    return false;
+                    return game.setLastError(Error.Incompatible_UnitType);
                 }
                 break;
         }
 
-        return targetUnit != this;
+        if (targetUnit == this) {
+            return game.setLastError(Error.Invalid_Parameter);
+        }
+        return true;
     }
 
     public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType) {
@@ -6243,7 +6657,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canUseTechPosition(TechType tech, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -6254,7 +6670,10 @@ public class Unit implements Comparable<Unit> {
         if (!canUseTechWithOrWithoutTarget(tech, false, false)) {
             return false;
         }
-        return tech.targetsPosition();
+        if (!tech.targetsPosition()) {
+            return game.setLastError(Error.Incompatible_TechType);
+        }
+        return true;
     }
 
     public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType) {
@@ -6277,7 +6696,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#useTech
      */
     public boolean canUseTechPosition(TechType tech, Position target, boolean checkTargetsPositions, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
@@ -6289,7 +6710,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return tech != TechType.Spider_Mines || hasPath(target);
+        if (tech == TechType.Spider_Mines && !hasPath(target)) {
+            return game.setLastError(Error.Unreachable_Location);
+        }
+        return true;
     }
 
     public boolean canPlaceCOP() {
@@ -6297,15 +6721,20 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canPlaceCOP(boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 
         if (!getType().isFlagBeacon()) {
-            return false;
+            return game.setLastError(Error.Incompatible_UnitType);
         }
 
-        return unitData.getButtonset() != 228 && getOrder() == CTFCOPInit;
+        if (unitData.getButtonset() == 228 || getOrder() != CTFCOPInit) {
+            return game.setLastError(Error.Incompatible_State);
+        }
+        return true;
     }
 
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType) {
@@ -6323,7 +6752,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#placeCOP
      */
     public boolean canPlaceCOP(TilePosition target, boolean checkCanIssueCommandType, boolean checkCommandibility) {
-        if (checkCommandibility && !canCommand()) {
+        if (!checkCommandibility) {
+            game.setLastError();
+        } else if (!canCommand()) {
             return false;
         }
 

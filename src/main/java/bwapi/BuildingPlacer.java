@@ -31,8 +31,11 @@ class BuildingPlacer {
             };
 
     static TilePosition getBuildLocation(final UnitType type, final TilePosition desiredPosition1, final int maxRange, final boolean creep, final Game game) {
+        game.setLastError(); // Reset last error
+
         // Make sure the type is compatible
         if (!type.isBuilding()) {
+            game.setLastError(Error.Incompatible_UnitType);
             return TilePosition.Invalid;
         }
 
@@ -111,7 +114,7 @@ class BuildingPlacer {
                 break;
             }
 
-            // If we were really targetting a region, and couldn't find a position above
+            // If we were really targeting a region, and couldn't find a position above
             if (pTargRegion != null) { // Then fallback to the default build position
                 desiredPosition = centerPosition;
             }
