@@ -1721,26 +1721,74 @@ public final class Game {
         addShape(ShapeType.Text, ctype, x, y, 0, 0, formatted, textSize.id, 0, false);
     }
 
+    /**
+     * Draw formatted text on the Map. (0, 0) coordinate is TopLeft.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextMap(50, 50, "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the TopLeft of the Map.
+     */
     public void drawTextMap(final int x, final int y, final String string, final Text... colors) {
         drawText(CoordinateType.Map, x, y, string, colors);
     }
 
+    /**
+     * Draw formatted text on the Map. (0, 0) coordinate is TopLeft of the Map.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextMap(new Position(50, 50), "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the TopLeft of the Map.
+     */
     public void drawTextMap(final Position p, final String string, final Text... colors) {
         drawTextMap(p.x, p.y, string, colors);
     }
 
+    /**
+     * Draw formatted text relative to the Mouse location. (0, 0) is the Mouse location.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextMouse(50, 50, "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the Mouse location.
+     */
     public void drawTextMouse(final int x, final int y, final String string, final Text... colors) {
         drawText(CoordinateType.Mouse, x, y, string, colors);
     }
 
+    /**
+     * Draw formatted text relative to the Mouse location. (0, 0) is the Mouse location.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextMouse(new Position(50, 50), "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the Mouse location.
+     */
     public void drawTextMouse(final Position p, final String string, final Text... colors) {
         drawTextMouse(p.x, p.y, string, colors);
     }
 
+    /**
+     * Draw formatted text relative to the Screen location. (0, 0) is TopLeft of the Screen.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextScreen(50, 50, "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the TopLeft of the Screen.
+     */
     public void drawTextScreen(final int x, final int y, final String string, final Text... colors) {
         drawText(CoordinateType.Screen, x, y, string, colors);
     }
 
+    /**
+     * Draw formatted text relative to the Screen location. (0, 0) is TopLeft of the Screen.
+     * Use the %c delimiter to change the color of the following text to given `colors` until the next %c
+     * <p>
+     * Example:
+     * `drawTextScreen(new Position(50, 50), "%cHello %cWorld", Text.Red, Text.Blue)`
+     * will draw the text `Hello` in Red and `World` in Blue at offset (50, 50) from the TopLeft of the Screen.
+     */
     public void drawTextScreen(final Position p, final String string, final Text... colors) {
         drawTextScreen(p.x, p.y, string, colors);
     }
