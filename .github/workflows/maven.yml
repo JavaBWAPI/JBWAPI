@@ -8,15 +8,31 @@ on:
   - pull_request
 
 jobs:
-  build:
+#  build_before_java16:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        java:
+#         - '8'  # 2030.12
+#         - '11' # 2026.09
+#    name: Build for Java ${{ matrix.Java }}
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Setup java
+#        uses: actions/setup-java@v2
+#        with:
+#          distribution: 'temurin'
+#          java-version: ${{ matrix.java }}
+#      - name: Build with Maven
+#        run: mvn -B package --file pom.xml
+
+  build_after_java16:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java:
-         - '8'
-         - '11'
-         #- '17'
-    name: Java ${{ matrix.Java }} sample
+          - '17' # 2029.09
+    name: Build for Java ${{ matrix.Java }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup java
