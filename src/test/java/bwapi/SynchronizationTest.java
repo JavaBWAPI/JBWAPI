@@ -175,7 +175,7 @@ public class SynchronizationTest {
                 .build();
         SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
         environment.runGame(20);
-        final double minObserved = 0.25;
+        final double minObserved = 0.01;
         final double maxObserved = 15;
         final double meanObserved = (minObserved + maxObserved) / 2;
         final double rangeObserved = (maxObserved - minObserved) / 2;

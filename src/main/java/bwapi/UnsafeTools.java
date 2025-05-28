@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.nio.Buffer;
 
 class UnsafeTools {
+    // TODO: make this Java >16 compatible.
 
     private static Object getOrCrash(final Class<?> className, final Object object, final String fieldName) {
         try { // get
@@ -20,10 +21,8 @@ class UnsafeTools {
             }
             return result;
 
-        } catch (final Exception e) { // or crash...
-            e.printStackTrace();
-            System.exit(-1);
-            return null;
+        } catch (final NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -32,8 +31,7 @@ class UnsafeTools {
     }
 
     /**
-     * Alternative to `((DirectBuffer) buffer).address())`
-     * (ab)using reflection
+     * Alternative to `((DirectBuffer) buffer).address()` using reflection.
      */
     static long getAddress(final Buffer buffer) {
         return (long) getOrCrash(Buffer.class, buffer, "address");

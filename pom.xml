@@ -59,18 +59,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.2.5</version>
                 <configuration>
-<!--                    <parallel>all</parallel> &lt;!&ndash; Run tests in parallel&ndash;&gt;-->
-<!--                    <useUnlimitedThreads>true</useUnlimitedThreads>-->
-                    <rerunFailingTestsCount>10</rerunFailingTestsCount>
-                    <argLine>-Xms1g -Xmx1g</argLine>
+                    <rerunFailingTestsCount>1</rerunFailingTestsCount>
+                    <argLine>--add-opens java.base/java.nio=ALL-UNNAMED -Xms1g -Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>run-benchmarks</id>
