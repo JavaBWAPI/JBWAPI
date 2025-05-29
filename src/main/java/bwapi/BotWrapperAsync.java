@@ -22,7 +22,7 @@ class BotWrapperAsync extends BotWrapper {
         // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
         // If BWAPI doesn't get priority, it may not detect completion of a frame on our end in timely fashion.
         Thread.currentThread().setName("JBWAPI Client");
-        Thread.currentThread().setPriority(4);
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 1);
     }
 
     /**
@@ -35,12 +35,13 @@ class BotWrapperAsync extends BotWrapper {
         liveClientData.setBuffer(liveData);
         this.liveData = liveData;
 
-        configuration.log("Main: Starting bot thread");
-        botThread = createBotThread();
-        botThread.setName("JBWAPI Bot");
-        // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
-        botThread.setPriority(3);
-        botThread.start();
+//        configuration.log("Main: Starting bot thread");
+//        botThread = createBotThread();
+//        botThread.setName("JBWAPI Bot");
+//        // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
+//        botThread.setPriority(Thread.NORM_PRIORITY - 2);
+//        botThread.start();
+        botThread = null;
     }
 
 
@@ -80,6 +81,15 @@ class BotWrapperAsync extends BotWrapper {
     void asyncOnFrame() {
         long startNanos = System.nanoTime();
         long endNanos = startNanos + (long) configuration.getMaxFrameDurationMs() * 1000000;
+
+        if (botThread == null) {
+            configuration.log("Main: Starting bot thread");
+            botThread = createBotThread();
+            botThread.setName("JBWAPI Bot");
+            // Reduced priority helps ensure that StarCraft.exe/BWAPI pick up on our frame completion in timely fashion
+            botThread.setPriority(3);
+            botThread.start();
+        }
 
         // Unsafe mode:
         // If the frame buffer is empty (meaning the bot must be idle)

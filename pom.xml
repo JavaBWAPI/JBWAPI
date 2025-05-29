@@ -62,7 +62,8 @@
                 <version>3.2.5</version>
                 <configuration>
                     <rerunFailingTestsCount>1</rerunFailingTestsCount>
-                    <argLine>--add-opens java.base/java.nio=ALL-UNNAMED -Xms1g -Xmx1g</argLine>
+<!--                    <argLine>&#45;&#45;add-opens java.base/java.nio=ALL-UNNAMED -Xms1g -Xmx1g</argLine>-->
+                    <argLine>-Xms1g -Xmx1g</argLine>
                 </configuration>
             </plugin>
             <plugin>
