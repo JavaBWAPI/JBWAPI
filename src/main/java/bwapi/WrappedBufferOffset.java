@@ -6,9 +6,7 @@ package bwapi;
  * <p> </p>For now this hardcodes a few things (size, offsets).
  */
 class WrappedBufferOffset extends WrappedBuffer {
-    // The "real" WrappedBuffer that contains the dynamic & static values.
-    // WrappedBufferOffset makes a copy of the dynamic ones, but delegates
-    // to the "real" one for the static values. This saves a lot of memory.
+
     private WrappedBuffer sourceBuffer;
 
     WrappedBufferOffset() {
@@ -165,7 +163,7 @@ class WrappedBufferOffset extends WrappedBuffer {
         static int offset(int offset) {
             for (MemRegion r : MEM_REGIONS) {
                 if (offset >= r.start && offset < r.end) {
-                    return offset - r.offset;
+                    return r.offset + (offset - r.start);
                 }
             }
             return -1;
