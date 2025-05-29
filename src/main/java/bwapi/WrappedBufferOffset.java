@@ -1,12 +1,13 @@
 package bwapi;
 
 /**
- * Like WrappedBuffer but with offsets.
+ * Like WrappedBuffer but to only copy the dynamic parts of the source WrappedBuffer.
  *
- * <p> </p>For now this hardcodes a few things (size, offsets).
+ * <p> For now this hardcodes a few things (size, offsets).
+ * TODO: the `put` operations might not need the check (always dynamic?)
+ * TODO: this class might not even be required if the Game class caches all initial static calls.
  */
 class WrappedBufferOffset extends WrappedBuffer {
-
     private WrappedBuffer sourceBuffer;
 
     WrappedBufferOffset() {
@@ -27,109 +28,70 @@ class WrappedBufferOffset extends WrappedBuffer {
         }
     }
 
-    byte getByte(final int offset) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            return sourceBuffer.getByte(offset);
-        } else {
-            return UNSAFE.getByte(address + newOffset);
+    long applyOffset(int offset) {
+        // Only 4 region checks.
+        for (MemRegion r : DynamicData.MEM_REGIONS) {
+            if (offset >= r.start && offset < r.end) {
+                return address + r.offset + (offset - r.start);
+            }
         }
+        return sourceBuffer.address + offset;
+    }
+
+    byte getByte(final int offset) {
+        return UNSAFE.getByte(applyOffset(offset));
     }
 
     void putByte(final int offset, final byte value) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            sourceBuffer.putByte(offset, value);
-        } else {
-            UNSAFE.putByte(address + newOffset, value);
-        }
+        UNSAFE.putByte(applyOffset(offset), value);
     }
 
     short getShort(final int offset) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            return sourceBuffer.getShort(offset);
-        } else {
-            return UNSAFE.getShort(address + newOffset);
-        }
+        return UNSAFE.getShort(applyOffset(offset));
     }
 
     void putShort(final int offset, final short value) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            sourceBuffer.putShort(offset, value);
-        } else {
-            UNSAFE.putShort(address + newOffset, value);
-        }
+        UNSAFE.putShort(applyOffset(offset), value);
     }
 
     int getInt(final int offset) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            return sourceBuffer.getInt(offset);
-        } else {
-            return UNSAFE.getInt(address + newOffset);
-        }
+        return UNSAFE.getInt(applyOffset(offset));
     }
 
     void putInt(final int offset, final int value) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            sourceBuffer.putInt(offset, value);
-        } else {
-            UNSAFE.putInt(address + newOffset, value);
-        }
+        UNSAFE.putInt(applyOffset(offset), value);
     }
 
     double getDouble(final int offset) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            return sourceBuffer.getDouble(offset);
-        } else {
-            return UNSAFE.getDouble(address + newOffset);
-        }
+        return UNSAFE.getDouble(applyOffset(offset));
     }
 
     void putDouble(final int offset, final double value) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            sourceBuffer.putDouble(offset, value);
-        } else {
-            UNSAFE.putDouble(address + newOffset, value);
-        }
+        UNSAFE.putDouble(applyOffset(offset), value);
     }
 
+
     String getString(final int offset, final int maxLen) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            return sourceBuffer.getString(offset, maxLen);
+        final char[] buf = new char[maxLen];
+        long start = applyOffset(offset);
+        long pos = start;
+        for (int i = 0; i < maxLen; i++) {
+            byte b = UNSAFE.getByte(pos);
+            if (b == 0) break;
+            buf[i] = (char) (b & 0xff);
+            pos++;
         }
-        else {
-            final char[] buf = new char[maxLen];
-            long pos = newOffset + address;
-            for (int i = 0; i < maxLen; i++) {
-                byte b = UNSAFE.getByte(pos);
-                if (b == 0) break;
-                buf[i] = (char) (b & 0xff);
-                pos++;
-            }
-            return new String(buf, 0, (int) (pos - newOffset - address));
-        }
+        return new String(buf, 0, (int) (pos - start));
+
     }
 
     void putString(final int offset, final int maxLen, final String string) {
-        int newOffset = DynamicData.offset(offset);
-        if (newOffset == -1) {
-            sourceBuffer.putString(offset, maxLen, string);
+        long pos = applyOffset(offset);
+        for (int i = 0; i < Math.min(string.length(), maxLen - 1); i++) {
+            UNSAFE.putByte(pos, (byte) string.charAt(i));
+            pos++;
         }
-        else {
-            long pos = newOffset + address;
-            for (int i = 0; i < Math.min(string.length(), maxLen - 1); i++) {
-                UNSAFE.putByte(pos, (byte) string.charAt(i));
-                pos++;
-            }
-            UNSAFE.putByte(pos, (byte) 0);
-        }
+        UNSAFE.putByte(pos, (byte) 0);
     }
 
     private void copyBuffer(long sourceOffset, long destinationOffset, int size) {
@@ -158,9 +120,12 @@ class WrappedBufferOffset extends WrappedBuffer {
 
         static final int STRINGSHAPES_END = 32242636;
         static final int UNITFINDER_START = 32962644;
+
+        // ~5MB
         static final int SIZE = OFFSET_3 + (UNITFINDER_START - STRINGSHAPES_END);
 
         static int offset(int offset) {
+            // Only 4 region checks.
             for (MemRegion r : MEM_REGIONS) {
                 if (offset >= r.start && offset < r.end) {
                     return r.offset + (offset - r.start);
