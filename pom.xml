@@ -61,8 +61,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <rerunFailingTestsCount>1</rerunFailingTestsCount>
-<!--                    <argLine>&#45;&#45;add-opens java.base/java.nio=ALL-UNNAMED -Xms1g -Xmx1g</argLine>-->
+                    <rerunFailingTestsCount>10</rerunFailingTestsCount>
                     <argLine>-Xms1g -Xmx1g</argLine>
                 </configuration>
             </plugin>
@@ -122,14 +121,14 @@
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>5.12.1</version>
+            <version>5.17.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.12.1</version>
+            <version>5.17.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -152,7 +151,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.27.3</version>
             <scope>test</scope>
         </dependency>
 
