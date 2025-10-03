@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmh.version>1.35</jmh.version>
+        <jmh.version>1.37</jmh.version>
     </properties>
 
     <build>
@@ -63,7 +63,6 @@
                 <configuration>
                     <rerunFailingTestsCount>10</rerunFailingTestsCount>
                     <argLine>-Xms1g -Xmx1g</argLine>
-                    <argLine>--add-opens java.base/java.nio=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -158,13 +157,13 @@
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>5.12.1</version>
+            <version>5.18.1</version>
         </dependency>
 
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.12.1</version>
+            <version>5.18.1</version>
         </dependency>
 
         <dependency>
@@ -177,7 +176,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.12.4</version>
+            <version>4.11.0</version>
             <scope>test</scope>
         </dependency>
 
