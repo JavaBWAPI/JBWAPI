@@ -166,14 +166,6 @@ class FrameBuffer {
     }
 
     void copyBuffer(WrappedBuffer source, WrappedBuffer destination, boolean copyEverything) {
-        /*
-        The speed at which we copy data into the frame buffer is a major cost of JBWAPI's asynchronous operation.
-        Copy times observed in the wild for the complete buffer usually range from 2.6ms - 19ms
-        but are prone to large amounts of variance.
-
-        The normal Java way to execute this copy is via ByteBuffer.put(), which has reasonably good performance characteristics.
-        */
-
         if (copyEverything) {
             copyBuffer(source, destination, 0, FrameBuffer.BUFFER_SIZE);
         } else {
