@@ -13,9 +13,11 @@ jobs:
     strategy:
       matrix:
         java:
-         - '8'
-         - '11'
-         #- '17'
+         # Java LTS versions
+         - '8'  # 2030/12
+         - '11' # 2032/01
+         - '17' # 2029/09
+         - '21' # 2031/09
     name: Java ${{ matrix.Java }} sample
     steps:
       - uses: actions/checkout@v2

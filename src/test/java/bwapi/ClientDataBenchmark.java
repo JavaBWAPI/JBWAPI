@@ -18,11 +18,12 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
+            WrappedBuffer wrappedBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
             game = new Game();
-            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
+            game.botClientData().setBuffer(wrappedBuffer);
+            client = new Client(wrappedBuffer);
             strings = buildStrings();
         }
-
     }
 
     @State(Scope.Thread)
@@ -33,9 +34,11 @@ public class ClientDataBenchmark {
 
         @Setup(Level.Invocation)
         public void setup() {
-            data = client.liveClientData().gameData();
+            WrappedBuffer wrappedBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
             game = new Game();
-            game.botClientData().setBuffer(new WrappedBuffer(ClientData.GameData.SIZE));
+            game.botClientData().setBuffer(wrappedBuffer);
+            client = new Client(wrappedBuffer);
+            data = game.botClientData().gameData();
             String[] strings = buildStrings();
             for (String s : strings) {
                 GameDataUtils.addString(client.liveClientData().gameData(), s);

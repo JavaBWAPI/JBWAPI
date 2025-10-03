@@ -21,9 +21,7 @@ class UnsafeTools {
             return result;
 
         } catch (final Exception e) { // or crash...
-            e.printStackTrace();
-            System.exit(-1);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
