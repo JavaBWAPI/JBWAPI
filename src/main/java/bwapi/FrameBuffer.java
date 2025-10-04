@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Circular buffer of game states.
  */
 class FrameBuffer {
-    private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
+    private static final int BUFFER_SIZE = ClientData.DYNAMIC_OFFSET_SIZE;
     private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     private WrappedBuffer liveData;
@@ -107,19 +107,10 @@ class FrameBuffer {
                 performanceMetrics.getIntentionallyBlocking().stopTiming();
             } finally { lockSize.unlock(); };
 
-            // For the first frame of the game, populate all buffers completely
-            // This is to ensure all buffers have access to immutable data like regions/walkability/buildability
-            // Afterwards, we want to shorten this process by only copying important and mutable data
-            if (stepGame == 0) {
-                for (WrappedBuffer frameBuffer : dataBuffer) {
-                    copyBuffer(liveData, frameBuffer, true);
-                }
-            } else {
-                performanceMetrics.getCopyingToBuffer().time(() -> {
-                    WrappedBuffer dataTarget = dataBuffer.get(indexGame());
-                    copyBuffer(liveData, dataTarget, false);
-                });
-            }
+            performanceMetrics.getCopyingToBuffer().time(() -> {
+                WrappedBuffer dataTarget = dataBuffer.get(indexGame());
+                copyWholeBuffer(liveData, dataTarget);
+            });
 
             lockSize.lock();
             try {
@@ -153,37 +144,21 @@ class FrameBuffer {
         } finally { lockSize.unlock(); }
     }
 
-    /**
-     *
-     * @param source Address to copy from
-     * @param destination Address to copy to
-     * @param size Number of bytes to copy
-     */
-    private void copyBuffer(WrappedBuffer source, WrappedBuffer destination, long offset, int size) {
-        long addressSource = source.getAddress() + offset;
-        long addressDestination = destination.getAddress() + offset;
-        unsafe.copyMemory(addressSource, addressDestination, size);
+    private void copyWholeBuffer(WrappedBuffer src, WrappedBuffer dest) {
+        assert src.getSize() == ClientData.GameData.SIZE && dest.getSize() == ClientData.DYNAMIC_OFFSET_SIZE;
+        int prevEnd = 0;
+        for (int [] offsets : ClientData.ALL_DYNAMIC_OFFSETS) {
+            int size = offsets[1] - offsets[0];
+            System.out.println("yems: " + offsets[0] + ", " + prevEnd + ", " +  size);
+            copyBuffer(src, dest, offsets[0], prevEnd, size);
+            prevEnd += size;
+        }
+        System.out.println("copied");
     }
 
-    void copyBuffer(WrappedBuffer source, WrappedBuffer destination, boolean copyEverything) {
-        if (copyEverything) {
-            copyBuffer(source, destination, 0, FrameBuffer.BUFFER_SIZE);
-        } else {
-            // After the buffer has been filled the first time,
-            // we can omit copying blocks of data which are unused or which don't change after game start.
-            // These blocks account for *most* of the 33MB shared memory,
-            // so omitting them drastically reduces the copy duration
-            final int STATICTILES_START = 3447004; // getGroundHeight, isWalkable, isBuildable
-            final int STATICTILES_END = 4823260;
-            final int REGION_START = 5085404; // getMapTileRegionId, ..., getRegions
-            final int REGION_END = 10586480;
-            final int STRINGSSHAPES_START = 10962632; // getStringCount, ... getShapes
-            final int STRINGSHAPES_END = 32242636;
-            final int UNITFINDER_START = 32962644;
-            copyBuffer(source, destination, 0, STATICTILES_START);
-            copyBuffer(source, destination, STATICTILES_END, REGION_START - STATICTILES_END);
-            copyBuffer(source, destination, REGION_END, STRINGSSHAPES_START - REGION_END);
-            copyBuffer(source, destination, STRINGSHAPES_END, UNITFINDER_START - STRINGSHAPES_END);
-        }
+    private void copyBuffer(WrappedBuffer src, WrappedBuffer dest, long srcOffset, long dstOffset, int size) {
+        long srcAddress = src.getAddress() + srcOffset;
+        long destAddress = dest.getAddress() + dstOffset;
+        unsafe.copyMemory(srcAddress, destAddress, size);
     }
 }

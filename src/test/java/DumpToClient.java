@@ -126,7 +126,6 @@ class DumpToClient {
             out.print("    private final Wrapper mainBuffer = new Wrapper();\n");
             out.print("    // dynamicBuffer can point to the same buffer as main or its own.\n");
             out.print("    private final Wrapper dynamicBuffer = new Wrapper();\n");
-            out.print("    private boolean useExtraOffset = false;\n");
             out.print("    private final GameData gameData;\n");
             out.print("    ClientData() {\n");
             out.print("        gameData = new ClientData.GameData(0);\n");
@@ -141,13 +140,10 @@ class DumpToClient {
             out.print("    void setDynamicBuffer(WrappedBuffer dynamicBuffer) {\n");
             out.print("        this.dynamicBuffer.buff = dynamicBuffer;\n");
             out.print("    }\n");
-            out.print("    void setUseExtraOffset(boolean useExtraOffset) {\n");
-            out.print("        this.useExtraOffset = useExtraOffset;\n");
-            out.print("    }\n");
             // Skip getExtraOffset0()
             for (int offsetIdx = 1; offsetIdx < dynamicReadRegions.length; offsetIdx++) {
                 out.printf("    int getExtraOffset%d() {\n", offsetIdx);
-                out.printf("        return useExtraOffset ? %d : 0;\n", dynamicReadRegions[offsetIdx].startOffset);
+                out.printf("        return dynamicBuffer.buff.getSize() == DYNAMIC_OFFSET_SIZE ? %d : 0;\n", dynamicReadRegions[offsetIdx].startOffset);
                 out.print("    }\n");
             }
 

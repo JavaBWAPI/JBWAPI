@@ -16,7 +16,6 @@ class ClientData {
     private final Wrapper mainBuffer = new Wrapper();
     // dynamicBuffer can point to the same buffer as main or its own.
     private final Wrapper dynamicBuffer = new Wrapper();
-    private boolean useExtraOffset = false;
     private final GameData gameData;
     ClientData() {
         gameData = new ClientData.GameData(0);
@@ -31,17 +30,14 @@ class ClientData {
     void setDynamicBuffer(WrappedBuffer dynamicBuffer) {
         this.dynamicBuffer.buff = dynamicBuffer;
     }
-    void setUseExtraOffset(boolean useExtraOffset) {
-        this.useExtraOffset = useExtraOffset;
-    }
     int getExtraOffset1() {
-        return useExtraOffset ? 4823260 : 0;
+        return dynamicBuffer.buff.getSize() == DYNAMIC_OFFSET_SIZE ? 4823260 : 0;
     }
     int getExtraOffset2() {
-        return useExtraOffset ? 10586480 : 0;
+        return dynamicBuffer.buff.getSize() == DYNAMIC_OFFSET_SIZE ? 10586480 : 0;
     }
     int getExtraOffset3() {
-        return useExtraOffset ? 32242636 : 0;
+        return dynamicBuffer.buff.getSize() == DYNAMIC_OFFSET_SIZE ? 32242636 : 0;
     }
     class UnitCommand {
         static final int SIZE = 24;

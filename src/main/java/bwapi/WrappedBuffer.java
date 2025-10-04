@@ -11,15 +11,18 @@ import java.nio.ByteBuffer;
 class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
+    private final int size;
 
     private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     WrappedBuffer(final int size) {
-        buffer = ByteBuffer.allocateDirect(size);
-        address = UnsafeTools.getAddress(buffer);
+        this.size = size;
+        this.buffer = ByteBuffer.allocateDirect(size);
+        this.address = UnsafeTools.getAddress(buffer);
     }
 
     WrappedBuffer(final Pointer pointer, final int size) {
+        this.size = size;
         this.buffer = pointer.getByteBuffer(0, size);
         this.address = Pointer.nativeValue(pointer);
     }
@@ -84,5 +87,9 @@ class WrappedBuffer {
 
     long getAddress() {
         return address;
+    }
+
+    int getSize() {
+        return size;
     }
 }

@@ -119,7 +119,7 @@ class BotWrapperAsync extends BotWrapper {
                 // so there's no guarantee of safety here.
                 if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
                     configuration.log("Main: Weaning bot off live data");
-                    botGame.botClientData().setBuffer(frameBuffer.peek());
+                    botGame.botClientData().setDynamicBuffer(frameBuffer.peek());
                 }
 
                 // Make bot exceptions fall through to the main thread.
@@ -197,7 +197,7 @@ class BotWrapperAsync extends BotWrapper {
                         setUnsafeReadReady(false);
                     } else {
                         configuration.log("Bot: Peeking next frame from buffer");
-                        botGame.botClientData().setBuffer(frameBuffer.peek());
+                        botGame.botClientData().setDynamicBuffer(frameBuffer.peek());
                     }
 
                     configuration.log("Bot: Handling events on frame #" + botGame.getFrameCount());
