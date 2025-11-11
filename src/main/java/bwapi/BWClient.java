@@ -88,14 +88,9 @@ public class BWClient {
     public void startGame(BWClientConfiguration gameConfiguration) {
         this.configuration = gameConfiguration;
         this.performanceMetrics = new PerformanceMetrics(configuration);
-        botWrapper = new BotWrapper(configuration, eventListener);
-
-        // Use reduced priority to encourage Windows to give priority to StarCraft.exe/BWAPI.
-        // If BWAPI doesn't get priority, it may not detect completion of a frame on our end in timely fashion.
-        Thread.currentThread().setName("JBWAPI Client");
-        if (configuration.getAsync()) {
-            Thread.currentThread().setPriority(4);
-        }
+        botWrapper = configuration.getAsync()
+                ? new BotWrapperAsync(configuration, eventListener)
+                : new BotWrapper(configuration, eventListener);
 
         if (client == null) {
             client = new Client(this);
