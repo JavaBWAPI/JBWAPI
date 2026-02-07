@@ -44,7 +44,7 @@ public final class Bullet implements Comparable<Bullet> {
      * @return An integer value containing the identifier.
      */
     public int getID() {
-        return id;
+        return bulletData.getId();
     }
 
     /**
