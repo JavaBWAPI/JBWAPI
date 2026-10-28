@@ -30,3 +30,25 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Test with Maven
         run: mvn test
+
+  windows-java8-x86:
+    name: Windows Java 8 x86
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up the primary bot runtime
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          architecture: 'x86'
+      - name: Verify 32-bit Java 8
+        shell: pwsh
+        run: |
+          $settings = (& java -XshowSettings:properties -version 2>&1 | Out-String)
+          if ($settings -notmatch 'sun.arch.data.model\s*=\s*32' -or $settings -notmatch 'java.specification.version\s*=\s*1\.8') {
+            throw 'Expected a 32-bit Java 8 JVM'
+          }
+          java -version
+      - name: Build and test with Maven
+        run: mvn -B package --file pom.xml

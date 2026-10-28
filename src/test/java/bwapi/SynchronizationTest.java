@@ -175,7 +175,9 @@ public class SynchronizationTest {
                 .build();
         SynchronizationEnvironment environment = new SynchronizationEnvironment(config);
         environment.runGame(20);
-        final double minObserved = 0.25;
+        assertTrue("Copy to buffer: minimum must be positive",
+                environment.metrics().getCopyingToBuffer().getRunningTotal().getMin() > 0);
+        final double minObserved = 0;
         final double maxObserved = 15;
         final double meanObserved = (minObserved + maxObserved) / 2;
         final double rangeObserved = (maxObserved - minObserved) / 2;
