@@ -29,7 +29,12 @@ class BotWrapperAsync extends BotWrapper {
     void startNewGame(WrappedBuffer liveData, PerformanceMetrics performanceMetrics) {
         frameBuffer.initialize(liveData, performanceMetrics);
 
-        super.startNewGame(liveData, performanceMetrics);
+        this.performanceMetrics = performanceMetrics;
+        AsyncClientData asyncClientData = new AsyncClientData(liveData);
+        botGame = new Game(asyncClientData);
+        botGame.setConfiguration(configuration);
+        botGame.botClientData().setBuffer(liveData);
+        gameOver = false;
 
         liveClientData.setBuffer(liveData);
         this.liveData = liveData;

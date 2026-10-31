@@ -21,7 +21,7 @@ class BotWrapper {
      */
     void startNewGame(WrappedBuffer liveData, PerformanceMetrics performanceMetrics) {
         this.performanceMetrics = performanceMetrics;
-        botGame = new Game();
+        botGame = new Game(new SyncClientData());
         botGame.setConfiguration(configuration);
         botGame.botClientData().setBuffer(liveData);
         gameOver = false;
