@@ -2380,10 +2380,9 @@ public final class Game {
      * parameter.
      */
     final public boolean setMap(final String mapFileName) {
-        if (mapFileName == null || mapFileName.length() >= 260 || mapFileName.charAt(0) == 0) {
+        if (mapFileName == null || mapFileName.isEmpty() || mapFileName.length() >= 260 || mapFileName.charAt(0) == 0) {
             return false;
         }
-
         addCommand(CommandType.SetMap, mapFileName, 0);
         return true;
     }
