@@ -3,7 +3,9 @@ package bwapi;
 import java.util.function.Predicate;
 
 public interface UnitFilter extends Predicate<Unit> {
-    UnitFilter IsTransPort = u -> u.getType().spaceProvided() > 0 && u.getType() != UnitType.Terran_Bunker;
+    UnitFilter IsTransport = u -> u.getType().spaceProvided() > 0 && u.getType() != UnitType.Terran_Bunker;
+    @Deprecated // backwards compatible
+    UnitFilter IsTransPort = IsTransport;
     UnitFilter CanProduce = u -> u.getType().canProduce();
     UnitFilter CanAttack = u -> u.getType().canAttack();
     UnitFilter CanMove = u -> u.getType().canMove();
