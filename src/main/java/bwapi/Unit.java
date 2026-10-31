@@ -4719,7 +4719,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (!hasPath(getPosition())) {
+        if (!hasPath(targetUnit.getPosition())) {
             return false;
         }
 
@@ -6169,7 +6169,7 @@ public class Unit implements Comparable<Unit> {
                 if (!targetType.isOrganic() || targetType.isFlyer()) {
                     return false;
                 }
-                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer())) {
+                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer())) {
                     return false;
                 }
                 break;
