@@ -87,15 +87,17 @@ public class BWClient {
      */
     public void startGame(BWClientConfiguration gameConfiguration) {
         this.configuration = gameConfiguration;
-        this.performanceMetrics = new PerformanceMetrics(configuration);
-        botWrapper = configuration.getAsync()
-                ? new BotWrapperAsync(configuration, eventListener)
-                : new BotWrapper(configuration, eventListener);
 
         if (client == null) {
             client = new Client(this);
         }
         client.reconnect();
+
+        // Allocate game bookkeeping and async frame buffers only after the BWAPI handshake.
+        this.performanceMetrics = new PerformanceMetrics(configuration);
+        botWrapper = configuration.getAsync()
+                ? new BotWrapperAsync(configuration, eventListener)
+                : new BotWrapper(configuration, eventListener);
 
         do {
             ClientData.GameData liveGameData = client.liveClientData().gameData();
