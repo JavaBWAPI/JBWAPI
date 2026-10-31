@@ -680,10 +680,12 @@ public final class Game {
      * given build tile.
      */
     public List<Unit> getUnitsOnTile(final int tileX, final int tileY, final UnitFilter pred) {
-        return getAllUnits().stream().filter(u -> {
-            final TilePosition tp = u.getTilePosition();
-            return tp.x == tileX && tp.y == tileY && pred.test(u);
-        }).collect(Collectors.toList());
+        final TilePosition tile = new TilePosition(tileX, tileY);
+        if (!tile.isValid(this)) {
+            return Collections.emptyList();
+        }
+        final Position p = tile.toPosition();
+        return getUnitsInRectangle(p.x, p.y, p.x + 32, p.y + 32, pred);
     }
 
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom) {
@@ -740,7 +742,7 @@ public final class Game {
 
     public List<Unit> getUnitsInRadius(final Position center, final int radius, final UnitFilter pred) {
         return getAllUnits().stream()
-                .filter(u -> center.getApproxDistance(u.getPosition()) <= radius && pred.test(u))
+                .filter(u -> u.getDistance(center) <= radius && pred.test(u))
                 .collect(Collectors.toList());
     }
 
