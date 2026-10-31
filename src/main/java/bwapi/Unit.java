@@ -1301,30 +1301,28 @@ public class Unit implements Comparable<Unit> {
                 getRight() + max,
                 getBottom() + max,
                 u -> {
-                    if (!pred.test(u)) {
-                        return false;
-                    }
                     // Unit check and unit status
                     if (u == this || u.isInvincible()) {
                         return false;
                     }
-
                     // Weapon distance check
                     final int dist = getDistance(u);
                     if ((weapon.minRange() != 0 && dist < weapon.minRange()) || dist > max) {
                         return false;
                     }
-
                     // Weapon behavioural checks
                     final UnitType ut = u.getType();
-                    return (!weapon.targetsOwn() || u.getPlayer().equals(getPlayer())) &&
-                            (weapon.targetsAir() || u.isFlying()) &&
-                            (weapon.targetsGround() || !u.isFlying()) &&
-                            (!weapon.targetsMechanical() || !ut.isMechanical()) &&
-                            (!weapon.targetsOrganic() || !ut.isOrganic()) &&
-                            (!weapon.targetsNonBuilding() || ut.isBuilding()) &&
-                            (!weapon.targetsNonRobotic() || ut.isRobotic()) &&
-                            (!weapon.targetsOrgOrMech() || (!ut.isOrganic() && !ut.isMechanical()));
+                    if ((weapon.targetsOwn() && !u.getPlayer().equals(getPlayer())) ||
+                            (!weapon.targetsAir() && !u.isFlying()) ||
+                            (!weapon.targetsGround() && u.isFlying()) ||
+                            (weapon.targetsMechanical() && ut.isMechanical()) ||
+                            (weapon.targetsOrganic() && ut.isOrganic()) ||
+                            (weapon.targetsNonBuilding() && !ut.isBuilding()) ||
+                            (weapon.targetsNonRobotic() && !ut.isRobotic()) ||
+                            (weapon.targetsOrgOrMech() && (ut.isOrganic() || ut.isMechanical()))) {
+                        return false;
+                    }
+                    return pred.test(u);
                 });
     }
 
