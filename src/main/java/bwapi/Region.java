@@ -250,7 +250,7 @@ public final class Region implements Comparable<Region> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override

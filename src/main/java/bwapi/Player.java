@@ -848,7 +848,7 @@ public class Player implements Comparable<Player> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override
