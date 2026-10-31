@@ -244,8 +244,7 @@ class BuildingPlacer {
     }
 
     private static void ReserveExistingAddonPlacement(final PlacementReserve reserve, final TilePosition desiredPosition, final Game game) {
-        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE)).divide(2);
-
+        final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
         //Exclude addon placement locations
         reserve.backup();
         game.self().getUnits().stream()
@@ -274,14 +273,13 @@ class BuildingPlacer {
                 case Terran_Missile_Turret:
                 case Protoss_Robotics_Facility:
                 case Protoss_Gateway:
-                case Protoss_Photon_Cannon:
+                default:
+                    ReserveStructure(reserve, it, 2, type, desiredPosition);
+                    break;
                 case Terran_Barracks:
                 case Terran_Bunker:
                 case Zerg_Creep_Colony:
                     ReserveStructure(reserve, it, 1, type, desiredPosition);
-                    break;
-                default:
-                    ReserveStructure(reserve, it, 2, type, desiredPosition);
                     break;
             }
         }
