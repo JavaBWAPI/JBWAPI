@@ -190,7 +190,7 @@ public final class Color {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override

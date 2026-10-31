@@ -6345,7 +6345,7 @@ public class Unit implements Comparable<Unit> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     public int compareTo(final Unit other) {
