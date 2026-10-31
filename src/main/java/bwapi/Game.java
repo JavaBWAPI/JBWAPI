@@ -1033,7 +1033,7 @@ public final class Game {
         if (unitType.id >= 0 && unitType.id < UnitType.None.id) {
             return hasPowerPrecise(tileX * 32 + unitType.tileWidth() * 16, tileY * 32 + unitType.tileHeight() * 16, unitType);
         }
-        return hasPowerPrecise(tileY * 32, tileY * 32, UnitType.None);
+        return hasPowerPrecise(tileX * 32, tileY * 32, UnitType.None);
     }
 
     final public boolean hasPower(final int tileX, final int tileY, final int tileWidth, final int tileHeight) {
