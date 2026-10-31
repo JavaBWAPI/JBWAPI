@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Manages invocation of bot event handlers
  */
 class BotWrapperAsync extends BotWrapper {
-    private final ClientData liveClientData = new ClientData();
+    private final ClientData liveClientData = new SyncClientData();
     private final FrameBuffer frameBuffer;
     private WrappedBuffer liveData;
     private Thread botThread;

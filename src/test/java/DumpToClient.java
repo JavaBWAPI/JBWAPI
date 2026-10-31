@@ -91,11 +91,16 @@ class DumpToClient {
         try (PrintWriter out = new PrintWriter(sw)) {
             out.println("package bwapi;");
             out.println("");
-            out.println("final class ClientData {");
-            out.println("    private WrappedBuffer buffer;");
-            out.println("    private GameData gameData;");
+            out.println("import com.sun.jna.Pointer;");
+            out.println("");
+            out.println("class ClientData {");
+            out.println("    WrappedBuffer buffer;");
+            out.println("    GameData gameData;");
             out.println("    ClientData() {");
-            out.println("        gameData = new ClientData.GameData(0);");
+            out.println("        gameData = createGameData(0);");
+            out.println("    }");
+            out.println("    GameData createGameData(int offset) {");
+            out.println("        return new ClientData.GameData(offset);");
             out.println("    }");
             out.println("    GameData gameData() {");
             out.println("        return gameData;");
@@ -106,9 +111,13 @@ class DumpToClient {
             out.println("    void setPointer(Pointer pointer) {");
             out.println("        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));");
             out.println("    }");
+            out.println("    WrappedBuffer getStaticBuffer() {");
+            out.println("        return buffer;");
+            out.println("    }");
             out.println("");
 
             structs.values().forEach(s -> {
+                String bufName = s.name.equals("RegionData") ? "getStaticBuffer()" : "buffer";
                 out.printf("    class %s {\n", s.name);
                 out.printf("        static final int SIZE = %d;\n", s.size);
                 out.println("        private int myOffset;");
@@ -196,26 +205,26 @@ class DumpToClient {
                     switch (v.type) {
                         case UNSIGNED_INT:
                         case INT:
-                            out.print("buffer.getInt(offset)");
+                            out.printf("%s.getInt(offset)", bufName);
                             break;
                         case CHAR:
-                            out.printf("buffer.getString(offset, %d)",
-                                v.arraySizes.get(v.arraySizes.size() - 1));
+                            out.printf("%s.getString(offset, %d)",
+                                bufName, v.arraySizes.get(v.arraySizes.size() - 1));
                             break;
                         case ENUM:
-                            out.print(v.enumName + ".idToEnum[buffer.getInt(offset)]");
+                            out.printf("%s.idToEnum[%s.getInt(offset)]", v.enumName, bufName);
                             break;
                         case DOUBLE:
-                            out.print("buffer.getDouble(offset)");
+                            out.printf("%s.getDouble(offset)", bufName);
                             break;
                         case STRUCT:
                             out.printf("new %s(offset)", v.structRef.name);
                             break;
                         case BOOLEAN:
-                            out.print("buffer.getByte(offset) != 0");
+                            out.printf("%s.getByte(offset) != 0", bufName);
                             break;
                         case UNSIGNED_SHORT:
-                            out.print("buffer.getShort(offset)");
+                            out.printf("%s.getShort(offset)", bufName);
                             break;
                     }
                     out.println(";");
@@ -231,36 +240,36 @@ class DumpToClient {
                             case INT:
                             case UNSIGNED_INT:
                                 out.println("int value) {");
-                                out.printf("            buffer.putInt(%s, value);\n",
-                                    offsetString);
+                                out.printf("            %s.putInt(%s, value);\n",
+                                    bufName, offsetString);
                                 break;
                             case ENUM:
                                 out.printf("%s value) {\n", v.enumName);
-                                out.printf("            buffer.putInt(%s, value.id);\n",
-                                    offsetString);
+                                out.printf("            %s.putInt(%s, value.id);\n",
+                                    bufName, offsetString);
                                 break;
                             case UNSIGNED_SHORT:
                                 out.println("short value) {");
-                                out.printf("            buffer.putShort(%s, value);\n",
-                                    offsetString);
+                                out.printf("            %s.putShort(%s, value);\n",
+                                    bufName, offsetString);
                                 break;
                             case DOUBLE:
                                 out.println("double value) {");
-                                out.printf("            buffer.putDouble(%s, value);\n",
-                                    offsetString);
+                                out.printf("            %s.putDouble(%s, value);\n",
+                                    bufName, offsetString);
                                 break;
                             case BOOLEAN:
                                 out.println("boolean value) {");
                                 out.printf(
-                                    "            buffer.putByte(%s, (byte) (value ? 1 : 0));\n",
-                                    offsetString);
+                                    "            %s.putByte(%s, (byte) (value ? 1 : 0));\n",
+                                    bufName, offsetString);
                                 break;
                             case CHAR:
                                 out.println("String value) {");
                                 int maxLength = v.arraySizes.get(v.arraySizes.size() - 1);
                                 out.printf(
-                                    "            buffer.putString(%s, %d, value);\n",
-                                    offsetString,
+                                    "            %s.putString(%s, %d, value);\n",
+                                    bufName, offsetString,
                                     maxLength);
                                 break;
                         }

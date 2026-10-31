@@ -45,7 +45,7 @@ class Client {
      * For test purposes only
      */
     Client(final WrappedBuffer buffer) {
-        clientData = new ClientData();
+        clientData = new SyncClientData();
         clientData.setBuffer(buffer);
         clientConnector = null;
     }
@@ -145,7 +145,7 @@ class Client {
             return false;
         }
         try {
-            clientData = new ClientData();
+            clientData = new SyncClientData();
             clientData.setBuffer(mapShm);
         } catch (Exception e) {
             System.err.println("Unable to map game data.");

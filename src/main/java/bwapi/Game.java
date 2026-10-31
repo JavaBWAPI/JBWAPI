@@ -106,7 +106,11 @@ public final class Game {
     final SideEffectQueue sideEffects = new SideEffectQueue();
 
     Game() {
-        clientData = new ClientData();
+        this(new SyncClientData());
+    }
+
+    Game(ClientData clientData) {
+        this.clientData = clientData;
     }
 
     void setConfiguration(BWClientConfiguration configuration) {
