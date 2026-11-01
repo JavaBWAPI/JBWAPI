@@ -1270,7 +1270,7 @@ public class Unit implements Comparable<Unit> {
                 getTop() - radius,
                 getRight() + radius,
                 getBottom() + radius,
-                u -> getDistance(u) <= radius && pred.test(u));
+                u -> u != this && getDistance(u) <= radius && pred.test(u));
     }
 
     public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
@@ -1301,30 +1301,28 @@ public class Unit implements Comparable<Unit> {
                 getRight() + max,
                 getBottom() + max,
                 u -> {
-                    if (!pred.test(u)) {
-                        return false;
-                    }
                     // Unit check and unit status
                     if (u == this || u.isInvincible()) {
                         return false;
                     }
-
                     // Weapon distance check
                     final int dist = getDistance(u);
                     if ((weapon.minRange() != 0 && dist < weapon.minRange()) || dist > max) {
                         return false;
                     }
-
                     // Weapon behavioural checks
                     final UnitType ut = u.getType();
-                    return (!weapon.targetsOwn() || u.getPlayer().equals(getPlayer())) &&
-                            (weapon.targetsAir() || u.isFlying()) &&
-                            (weapon.targetsGround() || !u.isFlying()) &&
-                            (!weapon.targetsMechanical() || !ut.isMechanical()) &&
-                            (!weapon.targetsOrganic() || !ut.isOrganic()) &&
-                            (!weapon.targetsNonBuilding() || ut.isBuilding()) &&
-                            (!weapon.targetsNonRobotic() || ut.isRobotic()) &&
-                            (!weapon.targetsOrgOrMech() || (!ut.isOrganic() && !ut.isMechanical()));
+                    if ((weapon.targetsOwn() && !u.getPlayer().equals(getPlayer())) ||
+                            (!weapon.targetsAir() && !u.isFlying()) ||
+                            (!weapon.targetsGround() && u.isFlying()) ||
+                            (weapon.targetsMechanical() && ut.isMechanical()) ||
+                            (weapon.targetsOrganic() && ut.isOrganic()) ||
+                            (weapon.targetsNonBuilding() && !ut.isBuilding()) ||
+                            (weapon.targetsNonRobotic() && !ut.isRobotic()) ||
+                            (weapon.targetsOrgOrMech() && (ut.isOrganic() || ut.isMechanical()))) {
+                        return false;
+                    }
+                    return pred.test(u);
                 });
     }
 
@@ -3913,7 +3911,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (isInvincible()) {
+        if (targetUnit.isInvincible()) {
             return false;
         }
 
@@ -4721,12 +4719,10 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (!hasPath(getPosition())) {
+        if (!hasPath(targetUnit.getPosition())) {
             return false;
         }
-
-        return !uType.isRefinery() || getPlayer().equals(game.self());
-
+        return !targetUnit.getType().isRefinery() || targetUnit.getPlayer().equals(game.self());
     }
 
     public boolean canReturnCargo() {
@@ -6171,7 +6167,7 @@ public class Unit implements Comparable<Unit> {
                 if (!targetType.isOrganic() || targetType.isFlyer()) {
                     return false;
                 }
-                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(getPlayer())) {
+                if (!targetUnit.getPlayer().isNeutral() && getPlayer().isEnemy(targetUnit.getPlayer())) {
                     return false;
                 }
                 break;
