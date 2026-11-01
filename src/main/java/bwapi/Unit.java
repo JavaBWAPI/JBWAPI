@@ -1270,7 +1270,7 @@ public class Unit implements Comparable<Unit> {
                 getTop() - radius,
                 getRight() + radius,
                 getBottom() + radius,
-                u -> getDistance(u) <= radius && pred.test(u));
+                u -> u != this && getDistance(u) <= radius && pred.test(u));
     }
 
     public List<Unit> getUnitsInWeaponRange(final WeaponType weapon) {
