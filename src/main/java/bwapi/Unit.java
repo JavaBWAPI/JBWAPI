@@ -3911,7 +3911,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (isInvincible()) {
+        if (targetUnit.isInvincible()) {
             return false;
         }
 
@@ -4722,9 +4722,7 @@ public class Unit implements Comparable<Unit> {
         if (!hasPath(targetUnit.getPosition())) {
             return false;
         }
-
-        return !uType.isRefinery() || getPlayer().equals(game.self());
-
+        return !targetUnit.getType().isRefinery() || targetUnit.getPlayer().equals(game.self());
     }
 
     public boolean canReturnCargo() {
