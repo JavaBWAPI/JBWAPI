@@ -1328,6 +1328,40 @@ public class Unit implements Comparable<Unit> {
                 });
     }
 
+    public Unit getClosestUnit() {
+        return getClosestUnit(u -> true, 999999);
+    }
+
+    public Unit getClosestUnit(final UnitFilter pred) {
+        return getClosestUnit(pred, 999999);
+    }
+
+    public Unit getClosestUnit(final int radius) {
+        return getClosestUnit(u -> true, radius);
+    }
+
+    /**
+     * Retrieves the closest unit to this one.
+     *
+     * @param pred (optional)
+     *             A predicate used to determine which units are considered.
+     *             If omitted or {@code null}, the closest unit owned by any
+     *             player will be returned.
+     * @param radius (optional)
+     *               The maximum radius to search for the closest unit.
+     *               Limiting the radius can improve performance.
+     *               If omitted, the entire map is searched.
+     * @return The closest matching unit, or {@code null} if no unit is found.
+     * @see #getUnitsInRadius(int, UnitFilter)
+     * @see Game#getUnitsInRadius
+     * @see Game#getUnitsInRectangle
+     */
+    public Unit getClosestUnit(final UnitFilter pred, final int radius) {
+        return getUnitsInRadius(radius, pred == null ? u -> true : pred).stream()
+                .min(Comparator.comparingInt(this::getDistance))
+                .orElse(null);
+    }
+
     /**
      * Checks if the current unit is housing a @Nuke. This is only available
      * for @Silos.
