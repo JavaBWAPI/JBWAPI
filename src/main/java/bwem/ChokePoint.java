@@ -313,25 +313,14 @@ public final class ChokePoint {
             return false;
         } else {
             final ChokePoint that = (ChokePoint) object;
-            final boolean lel = this.areas.getLeft().equals(that.areas.getLeft());
-            final boolean ler = this.areas.getLeft().equals(that.areas.getRight());
-            final boolean rer = this.areas.getRight().equals(that.areas.getRight());
-            final boolean rel = this.areas.getRight().equals(that.areas.getLeft());
-            return lel && rer
-                    || ler && rel; /* true if area pairs are an exact match or if one pair is reversed. */
+            // Parallel connections can share areas or even a center, but not a graph/index.
+            return this.graph == that.graph && this.index == that.index;
         }
     }
 
     @Override
     public int hashCode() {
-        int idLeft = areas.getLeft().getId().intValue();
-        int idRight = areas.getRight().getId().intValue();
-        if (idLeft > idRight) {
-            final int idLeftTmp = idLeft;
-            idLeft = idRight;
-            idRight = idLeftTmp;
-        }
-        return Objects.hash(idLeft, idRight);
+        return Objects.hash(graph, index);
     }
 
     /**

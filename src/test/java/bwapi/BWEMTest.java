@@ -2,13 +2,19 @@ package bwapi;
 
 import bwem.BWEM;
 import bwem.BWMap;
+import bwta.BWTA;
+import bwta.Chokepoint;
+import bwta.Region;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class BWEMTest {
     static class BWEMMap{
@@ -67,12 +73,37 @@ public class BWEMTest {
     }
 
     @Test
+    public void chokePointsFromDifferentMapsAreDistinct() throws IOException {
+        BWEM first = new BWEM(GameBuilder.createGame());
+        first.initialize();
+        BWEM second = new BWEM(GameBuilder.createGame());
+        second.initialize();
+        assertTrue(Collections.disjoint(first.getMap().getChokePoints(), second.getMap().getChokePoints()));
+    }
+
+    @Test
     public void checkSSCAITMaps() throws IOException {
         for (String mapName : mapData.keySet()) {
-            Game game = GameBuilder.createGame(mapName);
-            BWEM bwem = new BWEM(game);
-            bwem.initialize();
-            assertEquals(new BWEMMap(bwem.getMap()), mapData.get(mapName));
+            BWTA.readMap(GameBuilder.createGame(mapName));
+            BWTA.analyze();
+            BWMap map = BWTA.getBWEM().getMap();
+            assertEquals(new BWEMMap(map), mapData.get(mapName));
+            assertEquals(mapName, map.getChokePoints().size(), new HashSet<>(map.getChokePoints()).size());
+
+            List<Chokepoint> chokes = BWTA.getChokepoints();
+            assertEquals(mapName, map.getChokePoints().size(), chokes.size());
+            for (Chokepoint choke : chokes) {
+                assertTrue(choke.getRegions().getLeft().getChokepoints().contains(choke));
+                assertTrue(choke.getRegions().getRight().getChokepoints().contains(choke));
+            }
+            for (Region region : BWTA.getRegions()) {
+                for (Chokepoint choke : region.getChokepoints()) {
+                    assertNotNull(mapName, choke);
+                    assertTrue(mapName, chokes.contains(choke));
+                    assertTrue(choke.getRegions().getLeft().equals(region)
+                            || choke.getRegions().getRight().equals(region));
+                }
+            }
         }
     }
 }
