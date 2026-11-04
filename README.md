@@ -84,8 +84,9 @@ or if you already have maven installed
 
 `mvn package`
 
-The build also produces `target/jbwapi-2.2.0-distribution.zip`. Keep its DLLs beside
-your bot's JAR to avoid unpacking them at startup, so the bot can connect sooner.
+The build also produces `target/jbwapi-2.2.0-distribution.zip`. You can make the
+JBWAPI bot ready to connect sooner by placing its DLLs next to the bot's JAR, so it
+doesn't need to extract them.
 The DLLs must match your bot's JNA version. If they are omitted, JNA extracts its
 library normally at startup.
 
