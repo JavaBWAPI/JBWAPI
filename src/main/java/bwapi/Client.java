@@ -37,8 +37,12 @@ class Client {
 
     Client(BWClient bwClient) {
         this.bwClient = bwClient;
-        boolean windowsOs = System.getProperty("os.name").toLowerCase().contains("win");
-        clientConnector = windowsOs ? new ClientConnectionW32() : new ClientConnectionPosix();
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            JnaNativeLoader.initialize();
+            clientConnector = new ClientConnectionW32();
+        } else {
+            clientConnector = new ClientConnectionPosix();
+        }
     }
 
     /**
