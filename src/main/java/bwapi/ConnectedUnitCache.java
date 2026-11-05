@@ -27,18 +27,15 @@ class ConnectedUnitCache {
             for (final Unit u : game.getAllUnits()) {
                 final Unit owner = condition.apply(u);
                 if (owner != null) {
-                    if (!connectedUnits.containsKey(owner)) {
-                        connectedUnits.put(owner, new ArrayList<>());
-                    }
-                    connectedUnits.get(owner).add(u);
+                    connectedUnits.computeIfAbsent(owner, k -> new ArrayList<>()).add(u);
                 }
             }
             lastUpdate = frame;
         }
-        if (!connectedUnits.containsKey(unit)) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(connectedUnits.get(unit));
+        List<Unit> connected = connectedUnits.get(unit);
+        return connected == null ?
+                Collections.emptyList() :
+                Collections.unmodifiableList(connected);
     }
     void reset() {
         lastUpdate = -1;

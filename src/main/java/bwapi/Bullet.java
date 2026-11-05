@@ -197,7 +197,7 @@ public final class Bullet implements Comparable<Bullet> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override

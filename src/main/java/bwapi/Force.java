@@ -64,7 +64,7 @@ public final class Force implements Comparable<Force> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Integer.hashCode(id);
     }
 
     @Override
