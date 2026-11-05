@@ -11,17 +11,28 @@ import java.nio.ByteBuffer;
 class WrappedBuffer {
     private final ByteBuffer buffer;
     private final long address;
+    private final boolean packed;
 
     private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     WrappedBuffer(final int size) {
+        this(size, false);
+    }
+
+    WrappedBuffer(final int size, final boolean packed) {
         buffer = ByteBuffer.allocateDirect(size);
         address = UnsafeTools.getAddress(buffer);
+        this.packed = packed;
     }
 
     WrappedBuffer(final Pointer pointer, final int size) {
         this.buffer = pointer.getByteBuffer(0, size);
         this.address = Pointer.nativeValue(pointer);
+        this.packed = false;
+    }
+
+    boolean isPacked() {
+        return packed;
     }
 
     byte getByte(final int offset) {
