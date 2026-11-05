@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -91,11 +92,16 @@ class DumpToClient {
         try (PrintWriter out = new PrintWriter(sw)) {
             out.println("package bwapi;");
             out.println("");
-            out.println("final class ClientData {");
-            out.println("    private WrappedBuffer buffer;");
-            out.println("    private GameData gameData;");
+            out.println("import com.sun.jna.Pointer;");
+            out.println("");
+            out.println("class ClientData {");
+            out.println("    WrappedBuffer buffer;");
+            out.println("    GameData gameData;");
             out.println("    ClientData() {");
-            out.println("        gameData = new ClientData.GameData(0);");
+            out.println("        gameData = createGameData(0);");
+            out.println("    }");
+            out.println("    GameData createGameData(int offset) {");
+            out.println("        return new ClientData.GameData(offset);");
             out.println("    }");
             out.println("    GameData gameData() {");
             out.println("        return gameData;");
@@ -106,174 +112,300 @@ class DumpToClient {
             out.println("    void setPointer(Pointer pointer) {");
             out.println("        setBuffer(new WrappedBuffer(pointer, GameData.SIZE));");
             out.println("    }");
+            out.println("    WrappedBuffer getStaticBuffer() {");
+            out.println("        return buffer;");
+            out.println("    }");
             out.println("");
 
             structs.values().forEach(s -> {
+                String bufName = s.name.equals("RegionData") ? "getStaticBuffer()" : "buffer";
                 out.printf("    class %s {\n", s.name);
                 out.printf("        static final int SIZE = %d;\n", s.size);
-                out.println("        private int myOffset;");
+                // GameData.myOffset needs to be accessible from AsyncGameData subclass
+                String access = s.name.equals("GameData") ? "protected" : "private";
+                out.printf("        %s int myOffset;\n", access);
                 out.printf("        %s(int myOffset) {\n", s.name);
                 out.println("          this.myOffset = myOffset;");
                 out.println("        }");
-                s.variables.forEach(v -> {
-                    out.print("        ");
-                    switch (v.type) {
-                        case INT:
-                            out.print("int");
-                            break;
-                        case CHAR:
-                            if (v.arraySizes.isEmpty()) {
-                                out.print("char");
-                            } else {
-                                out.print("String");
-                            }
-                            break;
-                        case ENUM:
-                            out.print(v.enumName);
-                            break;
-                        case DOUBLE:
-                            out.print("double");
-                            break;
-                        case STRUCT:
-                            out.print(v.structRef.name);
-                            break;
-                        case BOOLEAN:
-                            out.print("boolean");
-                            break;
-                        case UNSIGNED_INT:
-                            out.print("int");
-                            break;
-                        case UNSIGNED_SHORT:
-                            out.print("short");
-                            break;
-                    }
-                    String camelCaseName =
-                        v.name.substring(0, 1).toUpperCase() + v.name.substring(1);
-                    if (v.name.startsWith("is") || v.name.startsWith("get")) {
-                        out.printf(" %s(", v.name);
-                    } else {
-                        out.printf(" get%s(", camelCaseName);
-                    }
-                    List<String> params = new ArrayList<>();
-                    String offsetString;
-                    int arrayIndices = v.arraySizes.size();
-                    if (v.type == Type.CHAR) {
-                        arrayIndices--;
-                    }
-                    if (arrayIndices > 0) {
-                        List<String> index = new ArrayList<>();
-                        int offset = 1;
-                        for (int i = v.arraySizes.size() - 1; i >= 0; i--) {
-                            int size = 1;
-                            switch (v.type) {
-                                case UNSIGNED_SHORT:
-                                    size *= 2;
-                                    break;
-                                case UNSIGNED_INT:
-                                case INT:
-                                case ENUM:
-                                    size *= 4;
-                                    break;
-                                case STRUCT:
-                                    size *= v.structRef.size;
-                                    break;
-                            }
-                            if (i < arrayIndices) {
-                                params.add("int " + (char) ('i' + arrayIndices - 1 - i));
-                                index.add(
-                                    size + " * " + offset + " * " + (char) ('i' + i));
-                            }
-                            offset *= v.arraySizes.get(i);
-                        }
-                        offsetString = "myOffset + " + v.offset + " + " + String.join(" + ", index);
-                    } else {
-                        offsetString = "myOffset + " + v.offset;
-                    }
-                    String paramString = String.join(", ", params);
-                    out.printf("%s) {\n", paramString);
-                    out.printf("            int offset = %s;\n", offsetString);
-                    out.print("            return ");
-                    switch (v.type) {
-                        case UNSIGNED_INT:
-                        case INT:
-                            out.print("buffer.getInt(offset)");
-                            break;
-                        case CHAR:
-                            out.printf("buffer.getString(offset, %d)",
-                                v.arraySizes.get(v.arraySizes.size() - 1));
-                            break;
-                        case ENUM:
-                            out.print(v.enumName + ".idToEnum[buffer.getInt(offset)]");
-                            break;
-                        case DOUBLE:
-                            out.print("buffer.getDouble(offset)");
-                            break;
-                        case STRUCT:
-                            out.printf("new %s(offset)", v.structRef.name);
-                            break;
-                        case BOOLEAN:
-                            out.print("buffer.getByte(offset) != 0");
-                            break;
-                        case UNSIGNED_SHORT:
-                            out.print("buffer.getShort(offset)");
-                            break;
-                    }
-                    out.println(";");
-                    out.println("        }");
-
-                    if (v.type != Type.STRUCT && (v.type != Type.CHAR || !v.arraySizes.isEmpty())) {
-                        if (paramString.isEmpty()) {
-                            out.printf("        void set%s(", camelCaseName);
-                        } else {
-                            out.printf("        void set%s(%s, ", camelCaseName, paramString);
-                        }
-                        switch (v.type) {
-                            case INT:
-                            case UNSIGNED_INT:
-                                out.println("int value) {");
-                                out.printf("            buffer.putInt(%s, value);\n",
-                                    offsetString);
-                                break;
-                            case ENUM:
-                                out.printf("%s value) {\n", v.enumName);
-                                out.printf("            buffer.putInt(%s, value.id);\n",
-                                    offsetString);
-                                break;
-                            case UNSIGNED_SHORT:
-                                out.println("short value) {");
-                                out.printf("            buffer.putShort(%s, value);\n",
-                                    offsetString);
-                                break;
-                            case DOUBLE:
-                                out.println("double value) {");
-                                out.printf("            buffer.putDouble(%s, value);\n",
-                                    offsetString);
-                                break;
-                            case BOOLEAN:
-                                out.println("boolean value) {");
-                                out.printf(
-                                    "            buffer.putByte(%s, (byte) (value ? 1 : 0));\n",
-                                    offsetString);
-                                break;
-                            case CHAR:
-                                out.println("String value) {");
-                                int maxLength = v.arraySizes.get(v.arraySizes.size() - 1);
-                                out.printf(
-                                    "            buffer.putString(%s, %d, value);\n",
-                                    offsetString,
-                                    maxLength);
-                                break;
-                        }
-                        out.println("        }");
-                    }
-                });
+                s.variables.forEach(v -> generateVariable(out, s, v, bufName, null, false));
                 out.println("    }");
             });
             out.println("}");
         }
+        String clientDataText = sw.toString().replace("\r\n", "\n").replace("\n", "\r\n");
         Files.write(Paths.get("src/main/java/bwapi/ClientData.java"),
-            Collections.singleton(sw.toString()),
+            clientDataText.getBytes(StandardCharsets.UTF_8),
             StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+        StringWriter swAsync = new StringWriter();
+        try (PrintWriter out = new PrintWriter(swAsync)) {
+            out.println("package bwapi;");
+            out.println("");
+            out.println("/**");
+            out.println(" * Asynchronous client data that routes static information to the main/static shared buffer");
+            out.println(" * and dynamic information to the packed dynamic buffer.");
+            out.println(" * Automatically generated by DumpToClient.");
+            out.println(" */");
+            out.println("class AsyncClientData extends ClientData {");
+            out.println("    static final int STATICTILES_START = 3447004;");
+            out.println("    static final int STATICTILES_END = 4823260;");
+            out.println("    static final int REGION_START = 5085404;");
+            out.println("    static final int REGION_END = 10586480;");
+            out.println("    static final int STRINGSSHAPES_START = 10962632;");
+            out.println("    static final int STRINGSHAPES_END = 32242636;");
+            out.println("    static final int UNITFINDER_START = 32962644;");
+            out.println("");
+            out.println("    static final int DYNAMIC_SLICE1_SIZE = STATICTILES_START;");
+            out.println("    static final int DYNAMIC_SLICE2_SIZE = REGION_START - STATICTILES_END;");
+            out.println("    static final int DYNAMIC_SLICE3_SIZE = STRINGSSHAPES_START - REGION_END;");
+            out.println("    static final int DYNAMIC_SLICE4_SIZE = UNITFINDER_START - STRINGSHAPES_END;");
+            out.println("");
+            out.println("    static final int DEST_SLICE1_OFFSET = 0;");
+            out.println("    static final int DEST_SLICE2_OFFSET = DYNAMIC_SLICE1_SIZE;");
+            out.println("    static final int DEST_SLICE3_OFFSET = DEST_SLICE2_OFFSET + DYNAMIC_SLICE2_SIZE;");
+            out.println("    static final int DEST_SLICE4_OFFSET = DEST_SLICE3_OFFSET + DYNAMIC_SLICE3_SIZE;");
+            out.println("");
+            out.println("    static final int BUFFER_SIZE = DEST_SLICE4_OFFSET + DYNAMIC_SLICE4_SIZE;");
+            out.println("");
+            out.println("    static final int DELTA_RANGE2 = STATICTILES_END - STATICTILES_START;");
+            out.println("    static final int DELTA_RANGE3 = DELTA_RANGE2 + (REGION_END - REGION_START);");
+            out.println("    static final int DELTA_RANGE4 = DELTA_RANGE3 + (STRINGSHAPES_END - STRINGSSHAPES_START);");
+            out.println("");
+            out.println("    private WrappedBuffer staticBuffer;");
+            out.println("");
+            out.println("    AsyncClientData() {");
+            out.println("        super();");
+            out.println("    }");
+            out.println("");
+            out.println("    AsyncClientData(WrappedBuffer staticBuffer) {");
+            out.println("        super();");
+            out.println("        this.staticBuffer = staticBuffer;");
+            out.println("    }");
+            out.println("");
+            out.println("    void setStaticBuffer(WrappedBuffer staticBuffer) {");
+            out.println("        this.staticBuffer = staticBuffer;");
+            out.println("    }");
+            out.println("");
+            out.println("    @Override");
+            out.println("    WrappedBuffer getStaticBuffer() {");
+            out.println("        return staticBuffer != null ? staticBuffer : buffer;");
+            out.println("    }");
+            out.println("");
+            out.println("    @Override");
+            out.println("    GameData createGameData(int offset) {");
+            out.println("        return new AsyncGameData(offset);");
+            out.println("    }");
+            out.println("");
+            out.println("    class AsyncGameData extends GameData {");
+            out.println("        AsyncGameData(int myOffset) {");
+            out.println("            super(myOffset);");
+            out.println("        }");
+            out.println("");
+            out.println("        private int deltaRange2() {");
+            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE2 : 0;");
+            out.println("        }");
+            out.println("");
+            out.println("        private int deltaRange3() {");
+            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE3 : 0;");
+            out.println("        }");
+            out.println("");
+            out.println("        private int deltaRange4() {");
+            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE4 : 0;");
+            out.println("        }");
+            out.println("");
+
+            Struct gameData = structs.get("GameData");
+            for (Variable v : gameData.variables) {
+                boolean isStaticTile = v.offset >= 3447004 && v.offset < 4823260;
+                boolean isDynamicTile = v.offset >= 4823260 && v.offset < 5085404;
+                boolean isStaticRegion = v.offset >= 5085404 && v.offset < 10586480;
+                boolean isDynamicGame = v.offset >= 10586480 && v.offset < 10962632;
+                boolean isDynamicCommand = v.offset >= 32242636 && v.offset < 32962644;
+
+                if (isStaticTile || isStaticRegion) {
+                    generateVariable(out, gameData, v, "getStaticBuffer()", null, true);
+                } else if (isDynamicTile) {
+                    generateVariable(out, gameData, v, "buffer", "deltaRange2()", true);
+                } else if (isDynamicGame) {
+                    generateVariable(out, gameData, v, "buffer", "deltaRange3()", true);
+                } else if (isDynamicCommand) {
+                    generateVariable(out, gameData, v, "buffer", "deltaRange4()", true);
+                }
+            }
+            out.println("    }");
+            out.println("}");
+        }
+        String asyncClientDataText = swAsync.toString().replace("\r\n", "\n");
+        Files.write(Paths.get("src/main/java/bwapi/AsyncClientData.java"),
+            asyncClientDataText.getBytes(StandardCharsets.UTF_8),
+            StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+    }
+
+    private static void generateVariable(PrintWriter out, Struct s, Variable v, String bufName, String delta, boolean isOverride) {
+        if (isOverride) {
+            out.println("        @Override");
+        }
+        out.print("        ");
+        switch (v.type) {
+            case INT:
+                out.print("int");
+                break;
+            case CHAR:
+                if (v.arraySizes.isEmpty()) {
+                    out.print("char");
+                } else {
+                    out.print("String");
+                }
+                break;
+            case ENUM:
+                out.print(v.enumName);
+                break;
+            case DOUBLE:
+                out.print("double");
+                break;
+            case STRUCT:
+                out.print(v.structRef.name);
+                break;
+            case BOOLEAN:
+                out.print("boolean");
+                break;
+            case UNSIGNED_INT:
+                out.print("int");
+                break;
+            case UNSIGNED_SHORT:
+                out.print("short");
+                break;
+        }
+        String camelCaseName =
+            v.name.substring(0, 1).toUpperCase() + v.name.substring(1);
+        if (v.name.startsWith("is") || v.name.startsWith("get")) {
+            out.printf(" %s(", v.name);
+        } else {
+            out.printf(" get%s(", camelCaseName);
+        }
+        List<String> params = new ArrayList<>();
+        String offsetString;
+        int arrayIndices = v.arraySizes.size();
+        if (v.type == Type.CHAR) {
+            arrayIndices--;
+        }
+        if (arrayIndices > 0) {
+            List<String> index = new ArrayList<>();
+            int offset = 1;
+            for (int i = v.arraySizes.size() - 1; i >= 0; i--) {
+                int size = 1;
+                switch (v.type) {
+                    case UNSIGNED_SHORT:
+                        size *= 2;
+                        break;
+                    case UNSIGNED_INT:
+                    case INT:
+                    case ENUM:
+                        size *= 4;
+                        break;
+                    case STRUCT:
+                        size *= v.structRef.size;
+                        break;
+                }
+                if (i < arrayIndices) {
+                    params.add("int " + (char) ('i' + arrayIndices - 1 - i));
+                    index.add(
+                        size + " * " + offset + " * " + (char) ('i' + i));
+                }
+                offset *= v.arraySizes.get(i);
+            }
+            if (delta != null) {
+                offsetString = "myOffset + " + v.offset + " - " + delta + " + " + String.join(" + ", index);
+            } else {
+                offsetString = "myOffset + " + v.offset + " + " + String.join(" + ", index);
+            }
+        } else {
+            if (delta != null) {
+                offsetString = "myOffset + " + v.offset + " - " + delta;
+            } else {
+                offsetString = "myOffset + " + v.offset;
+            }
+        }
+        String paramString = String.join(", ", params);
+        out.printf("%s) {\n", paramString);
+        out.printf("            int offset = %s;\n", offsetString);
+        out.print("            return ");
+        switch (v.type) {
+            case UNSIGNED_INT:
+            case INT:
+                out.printf("%s.getInt(offset)", bufName);
+                break;
+            case CHAR:
+                out.printf("%s.getString(offset, %d)",
+                    bufName, v.arraySizes.get(v.arraySizes.size() - 1));
+                break;
+            case ENUM:
+                out.printf("%s.idToEnum[%s.getInt(offset)]", v.enumName, bufName);
+                break;
+            case DOUBLE:
+                out.printf("%s.getDouble(offset)", bufName);
+                break;
+            case STRUCT:
+                out.printf("new %s(offset)", v.structRef.name);
+                break;
+            case BOOLEAN:
+                out.printf("%s.getByte(offset) != 0", bufName);
+                break;
+            case UNSIGNED_SHORT:
+                out.printf("%s.getShort(offset)", bufName);
+                break;
+        }
+        out.println(";");
+        out.println("        }");
+
+        if (v.type != Type.STRUCT && (v.type != Type.CHAR || !v.arraySizes.isEmpty())) {
+            if (isOverride) {
+                out.println("        @Override");
+            }
+            if (paramString.isEmpty()) {
+                out.printf("        void set%s(", camelCaseName);
+            } else {
+                out.printf("        void set%s(%s, ", camelCaseName, paramString);
+            }
+            switch (v.type) {
+                case INT:
+                case UNSIGNED_INT:
+                    out.println("int value) {");
+                    out.printf("            %s.putInt(%s, value);\n",
+                        bufName, offsetString);
+                    break;
+                case ENUM:
+                    out.printf("%s value) {\n", v.enumName);
+                    out.printf("            %s.putInt(%s, value.id);\n",
+                        bufName, offsetString);
+                    break;
+                case UNSIGNED_SHORT:
+                    out.println("short value) {");
+                    out.printf("            %s.putShort(%s, value);\n",
+                        bufName, offsetString);
+                    break;
+                case DOUBLE:
+                    out.println("double value) {");
+                    out.printf("            %s.putDouble(%s, value);\n",
+                        bufName, offsetString);
+                    break;
+                case BOOLEAN:
+                    out.println("boolean value) {");
+                    out.printf(
+                        "            %s.putByte(%s, (byte) (value ? 1 : 0));\n",
+                        bufName, offsetString);
+                    break;
+                case CHAR:
+                    out.println("String value) {");
+                    int maxLength = v.arraySizes.get(v.arraySizes.size() - 1);
+                    out.printf(
+                        "            %s.putString(%s, %d, value);\n",
+                        bufName, offsetString,
+                        maxLength);
+                    break;
+            }
+            out.println("        }");
+        }
     }
 
     enum Type {

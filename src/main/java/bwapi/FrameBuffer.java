@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Circular buffer of game states.
  */
 class FrameBuffer {
-    private static final int BUFFER_SIZE = ClientData.GameData.SIZE;
+    static final int BUFFER_SIZE = AsyncClientData.BUFFER_SIZE;
     private static final Unsafe unsafe = UnsafeTools.getUnsafe();
 
     private WrappedBuffer liveData;
@@ -30,7 +30,7 @@ class FrameBuffer {
         this.capacity = configuration.getAsyncFrameBufferCapacity();
         this.configuration = configuration;
         while(dataBuffer.size() < capacity) {
-            dataBuffer.add(new WrappedBuffer(BUFFER_SIZE));
+            dataBuffer.add(new WrappedBuffer(BUFFER_SIZE, true));
         }
     }
 
@@ -107,17 +107,15 @@ class FrameBuffer {
                 performanceMetrics.getIntentionallyBlocking().stopTiming();
             } finally { lockSize.unlock(); };
 
-            // For the first frame of the game, populate all buffers completely
-            // This is to ensure all buffers have access to immutable data like regions/walkability/buildability
-            // Afterwards, we want to shorten this process by only copying important and mutable data
+            // Copy dynamic game information into the current frame buffer slot.
+            // Static information (e.g. walkability/buildability/regions) is accessed
+            // directly from the main shared memory buffer by AsyncClientData.
             if (stepGame == 0) {
-                for (WrappedBuffer frameBuffer : dataBuffer) {
-                    copyBuffer(liveData, frameBuffer, true);
-                }
+                copyBuffer(liveData, dataBuffer.get(indexGame()));
             } else {
                 performanceMetrics.getCopyingToBuffer().time(() -> {
                     WrappedBuffer dataTarget = dataBuffer.get(indexGame());
-                    copyBuffer(liveData, dataTarget, false);
+                    copyBuffer(liveData, dataTarget);
                 });
             }
 
@@ -153,45 +151,10 @@ class FrameBuffer {
         } finally { lockSize.unlock(); }
     }
 
-    /**
-     *
-     * @param source Address to copy from
-     * @param destination Address to copy to
-     * @param size Number of bytes to copy
-     */
-    private void copyBuffer(WrappedBuffer source, WrappedBuffer destination, long offset, int size) {
-        long addressSource = source.getAddress() + offset;
-        long addressDestination = destination.getAddress() + offset;
-        unsafe.copyMemory(addressSource, addressDestination, size);
-    }
-
-    void copyBuffer(WrappedBuffer source, WrappedBuffer destination, boolean copyEverything) {
-        /*
-        The speed at which we copy data into the frame buffer is a major cost of JBWAPI's asynchronous operation.
-        Copy times observed in the wild for the complete buffer usually range from 2.6ms - 19ms
-        but are prone to large amounts of variance.
-
-        The normal Java way to execute this copy is via ByteBuffer.put(), which has reasonably good performance characteristics.
-        */
-
-        if (copyEverything) {
-            copyBuffer(source, destination, 0, FrameBuffer.BUFFER_SIZE);
-        } else {
-            // After the buffer has been filled the first time,
-            // we can omit copying blocks of data which are unused or which don't change after game start.
-            // These blocks account for *most* of the 33MB shared memory,
-            // so omitting them drastically reduces the copy duration
-            final int STATICTILES_START = 3447004; // getGroundHeight, isWalkable, isBuildable
-            final int STATICTILES_END = 4823260;
-            final int REGION_START = 5085404; // getMapTileRegionId, ..., getRegions
-            final int REGION_END = 10586480;
-            final int STRINGSSHAPES_START = 10962632; // getStringCount, ... getShapes
-            final int STRINGSHAPES_END = 32242636;
-            final int UNITFINDER_START = 32962644;
-            copyBuffer(source, destination, 0, STATICTILES_START);
-            copyBuffer(source, destination, STATICTILES_END, REGION_START - STATICTILES_END);
-            copyBuffer(source, destination, REGION_END, STRINGSSHAPES_START - REGION_END);
-            copyBuffer(source, destination, STRINGSHAPES_END, UNITFINDER_START - STRINGSHAPES_END);
-        }
+    void copyBuffer(WrappedBuffer source, WrappedBuffer destination) {
+        unsafe.copyMemory(source.getAddress() + 0, destination.getAddress() + AsyncClientData.DEST_SLICE1_OFFSET, AsyncClientData.DYNAMIC_SLICE1_SIZE);
+        unsafe.copyMemory(source.getAddress() + AsyncClientData.STATICTILES_END, destination.getAddress() + AsyncClientData.DEST_SLICE2_OFFSET, AsyncClientData.DYNAMIC_SLICE2_SIZE);
+        unsafe.copyMemory(source.getAddress() + AsyncClientData.REGION_END, destination.getAddress() + AsyncClientData.DEST_SLICE3_OFFSET, AsyncClientData.DYNAMIC_SLICE3_SIZE);
+        unsafe.copyMemory(source.getAddress() + AsyncClientData.STRINGSHAPES_END, destination.getAddress() + AsyncClientData.DEST_SLICE4_OFFSET, AsyncClientData.DYNAMIC_SLICE4_SIZE);
     }
 }
