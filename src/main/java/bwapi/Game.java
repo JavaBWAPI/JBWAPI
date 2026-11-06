@@ -280,17 +280,28 @@ public final class Game {
             enemies = Collections.emptyList();
             allies = Collections.emptyList();
             observers = Collections.emptyList();
-        } else {
-            enemies = playerSet.stream()
-                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && self().isEnemy(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            allies = playerSet.stream()
-                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && self().isAlly(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            observers = playerSet.stream()
-                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && p.isObserver())
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            return;
         }
+        final List<Player> newEnemies = new ArrayList<>();
+        final List<Player> newAllies = new ArrayList<>();
+        final List<Player> newObservers = new ArrayList<>();
+        for (final Player p : playerSet) {
+            if (p.leftGame() || p.isDefeated() || p.equals(self())) {
+                continue;
+            }
+            if (self().isAlly(p)) {
+                newAllies.add(p);
+            }
+            if (self().isEnemy(p)) {
+                newEnemies.add(p);
+            }
+            if (p.isObserver()) {
+                newObservers.add(p);
+            }
+        }
+        enemies = Collections.unmodifiableList(newEnemies);
+        allies = Collections.unmodifiableList(newAllies);
+        observers = Collections.unmodifiableList(newObservers);
     }
 
     void unitCreate(final int id) {
