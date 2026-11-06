@@ -2093,8 +2093,23 @@ public class Unit implements Comparable<Unit> {
      * fog of war will be accessible, but isVisible will still return false.
      * @see #exists
      */
-    public boolean isVisible(final Player player) {
-        return unitData.isVisible(player.getID());
+    public boolean isVisible(Player player) {
+        if (player == null) {
+            player = game.self();
+        }
+        if (player != null) {
+            final int id = player.getID();
+            if (id >= 0 && id < 9) {
+                return unitData.isVisible(id);
+            }
+        } else {
+            for (int i = 0; i < 9; ++i) {
+                if (unitData.isVisible(i)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
