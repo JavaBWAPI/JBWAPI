@@ -7,6 +7,87 @@ import static org.junit.Assert.*;
 public class AsyncClientDataTest {
 
     @Test
+    public void retainedViewsSurviveLiveAndPackedHandoffs() {
+        WrappedBuffer live = new WrappedBuffer(ClientData.GameData.SIZE);
+        // Padding lets the unfixed code fail assertions instead of reading past native memory.
+        WrappedBuffer packed = new WrappedBuffer(ClientData.GameData.SIZE, true);
+        ClientData source = new ClientData();
+        source.setBuffer(live);
+        source.gameData().getEvents(0).setType(EventType.MatchFrame);
+        source.gameData().getStartLocations(0).setX(123);
+        source.gameData().getCommands(0).setType(CommandType.SetLocalSpeed);
+        source.gameData().getUnitCommands(0).setUnitIndex(456);
+        new FrameBuffer(new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build())
+                .copyBuffer(live, packed);
+
+        AsyncClientData data = new AsyncClientData(live);
+        data.setBuffer(live);
+        ClientData.Event event = data.gameData().getEvents(0);
+        ClientData.Position position = data.gameData().getStartLocations(0);
+        ClientData.Command command = data.gameData().getCommands(0);
+        ClientData.UnitCommand unitCommand = data.gameData().getUnitCommands(0);
+        data.setBuffer(packed);
+        assertEquals(EventType.MatchFrame, event.getType());
+        assertEquals(123, position.getX());
+        assertEquals(CommandType.SetLocalSpeed, command.getType());
+        assertEquals(456, unitCommand.getUnitIndex());
+
+        event.setType(EventType.MatchEnd);
+        position.setX(789);
+        unitCommand.setUnitIndex(987);
+        ClientData.Event packedEvent = data.gameData().getEvents(0);
+        data.setBuffer(live);
+        assertEquals(EventType.MatchFrame, packedEvent.getType());
+        assertEquals(123, position.getX());
+        assertEquals(456, unitCommand.getUnitIndex());
+        data.setBuffer(packed);
+        assertEquals(EventType.MatchEnd, event.getType());
+        assertEquals(789, position.getX());
+        assertEquals(987, unitCommand.getUnitIndex());
+    }
+
+    @Test
+    public void handoffDuringReadKeepsTheSelectedBuffersLayout() {
+        class SwitchingBuffer extends WrappedBuffer {
+            Runnable handoff;
+
+            SwitchingBuffer(boolean packed) {
+                // Keep a stale full-layout offset inside the allocation on the unfixed code.
+                super(ClientData.GameData.SIZE, packed);
+            }
+
+            @Override boolean isPacked() {
+                boolean packed = super.isPacked();
+                if (handoff != null) handoff.run();
+                return packed;
+            }
+
+            @Override byte getByte(int offset) {
+                if (handoff != null) handoff.run();
+                return super.getByte(offset);
+            }
+        }
+
+        SwitchingBuffer live = new SwitchingBuffer(false);
+        SwitchingBuffer packed = new SwitchingBuffer(true);
+        ClientData source = new ClientData();
+        source.setBuffer(live);
+        source.gameData().setIsVisible(0, 0, true);
+        new FrameBuffer(new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build())
+                .copyBuffer(live, packed);
+        AsyncClientData data = new AsyncClientData(live);
+        data.setBuffer(live);
+        live.handoff = () -> data.setBuffer(packed);
+        assertTrue(data.gameData().isVisible(0, 0));
+        assertSame(packed, data.buffer);
+
+        live.handoff = null;
+        packed.handoff = () -> data.setBuffer(live);
+        assertTrue(data.gameData().isVisible(0, 0));
+        assertSame(live, data.buffer);
+    }
+
+    @Test
     public void frameBufferAllocatesReducedMemory() {
         // Full GameData buffer is ~33 MB
         assertEquals(33017048, ClientData.GameData.SIZE);

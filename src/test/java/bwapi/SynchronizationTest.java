@@ -2,6 +2,9 @@ package bwapi;
 
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -28,6 +31,40 @@ public class SynchronizationTest {
         assertTrue(
             message + ": " + describeApproximateExpectation(expected, actual, margin),
             measureApproximateEquality(expected, actual, margin));
+    }
+
+    @Test
+    public void asyncUnsafe_StartsBotBeforeCopyCompletes() {
+        CountDownLatch botStarted = new CountDownLatch(1);
+        AtomicBoolean overlapped = new AtomicBoolean();
+        WrappedBuffer live = new WrappedBuffer(ClientData.GameData.SIZE) {
+            private boolean firstCopy = true;
+
+            @Override long getAddress() {
+                if (firstCopy) {
+                    firstCopy = false;
+                    try {
+                        // Hold the first copy until the bot starts reading the live frame.
+                        overlapped.set(botStarted.await(5, TimeUnit.SECONDS));
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                return super.getAddress();
+            }
+        };
+        WrappedBuffer fixture = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        fixture.getBuffer().rewind();
+        live.getBuffer().put(fixture.getBuffer());
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withAsyncFrameBufferCapacity(2)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+        environment.onFrame(0, botStarted::countDown);
+        environment.runGame(6);
+        assertTrue("Unsafe async must overlap bot execution with the frame copy", overlapped.get());
     }
 
     @Test
