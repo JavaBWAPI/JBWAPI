@@ -790,7 +790,7 @@ class CommandTemp {
                 unit.self().remainingUpgradeTime.set(upgradeType.upgradeTime(level + 1), frame);
 
                 player.self().minerals.setOrAdd(-upgradeType.mineralPrice(level + 1), frame);
-                player.self().gas.setOrAdd(upgradeType.gasPrice(level + 1), frame);
+                player.self().gas.setOrAdd(-upgradeType.gasPrice(level + 1), frame);
 
                 player.self().isUpgrading[upgradeType.id].set(true, frame);
             }
