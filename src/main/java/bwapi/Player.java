@@ -557,7 +557,7 @@ public class Player implements Comparable<Player> {
                 return Text.Orange;
             case 19:  // brown
                 return Text.Brown;
-            case 84:  // white
+            case 255: // white
                 return Text.PlayerWhite;
             case 135: // yellow
                 return Text.PlayerYellow;
