@@ -336,7 +336,7 @@ class CommandTemp {
 
                         // Shift training queue back one slot after the cancelled unit
                         for (int i = command.extra; i < 4; ++i) {
-                            unit.self().trainingQueue[i].set(unit.self().trainingQueue[i + 1].get(frame), frame);
+                            unit.self().trainingQueue[i].set(unit.getTrainingQueueAt(i + 1), frame);
                         }
 
                         unit.self().trainingQueueCount.setOrAdd(-1, frame);
