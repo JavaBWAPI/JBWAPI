@@ -2051,15 +2051,15 @@ public final class Game {
     }
 
     public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Screen, x, y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color) {
-        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Screen, p.x, p.y, xrad, yrad, color);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Screen, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
     /**
