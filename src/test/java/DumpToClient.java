@@ -95,7 +95,7 @@ class DumpToClient {
             out.println("import com.sun.jna.Pointer;");
             out.println("");
             out.println("class ClientData {");
-            out.println("    WrappedBuffer buffer;");
+            out.println("    volatile WrappedBuffer buffer;");
             out.println("    GameData gameData;");
             out.println("    ClientData() {");
             out.println("        gameData = createGameData(0);");
@@ -127,7 +127,7 @@ class DumpToClient {
                 out.printf("        %s(int myOffset) {\n", s.name);
                 out.println("          this.myOffset = myOffset;");
                 out.println("        }");
-                s.variables.forEach(v -> generateVariable(out, s, v, bufName, null, false));
+                s.variables.forEach(v -> generateVariable(out, s, v, bufName, false));
                 out.println("    }");
             });
             out.println("}");
@@ -201,35 +201,13 @@ class DumpToClient {
             out.println("            super(myOffset);");
             out.println("        }");
             out.println("");
-            out.println("        private int deltaRange2() {");
-            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE2 : 0;");
-            out.println("        }");
-            out.println("");
-            out.println("        private int deltaRange3() {");
-            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE3 : 0;");
-            out.println("        }");
-            out.println("");
-            out.println("        private int deltaRange4() {");
-            out.println("            return buffer != null && buffer.isPacked() ? DELTA_RANGE4 : 0;");
-            out.println("        }");
-            out.println("");
-
             Struct gameData = structs.get("GameData");
             for (Variable v : gameData.variables) {
                 boolean isStaticTile = v.offset >= 3447004 && v.offset < 4823260;
-                boolean isDynamicTile = v.offset >= 4823260 && v.offset < 5085404;
                 boolean isStaticRegion = v.offset >= 5085404 && v.offset < 10586480;
-                boolean isDynamicGame = v.offset >= 10586480 && v.offset < 10962632;
-                boolean isDynamicCommand = v.offset >= 32242636 && v.offset < 32962644;
 
                 if (isStaticTile || isStaticRegion) {
-                    generateVariable(out, gameData, v, "getStaticBuffer()", null, true);
-                } else if (isDynamicTile) {
-                    generateVariable(out, gameData, v, "buffer", "deltaRange2()", true);
-                } else if (isDynamicGame) {
-                    generateVariable(out, gameData, v, "buffer", "deltaRange3()", true);
-                } else if (isDynamicCommand) {
-                    generateVariable(out, gameData, v, "buffer", "deltaRange4()", true);
+                    generateVariable(out, gameData, v, "getStaticBuffer()", true);
                 }
             }
             out.println("    }");
@@ -241,7 +219,7 @@ class DumpToClient {
             StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
-    private static void generateVariable(PrintWriter out, Struct s, Variable v, String bufName, String delta, boolean isOverride) {
+    private static void generateVariable(PrintWriter out, Struct s, Variable v, String bufName, boolean isOverride) {
         if (isOverride) {
             out.println("        @Override");
         }
@@ -314,17 +292,9 @@ class DumpToClient {
                 }
                 offset *= v.arraySizes.get(i);
             }
-            if (delta != null) {
-                offsetString = "myOffset + " + v.offset + " - " + delta + " + " + String.join(" + ", index);
-            } else {
-                offsetString = "myOffset + " + v.offset + " + " + String.join(" + ", index);
-            }
+            offsetString = "myOffset + " + v.offset + " + " + String.join(" + ", index);
         } else {
-            if (delta != null) {
-                offsetString = "myOffset + " + v.offset + " - " + delta;
-            } else {
-                offsetString = "myOffset + " + v.offset;
-            }
+            offsetString = "myOffset + " + v.offset;
         }
         String paramString = String.join(", ", params);
         out.printf("%s) {\n", paramString);

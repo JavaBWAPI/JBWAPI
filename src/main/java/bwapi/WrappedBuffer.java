@@ -35,52 +35,67 @@ class WrappedBuffer {
         return packed;
     }
 
+    private long addressAt(int offset) {
+        // Translate on the selected buffer: unsafe async can switch layouts during a read.
+        if (packed && offset >= AsyncClientData.STATICTILES_END) {
+            if (offset >= AsyncClientData.STATICTILES_END && offset < AsyncClientData.REGION_START) {
+                offset -= AsyncClientData.DELTA_RANGE2;
+            } else if (offset >= AsyncClientData.REGION_END && offset < AsyncClientData.STRINGSSHAPES_START) {
+                offset -= AsyncClientData.DELTA_RANGE3;
+            } else if (offset >= AsyncClientData.STRINGSHAPES_END && offset < AsyncClientData.UNITFINDER_START) {
+                offset -= AsyncClientData.DELTA_RANGE4;
+            }
+        }
+        return address + offset;
+    }
+
     byte getByte(final int offset) {
-        return unsafe.getByte(address + offset);
+        return unsafe.getByte(addressAt(offset));
     }
 
     void putByte(final int offset, final byte value) {
-        unsafe.putByte(address + offset, value);
+        unsafe.putByte(addressAt(offset), value);
     }
 
     short getShort(final int offset) {
-        return unsafe.getShort(address + offset);
+        return unsafe.getShort(addressAt(offset));
     }
 
     void putShort(final int offset, final short value) {
-        unsafe.putShort(address + offset, value);
+        unsafe.putShort(addressAt(offset), value);
     }
 
     int getInt(final int offset) {
-        return unsafe.getInt(address + offset);
+        return unsafe.getInt(addressAt(offset));
     }
 
     void putInt(final int offset, final int value) {
-        unsafe.putInt(address + offset, value);
+        unsafe.putInt(addressAt(offset), value);
     }
 
     double getDouble(final int offset) {
-        return unsafe.getDouble(address + offset);
+        return unsafe.getDouble(addressAt(offset));
     }
 
     void putDouble(final int offset, final double value) {
-        unsafe.putDouble(address + offset, value);
+        unsafe.putDouble(addressAt(offset), value);
     }
 
     String getString(final int offset, final int maxLen) {
         final char[] buf = new char[maxLen];
-        long pos = offset + address;
+        final long start = addressAt(offset);
+        long pos = start;
         for (int i = 0; i < maxLen; i++) {
             byte b = unsafe.getByte(pos);
             if (b == 0) break;
             buf[i] = (char) (b & 0xff);
             pos++;
         }
-        return new String(buf, 0, (int) (pos - offset - address));
+        return new String(buf, 0, (int) (pos - start));
     }
 
     void putString(final int offset, final int maxLen, final String string) {
-        long pos = offset + address;
+        long pos = addressAt(offset);
         for (int i = 0; i < Math.min(string.length(), maxLen - 1); i++) {
             unsafe.putByte(pos, (byte) string.charAt(i));
             pos++;

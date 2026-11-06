@@ -3,7 +3,7 @@ package bwapi;
 import com.sun.jna.Pointer;
 
 class ClientData {
-    WrappedBuffer buffer;
+    volatile WrappedBuffer buffer;
     GameData gameData;
     ClientData() {
         gameData = createGameData(0);
