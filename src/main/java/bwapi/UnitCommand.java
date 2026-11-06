@@ -401,6 +401,7 @@ public final class UnitCommand {
                 type == Follow ||
                 type == Gather ||
                 type == Return_Cargo ||
+                type == Repair ||
                 type == Load ||
                 type == Unload_All ||
                 type == Unload_All_Position ||
