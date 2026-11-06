@@ -141,7 +141,7 @@ public class Player implements Comparable<Player> {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
             return false;
         }
-        return !playerData.isAlly(player.getID());
+        return playerData.isEnemy(player.getID());
     }
 
     /**
@@ -150,7 +150,7 @@ public class Player implements Comparable<Player> {
      * @return true if this player is the neutral player, false if this player is any other player.
      */
     public boolean isNeutral() {
-        return equals(game.neutral());
+        return playerData.isNeutral();
     }
 
     /**
@@ -339,8 +339,14 @@ public class Player implements Comparable<Player> {
      * @return The total supply available for this player and the given race.
      * @see #supplyUsed
      */
-    public int supplyTotal(final Race race) {
-        return playerData.getSupplyTotal(race.id);
+    public int supplyTotal(Race race) {
+        if (race == Race.None) {
+            race = getRace();
+        }
+        if (race.id >= 0 && race.id < 3) {
+            return playerData.getSupplyTotal(race.id);
+        }
+        return 0;
     }
 
     public int supplyUsed() {
@@ -354,7 +360,13 @@ public class Player implements Comparable<Player> {
      * @return The supply that is in use for this player and the given race.
      * @see #supplyTotal
      */
-    public int supplyUsed(final Race race) {
+    public int supplyUsed(Race race) {
+        if (race == Race.None) {
+            race = getRace();
+        }
+        if (race.id < 0 || race.id >= 3) {
+            return 0;
+        }
         int supplyUsed = playerData.getSupplyUsed(race.id);
         if (game.isLatComEnabled() && self().supplyUsed[race.id].valid(game.getFrameCount())) {
             return supplyUsed + self().supplyUsed[race.id].get();
