@@ -2093,8 +2093,17 @@ public class Unit implements Comparable<Unit> {
      * fog of war will be accessible, but isVisible will still return false.
      * @see #exists
      */
-    public boolean isVisible(final Player player) {
-        return unitData.isVisible(player.getID());
+    public boolean isVisible(Player player) {
+        player = player == null ? game.self() : player;
+        if (player != null) {
+            return player.hasValidId() && unitData.isVisible(player.getID());
+        }
+        for (int i = 0; i < Player.MAX_VALID_ID; ++i) {
+            if (unitData.isVisible(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2106,6 +2115,9 @@ public class Unit implements Comparable<Unit> {
      */
     public boolean isTargetable() {
         if (!exists()) {
+            return false;
+        }
+        if (!isVisible() && !game.isFlagEnabled(Flag.CompleteMapInformation)) {
             return false;
         }
         final UnitType ut = getType();
@@ -2206,7 +2218,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean build(final UnitType type) {
-        return issueCommand(UnitCommand.train(this, type));
+        return build(type, TilePosition.None);
     }
 
     /**
@@ -2226,6 +2238,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canBuild
      */
     public boolean build(final UnitType type, final TilePosition target) {
+        if (TilePosition.None.equals(target)) {
+            return train(type);
+        }
         return issueCommand(UnitCommand.build(this, target, type));
     }
 
@@ -2270,7 +2285,23 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#isTraining
      * @see Unit#canTrain
      */
-    public boolean train(final UnitType type) {
+    public boolean train() {
+        return train(UnitType.None);
+    }
+
+    public boolean train(UnitType type) {
+        if (type == UnitType.None) {
+            switch (getType()) {
+                case Protoss_Carrier:
+                case Hero_Gantrithor:
+                    type = Protoss_Interceptor;
+                    break;
+                case Protoss_Reaver:
+                case Hero_Warbringer:
+                    type = Protoss_Scarab;
+                    break;
+            }
+        }
         return issueCommand(UnitCommand.train(this, type));
     }
 
@@ -2877,6 +2908,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean useTech(final TechType tech, final Unit target) {
+        if (target == null) {
+            return issueCommand(UnitCommand.useTech(this, tech));
+        }
         return issueCommand(UnitCommand.useTech(this, tech, target));
     }
 
@@ -3507,18 +3541,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canTargetUnit(Unit targetUnit) {
-        if (targetUnit == null || !targetUnit.exists()) {
-            return false;
-        }
-        final UnitType targetType = targetUnit.getType();
-        if (!targetUnit.isCompleted() && !targetType.isBuilding() && !targetUnit.isMorphing() &&
-                targetType != Protoss_Archon && targetType != Protoss_Dark_Archon) {
-            return false;
-        }
-        return targetType != Spell_Scanner_Sweep &&
-                targetType != Spell_Dark_Swarm &&
-                targetType != Spell_Disruption_Web &&
-                targetType != Special_Map_Revealer;
+        return canTargetUnit(targetUnit, true);
     }
 
     /**
@@ -3535,7 +3558,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibility && !canCommand()) {
             return false;
         }
-        return canTargetUnit(targetUnit);
+        return targetUnit != null && targetUnit.isTargetable();
     }
 
     public boolean canAttack() {
@@ -3669,7 +3692,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
-        return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
+        return canAttackMoveGrouped(false, false);
     }
 
     public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
@@ -4052,7 +4075,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibility && !canCommand()) {
             return false;
         }
-        if (checkCanIssueCommandType && !canBuildAddon(uType, false)) {
+        if (checkCanIssueCommandType && !canBuildAddon(false)) {
             return false;
         }
         if (!game.canMake(uType, this)) {

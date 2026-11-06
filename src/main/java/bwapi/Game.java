@@ -162,6 +162,7 @@ public final class Game {
             forces[id] = new Force(gameData().getForces(id), id, this);
         }
 
+        // Note: C++ BWAPIClient starts at i = 1, which is a legacy bug in BWAPIClient (Server.cpp 0-indexes forces[0..3]).
         forceSet = Collections.unmodifiableList(Arrays.asList(forces));
 
         final int playerCount = gameData().getPlayerCount();
@@ -270,21 +271,37 @@ public final class Game {
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
 
-        if (isReplay()) {
+        updatePlayers();
+        setLatCom(!configuration.getAsync());
+    }
+
+    private void updatePlayers() {
+        if (isReplay() || self() == null) {
             enemies = Collections.emptyList();
             allies = Collections.emptyList();
             observers = Collections.emptyList();
+            return;
         }
-        else {
-            enemies = playerSet.stream().filter(p -> !p.equals(self()) && self().isEnemy(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            allies = playerSet.stream().filter(p -> !p.equals(self()) && self().isAlly(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
-            observers = playerSet.stream().filter(p -> !p.equals(self()) && p.isObserver())
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        final List<Player> newEnemies = new ArrayList<>();
+        final List<Player> newAllies = new ArrayList<>();
+        final List<Player> newObservers = new ArrayList<>();
+        for (final Player p : playerSet) {
+            if (p.leftGame() || p.isDefeated() || p.equals(self())) {
+                continue;
+            }
+            if (self().isAlly(p)) {
+                newAllies.add(p);
+            }
+            if (self().isEnemy(p)) {
+                newEnemies.add(p);
+            }
+            if (p.isObserver()) {
+                newObservers.add(p);
+            }
         }
-        setLatCom(!configuration.getAsync());
+        enemies = Collections.unmodifiableList(newEnemies);
+        allies = Collections.unmodifiableList(newAllies);
+        observers = Collections.unmodifiableList(newObservers);
     }
 
     void unitCreate(final int id) {
@@ -317,6 +334,7 @@ public final class Game {
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
+        updatePlayers();
     }
 
     /**
@@ -2051,15 +2069,15 @@ public final class Game {
     }
 
     public void drawEllipseScreen(int x, int y, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(CoordinateType.Mouse, x, y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Screen, x, y, xrad, yrad, color, isSolid);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color) {
-        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color);
+        drawEllipse(CoordinateType.Screen, p.x, p.y, xrad, yrad, color);
     }
 
     public void drawEllipseScreen(Position p, int xrad, int yrad, Color color, boolean isSolid) {
-        drawEllipse(CoordinateType.Mouse, p.x, p.y, xrad, yrad, color, isSolid);
+        drawEllipse(CoordinateType.Screen, p.x, p.y, xrad, yrad, color, isSolid);
     }
 
     /**
