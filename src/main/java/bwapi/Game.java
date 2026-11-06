@@ -162,7 +162,9 @@ public final class Game {
             forces[id] = new Force(gameData().getForces(id), id, this);
         }
 
-        forceSet = Collections.unmodifiableList(Arrays.asList(forces));
+        forceSet = forceCount > 1
+                ? Collections.unmodifiableList(Arrays.asList(forces).subList(1, forceCount))
+                : Collections.emptyList();
 
         final int playerCount = gameData().getPlayerCount();
         players = new Player[playerCount];
@@ -270,21 +272,26 @@ public final class Game {
         mapPixelWidth = mapWidth * TilePosition.SIZE_IN_PIXELS;
         mapPixelHeight = mapHeight * TilePosition.SIZE_IN_PIXELS;
 
-        if (isReplay()) {
+        updatePlayers();
+        setLatCom(!configuration.getAsync());
+    }
+
+    private void updatePlayers() {
+        if (isReplay() || self() == null) {
             enemies = Collections.emptyList();
             allies = Collections.emptyList();
             observers = Collections.emptyList();
+        } else {
+            enemies = playerSet.stream()
+                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && self().isEnemy(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            allies = playerSet.stream()
+                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && self().isAlly(p))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            observers = playerSet.stream()
+                    .filter(p -> !p.leftGame() && !p.isDefeated() && !p.equals(self()) && p.isObserver())
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
-        else {
-            enemies = playerSet.stream().filter(p -> !p.equals(self()) && self().isEnemy(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-            allies = playerSet.stream().filter(p -> !p.equals(self()) && self().isAlly(p))
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-
-            observers = playerSet.stream().filter(p -> !p.equals(self()) && p.isObserver())
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-        }
-        setLatCom(!configuration.getAsync());
     }
 
     void unitCreate(final int id) {
@@ -317,6 +324,7 @@ public final class Game {
                     .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
         }
         getAllUnits().forEach(u -> u.updatePosition(frame));
+        updatePlayers();
     }
 
     /**
