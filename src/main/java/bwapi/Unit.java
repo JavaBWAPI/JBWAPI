@@ -2209,7 +2209,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean build(final UnitType type) {
-        return issueCommand(UnitCommand.train(this, type));
+        return build(type, TilePosition.None);
     }
 
     /**
@@ -2229,6 +2229,9 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#canBuild
      */
     public boolean build(final UnitType type, final TilePosition target) {
+        if (TilePosition.None.equals(target)) {
+            return train(type);
+        }
         return issueCommand(UnitCommand.build(this, target, type));
     }
 
@@ -2273,7 +2276,23 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#isTraining
      * @see Unit#canTrain
      */
-    public boolean train(final UnitType type) {
+    public boolean train() {
+        return train(UnitType.None);
+    }
+
+    public boolean train(UnitType type) {
+        if (type == UnitType.None) {
+            switch (getType()) {
+                case Protoss_Carrier:
+                case Hero_Gantrithor:
+                    type = Protoss_Interceptor;
+                    break;
+                case Protoss_Reaver:
+                case Hero_Warbringer:
+                    type = Protoss_Scarab;
+                    break;
+            }
+        }
         return issueCommand(UnitCommand.train(this, type));
     }
 
@@ -2880,6 +2899,9 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean useTech(final TechType tech, final Unit target) {
+        if (target == null) {
+            return issueCommand(UnitCommand.useTech(this, tech));
+        }
         return issueCommand(UnitCommand.useTech(this, tech, target));
     }
 
