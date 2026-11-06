@@ -64,7 +64,7 @@ public final class Region implements Comparable<Region> {
             final Region region = game.getRegion(regionData.getNeighbors(i));
             neighbours.add(region);
             final int d = getDistance(region);
-            if (region.isAccessible()) {
+            if (this.getRegionGroupID() == region.getRegionGroupID()) {
                 if (d < accessibleBestDist) {
                     closestAccessibleRegion = region;
                     accessibleBestDist = d;
