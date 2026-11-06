@@ -3661,7 +3661,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibilityGrouped && !canCommandGrouped(false)) {
             return false;
         }
-        return canAttackMoveGrouped(false, false) || canAttackUnitGrouped(false, false);
+        return canAttackMoveGrouped(false, false);
     }
 
     public boolean canAttackGrouped(Unit target, boolean checkCanTargetUnit, boolean checkCanIssueCommandType, boolean checkCommandibilityGrouped, boolean checkCommandibility) {
