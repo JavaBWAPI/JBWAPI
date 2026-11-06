@@ -2108,6 +2108,9 @@ public class Unit implements Comparable<Unit> {
         if (!exists()) {
             return false;
         }
+        if (!isVisible() && !game.isFlagEnabled(Flag.CompleteMapInformation)) {
+            return false;
+        }
         final UnitType ut = getType();
         if (!isCompleted() &&
                 !ut.isBuilding() &&
@@ -3507,18 +3510,7 @@ public class Unit implements Comparable<Unit> {
     }
 
     public boolean canTargetUnit(Unit targetUnit) {
-        if (targetUnit == null || !targetUnit.exists()) {
-            return false;
-        }
-        final UnitType targetType = targetUnit.getType();
-        if (!targetUnit.isCompleted() && !targetType.isBuilding() && !targetUnit.isMorphing() &&
-                targetType != Protoss_Archon && targetType != Protoss_Dark_Archon) {
-            return false;
-        }
-        return targetType != Spell_Scanner_Sweep &&
-                targetType != Spell_Dark_Swarm &&
-                targetType != Spell_Disruption_Web &&
-                targetType != Special_Map_Revealer;
+        return canTargetUnit(targetUnit, true);
     }
 
     /**
@@ -3535,7 +3527,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibility && !canCommand()) {
             return false;
         }
-        return canTargetUnit(targetUnit);
+        return targetUnit != null && targetUnit.isTargetable();
     }
 
     public boolean canAttack() {
