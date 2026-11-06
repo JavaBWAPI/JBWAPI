@@ -4052,7 +4052,7 @@ public class Unit implements Comparable<Unit> {
         if (checkCommandibility && !canCommand()) {
             return false;
         }
-        if (checkCanIssueCommandType && !canBuildAddon(uType, false)) {
+        if (checkCanIssueCommandType && !canBuildAddon(false)) {
             return false;
         }
         if (!game.canMake(uType, this)) {
