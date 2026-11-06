@@ -2094,19 +2094,13 @@ public class Unit implements Comparable<Unit> {
      * @see #exists
      */
     public boolean isVisible(Player player) {
-        if (player == null) {
-            player = game.self();
-        }
+        player = player == null ? game.self() : player;
         if (player != null) {
-            final int id = player.getID();
-            if (id >= 0 && id < 9) {
-                return unitData.isVisible(id);
-            }
-        } else {
-            for (int i = 0; i < 9; ++i) {
-                if (unitData.isVisible(i)) {
-                    return true;
-                }
+            return player.hasValidId() && unitData.isVisible(player.getID());
+        }
+        for (int i = 0; i < Player.MAX_VALID_ID; ++i) {
+            if (unitData.isVisible(i)) {
+                return true;
             }
         }
         return false;

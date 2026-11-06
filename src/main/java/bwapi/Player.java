@@ -19,6 +19,8 @@ import static bwapi.WeaponType.*;
  * @see Race
  */
 public class Player implements Comparable<Player> {
+    static final int MAX_VALID_ID = 9;
+
     private final PlayerData playerData;
     private final Game game;
     private final int id;
@@ -51,6 +53,10 @@ public class Player implements Comparable<Player> {
      */
     public int getID() {
         return id;
+    }
+
+    boolean hasValidId() {
+        return id >= 0 && id < MAX_VALID_ID;
     }
 
     /**
@@ -340,13 +346,8 @@ public class Player implements Comparable<Player> {
      * @see #supplyUsed
      */
     public int supplyTotal(Race race) {
-        if (race == Race.None) {
-            race = getRace();
-        }
-        if (race.id >= 0 && race.id < 3) {
-            return playerData.getSupplyTotal(race.id);
-        }
-        return 0;
+        race = race == Race.None ? getRace() : race;
+        return race.hasValidId() ? playerData.getSupplyTotal(race.id) : 0;
     }
 
     public int supplyUsed() {
@@ -361,10 +362,8 @@ public class Player implements Comparable<Player> {
      * @see #supplyTotal
      */
     public int supplyUsed(Race race) {
-        if (race == Race.None) {
-            race = getRace();
-        }
-        if (race.id < 0 || race.id >= 3) {
+        race = race == Race.None ? getRace() : race;
+        if (!race.hasValidId()) {
             return 0;
         }
         int supplyUsed = playerData.getSupplyUsed(race.id);

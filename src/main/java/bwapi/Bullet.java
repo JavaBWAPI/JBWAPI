@@ -181,19 +181,13 @@ public final class Bullet implements Comparable<Bullet> {
      * @return true if the {@link Bullet} is visible to the specified player, false if the {@link Bullet} is not visible to the specified player.
      */
     public boolean isVisible(Player player) {
-        if (player == null) {
-            player = game.self();
-        }
+        player = player == null ? game.self() : player;
         if (player != null) {
-            final int id = player.getID();
-            if (id >= 0 && id < 9) {
-                return bulletData.isVisible(id);
-            }
-        } else {
-            for (int i = 0; i < 9; ++i) {
-                if (bulletData.isVisible(i)) {
-                    return true;
-                }
+            return player.hasValidId() && bulletData.isVisible(player.getID());
+        }
+        for (int i = 0; i < Player.MAX_VALID_ID; ++i) {
+            if (bulletData.isVisible(i)) {
+                return true;
             }
         }
         return false;
