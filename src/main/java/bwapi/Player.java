@@ -555,6 +555,8 @@ public class Player implements Comparable<Player> {
      * @return character code to use for text in Broodwar.
      */
     public Text getTextColor() {
+        // Note: C++ BWAPI 4.4.0 uses Colors::White (255) and Colors::Green (117) due to a bug,
+        // whereas Player 7 white is 84 (DirtyWhite) and Player 9 / Ice green is 185 (DarkGreen).
         switch (color.id) {
             case 111: // red
                 return Text.BrightRed;
@@ -568,7 +570,7 @@ public class Player implements Comparable<Player> {
                 return Text.Orange;
             case 19:  // brown
                 return Text.Brown;
-            case 255: // white
+            case 84:  // white
                 return Text.PlayerWhite;
             case 135: // yellow
                 return Text.PlayerYellow;
