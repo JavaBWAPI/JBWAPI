@@ -162,9 +162,8 @@ public final class Game {
             forces[id] = new Force(gameData().getForces(id), id, this);
         }
 
-        forceSet = forceCount > 1
-                ? Collections.unmodifiableList(Arrays.asList(forces).subList(1, forceCount))
-                : Collections.emptyList();
+        // Note: C++ BWAPIClient starts at i = 1, which is a legacy bug in BWAPIClient (Server.cpp 0-indexes forces[0..3]).
+        forceSet = Collections.unmodifiableList(Arrays.asList(forces));
 
         final int playerCount = gameData().getPlayerCount();
         players = new Player[playerCount];
