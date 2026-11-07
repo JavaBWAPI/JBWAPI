@@ -101,4 +101,19 @@ public class GameTest {
         assertTrue(game.enemies().isEmpty());
         assertTrue(game.allies().isEmpty());
     }
+
+    @Test
+    public void hasPowerOnTile() throws IOException {
+        Game game = GameBuilder.createGame();
+        Unit pylon = mock(Unit.class);
+        given(pylon.getType()).willReturn(UnitType.Protoss_Pylon);
+        given(pylon.getPlayer()).willReturn(game.self());
+        given(pylon.exists()).willReturn(true);
+        given(pylon.isCompleted()).willReturn(true);
+        given(pylon.getPosition()).willReturn(new Position(1024, 512));
+        game.setAllUnits(Collections.singletonList(pylon));
+
+        // tile (31, 15) is pixel (992, 480), right next to the pylon
+        assertTrue(game.hasPower(31, 15));
+    }
 }
