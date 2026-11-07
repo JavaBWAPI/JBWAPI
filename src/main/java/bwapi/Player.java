@@ -544,14 +544,14 @@ public class Player implements Comparable<Player> {
      * @return character code to use for text in Broodwar.
      */
     public Text getTextColor() {
-        switch (color.id) {
+        switch (getColor().id) {
             case 111: // red
                 return Text.BrightRed;
             case 165: // blue
                 return Text.Blue;
             case 159: // teal
                 return Text.Teal;
-            case 164: // purp
+            case 164: // purple
                 return Text.Purple;
             case 156: // orange with fix from @n00byEdge
                 return Text.Orange;
@@ -561,7 +561,7 @@ public class Player implements Comparable<Player> {
                 return Text.PlayerWhite;
             case 135: // yellow
                 return Text.PlayerYellow;
-            case 185: // green p9
+            case 117: // green
                 return Text.DarkGreen;
             case 136: // p10
                 return Text.LightYellow;
