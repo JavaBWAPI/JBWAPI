@@ -16,14 +16,11 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENBW_DIR=../../openbw -DOPENBW_ENABLE_UI
 make -j4
 
 # Download runtime deps
-curl http://www.cs.mun.ca/~dchurchill/starcraftaicomp/files/Starcraft_1161.zip -o starcraft.zip
-unzip starcraft.zip patch_rt.mpq BROODAT.MPQ STARDAT.MPQ
-mv patch_rt.mpq Patch_rt.mpq && mv BROODAT.MPQ BrooDat.mpq && mv STARDAT.MPQ StarDat.mpq
+git clone --depth 1 https://github.com/dgant/mpqs
+cp mpqs/patch_rt.mpq Patch_rt.mpq && cp mpqs/BROODAT.MPQ BrooDat.mpq && cp mpqs/STARDAT.MPQ StarDat.mpq
 
-# Run openbw using the map: Destination 1.1.scx
-unzip starcraft.zip "maps/BroodWar/ICCup/ICCup Destination 1.1.scx"
-
-BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="maps/BroodWar/ICCup/ICCup Destination 1.1.scx" ./bin/BWAPILauncher
+# Run openbw using the map: (2)Destination.scx
+BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="it/(2)Destination.scx" ./bin/BWAPILauncher
 ```
 
 Compiling and running openbw on macos with client support:
@@ -42,12 +39,9 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENBW_DIR=../../openbw -DOPENBW_ENABLE_UI
 make -j4
 
 # Download runtime deps
-curl -L "https://web.archive.org/web/20250823150201id_/https://www.cs.mun.ca/~dchurchill/starcraftaicomp/files/Starcraft_1161.zip" -o starcraft.zip
-unzip starcraft.zip patch_rt.mpq BROODAT.MPQ STARDAT.MPQ
-mv patch_rt.mpq Patch_rt.mpq && mv BROODAT.MPQ BrooDat.mpq && mv STARDAT.MPQ StarDat.mpq
+git clone --depth 1 https://github.com/dgant/mpqs
+cp mpqs/patch_rt.mpq Patch_rt.mpq && cp mpqs/BROODAT.MPQ BrooDat.mpq && cp mpqs/STARDAT.MPQ StarDat.mpq
 
-# Run openbw using the map: Destination 1.1.scx
-unzip starcraft.zip "maps/BroodWar/ICCup/ICCup Destination 1.1.scx"
-
-BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="maps/BroodWar/ICCup/ICCup Destination 1.1.scx" OPENBW_ENABLE_UI=1 ./bin/BWAPILauncher
+# Run openbw using the map: (2)Destination.scx
+BWAPI_CONFIG_AUTO_MENU__RACE=Terran BWAPI_CONFIG_AUTO_MENU__MAP="it/(2)Destination.scx" OPENBW_ENABLE_UI=1 ./bin/BWAPILauncher
 ```
