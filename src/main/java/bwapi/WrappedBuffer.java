@@ -24,6 +24,11 @@ class WrappedBuffer {
         this.address = Pointer.nativeValue(pointer);
     }
 
+    WrappedBuffer(final ByteBuffer buffer, final long address) {
+        this.buffer = buffer;
+        this.address = address;
+    }
+
     byte getByte(final int offset) {
         return unsafe.getByte(address + offset);
     }

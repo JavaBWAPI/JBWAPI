@@ -22,6 +22,10 @@ class SynchronizationEnvironment {
     private final Map<Integer, Runnable> onFrames;
 
     SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration) {
+        this(bwClientConfiguration, GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
+    }
+
+    SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration, final WrappedBuffer newGameState) {
         BWEventListener listener = mock(BWEventListener.class);
 
         configuration = bwClientConfiguration;
@@ -32,7 +36,6 @@ class SynchronizationEnvironment {
         bwapiDelayMs = 0;
         onFrames = new HashMap<>();
 
-        WrappedBuffer newGameState = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
         when(client.mapFile()).thenReturn(newGameState);
         when(client.liveClientData()).thenReturn(new ClientData());
         client.liveClientData().setBuffer(client.mapFile());
@@ -88,7 +91,7 @@ class SynchronizationEnvironment {
         if (configuration.getAsync()) {
             final long MEGABYTE = 1024 * 1024;
             long memoryFree = Runtime.getRuntime().freeMemory() / MEGABYTE;
-            long memoryRequired = configuration.getAsyncFrameBufferCapacity() * ClientData.GameData.SIZE / MEGABYTE;
+            long memoryRequired = (long) configuration.getAsyncFrameBufferCapacity() * FrameBuffer.BUFFER_SIZE / MEGABYTE;
             assertTrue(
                     "Unit test needs to be run with sufficient memory to allocate frame buffer. Has "
                             + memoryFree
