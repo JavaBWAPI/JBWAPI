@@ -12,6 +12,7 @@ public class AsyncClientDataTest {
         PackedWrappedBuffer packed = new PackedWrappedBuffer(ClientData.GameData.SIZE);
         ClientData source = new ClientData();
         source.setBuffer(live);
+        source.gameData().setEventCount(1);
         source.gameData().getEvents(0).setType(EventType.MatchFrame);
         source.gameData().getStartLocations(0).setX(123);
         new FrameBuffer(new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build())
@@ -212,5 +213,47 @@ public class AsyncClientDataTest {
 
         assertTrue(asyncData.gameData().isVisible(10, 20));
         assertTrue(asyncData.gameData().isInGame());
+    }
+
+    @Test
+    public void copyBufferTracksMaxUnitsAndOnlyCopiesActiveUnitsAndEvents() {
+        WrappedBuffer mainBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
+        PackedWrappedBuffer packedBuffer = new PackedWrappedBuffer();
+
+        ClientData mainData = new ClientData();
+        mainData.setBuffer(mainBuffer);
+
+        // Set initialUnitCount = 3 and populate unit #2 and unit #50 (beyond initialUnitCount)
+        mainData.gameData().setInitialUnitCount(3);
+        mainData.gameData().getUnits(2).setHitPoints(100);
+        mainData.gameData().getUnits(50).setHitPoints(250);
+
+        // Populate event #0 (active) and event #5 (beyond eventCount = 1)
+        mainData.gameData().setEventCount(1);
+        mainData.gameData().getEvents(0).setType(EventType.MatchFrame);
+        mainData.gameData().getEvents(5).setType(EventType.MatchEnd);
+
+        FrameBuffer frameBuffer = new FrameBuffer(
+                new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build());
+        frameBuffer.copyBuffer(mainBuffer, packedBuffer);
+
+        AsyncClientData asyncData = new AsyncClientData(mainBuffer);
+        asyncData.setBuffer(packedBuffer);
+
+        assertEquals(3, frameBuffer.getMaxUnitCount());
+        assertEquals(100, asyncData.gameData().getUnits(2).getHitPoints());
+        // Unit #50 and Event #5 were beyond active counts, so they were skipped
+        assertEquals(0, asyncData.gameData().getUnits(50).getHitPoints());
+        assertEquals(EventType.MatchFrame, asyncData.gameData().getEvents(0).getType());
+        assertEquals(EventType.MatchStart, asyncData.gameData().getEvents(5).getType());
+
+        // Now fire UnitDiscover for unit #50 on the next frame
+        mainData.gameData().setEventCount(1);
+        mainData.gameData().getEvents(0).setType(EventType.UnitDiscover);
+        mainData.gameData().getEvents(0).setV1(50);
+        frameBuffer.copyBuffer(mainBuffer, packedBuffer);
+
+        assertEquals(51, frameBuffer.getMaxUnitCount());
+        assertEquals(250, asyncData.gameData().getUnits(50).getHitPoints());
     }
 }
