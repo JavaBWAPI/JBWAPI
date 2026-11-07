@@ -2,12 +2,18 @@ package bwapi;
 
 import org.junit.Test;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 
@@ -76,5 +82,191 @@ public class UnitTest {
         when(u.getX()).thenCallRealMethod();
         when(u.getY()).thenCallRealMethod();
         return u;
+    }
+
+    @Test
+    public void getUnitsInRadiusShouldExcludeSelf() {
+        Game game = spy(new Game());
+        doReturn(0).when(game).getFrameCount();
+
+        Unit selfUnit = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        Position pos = new Position(100, 100);
+        doReturn(pos).when(selfUnit).getPosition();
+        doReturn(90).when(selfUnit).getLeft();
+        doReturn(110).when(selfUnit).getRight();
+        doReturn(90).when(selfUnit).getTop();
+        doReturn(110).when(selfUnit).getBottom();
+        doReturn(true).when(selfUnit).exists();
+        doReturn(0).when(selfUnit).getDistance(any(Unit.class));
+        doReturn(0).when(selfUnit).getDistance(any(Position.class));
+
+        Unit neighbor = mock(Unit.class);
+        when(neighbor.getPosition()).thenReturn(new Position(105, 100));
+        when(neighbor.getLeft()).thenReturn(95);
+        when(neighbor.getRight()).thenReturn(115);
+        when(neighbor.getTop()).thenReturn(90);
+        when(neighbor.getBottom()).thenReturn(110);
+        when(neighbor.exists()).thenReturn(true);
+        when(neighbor.getDistance(any(Position.class))).thenReturn(0);
+
+        game.setAllUnits(Arrays.asList(selfUnit, neighbor));
+
+        List<Unit> result = selfUnit.getUnitsInRadius(50, u -> true);
+        assertEquals(Collections.singletonList(neighbor), result);
+    }
+
+    @Test
+    public void getUnitsInWeaponRangeShouldOnlyEvaluatePredicateForValidTargets() {
+        Game game = spy(new Game());
+        doReturn(0).when(game).getFrameCount();
+        Player selfPlayer = mock(Player.class);
+
+        Unit selfUnit = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(true).when(selfUnit).exists();
+        doReturn(selfPlayer).when(selfUnit).getPlayer();
+        doReturn(100).when(selfUnit).getLeft();
+        doReturn(100).when(selfUnit).getTop();
+        doReturn(120).when(selfUnit).getRight();
+        doReturn(120).when(selfUnit).getBottom();
+
+        Unit invincibleUnit = mock(Unit.class);
+        when(invincibleUnit.getLeft()).thenReturn(110);
+        when(invincibleUnit.getTop()).thenReturn(110);
+        when(invincibleUnit.getRight()).thenReturn(130);
+        when(invincibleUnit.getBottom()).thenReturn(130);
+        when(invincibleUnit.isInvincible()).thenReturn(true);
+
+        Unit outOfRangeUnit = mock(Unit.class);
+        when(outOfRangeUnit.getLeft()).thenReturn(110);
+        when(outOfRangeUnit.getTop()).thenReturn(110);
+        when(outOfRangeUnit.getRight()).thenReturn(130);
+        when(outOfRangeUnit.getBottom()).thenReturn(130);
+        when(outOfRangeUnit.isInvincible()).thenReturn(false);
+        doReturn(9999).when(selfUnit).getDistance(outOfRangeUnit);
+
+        game.setAllUnits(Arrays.asList(selfUnit, invincibleUnit, outOfRangeUnit));
+
+        AtomicInteger predicateCalls = new AtomicInteger(0);
+        selfUnit.getUnitsInWeaponRange(WeaponType.Gauss_Rifle, u -> {
+            predicateCalls.incrementAndGet();
+            return true;
+        });
+
+        assertEquals(0, predicateCalls.get());
+    }
+
+    @Test
+    public void canAttackUnitGroupedShouldCheckTargetUnitInvincibility() {
+        Unit attacker = mock(Unit.class);
+        Unit target = mock(Unit.class);
+        Player selfPlayer = mock(Player.class);
+
+        when(attacker.getPlayer()).thenReturn(selfPlayer);
+        when(attacker.getType()).thenReturn(UnitType.Terran_Marine);
+        when(attacker.isInvincible()).thenReturn(false);
+
+        when(target.isInvincible()).thenReturn(true);
+        when(target.isFlying()).thenReturn(false);
+        when(target.getType()).thenReturn(UnitType.Terran_SCV);
+
+        when(attacker.canAttackUnitGrouped(target, false, false, false, false)).thenCallRealMethod();
+
+        assertFalse(attacker.canAttackUnitGrouped(target, false, false, false, false));
+    }
+
+    @Test
+    public void canGatherShouldCheckPathToTargetPosition() {
+        Game game = mock(Game.class);
+        Player selfPlayer = mock(Player.class);
+        when(game.self()).thenReturn(selfPlayer);
+
+        Position workerPos = new Position(100, 100);
+        Position unreachableMineralPos = new Position(500, 500);
+
+        Unit worker = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(workerPos).when(worker).getPosition();
+        doReturn(selfPlayer).when(worker).getPlayer();
+        doReturn(true).when(worker).isCompleted();
+        doReturn(true).when(worker).hasPath(workerPos);
+        doReturn(false).when(worker).hasPath(unreachableMineralPos);
+
+        Unit unreachableMineral = mock(Unit.class);
+        when(unreachableMineral.getType()).thenReturn(UnitType.Resource_Mineral_Field);
+        when(unreachableMineral.getPosition()).thenReturn(unreachableMineralPos);
+        when(unreachableMineral.isCompleted()).thenReturn(true);
+
+        assertFalse(worker.canGather(unreachableMineral, false, false, false));
+    }
+
+    @Test
+    public void canGatherShouldCheckTargetRefineryOwner() {
+        Game game = mock(Game.class);
+        Player selfPlayer = mock(Player.class);
+        Player enemyPlayer = mock(Player.class);
+        when(game.self()).thenReturn(selfPlayer);
+
+        Position workerPos = new Position(100, 100);
+        Position reachableRefineryPos = new Position(150, 150);
+
+        Unit worker = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(workerPos).when(worker).getPosition();
+        doReturn(selfPlayer).when(worker).getPlayer();
+        doReturn(true).when(worker).isCompleted();
+        doReturn(true).when(worker).hasPath(workerPos);
+        doReturn(true).when(worker).hasPath(reachableRefineryPos);
+
+        Unit enemyRefinery = mock(Unit.class);
+        when(enemyRefinery.getType()).thenReturn(UnitType.Terran_Refinery);
+        when(enemyRefinery.getPosition()).thenReturn(reachableRefineryPos);
+        when(enemyRefinery.getPlayer()).thenReturn(enemyPlayer);
+        when(enemyRefinery.isCompleted()).thenReturn(true);
+
+        assertFalse(worker.canGather(enemyRefinery, false, false, false));
+    }
+
+    @Test
+    public void canGatherShouldCheckTargetUnitCompleted() {
+        Game game = mock(Game.class);
+        Player selfPlayer = mock(Player.class);
+        when(game.self()).thenReturn(selfPlayer);
+
+        Position workerPos = new Position(100, 100);
+        Position refineryPos = new Position(150, 150);
+
+        Unit worker = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(workerPos).when(worker).getPosition();
+        doReturn(selfPlayer).when(worker).getPlayer();
+        doReturn(true).when(worker).isCompleted();
+        doReturn(true).when(worker).hasPath(refineryPos);
+
+        Unit incompleteRefinery = mock(Unit.class);
+        when(incompleteRefinery.getType()).thenReturn(UnitType.Terran_Refinery);
+        when(incompleteRefinery.getPosition()).thenReturn(refineryPos);
+        when(incompleteRefinery.getPlayer()).thenReturn(selfPlayer);
+        when(incompleteRefinery.isCompleted()).thenReturn(false);
+
+        assertFalse(worker.canGather(incompleteRefinery, false, false, false));
+    }
+
+    @Test
+    public void canUseTechUnitHealingShouldRejectEnemyTarget() {
+        Player selfPlayer = mock(Player.class);
+        Player enemyPlayer = mock(Player.class);
+        when(enemyPlayer.isNeutral()).thenReturn(false);
+        when(selfPlayer.isEnemy(selfPlayer)).thenReturn(false);
+        when(selfPlayer.isEnemy(enemyPlayer)).thenReturn(true);
+
+        Unit medic = mock(Unit.class);
+        when(medic.getPlayer()).thenReturn(selfPlayer);
+
+        Unit enemyMarine = mock(Unit.class);
+        when(enemyMarine.getPlayer()).thenReturn(enemyPlayer);
+        when(enemyMarine.getType()).thenReturn(UnitType.Terran_Marine);
+        when(enemyMarine.isFlying()).thenReturn(false);
+        when(enemyMarine.getHitPoints()).thenReturn(20);
+
+        when(medic.canUseTechUnit(TechType.Healing, enemyMarine, false, false, false, false)).thenCallRealMethod();
+
+        assertFalse(medic.canUseTechUnit(TechType.Healing, enemyMarine, false, false, false, false));
     }
 }

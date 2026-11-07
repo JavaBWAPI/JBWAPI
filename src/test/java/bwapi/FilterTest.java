@@ -39,4 +39,20 @@ public class FilterTest {
         assertTrue(units.stream().noneMatch(IsMineralField.and(IsRefinery)));
         assertTrue(units.stream().noneMatch(IsMineralField.negate()));
     }
+
+    @Test
+    public void isTransportShouldMatchDropshipAndExcludeBunker() {
+        Unit dropship = mock(Unit.class);
+        when(dropship.getType()).thenReturn(UnitType.Terran_Dropship);
+
+        Unit bunker = mock(Unit.class);
+        when(bunker.getType()).thenReturn(UnitType.Terran_Bunker);
+
+        Unit marine = mock(Unit.class);
+        when(marine.getType()).thenReturn(UnitType.Terran_Marine);
+
+        assertTrue(IsTransport.test(dropship));
+        assertFalse(IsTransport.test(bunker));
+        assertFalse(IsTransport.test(marine));
+    }
 }

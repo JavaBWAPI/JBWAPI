@@ -16,7 +16,7 @@ import static bwapi.UnitType.*;
  * game state information from Starcraft Broodwar. Game state information includes all units,
  * resources, players, forces, bullets, terrain, fog of war, regions, etc.
  */
-public final class Game {
+public class Game {
     private static final int[][] damageRatio = {
             // Ind, Sml, Med, Lrg, Non, Unk
             {0, 0, 0, 0, 0, 0}, // Independent

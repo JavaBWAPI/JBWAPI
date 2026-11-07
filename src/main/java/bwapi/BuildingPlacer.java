@@ -243,7 +243,7 @@ class BuildingPlacer {
         reserve.restoreIfInvalid();
     }
 
-    private static void ReserveExistingAddonPlacement(final PlacementReserve reserve, final TilePosition desiredPosition, final Game game) {
+    static void ReserveExistingAddonPlacement(final PlacementReserve reserve, final TilePosition desiredPosition, final Game game) {
         final TilePosition start = desiredPosition.subtract(new TilePosition(MAX_RANGE, MAX_RANGE).divide(2));
         //Exclude addon placement locations
         reserve.backup();
@@ -258,7 +258,7 @@ class BuildingPlacer {
         reserve.restoreIfInvalid();
     }
 
-    private static void ReserveDefault(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final Game game) {
+    static void ReserveDefault(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final Game game) {
         reserve.backup();
         final PlacementReserve original = reserve;
 

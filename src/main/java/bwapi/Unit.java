@@ -1311,6 +1311,7 @@ public class Unit implements Comparable<Unit> {
                         return false;
                     }
                     // Weapon behavioural checks
+                    // NOTE: The target flag checks below (after targetsOwn) are inverted, matching an upstream bug in C++ BWAPI's UnitInterface::getUnitsInWeaponRange (BWAPILIB/Source/Unit.cpp).
                     final UnitType ut = u.getType();
                     if ((weapon.targetsOwn() && !u.getPlayer().equals(getPlayer())) ||
                             (!weapon.targetsAir() && !u.isFlying()) ||
@@ -4715,14 +4716,14 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        if (!isCompleted()) {
+        if (!targetUnit.isCompleted()) {
             return false;
         }
 
         if (!hasPath(targetUnit.getPosition())) {
             return false;
         }
-        return !targetUnit.getType().isRefinery() || targetUnit.getPlayer().equals(game.self());
+        return !uType.isRefinery() || targetUnit.getPlayer().equals(game.self());
     }
 
     public boolean canReturnCargo() {

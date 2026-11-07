@@ -13,10 +13,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 @RunWith(Theories.class)
 public class GameTest {
@@ -115,5 +120,58 @@ public class GameTest {
 
         // tile (31, 15) is pixel (992, 480), right next to the pylon
         assertTrue(game.hasPower(31, 15));
+    }
+
+    @Test
+    public void getUnitsOnTileShouldUseUnitBoundingBoxAndValidateTile() {
+        Game game = spy(new Game());
+        doReturn(128 * 32).when(game).mapPixelWidth();
+        doReturn(128 * 32).when(game).mapPixelHeight();
+
+        // Command Center at top-left tile (10, 10) spans pixels [320..447, 320..415] (tiles 10..13, 10..12)
+        Unit commandCenter = mock(Unit.class);
+        when(commandCenter.getTilePosition()).thenReturn(new TilePosition(10, 10));
+        when(commandCenter.getLeft()).thenReturn(320);
+        when(commandCenter.getTop()).thenReturn(320);
+        when(commandCenter.getRight()).thenReturn(447);
+        when(commandCenter.getBottom()).thenReturn(415);
+
+        game.setAllUnits(Collections.singletonList(commandCenter));
+
+        // Tile (11, 11) is covered by the Command Center even though its top-left tile is (10, 10)
+        List<Unit> onTile = game.getUnitsOnTile(11, 11);
+        assertEquals(Collections.singletonList(commandCenter), onTile);
+
+        // Invalid tile should return empty list
+        assertTrue(game.getUnitsOnTile(-1, -1).isEmpty());
+    }
+
+    @Test
+    public void getUnitsInRadiusShouldUseUnitEdgeDistance() {
+        Game game = new Game();
+
+        // Unit centered at (100, 100) with bounding box [80..120, 80..120]
+        Unit unit = mock(Unit.class);
+        Position unitCenter = new Position(100, 100);
+        Position queryCenter = new Position(150, 100);
+        when(unit.getPosition()).thenReturn(unitCenter);
+        when(unit.getLeft()).thenReturn(80);
+        when(unit.getRight()).thenReturn(120);
+        when(unit.getTop()).thenReturn(80);
+        when(unit.getBottom()).thenReturn(120);
+        when(unit.exists()).thenReturn(true);
+        when(unit.getDistance(queryCenter)).thenCallRealMethod();
+
+        game.setAllUnits(Collections.singletonList(unit));
+
+        // Center-to-center distance is 50 (> 35), but edge-to-point distance is 30 (<= 35)
+        List<Unit> result = game.getUnitsInRadius(queryCenter, 35);
+        assertEquals(Collections.singletonList(unit), result);
+    }
+
+    @Test
+    public void setMapWithEmptyStringShouldReturnFalseInsteadOfThrowing() {
+        Game game = new Game();
+        assertFalse(game.setMap(""));
     }
 }
