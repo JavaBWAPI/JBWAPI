@@ -1,0 +1,124 @@
+name: E2E OpenBW Linux
+
+on:
+  - pull_request
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache OpenBW runtime and MPQs
+        id: cache-openbw
+        uses: actions/cache@v4
+        with:
+          path: openbw-runtime
+          key: openbw-linux-v2
+
+      - name: Build OpenBW and fetch MPQs
+        if: steps.cache-openbw.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang libsdl2-dev libsdl2-mixer-dev
+
+          git clone --depth 1 https://github.com/basil-ladder/openbw
+          git clone --depth 1 -b linux-client-support https://github.com/basil-ladder/bwapi
+          sed -i 's/switch *(command\.type)/switch ((UnitCommandType) command.type)/g' bwapi/bwapi/include/BWAPI/Client/CommandTemp.h
+          cmake -S bwapi -B bwapi/build \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_CXX_FLAGS="-include cstdint" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOPENBW_DIR="$PWD/openbw" \
+            -DOPENBW_ENABLE_UI=1 \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build bwapi/build --target BWAPILauncher -j$(nproc)
+
+          mkdir -p openbw-runtime/bin openbw-runtime/lib
+          cp bwapi/build/bin/BWAPILauncher openbw-runtime/bin/
+          cp bwapi/build/lib/*.so openbw-runtime/lib/
+          ldd bwapi/build/lib/libOpenBWData.so | awk '/=> \// {print $3}' | grep -vE '/(libc|libm|libmvec|libdl|libpthread|librt|libgcc_s|libstdc\+\+|ld-linux)(\.so|-)' | xargs -r cp -L -t openbw-runtime/lib/
+
+          git clone --depth 1 https://github.com/dgant/mpqs
+          cp mpqs/STARDAT.MPQ openbw-runtime/StarDat.mpq
+          cp mpqs/BROODAT.MPQ openbw-runtime/BrooDat.mpq
+          cp mpqs/patch_rt.mpq openbw-runtime/Patch_rt.mpq
+
+      - name: Compile JBWAPI and test bots
+        run: |
+          mvn -B test-compile dependency:build-classpath -Dmdep.outputFile=cp.txt --file pom.xml
+          javac -cp "target/classes:$(cat cp.txt)" -d target/test-classes it/bots/SittingDuck/src/main/java/SittingDuck.java
+
+      - name: Run MarineHell vs SittingDuck match
+        run: |
+          mkdir -p openbw-runtime/maps openbw-runtime/bwapi-data
+          cp "it/(2)Destination.scx" "openbw-runtime/maps/(2)Destination.scx"
+
+          cat << 'EOF' > openbw-runtime/bwapi-data/bwapi.ini
+          [ai]
+          ai = NULL
+          ai_dbg = NULL
+
+          [auto_menu]
+          auto_menu = LAN
+          pause_dbg = OFF
+          lan_mode = Local Area Network (UDP)
+          auto_restart = OFF
+          map = maps/(2)Destination.scx
+          mapiteration = Random
+          race = Terran
+          enemy_count = 1
+          enemy_race = Terran
+          game_type = MELEE
+          wait_for_min_players = 2
+          wait_for_max_players = 2
+          wait_for_time = 60000
+
+          [config]
+          holiday = OFF
+          shared_memory = ON
+          show_warnings = YES
+          EOF
+
+          BOT_CP="$PWD/target/classes:$PWD/target/test-classes:$(cat cp.txt)"
+
+          cd openbw-runtime
+          export LD_LIBRARY_PATH="$PWD/lib:${LD_LIBRARY_PATH:-}"
+          rm -rf /tmp/openbw /tmp/bwapi_socket_* /dev/shm/bwapi_shared_memory_* /tmp/launcher1.log /tmp/launcher2.log /tmp/duck.log /tmp/marinehell.log
+
+          BWAPI_CONFIG_AUTO_MENU__CHARACTER_NAME="SittingDuck" OPENBW_ENABLE_UI=0 ./bin/BWAPILauncher > /tmp/launcher1.log 2>&1 &
+          L1_PID=$!
+
+          java -cp "$BOT_CP" SittingDuck > /tmp/duck.log 2>&1 &
+          B1_PID=$!
+
+          for i in $(seq 1 30); do
+            if grep -q "Connected" /tmp/duck.log 2>/dev/null; then
+              echo "SittingDuck connected!"
+              break
+            fi
+            sleep 0.5
+          done
+
+          BWAPI_CONFIG_AUTO_MENU__CHARACTER_NAME="MarineHell" OPENBW_ENABLE_UI=0 ./bin/BWAPILauncher > /tmp/launcher2.log 2>&1 &
+          L2_PID=$!
+
+          timeout 60 java -cp "$BOT_CP" marinehell.MarineHell | tee /tmp/marinehell.log || true
+          kill $L1_PID $L2_PID $B1_PID 2>/dev/null || true
+
+          if ! grep -q "Hello from JBWAPI!" /tmp/launcher1.log /tmp/launcher2.log || ! grep -q "Game ended! Winner: true" /tmp/marinehell.log; then
+            echo "=== launcher1.log ===" && cat /tmp/launcher1.log || true
+            echo "=== launcher2.log ===" && cat /tmp/launcher2.log || true
+            echo "=== duck.log ===" && cat /tmp/duck.log || true
+            exit 1
+          fi

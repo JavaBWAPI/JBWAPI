@@ -3,6 +3,7 @@ package bwapi;
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.linux.Fcntl;
 import com.sun.jna.platform.linux.LibRT;
@@ -24,7 +25,7 @@ class ClientConnectionPosix implements ClientConnection {
     interface LibCExt extends LibC {
         LibCExt INSTANCE = Native.load(LibCExt.class);
 
-        Pointer mmap(Pointer addr, int length, int prot, int flags, int fd, int offset) throws LastErrorException;
+        Pointer mmap(Pointer addr, NativeLong length, int prot, int flags, int fd, NativeLong offset) throws LastErrorException;
     }
 
     interface PosixShm extends Library {
@@ -57,17 +58,26 @@ class ClientConnectionPosix implements ClientConnection {
     public WrappedBuffer getGameTable() {
         int fd = PosixShm.INSTANCE.shm_open("/bwapi_shared_memory_game_list", Fcntl.O_RDWR, 0);
         if (fd < 0) throw new IllegalStateException("SHM not found");
-        Pointer gameTableView = LibCExt.INSTANCE.mmap(Pointer.NULL, GameTable.SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        return new WrappedBuffer(gameTableView, GameTable.SIZE);
+        try {
+            Pointer gameTableView = LibCExt.INSTANCE.mmap(Pointer.NULL, new NativeLong(GameTable.SIZE), PROT_READ | PROT_WRITE, MAP_SHARED, fd, new NativeLong(0));
+            return new WrappedBuffer(gameTableView, GameTable.SIZE);
+        } finally {
+            LibCExt.INSTANCE.close(fd);
+        }
     }
 
     @Override
     public WrappedBuffer getSharedMemory(int serverProcID) {
         String sharedMemoryName = "/bwapi_shared_memory_" + serverProcID;
         try {
-            Pointer mapFileView = LibCExt.INSTANCE.mmap(Pointer.NULL, ClientData.GameData.SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, LibRT.INSTANCE.shm_open(sharedMemoryName, Fcntl.O_RDWR, 0),
-                    0);
-            return new WrappedBuffer(mapFileView, ClientData.GameData.SIZE);
+            int fd = PosixShm.INSTANCE.shm_open(sharedMemoryName, Fcntl.O_RDWR, 0);
+            if (fd < 0) throw new IllegalStateException("SHM not found");
+            try {
+                Pointer mapFileView = LibCExt.INSTANCE.mmap(Pointer.NULL, new NativeLong(ClientData.GameData.SIZE), PROT_READ | PROT_WRITE, MAP_SHARED, fd, new NativeLong(0));
+                return new WrappedBuffer(mapFileView, ClientData.GameData.SIZE);
+            } finally {
+                LibCExt.INSTANCE.close(fd);
+            }
         } catch (Exception e) {
             throw new SharedMemoryConnectionException(sharedMemoryName, e);
         }

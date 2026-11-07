@@ -72,7 +72,7 @@ public class MarineHell extends DefaultBWListener {
         BWTA.analyze();
 
         int i = 0;
-        System.out.printf("Map name: %s; Map file name: %s\n", game.mapName(), game.mapFileName());
+        System.out.printf("Map name: %s; Map file name: %s; Race: %s; Units: %d\n", game.mapName(), game.mapFileName(), self.getRace(), self.getUnits().size());
 
         // Add a DrawShape call to ensure this doesn't block
         game.drawCircleScreen(new Position(200, 200), 3, Color.Black);
@@ -170,8 +170,9 @@ public class MarineHell extends DefaultBWListener {
             // patch
             if (myUnit.getType().isWorker() && myUnit.isIdle()) {
                 boolean skip = false;
-                if (bunker == null && bunkerBuilder != null && myUnit.equals(bunkerBuilder)
-                        && barracks.isEmpty() == false) {
+                if ((bunker == null && bunkerBuilder != null && myUnit.equals(bunkerBuilder)
+                        && barracks.isEmpty() == false)
+                        || (myUnit.equals(searcher) && searchingScv > 0)) {
                     skip = true;
                 }
 
@@ -283,7 +284,7 @@ public class MarineHell extends DefaultBWListener {
 
         for (BaseLocation b : BWTA.getBaseLocations()) {
             // If this is a possible start location,
-            if (b.isStartLocation()) {
+            if (b.isStartLocation() && !b.getTilePosition().equals(self.getStartLocation())) {
                 baseLocations.add(b);
             }
 
@@ -397,6 +398,11 @@ public class MarineHell extends DefaultBWListener {
 
         // draw my units on screen
         // game.drawTextScreen(10, 25, units.toString());
+    }
+
+    @Override
+    public void onEnd(boolean isWinner) {
+        System.out.println("Game ended! Winner: " + isWinner);
     }
 
     public static void main(String[] args) {
