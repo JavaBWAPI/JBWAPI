@@ -19,6 +19,8 @@ import static bwapi.WeaponType.*;
  * @see Race
  */
 public class Player implements Comparable<Player> {
+    static final int MAX_VALID_ID = 9;
+
     private final PlayerData playerData;
     private final Game game;
     private final int id;
@@ -51,6 +53,10 @@ public class Player implements Comparable<Player> {
      */
     public int getID() {
         return id;
+    }
+
+    boolean hasValidId() {
+        return id >= 0 && id < MAX_VALID_ID;
     }
 
     /**
@@ -141,7 +147,7 @@ public class Player implements Comparable<Player> {
         if (player == null || isNeutral() || player.isNeutral() || isObserver() || player.isObserver()) {
             return false;
         }
-        return !playerData.isAlly(player.getID());
+        return playerData.isEnemy(player.getID());
     }
 
     /**
@@ -150,7 +156,7 @@ public class Player implements Comparable<Player> {
      * @return true if this player is the neutral player, false if this player is any other player.
      */
     public boolean isNeutral() {
-        return equals(game.neutral());
+        return playerData.isNeutral();
     }
 
     /**
@@ -339,8 +345,9 @@ public class Player implements Comparable<Player> {
      * @return The total supply available for this player and the given race.
      * @see #supplyUsed
      */
-    public int supplyTotal(final Race race) {
-        return playerData.getSupplyTotal(race.id);
+    public int supplyTotal(Race race) {
+        race = race == Race.None ? getRace() : race;
+        return race.hasValidId() ? playerData.getSupplyTotal(race.id) : 0;
     }
 
     public int supplyUsed() {
@@ -354,7 +361,11 @@ public class Player implements Comparable<Player> {
      * @return The supply that is in use for this player and the given race.
      * @see #supplyTotal
      */
-    public int supplyUsed(final Race race) {
+    public int supplyUsed(Race race) {
+        race = race == Race.None ? getRace() : race;
+        if (!race.hasValidId()) {
+            return 0;
+        }
         int supplyUsed = playerData.getSupplyUsed(race.id);
         if (game.isLatComEnabled() && self().supplyUsed[race.id].valid(game.getFrameCount())) {
             return supplyUsed + self().supplyUsed[race.id].get();
@@ -544,6 +555,8 @@ public class Player implements Comparable<Player> {
      * @return character code to use for text in Broodwar.
      */
     public Text getTextColor() {
+        // Note: C++ BWAPI 4.4.0 uses Colors::White (255) and Colors::Green (117) due to a bug,
+        // whereas Player 7 white is 84 (DirtyWhite) and Player 9 / Ice green is 185 (DarkGreen).
         switch (getColor().id) {
             case 111: // red
                 return Text.BrightRed;

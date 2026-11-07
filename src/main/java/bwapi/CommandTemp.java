@@ -336,7 +336,7 @@ class CommandTemp {
 
                         // Shift training queue back one slot after the cancelled unit
                         for (int i = command.extra; i < 4; ++i) {
-                            unit.self().trainingQueue[i].set(unit.getTrainingQueue().get(i + 1), frame);
+                            unit.self().trainingQueue[i].set(unit.getTrainingQueueAt(i + 1), frame);
                         }
 
                         unit.self().trainingQueueCount.setOrAdd(-1, frame);
@@ -790,7 +790,7 @@ class CommandTemp {
                 unit.self().remainingUpgradeTime.set(upgradeType.upgradeTime(level + 1), frame);
 
                 player.self().minerals.setOrAdd(-upgradeType.mineralPrice(level + 1), frame);
-                player.self().gas.setOrAdd(upgradeType.gasPrice(level + 1), frame);
+                player.self().gas.setOrAdd(-upgradeType.gasPrice(level + 1), frame);
 
                 player.self().isUpgrading[upgradeType.id].set(true, frame);
             }

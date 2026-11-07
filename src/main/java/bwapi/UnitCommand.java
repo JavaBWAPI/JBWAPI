@@ -20,6 +20,7 @@ public final class UnitCommand {
     }
 
     private <T extends Point<T>> void assignTarget(Point<T> target) {
+        // Note: C++ BWAPI clamps target via target.makeValid() to [0, mapWidth] and [0, mapHeight].
         this.x = target.x;
         this.y = target.y;
     }
@@ -401,6 +402,7 @@ public final class UnitCommand {
                 type == Follow ||
                 type == Gather ||
                 type == Return_Cargo ||
+                type == Repair ||
                 type == Load ||
                 type == Unload_All ||
                 type == Unload_All_Position ||
@@ -409,6 +411,7 @@ public final class UnitCommand {
                 && extra != 0;
     }
 
+    // Note: JBWAPI includes `unit` in equals and hashCode, C++ BWAPI does not.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
