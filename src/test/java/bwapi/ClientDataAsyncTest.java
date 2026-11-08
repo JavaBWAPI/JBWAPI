@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class AsyncClientDataTest {
+public class ClientDataAsyncTest {
 
     @Test
     public void retainedViewsSurviveLiveAndPackedHandoffs() {
@@ -18,7 +18,7 @@ public class AsyncClientDataTest {
         new FrameBuffer(new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build())
                 .copyBuffer(live, packed);
 
-        AsyncClientData data = new AsyncClientData(live);
+        ClientDataAsync data = new ClientDataAsync(live);
         data.setBuffer(live);
         ClientData.Event event = data.gameData().getEvents(0);
         ClientData.Position position = data.gameData().getStartLocations(0);
@@ -61,7 +61,7 @@ public class AsyncClientDataTest {
         new FrameBuffer(new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build())
                 .copyBuffer(live, packed);
 
-        AsyncClientData data = new AsyncClientData(live);
+        ClientDataAsync data = new ClientDataAsync(live);
         data.setBuffer(live);
         live.handoff = () -> data.setBuffer(packed);
         assertTrue(data.gameData().isVisible(0, 0));
@@ -84,7 +84,7 @@ public class AsyncClientDataTest {
     }
 
     @Test
-    public void asyncClientDataReadsStaticDataFromStaticBuffer() {
+    public void clientDataAsyncReadsStaticDataFromStaticBuffer() {
         WrappedBuffer mainBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
         PackedWrappedBuffer dynamicBuffer = new PackedWrappedBuffer();
 
@@ -106,8 +106,8 @@ public class AsyncClientDataTest {
         mainData.gameData().getRegions(2).setIsAccessible(true);
         mainData.gameData().getRegions(2).setIsHigherGround(true);
 
-        // Configure AsyncClientData with mainBuffer as static and dynamicBuffer as active
-        AsyncClientData asyncData = new AsyncClientData(mainBuffer);
+        // Configure ClientDataAsync with mainBuffer as static and dynamicBuffer as active
+        ClientDataAsync asyncData = new ClientDataAsync(mainBuffer);
         asyncData.setBuffer(dynamicBuffer);
 
         assertEquals(2, asyncData.gameData().getGroundHeight(10, 20));
@@ -127,7 +127,7 @@ public class AsyncClientDataTest {
     }
 
     @Test
-    public void asyncClientDataReadsDynamicDataWithPackedOffsets() {
+    public void clientDataAsyncReadsDynamicDataWithPackedOffsets() {
         WrappedBuffer mainBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
         PackedWrappedBuffer packedBuffer = new PackedWrappedBuffer();
 
@@ -166,8 +166,8 @@ public class AsyncClientDataTest {
         FrameBuffer frameBuffer = new FrameBuffer(config);
         frameBuffer.copyBuffer(mainBuffer, packedBuffer);
 
-        // Verify AsyncClientData reads packed dynamic data accurately
-        AsyncClientData asyncData = new AsyncClientData(mainBuffer);
+        // Verify ClientDataAsync reads packed dynamic data accurately
+        ClientDataAsync asyncData = new ClientDataAsync(mainBuffer);
         asyncData.setBuffer(packedBuffer);
 
         // Range 1
@@ -199,7 +199,7 @@ public class AsyncClientDataTest {
     }
 
     @Test
-    public void asyncClientDataWorksWithFullUnpackedBuffer() {
+    public void clientDataAsyncWorksWithFullUnpackedBuffer() {
         // Tests asyncUnsafe mode where bot is placed directly on the full 33MB liveData buffer
         WrappedBuffer fullBuffer = new WrappedBuffer(ClientData.GameData.SIZE);
 
@@ -208,7 +208,7 @@ public class AsyncClientDataTest {
         syncData.gameData().setIsVisible(10, 20, true);
         syncData.gameData().setIsInGame(true);
 
-        AsyncClientData asyncData = new AsyncClientData(fullBuffer);
+        ClientDataAsync asyncData = new ClientDataAsync(fullBuffer);
         asyncData.setBuffer(fullBuffer); // Unpacked full buffer
 
         assertTrue(asyncData.gameData().isVisible(10, 20));
@@ -237,7 +237,7 @@ public class AsyncClientDataTest {
                 new BWClientConfiguration.Builder().withAsyncFrameBufferCapacity(1).build());
         frameBuffer.copyBuffer(mainBuffer, packedBuffer);
 
-        AsyncClientData asyncData = new AsyncClientData(mainBuffer);
+        ClientDataAsync asyncData = new ClientDataAsync(mainBuffer);
         asyncData.setBuffer(packedBuffer);
 
         assertEquals(3, frameBuffer.getMaxUnitCount());

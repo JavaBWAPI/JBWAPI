@@ -120,7 +120,7 @@ class FrameBuffer {
 
         // Copy dynamic game information into the current frame buffer slot.
         // Static information (e.g. walkability/buildability/regions) is accessed
-        // directly from the main shared memory buffer by AsyncClientData.
+        // directly from the main shared memory buffer by ClientDataAsync.
         if (stepGame == 0) {
             copyBuffer(liveData, dataBuffer.get(indexGame()));
         } else {
@@ -174,7 +174,7 @@ class FrameBuffer {
      *
      * To minimize both memory footprint and copy time, we:
      * 1. Omit static map and region data (groundHeight, isWalkable, isBuildable, regions), which are read directly
-     *    from the main shared memory buffer via AsyncClientData.
+     *    from the main shared memory buffer via ClientDataAsync.
      * 2. Omit client-to-server output buffers (strings, shapes, commands, unitCommands), which are flushed directly
      *    to live shared memory by SideEffectQueue at the end of the frame.
      * 3. Pack the remaining 3 dynamic ranges into a 4.08 MB PackedWrappedBuffer (using pre-shifted slice views so
