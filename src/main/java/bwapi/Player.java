@@ -28,11 +28,16 @@ public class Player implements Comparable<Player> {
     private final Color color;
     private final UnitListCache units;
     private PlayerSelf self = null;
+
     PlayerSelf self() {
         if (self == null) {
             self = new PlayerSelf();
         }
         return self;
+    }
+
+    boolean hasLatCom() {
+        return self != null && game.isLatComEnabled();
     }
 
     Player(final PlayerData playerData, final int id, final Game game) {
@@ -206,8 +211,8 @@ public class Player implements Comparable<Player> {
      */
     public int minerals() {
         int minerals = playerData.getMinerals();
-        if (game.isLatComEnabled() && self().minerals.valid(game.getFrameCount())) {
-            return minerals + self().minerals.get();
+        if (hasLatCom() && self.minerals.valid(game.getFrameCount())) {
+            return minerals + self.minerals.get();
         }
         return minerals;
     }
@@ -221,8 +226,8 @@ public class Player implements Comparable<Player> {
      */
     public int gas() {
         int gas = playerData.getGas();
-        if (game.isLatComEnabled() && self().gas.valid(game.getFrameCount())) {
-            return gas + self().gas.get();
+        if (hasLatCom() && self.gas.valid(game.getFrameCount())) {
+            return gas + self.gas.get();
         }
         return gas;
     }
@@ -365,8 +370,8 @@ public class Player implements Comparable<Player> {
             return 0;
         }
         int supplyUsed = playerData.getSupplyUsed(race.id);
-        if (game.isLatComEnabled() && self().supplyUsed[race.id].valid(game.getFrameCount())) {
-            return supplyUsed + self().supplyUsed[race.id].get();
+        if (hasLatCom() && self.supplyUsed[race.id].valid(game.getFrameCount())) {
+            return supplyUsed + self.supplyUsed[race.id].get();
         }
         return supplyUsed;
     }
@@ -517,8 +522,8 @@ public class Player implements Comparable<Player> {
      * @see #hasResearched
      */
     public boolean isResearching(final TechType tech) {
-        if (game.isLatComEnabled() && self().isResearching[tech.id].valid(game.getFrameCount())) {
-            return self().isResearching[tech.id].get();
+        if (hasLatCom() && self.isResearching[tech.id].valid(game.getFrameCount())) {
+            return self.isResearching[tech.id].get();
         }
         return playerData.isResearching(tech.id);
     }
@@ -531,8 +536,8 @@ public class Player implements Comparable<Player> {
      * @see Unit#upgrade
      */
     public boolean isUpgrading(final UpgradeType upgrade) {
-        if (game.isLatComEnabled() && self().isUpgrading[upgrade.id].valid(game.getFrameCount())) {
-            return self().isUpgrading[upgrade.id].get();
+        if (hasLatCom() && self.isUpgrading[upgrade.id].valid(game.getFrameCount())) {
+            return self.isUpgrading[upgrade.id].get();
         }
         return playerData.isUpgrading(upgrade.id);
     }
