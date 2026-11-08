@@ -297,4 +297,88 @@ public class PerformanceBenchmark {
         }
         return buildableCount;
     }
+
+    /**
+     * Separate state for worst-case late-game visibility churn:
+     * - 700 active visible units distributed across IDs 0..3000 (simulating a 25-minute macro game
+     *   where ~2,300 units have died and new units have IDs > 127 outside Integer.valueOf cache,
+     *   and peak unit count previously reached ~1,200).
+     * - 40 units at the fog-of-war boundary toggling unitHide / unitShow on a frame, followed by onFrame(frame).
+     */
+    @State(Scope.Thread)
+    public static class LateGameVisibilityState {
+        Game game;
+        ClientData.GameData gameData;
+        int[] fogBoundaryIds;
+        int frame;
+
+        @Setup(Level.Trial)
+        public void setup() throws IOException {
+            game = GameBuilder.createGame(MAP_NAME);
+            gameData = game.botClientData().gameData();
+
+            int selfId = game.self().getID();
+            int enemyId = game.enemy().getID();
+
+            // Simulate peak of 1,200 units earlier in the game so the collection has experienced realistic growth
+            for (int id = 0; id < 1200; id++) {
+                ClientData.UnitData ud = gameData.getUnits(id);
+                ud.setId(id);
+                ud.setPlayer(id % 2 == 0 ? selfId : enemyId);
+                ud.setType(UnitType.Terran_Marine.id);
+                ud.setPositionX(1000);
+                ud.setPositionY(1000);
+                ud.setHitPoints(40);
+                ud.setExists(true);
+                ud.setIsCompleted(true);
+                game.unitShow(id);
+            }
+            for (int id = 0; id < 1200; id++) {
+                game.unitHide(id);
+            }
+
+            // Now populate 700 currently visible units scattered across IDs 0..2800 (step 4)
+            fogBoundaryIds = new int[40];
+            int count = 0;
+            for (int id = 0; count < 700; id += 4) {
+                ClientData.UnitData ud = gameData.getUnits(id);
+                ud.setId(id);
+                ud.setPlayer(count < 350 ? selfId : enemyId);
+                ud.setType(UnitType.Terran_Marine.id);
+                ud.setPositionX(1024 + (count & 63) * 8);
+                ud.setPositionY(1024 + (count >> 6) * 8);
+                ud.setHitPoints(40);
+                ud.setExists(true);
+                ud.setIsCompleted(true);
+                game.unitShow(id);
+                if (count >= 660) {
+                    fogBoundaryIds[count - 660] = id;
+                }
+                count++;
+            }
+
+            frame = 1;
+            gameData.setFrameCount(frame);
+            game.onFrame(frame);
+            System.gc();
+        }
+    }
+
+    /**
+     * Benchmarks worst-case late-game visibility churn + onFrame rebuild of allUnits
+     * (40 fog-of-war unitHide/unitShow events with IDs > 2600 + onFrame over 700 visible units).
+     */
+    @Benchmark
+    public int visibleUnitsWorstCaseOnFrame(LateGameVisibilityState s) {
+        Game g = s.game;
+        int[] boundary = s.fogBoundaryIds;
+        for (int i = 0; i < boundary.length; i++) {
+            int id = boundary[i];
+            g.unitHide(id);
+            g.unitShow(id);
+        }
+        int f = ++s.frame;
+        g.onFrame(f);
+        return g.getAllUnits().size();
+    }
 }
