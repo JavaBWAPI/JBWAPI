@@ -3,8 +3,6 @@ package bwapi;
 import bwapi.ClientData.PlayerData;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static bwapi.UnitType.*;
 import static bwapi.UpgradeType.*;
@@ -28,6 +26,7 @@ public class Player implements Comparable<Player> {
     private final PlayerType playerType;
     private final TilePosition startLocation;
     private final Color color;
+    private final UnitListCache units;
     private PlayerSelf self = null;
     PlayerSelf self() {
         if (self == null) {
@@ -44,6 +43,7 @@ public class Player implements Comparable<Player> {
         this.playerType = PlayerType.idToEnum[playerData.getType()];
         this.startLocation = new TilePosition(playerData.getStartLocationX(), playerData.getStartLocationY());
         this.color = new Color(playerData.getColor());
+        this.units = new UnitListCache(game, u -> equals(u.getPlayer()));
     }
 
     /**
@@ -77,9 +77,7 @@ public class Player implements Comparable<Player> {
      * This does not include units that are loaded into transports, @Bunkers, @Refineries, @Assimilators, or @Extractors.
      */
     public List<Unit> getUnits() {
-        return game.getAllUnits().stream()
-                .filter(u -> equals(u.getPlayer()))
-                .collect(Collectors.toList());
+        return units.get();
     }
 
     /**

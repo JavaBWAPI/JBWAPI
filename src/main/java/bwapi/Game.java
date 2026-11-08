@@ -102,6 +102,10 @@ public class Game {
     final ConnectedUnitCache loadedUnitsCache = new ConnectedUnitCache(this, Unit::getTransport);
     final ConnectedUnitCache interceptorsCache = new ConnectedUnitCache(this, Unit::getCarrier);
     final ConnectedUnitCache larvaCache = new ConnectedUnitCache(this, Unit::getHatchery);
+    private final UnitListCache minerals = new UnitListCache(this, u -> u.getType().isMineralField());
+    private final UnitListCache geysers = new UnitListCache(this, u -> u.getType() == Resource_Vespene_Geyser);
+    private final UnitListCache neutralUnits = new UnitListCache(this, u -> u.getPlayer().equals(neutral()));
+    private final UnitListCache selfPylons = new UnitListCache(this, () -> self().getUnits(), u -> u.getType() == Protoss_Pylon);
 
     final SideEffectQueue sideEffects = new SideEffectQueue();
 
@@ -155,6 +159,10 @@ public class Game {
         loadedUnitsCache.reset();
         interceptorsCache.reset();
         larvaCache.reset();
+        minerals.reset();
+        geysers.reset();
+        neutralUnits.reset();
+        selfPylons.reset();
 
         final int forceCount = gameData().getForceCount();
         forces = new Force[forceCount];
@@ -368,9 +376,7 @@ public class Game {
      * @return List<Unit> containing @minerals
      */
     public List<Unit> getMinerals() {
-        return getAllUnits().stream()
-                .filter(u -> u.getType().isMineralField())
-                .collect(Collectors.toList());
+        return minerals.get();
     }
 
     /**
@@ -379,9 +385,7 @@ public class Game {
      * @return List<Unit> containing @geysers
      */
     public List<Unit> getGeysers() {
-        return getAllUnits().stream()
-                .filter(u -> u.getType() == Resource_Vespene_Geyser)
-                .collect(Collectors.toList());
+        return geysers.get();
     }
 
     /**
@@ -391,9 +395,7 @@ public class Game {
      * @return List<Unit> containing all neutral units.
      */
     public List<Unit> getNeutralUnits() {
-        return getAllUnits().stream()
-                .filter(u -> u.getPlayer().equals(neutral()))
-                .collect(Collectors.toList());
+        return neutralUnits.get();
     }
 
     /**
@@ -1018,7 +1020,7 @@ public class Game {
      * @return true if the type at the given position will have power, false if the type at the given position will be unpowered.
      */
     public boolean hasPowerPrecise(final int x, final int y, final UnitType unitType) {
-        return isValidPosition(x, y) && hasPower(x, y, unitType, self().getUnits().stream().filter(u -> u.getType() == Protoss_Pylon).collect(Collectors.toList()));
+        return isValidPosition(x, y) && hasPower(x, y, unitType, selfPylons.get());
     }
 
     public boolean hasPowerPrecise(final Position position) {

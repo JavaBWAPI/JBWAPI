@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
@@ -209,5 +210,36 @@ public class GameTest {
         game.onFrame(1);
 
         assertTrue(game.enemies().isEmpty());
+    }
+
+    @Test
+    public void unitListCachesShouldBeLazyAndCachedPerFrame() throws IOException {
+        Game game = GameBuilder.createGame();
+        Player self = game.self();
+        Player neutral = game.neutral();
+
+        Unit mineral = mock(Unit.class);
+        when(mineral.getType()).thenReturn(UnitType.Resource_Mineral_Field);
+        when(mineral.getPlayer()).thenReturn(neutral);
+
+        Unit geyser = mock(Unit.class);
+        when(geyser.getType()).thenReturn(UnitType.Resource_Vespene_Geyser);
+        when(geyser.getPlayer()).thenReturn(neutral);
+
+        Unit pylon = mock(Unit.class);
+        when(pylon.getType()).thenReturn(UnitType.Protoss_Pylon);
+        when(pylon.getPlayer()).thenReturn(self);
+
+        game.setAllUnits(Arrays.asList(mineral, geyser, pylon));
+
+        assertEquals(Collections.singletonList(mineral), game.getMinerals());
+        assertSame(game.getMinerals(), game.getMinerals());
+        assertEquals(Collections.singletonList(geyser), game.getGeysers());
+        assertSame(game.getGeysers(), game.getGeysers());
+        assertEquals(Arrays.asList(mineral, geyser), game.getNeutralUnits());
+        assertSame(game.getNeutralUnits(), game.getNeutralUnits());
+        assertEquals(Collections.singletonList(pylon), self.getUnits());
+        assertSame(self.getUnits(), self.getUnits());
+        assertEquals(Arrays.asList(mineral, geyser), neutral.getUnits());
     }
 }

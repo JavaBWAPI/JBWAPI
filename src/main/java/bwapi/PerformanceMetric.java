@@ -1,7 +1,5 @@
 package bwapi;
 
-import com.sun.jna.platform.win32.Kernel32;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -9,7 +7,7 @@ import java.util.ArrayList;
  * Aggregates labeled time series data.
  */
 public class PerformanceMetric {
-    public class RunningTotal {
+    public static class RunningTotal {
         private int samples = 0;
         private double last = 0d;
         private double mean = 0d;

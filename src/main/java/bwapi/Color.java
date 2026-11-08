@@ -2,7 +2,6 @@ package bwapi;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Color object is used in drawing routines to specify the color to use.

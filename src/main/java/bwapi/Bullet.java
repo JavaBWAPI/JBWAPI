@@ -2,8 +2,6 @@ package bwapi;
 
 import bwapi.ClientData.BulletData;
 
-import java.util.Objects;
-
 /**
  * An object representing a bullet or missile spawned from an attack.
  * <p>
