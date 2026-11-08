@@ -68,6 +68,34 @@ public class SynchronizationTest {
     }
 
     @Test
+    public void asyncUnsafe_KeepsLiveDataOnTimeAndSwapsToFrameBufferOnTimeout() {
+        WrappedBuffer live = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withUnlimitedFrameZero(false)
+                .withMaxFrameDurationMs(30)
+                .withAsyncFrameBufferCapacity(3)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+
+        environment.onFrame(1, () -> {
+            sleepUnchecked(5);
+            assertSame("On-time frame should stay on liveData without mid-frame swap",
+                    live, environment.bwClient.getGame().botClientData().buffer);
+        });
+        environment.onFrame(2, () -> {
+            assertSame("Start of frame should read liveData",
+                    live, environment.bwClient.getGame().botClientData().buffer);
+            sleepUnchecked(80);
+            assertTrue("Timed-out frame should swap bot onto PackedWrappedBuffer",
+                    environment.bwClient.getGame().botClientData().buffer instanceof PackedWrappedBuffer);
+        });
+
+        environment.runGame(5);
+    }
+
+    @Test
     public void sync_IfException_ThrowException() {
         BWClientConfiguration config = new BWClientConfiguration.Builder()
                 .withAsync(false)

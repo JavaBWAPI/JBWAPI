@@ -117,16 +117,6 @@ class BotWrapperAsync extends BotWrapper {
         frameBuffer.lockSize.lock();
         try {
             while (!frameBuffer.empty()) {
-                // Unsafe mode: Move the bot off of live data onto the frame buffer
-                // This is the unsafe step!
-                // We don't synchronize on calls which access the buffer
-                // (to avoid tens of thousands of synchronized calls per frame)
-                // so there's no guarantee of safety here.
-                if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
-                    configuration.log("Main: Weaning bot off live data");
-                    botGame.botClientData().setBuffer(frameBuffer.peek());
-                }
-
                 // Make bot exceptions fall through to the main thread.
                 Throwable lastThrow = getLastBotThrow();
                 if (lastThrow != null) {
@@ -140,6 +130,14 @@ class BotWrapperAsync extends BotWrapper {
                 } else {
                     long remainingNanos = endNanos - System.nanoTime();
                     if (remainingNanos <= 0) {
+                        // Unsafe mode: Move the bot off of live data onto the frame buffer
+                        // only when the frame times out and control is about to return to StarCraft.
+                        // When the bot finishes on time, liveData remains frozen for the entire frame.
+                        if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
+                            configuration.log("Main: Weaning bot off live data");
+                            setUnsafeReadReady(false);
+                            botGame.botClientData().setBuffer(frameBuffer.peek());
+                        }
                         configuration.log("Main: Out of time in frame #" + frame);
                         break;
                     }
