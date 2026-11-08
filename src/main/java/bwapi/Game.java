@@ -42,7 +42,7 @@ public class Game {
 
     private static final int REGION_DATA_SIZE = 5000;
 
-    private final Set<Integer> visibleUnits = new HashSet<>();
+    private final BitSet visibleUnits = new BitSet();
 
     private List<Unit> allUnits;
     private final ClientData clientData;
@@ -320,20 +320,24 @@ public class Game {
 
     void unitShow(final int id) {
         unitCreate(id);
-        visibleUnits.add(id);
+        visibleUnits.set(id);
     }
 
     void unitHide(final int id) {
-        visibleUnits.remove(id);
+        visibleUnits.clear(id);
     }
 
     void onFrame(final int frame) {
         if (frame > 0) {
-            allUnits = visibleUnits.stream()
-                    .map(i -> units[i])
-                    .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+            final List<Unit> visible = new ArrayList<>(visibleUnits.cardinality());
+            for (int i = visibleUnits.nextSetBit(0); i >= 0; i = visibleUnits.nextSetBit(i + 1)) {
+                visible.add(units[i]);
+            }
+            allUnits = Collections.unmodifiableList(visible);
         }
-        getAllUnits().forEach(u -> u.updatePosition(frame));
+        for (final Unit u : getAllUnits()) {
+            u.updatePosition(frame);
+        }
         updatePlayers();
     }
 
