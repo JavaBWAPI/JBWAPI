@@ -1,7 +1,5 @@
 package bwapi;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * Manages invocation of bot event handlers
  */
@@ -10,9 +8,7 @@ class BotWrapperAsync extends BotWrapper {
     private final FrameBuffer frameBuffer;
     private WrappedBuffer liveData;
     private Thread botThread;
-    private Throwable lastBotThrow;
-    private final ReentrantLock lastBotThrowLock = new ReentrantLock();
-    private final ReentrantLock unsafeReadReadyLock = new ReentrantLock();
+    private volatile Throwable lastBotThrow;
     private boolean unsafeReadReady = false;
 
     BotWrapperAsync(BWClientConfiguration configuration, BWEventListener eventListener) {
@@ -48,32 +44,6 @@ class BotWrapperAsync extends BotWrapper {
     }
 
 
-    private boolean isUnsafeReadReady() {
-        unsafeReadReadyLock.lock();
-        try {
-            return unsafeReadReady;
-        }
-        finally {
-            unsafeReadReadyLock.unlock();
-        }
-    }
-
-    private void setUnsafeReadReady(boolean value) {
-        unsafeReadReadyLock.lock();
-        try {
-            unsafeReadReady = value;
-        }
-        finally {
-            unsafeReadReadyLock.unlock();
-        }
-        frameBuffer.lockSize.lock();
-        try {
-            frameBuffer.conditionSize.signalAll();
-        } finally {
-            frameBuffer.lockSize.unlock();
-        }
-    }
-
     @Override
     void onFrame() {
         configuration.log("Main: onFrame asynchronous start");
@@ -94,9 +64,10 @@ class BotWrapperAsync extends BotWrapper {
                 if (frameBuffer.empty()) {
                     configuration.log("Main: Putting bot on live data");
                     botGame.botClientData().setBuffer(liveData);
-                    setUnsafeReadReady(true);
+                    unsafeReadReady = true;
+                    frameBuffer.conditionSize.signalAll();
                 } else {
-                    setUnsafeReadReady(false);
+                    unsafeReadReady = false;
                 }
             } finally {
                 frameBuffer.lockSize.unlock();
@@ -135,7 +106,7 @@ class BotWrapperAsync extends BotWrapper {
                         // When the bot finishes on time, liveData remains frozen for the entire frame.
                         if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
                             configuration.log("Main: Weaning bot off live data");
-                            setUnsafeReadReady(false);
+                            unsafeReadReady = false;
                             botGame.botClientData().setBuffer(frameBuffer.peek());
                         }
                         configuration.log("Main: Out of time in frame #" + frame);
@@ -167,10 +138,7 @@ class BotWrapperAsync extends BotWrapper {
     }
 
     Throwable getLastBotThrow() {
-        lastBotThrowLock.lock();
-        Throwable output = lastBotThrow;
-        lastBotThrowLock.unlock();
-        return output;
+        return lastBotThrow;
     }
 
     private Thread createBotThread() {
@@ -178,29 +146,25 @@ class BotWrapperAsync extends BotWrapper {
             try {
                 configuration.log("Bot: Thread started");
                 while (!gameOver) {
-
-                    boolean doUnsafeRead = false;
                     configuration.log("Bot: Ready for another frame");
                     performanceMetrics.getBotIdle().startTiming();
                     frameBuffer.lockSize.lock();
                     try {
-                        doUnsafeRead = isUnsafeReadReady();
-                        while ( ! doUnsafeRead && frameBuffer.empty()) {
+                        while (!unsafeReadReady && frameBuffer.empty()) {
                             configuration.log("Bot: Waiting for a frame");
                             frameBuffer.conditionSize.awaitUninterruptibly();
-                            doUnsafeRead = isUnsafeReadReady();
+                        }
+                        performanceMetrics.getBotIdle().stopTiming();
+
+                        if (unsafeReadReady) {
+                            configuration.log("Bot: Reading live frame");
+                            unsafeReadReady = false;
+                        } else {
+                            configuration.log("Bot: Peeking next frame from buffer");
+                            botGame.botClientData().setBuffer(frameBuffer.peek());
                         }
                     } finally {
                         frameBuffer.lockSize.unlock();
-                    }
-                    performanceMetrics.getBotIdle().stopTiming();
-
-                    if (doUnsafeRead) {
-                        configuration.log("Bot: Reading live frame");
-                        setUnsafeReadReady(false);
-                    } else {
-                        configuration.log("Bot: Peeking next frame from buffer");
-                        botGame.botClientData().setBuffer(frameBuffer.peek());
                     }
 
                     configuration.log("Bot: Handling events on frame #" + botGame.getFrameCount());
@@ -213,9 +177,7 @@ class BotWrapperAsync extends BotWrapper {
                 // Record the throw,
                 // Then allow the thread to terminate silently.
                 // The main thread will look for the stored throw.
-                lastBotThrowLock.lock();
                 lastBotThrow = throwable;
-                lastBotThrowLock.unlock();
 
                 // Awaken any threads waiting on bot progress
                 while (!frameBuffer.empty()) {

@@ -38,7 +38,6 @@ class FrameBuffer {
     private int maxUnitCount = 0;
     private final ArrayList<WrappedBuffer> dataBuffer = new ArrayList<>();
 
-    private final Lock lockWrite = new ReentrantLock();
     final Lock lockSize = new ReentrantLock();
     final Condition conditionSize = lockSize.newCondition();
 
@@ -64,27 +63,27 @@ class FrameBuffer {
     /**
      * @return The number of frames currently buffered ahead of the bot's current frame
      */
-    synchronized int framesBuffered() {
-        return stepGame - stepBot;
+    int framesBuffered() {
+        lockSize.lock();
+        try {
+            return stepGame - stepBot;
+        } finally {
+            lockSize.unlock();
+        }
     }
 
     /**
      * @return Number of frames currently stored in the buffer
      */
     int size() {
-        lockSize.lock();
-        try {
-            return framesBuffered();
-        }  finally {
-            lockSize.unlock();
-        }
+        return framesBuffered();
     }
 
     /**
      * @return Whether the frame buffer is empty and has no frames available for the bot to consume.
      */
     boolean empty() {
-        return size() <= 0;
+        return framesBuffered() <= 0;
     }
 
     /**
@@ -92,12 +91,7 @@ class FrameBuffer {
      * When the frame buffer is full, JBWAPI must wait for the bot to complete a frame before returning control to StarCraft.
      */
     boolean full() {
-        lockSize.lock();
-        try {
-            return framesBuffered() >= capacity;
-        } finally {
-            lockSize.unlock();
-        }
+        return framesBuffered() >= capacity;
     }
 
     private int indexGame() {
@@ -112,37 +106,38 @@ class FrameBuffer {
      * Copy dataBuffer from shared memory into the head of the frame buffer.
      */
     void enqueueFrame() {
-        lockWrite.lock();
+        lockSize.lock();
         try {
-            lockSize.lock();
-            try {
-                while (full()) {
-                    configuration.log("Main: Waiting for frame buffer capacity");
-                    performanceMetrics.getIntentionallyBlocking().startTiming();
-                    conditionSize.awaitUninterruptibly();
-                }
-                performanceMetrics.getIntentionallyBlocking().stopTiming();
-            } finally { lockSize.unlock(); };
-
-            // Copy dynamic game information into the current frame buffer slot.
-            // Static information (e.g. walkability/buildability/regions) is accessed
-            // directly from the main shared memory buffer by AsyncClientData.
-            if (stepGame == 0) {
-                copyBuffer(liveData, dataBuffer.get(indexGame()));
-            } else {
-                performanceMetrics.getCopyingToBuffer().time(() -> {
-                    WrappedBuffer dataTarget = dataBuffer.get(indexGame());
-                    copyBuffer(liveData, dataTarget);
-                });
+            while (stepGame - stepBot >= capacity) {
+                configuration.log("Main: Waiting for frame buffer capacity");
+                performanceMetrics.getIntentionallyBlocking().startTiming();
+                conditionSize.awaitUninterruptibly();
             }
+            performanceMetrics.getIntentionallyBlocking().stopTiming();
+        } finally {
+            lockSize.unlock();
+        }
 
-            lockSize.lock();
-            try {
-                performanceMetrics.getFrameBufferSize().record(framesBuffered());
-                ++stepGame;
-                conditionSize.signalAll();
-            } finally { lockSize.unlock(); }
-        } finally { lockWrite.unlock(); }
+        // Copy dynamic game information into the current frame buffer slot.
+        // Static information (e.g. walkability/buildability/regions) is accessed
+        // directly from the main shared memory buffer by AsyncClientData.
+        if (stepGame == 0) {
+            copyBuffer(liveData, dataBuffer.get(indexGame()));
+        } else {
+            performanceMetrics.getCopyingToBuffer().time(() -> {
+                WrappedBuffer dataTarget = dataBuffer.get(indexGame());
+                copyBuffer(liveData, dataTarget);
+            });
+        }
+
+        lockSize.lock();
+        try {
+            performanceMetrics.getFrameBufferSize().record(stepGame - stepBot);
+            ++stepGame;
+            conditionSize.signalAll();
+        } finally {
+            lockSize.unlock();
+        }
     }
 
     /**
@@ -151,9 +146,11 @@ class FrameBuffer {
     WrappedBuffer peek() {
         lockSize.lock();
         try {
-            while(empty()) conditionSize.awaitUninterruptibly();
+            while (stepGame - stepBot <= 0) conditionSize.awaitUninterruptibly();
             return dataBuffer.get(indexBot());
-        } finally { lockSize.unlock(); }
+        } finally {
+            lockSize.unlock();
+        }
     }
 
     /**
@@ -162,10 +159,12 @@ class FrameBuffer {
     void dequeue() {
         lockSize.lock();
         try {
-            while(empty()) conditionSize.awaitUninterruptibly();
+            while (stepGame - stepBot <= 0) conditionSize.awaitUninterruptibly();
             ++stepBot;
             conditionSize.signalAll();
-        } finally { lockSize.unlock(); }
+        } finally {
+            lockSize.unlock();
+        }
     }
 
     /**
