@@ -180,11 +180,17 @@ public final class Bullet implements Comparable<Bullet> {
      * @param player If this parameter is specified, then the Bullet's visibility to the given player is checked. If this parameter is omitted, then a default value of null is used, which will check if the BWAPI player has vision of the {@link Bullet}.
      * @return true if the {@link Bullet} is visible to the specified player, false if the {@link Bullet} is not visible to the specified player.
      */
-    public boolean isVisible(final Player player) {
-        if (player == null) {
-            return isVisible();
+    public boolean isVisible(Player player) {
+        player = player == null ? game.self() : player;
+        if (player != null) {
+            return player.hasValidId() && bulletData.isVisible(player.getID());
         }
-        return bulletData.isVisible(player.getID());
+        for (int i = 0; i < Player.MAX_VALID_ID; ++i) {
+            if (bulletData.isVisible(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

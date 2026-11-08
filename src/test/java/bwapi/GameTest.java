@@ -9,6 +9,7 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -173,5 +174,40 @@ public class GameTest {
     public void setMapWithEmptyStringShouldReturnFalseInsteadOfThrowing() {
         Game game = new Game();
         assertFalse(game.setMap(""));
+    }
+
+    @Test
+    public void onFrameShouldRefreshPlayersAndExcludeDefeatedOrLeftPlayers() {
+        Game game = spy(new Game());
+        Player self = mock(Player.class);
+        Player ally = mock(Player.class);
+        Player enemy = mock(Player.class);
+        Player defeatedEnemy = mock(Player.class);
+        Player leftAlly = mock(Player.class);
+        Player observer = mock(Player.class);
+
+        when(self.isAlly(ally)).thenReturn(true);
+        when(self.isAlly(leftAlly)).thenReturn(true);
+        when(self.isEnemy(enemy)).thenReturn(true);
+        when(self.isEnemy(defeatedEnemy)).thenReturn(true);
+
+        when(defeatedEnemy.isDefeated()).thenReturn(true);
+        when(leftAlly.leftGame()).thenReturn(true);
+        when(observer.isObserver()).thenReturn(true);
+
+        doReturn(self).when(game).self();
+        doReturn(Arrays.asList(self, ally, enemy, defeatedEnemy, leftAlly, observer)).when(game).getPlayers();
+        game.setAllUnits(Collections.emptyList());
+
+        game.onFrame(0);
+
+        assertEquals(Collections.singletonList(ally), game.allies());
+        assertEquals(Collections.singletonList(enemy), game.enemies());
+        assertEquals(Collections.singletonList(observer), game.observers());
+
+        when(enemy.isDefeated()).thenReturn(true);
+        game.onFrame(1);
+
+        assertTrue(game.enemies().isEmpty());
     }
 }

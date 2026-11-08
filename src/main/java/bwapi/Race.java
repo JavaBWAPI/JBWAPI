@@ -58,10 +58,16 @@ public enum Race {
         Arrays.stream(Race.values()).forEach(v -> idToEnum[v.id] = v);
     }
 
+    static final int MAX_VALID_ID = 3;
+
     public final int id;
 
     Race(final int id) {
         this.id = id;
+    }
+
+    boolean hasValidId() {
+        return id >= 0 && id < MAX_VALID_ID;
     }
 
     /**

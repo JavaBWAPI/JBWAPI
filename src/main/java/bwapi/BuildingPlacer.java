@@ -260,7 +260,7 @@ class BuildingPlacer {
 
     static void ReserveDefault(final PlacementReserve reserve, final UnitType type, final TilePosition desiredPosition, final Game game) {
         reserve.backup();
-        final PlacementReserve original = reserve;
+        final PlacementReserve original = new PlacementReserve(reserve);
 
         // Reserve some space around some specific units
         for (final Unit it : game.self().getUnits()) {
@@ -366,6 +366,15 @@ class BuildingPlacer {
             maxSearch = Math.min(Math.max(0, maxRange), MAX_RANGE);
             reset();
             backup();
+        }
+
+        PlacementReserve(final PlacementReserve other) {
+            maxSearch = other.maxSearch;
+            reset();
+            for (int i = 0; i < MAX_RANGE; i++) {
+                System.arraycopy(other.data[i], 0, data[i], 0, MAX_RANGE);
+                System.arraycopy(other.save[i], 0, save[i], 0, MAX_RANGE);
+            }
         }
 
         // Checks if the given x/y value is valid for the Placement position

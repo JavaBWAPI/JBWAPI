@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -268,5 +270,114 @@ public class UnitTest {
         when(medic.canUseTechUnit(TechType.Healing, enemyMarine, false, false, false, false)).thenCallRealMethod();
 
         assertFalse(medic.canUseTechUnit(TechType.Healing, enemyMarine, false, false, false, false));
+    }
+
+    @Test
+    public void isVisibleShouldFallbackToAnyPlayerWhenSelfIsNullAndCheckValidPlayerId() {
+        Game game = mock(Game.class);
+        when(game.self()).thenReturn(null);
+
+        ClientData.UnitData unitData = mock(ClientData.UnitData.class);
+        Unit unit = new Unit(unitData, 0, game);
+
+        assertFalse(unit.isVisible());
+
+        when(unitData.isVisible(3)).thenReturn(true);
+        assertTrue(unit.isVisible());
+        assertTrue(unit.isVisible(null));
+
+        ClientData.PlayerData neutralData = mock(ClientData.PlayerData.class);
+        when(neutralData.getName()).thenReturn("Neutral");
+        Player neutral = new Player(neutralData, 11, game);
+        when(unitData.isVisible(11)).thenReturn(true);
+        assertFalse(unit.isVisible(neutral));
+    }
+
+    @Test
+    public void isTargetableShouldRequireVisibilityWhenCompleteMapInfoDisabled() {
+        Game game = mock(Game.class);
+        Unit unit = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(true).when(unit).exists();
+        doReturn(false).when(unit).isVisible();
+        doReturn(true).when(unit).isCompleted();
+        doReturn(UnitType.Terran_Marine).when(unit).getType();
+
+        when(game.isFlagEnabled(Flag.CompleteMapInformation)).thenReturn(false);
+        assertFalse(unit.isTargetable());
+
+        when(game.isFlagEnabled(Flag.CompleteMapInformation)).thenReturn(true);
+        assertTrue(unit.isTargetable());
+    }
+
+    @Test
+    public void canTargetUnitShouldCheckCommandabilityByDefaultAndDelegateToIsTargetable() {
+        Game game = mock(Game.class);
+        Unit source = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        Unit target = mock(Unit.class);
+        when(target.exists()).thenReturn(true);
+        when(target.isCompleted()).thenReturn(true);
+        when(target.getType()).thenReturn(UnitType.Terran_Marine);
+        when(target.isTargetable()).thenReturn(true);
+
+        doReturn(false).when(source).canCommand();
+        assertFalse(source.canTargetUnit(target));
+        assertTrue(source.canTargetUnit(target, false));
+
+        doReturn(true).when(source).canCommand();
+        when(target.isTargetable()).thenReturn(false);
+        assertFalse(source.canTargetUnit(target));
+    }
+
+    @Test
+    public void buildWithNonePositionAndTrainWithNoneUnitTypeShouldRedirectToCarrierAndReaverAmmo() {
+        Game game = mock(Game.class);
+        Unit carrier = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(UnitType.Protoss_Carrier).when(carrier).getType();
+        doReturn(true).when(carrier).issueCommand(any(UnitCommand.class));
+
+        assertTrue(carrier.build(UnitType.None, TilePosition.None));
+        verify(carrier).issueCommand(UnitCommand.train(carrier, UnitType.Protoss_Interceptor));
+
+        Unit reaver = spy(new Unit(mock(ClientData.UnitData.class), 1, game));
+        doReturn(UnitType.Protoss_Reaver).when(reaver).getType();
+        doReturn(true).when(reaver).issueCommand(any(UnitCommand.class));
+
+        assertTrue(reaver.build(UnitType.None));
+        verify(reaver).issueCommand(UnitCommand.train(reaver, UnitType.Protoss_Scarab));
+    }
+
+    @Test
+    public void useTechWithNullUnitTargetShouldIssueTargetlessUseTechCommand() {
+        Game game = mock(Game.class);
+        Unit marine = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(true).when(marine).issueCommand(any(UnitCommand.class));
+
+        assertTrue(marine.useTech(TechType.Stim_Packs, (Unit) null));
+        verify(marine).issueCommand(UnitCommand.useTech(marine, TechType.Stim_Packs));
+    }
+
+    @Test
+    public void canAttackGroupedPositionShouldOnlyCheckCanAttackMoveGrouped() {
+        Game game = mock(Game.class);
+        Unit unit = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(false).when(unit).canAttackMoveGrouped(false, false);
+        doReturn(true).when(unit).canAttackUnitGrouped(false, false);
+
+        assertFalse(unit.canAttackGrouped(new Position(100, 100), false, true, false, false));
+    }
+
+    @Test
+    public void canBuildAddonWithUnitTypeShouldCheckCanBuildAddonWithoutRecursingOnUnitType() {
+        Game game = mock(Game.class);
+        when(game.canMake(any(UnitType.class), any(Unit.class))).thenReturn(true);
+        when(game.canBuildHere(any(TilePosition.class), any(UnitType.class), any(Unit.class))).thenReturn(true);
+
+        Unit factory = spy(new Unit(mock(ClientData.UnitData.class), 0, game));
+        doReturn(UnitType.Terran_Factory).when(factory).getType();
+        doReturn(new TilePosition(10, 10)).when(factory).getTilePosition();
+        // Not completed -> canBuildAddon(false) is false
+        doReturn(false).when(factory).isCompleted();
+
+        assertFalse(factory.canBuildAddon(UnitType.Terran_Machine_Shop, true, false));
     }
 }
