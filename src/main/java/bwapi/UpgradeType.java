@@ -201,8 +201,13 @@ public enum UpgradeType {
 
     static final UpgradeType[] idToEnum = new UpgradeType[62 + 1];
 
+    private List<UnitType> whatUses;
+
     static {
-        Arrays.stream(UpgradeType.values()).forEach(v -> idToEnum[v.id] = v);
+        for (final UpgradeType v : UpgradeType.values()) {
+            idToEnum[v.id] = v;
+            v.whatUses = Collections.unmodifiableList(Arrays.asList(upgradeWhatUses[v.id]));
+        }
     }
 
     public final int id;
@@ -309,7 +314,7 @@ public enum UpgradeType {
      * @return Set of unit types that passively use this upgrade type.
      */
     public List<UnitType> whatUses() {
-        return Collections.unmodifiableList(Arrays.asList(upgradeWhatUses[id]));
+        return whatUses;
     }
 
     /**

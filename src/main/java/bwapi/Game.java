@@ -1299,7 +1299,7 @@ public class Game {
                     }
 
                     // Check if there is room
-                    if (builder.getInterceptorCount() + builder.getTrainingQueue().size() >= max_amt) {
+                    if (builder.getInterceptorCount() + builder.getTrainingQueueCount() >= max_amt) {
                         return false;
                     }
                     break;
@@ -1312,7 +1312,7 @@ public class Game {
                     }
 
                     // check if there is room
-                    if (builder.getScarabCount() + builder.getTrainingQueue().size() >= max_amt) {
+                    if (builder.getScarabCount() + builder.getTrainingQueueCount() >= max_amt) {
                         return false;
                     }
                     break;

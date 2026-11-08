@@ -330,7 +330,7 @@ class CommandTemp {
             case Cancel_Train_Slot:
                 if (command.extra != 0) {
                     if (eventType == EventType.Resource) {
-                        UnitType unitType = unit.getTrainingQueue().get(command.extra);
+                        UnitType unitType = unit.getTrainingQueueAt(command.extra);
                         player.self().minerals.setOrAdd(unitType.mineralPrice(), frame);
                         player.self().gas.setOrAdd(unitType.gasPrice(), frame);
 
@@ -351,7 +351,7 @@ class CommandTemp {
             case Cancel_Train: {
                 switch (eventType) {
                     case Resource: {
-                        UnitType unitType = unit.getTrainingQueue().get(unit.getTrainingQueueCount() - 1);
+                        UnitType unitType = unit.getTrainingQueueAt(unit.getTrainingQueueCount() - 1);
                         player.self().minerals.setOrAdd(unitType.mineralPrice(), frame);
                         player.self().gas.setOrAdd(unitType.gasPrice(), frame);
 
@@ -366,14 +366,14 @@ class CommandTemp {
 
                     case Order: {
                         unit.self().trainingQueueCount.setOrAdd(-1, frame);
-                        UnitType unitType = unit.getTrainingQueue().get(unit.getTrainingQueueCount());
+                        UnitType unitType = unit.getTrainingQueueAt(unit.getTrainingQueueCount());
                         player.self().supplyUsed[unitType.getRace().id]
                                 .setOrAdd(-unitType.supplyRequired(), frame);
 
                         if (unit.getTrainingQueueCount() == 0) {
                             unit.self().buildType.set(UnitType.None, frame);
                         } else {
-                            UnitType ut = unit.getTrainingQueue().get(unit.getTrainingQueueCount() - 1);
+                            UnitType ut = unit.getTrainingQueueAt(unit.getTrainingQueueCount() - 1);
                             // Actual time decreases, but we'll let it be the buildTime until latency catches up.
                             unit.self().remainingTrainTime.set(ut.buildTime(), frame);
                             unit.self().buildType.set(ut, frame);

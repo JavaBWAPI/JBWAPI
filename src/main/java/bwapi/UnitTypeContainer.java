@@ -1,6 +1,8 @@
 package bwapi;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1448,6 +1450,59 @@ class UnitTypeContainer {
             {},// Factories,
             {}// Unknown,
     };
+    static final TilePosition[] tileSizes = new TilePosition[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final Pair<UnitType, Integer>[] whatBuildsPairs = new Pair[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final List<TechType>[] unitTechsLists = new List[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final List<UpgradeType>[] upgradesLists = new List[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final List<UnitType>[] buildsWhatLists = new List[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final List<TechType>[] researchesWhatLists = new List[UnitType.values().length];
+    @SuppressWarnings("unchecked")
+    static final List<UpgradeType>[] upgradesWhatLists = new List[UnitType.values().length];
+    static final int maxUnitWidth;
+    static final int maxUnitHeight;
+
+    static {
+        int maxW = 0;
+        int maxH = 0;
+        for (final UnitType ut : UnitType.values()) {
+            final int id = ut.id;
+            tileSizes[id] = new TilePosition(
+                    unitDimensions[id][UnitDimensions.tileWidth],
+                    unitDimensions[id][UnitDimensions.tileHeight]);
+
+            final UnitType builderType = whatBuilds[id];
+            int count = 1;
+            if (builderType == UnitType.None) {
+                count = 0;
+            } else if (ut == UnitType.Protoss_Archon || ut == UnitType.Protoss_Dark_Archon) {
+                count = 2;
+            }
+            whatBuildsPairs[id] = new Pair<>(builderType, count);
+
+            unitTechsLists[id] = Collections.unmodifiableList(Arrays.asList(unitTechs[id]));
+            upgradesLists[id] = Collections.unmodifiableList(Arrays.asList(upgrades[id]));
+            buildsWhatLists[id] = Collections.unmodifiableList(Arrays.asList(buildsWhat[id]));
+            researchesWhatLists[id] = Collections.unmodifiableList(Arrays.asList(researchesWhat[id]));
+            upgradesWhatLists[id] = Collections.unmodifiableList(Arrays.asList(upgradesWhat[id]));
+
+            final int w = unitDimensions[id][UnitDimensions.left] + 1 + unitDimensions[id][UnitDimensions.right];
+            final int h = unitDimensions[id][UnitDimensions.up] + 1 + unitDimensions[id][UnitDimensions.down];
+            if (w > maxW) {
+                maxW = w;
+            }
+            if (h > maxH) {
+                maxH = h;
+            }
+        }
+        maxUnitWidth = maxW;
+        maxUnitHeight = maxH;
+    }
+
     static final List<Map<UnitType, Integer>> reqUnitsMap = reqUnitsInit();
 
     private static List<Map<UnitType, Integer>> reqUnitsInit() {
@@ -1531,6 +1586,10 @@ class UnitTypeContainer {
         req.get(Protoss_Arbiter_Tribunal.id).put(Protoss_Stargate, 1);
         req.get(Protoss_Robotics_Support_Bay.id).put(Protoss_Robotics_Facility, 1);
         req.get(Protoss_Shield_Battery.id).put(Protoss_Gateway, 1);
+
+        for (int i = 0; i < req.size(); i++) {
+            req.set(i, Collections.unmodifiableMap(req.get(i)));
+        }
 
         return req;
     }

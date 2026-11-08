@@ -187,8 +187,13 @@ public enum TechType {
 
     static final TechType[] idToEnum = new TechType[46 + 1];
 
+    private List<UnitType> whatUses;
+
     static {
-        Arrays.stream(TechType.values()).forEach(v -> idToEnum[v.id] = v);
+        for (final TechType v : TechType.values()) {
+            idToEnum[v.id] = v;
+            v.whatUses = Collections.unmodifiableList(Arrays.asList(techWhatUses[v.id]));
+        }
     }
 
     public final int id;
@@ -294,7 +299,7 @@ public enum TechType {
      * @return Set of UnitTypes that can use this ability when researched.
      */
     public List<UnitType> whatUses() {
-        return Collections.unmodifiableList(Arrays.asList(techWhatUses[id]));
+        return whatUses;
     }
 
     /**

@@ -5893,7 +5893,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return isTraining() && slot >= 0 && getTrainingQueue().size() > slot;
+        return isTraining() && slot >= 0 && getTrainingQueueCount() > slot;
     }
 
     public boolean canCancelMorph() {
