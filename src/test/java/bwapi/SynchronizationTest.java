@@ -388,4 +388,46 @@ public class SynchronizationTest {
         environmentAsync.onFrame(2, () -> { assertThrows(IllegalStateException.class, () -> environmentAsync.bwClient.getGame().setLatCom(true)); });
         environmentAsync.runGame(3);
     }
+
+    @Test
+    public void sideEffectQueue_DoesNotBlockEnqueueDuringFlush() throws Exception {
+        SideEffectQueue queue = new SideEffectQueue();
+        CountDownLatch inFlush = new CountDownLatch(1);
+        CountDownLatch enqueueDone = new CountDownLatch(1);
+        AtomicBoolean secondApplied = new AtomicBoolean(false);
+
+        SideEffect first = org.mockito.Mockito.mock(SideEffect.class);
+        org.mockito.Mockito.doAnswer(inv -> {
+            inFlush.countDown();
+            assertTrue("enqueue should not be blocked while flushTo is applying side effects",
+                    enqueueDone.await(5, TimeUnit.SECONDS));
+            return null;
+        }).when(first).apply(null);
+
+        SideEffect second = org.mockito.Mockito.mock(SideEffect.class);
+        org.mockito.Mockito.doAnswer(inv -> {
+            secondApplied.set(true);
+            return null;
+        }).when(second).apply(null);
+
+        queue.enqueue(first);
+
+        Thread enqueuer = new Thread(() -> {
+            try {
+                assertTrue(inFlush.await(5, TimeUnit.SECONDS));
+                queue.enqueue(second);
+                enqueueDone.countDown();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        enqueuer.start();
+
+        queue.flushTo(null);
+        enqueuer.join(5000);
+        assertFalse("Second side effect should remain queued for the next flush", secondApplied.get());
+
+        queue.flushTo(null);
+        assertTrue("Second side effect should be applied on the next flush", secondApplied.get());
+    }
 }
