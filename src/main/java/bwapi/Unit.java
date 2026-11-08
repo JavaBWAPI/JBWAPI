@@ -80,7 +80,8 @@ public class Unit implements Comparable<Unit> {
         this.unitData = unitData;
         this.game = game;
 
-        updatePosition(0);
+        position = new Position(unitData.getPositionX(), unitData.getPositionY());
+        lastPositionUpdate = 0;
 
         initialType = getType();
         initialResources = getResources();
@@ -395,26 +396,41 @@ public class Unit implements Comparable<Unit> {
         }
         /////// Compute distance
 
+        final UnitType type = getType();
+        final Position pos = this.position != null ? this.position : getPosition();
+        final int left, right, top, bottom;
+        if (type != null && pos != null) {
+            left = pos.x - type.dimensionLeft();
+            right = pos.x + type.dimensionRight();
+            top = pos.y - type.dimensionUp();
+            bottom = pos.y + type.dimensionDown();
+        } else {
+            left = getLeft();
+            right = getRight();
+            top = getTop();
+            bottom = getBottom();
+        }
+
         // compute x distance
-        int xDist = getLeft() - target.x;
+        int xDist = left - target.x;
         if (xDist < 0) {
-            xDist = target.x - (getRight() + 1);
+            xDist = target.x - (right + 1);
             if (xDist < 0) {
                 xDist = 0;
             }
         }
 
         // compute y distance
-        int yDist = getTop() - target.y;
+        int yDist = top - target.y;
         if (yDist < 0) {
-            yDist = target.y - (getBottom() + 1);
+            yDist = target.y - (bottom + 1);
             if (yDist < 0) {
                 yDist = 0;
             }
         }
 
         // compute actual distance
-        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+        return Point.getApproxDistance(0, 0, xDist, yDist);
     }
 
     public int getDistance(final Unit target) {
@@ -430,32 +446,57 @@ public class Unit implements Comparable<Unit> {
 
         /////// Compute distance
 
+        final UnitType thisType = getType();
+        final Position thisPos = this.position != null ? this.position : getPosition();
+        final int thisLeft, thisRight, thisTop, thisBottom;
+        if (thisType != null && thisPos != null) {
+            thisLeft = thisPos.x - thisType.dimensionLeft();
+            thisRight = thisPos.x + thisType.dimensionRight();
+            thisTop = thisPos.y - thisType.dimensionUp();
+            thisBottom = thisPos.y + thisType.dimensionDown();
+        } else {
+            thisLeft = getLeft();
+            thisRight = getRight();
+            thisTop = getTop();
+            thisBottom = getBottom();
+        }
+
         // retrieve left/top/right/bottom values for calculations
-        final int left = target.getLeft() - 1;
-        final int top = target.getTop() - 1;
-        final int right = target.getRight() + 1;
-        final int bottom = target.getBottom() + 1;
+        final UnitType targetType = target.getType();
+        final Position targetPos = target.position != null ? target.position : target.getPosition();
+        final int left, top, right, bottom;
+        if (targetType != null && targetPos != null) {
+            left = targetPos.x - targetType.dimensionLeft() - 1;
+            top = targetPos.y - targetType.dimensionUp() - 1;
+            right = targetPos.x + targetType.dimensionRight() + 1;
+            bottom = targetPos.y + targetType.dimensionDown() + 1;
+        } else {
+            left = target.getLeft() - 1;
+            top = target.getTop() - 1;
+            right = target.getRight() + 1;
+            bottom = target.getBottom() + 1;
+        }
 
         // compute x distance
-        int xDist = getLeft() - right;
+        int xDist = thisLeft - right;
         if (xDist < 0) {
-            xDist = left - getRight();
+            xDist = left - thisRight;
             if (xDist < 0) {
                 xDist = 0;
             }
         }
 
         // compute y distance
-        int yDist = getTop() - bottom;
+        int yDist = thisTop - bottom;
         if (yDist < 0) {
-            yDist = top - getBottom();
+            yDist = top - thisBottom;
             if (yDist < 0) {
                 yDist = 0;
             }
         }
 
         // compute actual distance
-        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+        return Point.getApproxDistance(0, 0, xDist, yDist);
     }
 
     /**
@@ -6413,10 +6454,28 @@ public class Unit implements Comparable<Unit> {
         return id - other.id;
     }
 
+    static boolean overlapsRectangle(final Unit u, final int rectLeft, final int rectTop, final int rectRight, final int rectBottom) {
+        final Position pos = u.position;
+        if (pos != null) {
+            final UnitType type = u.getType();
+            if (type != null) {
+                return rectLeft <= pos.x + type.dimensionRight()
+                        && rectTop <= pos.y + type.dimensionDown()
+                        && rectRight >= pos.x - type.dimensionLeft()
+                        && rectBottom >= pos.y - type.dimensionUp();
+            }
+        }
+        return rectLeft <= u.getRight() && rectTop <= u.getBottom() && rectRight >= u.getLeft() && rectBottom >= u.getTop();
+    }
+
     void updatePosition(final int frame) {
         if (frame > lastPositionUpdate) {
             lastPositionUpdate = frame;
-            position = new Position(unitData.getPositionX(), unitData.getPositionY());
+            final int newX = unitData.getPositionX();
+            final int newY = unitData.getPositionY();
+            if (((position.x ^ newX) | (position.y ^ newY)) != 0) {
+                position = new Position(newX, newY);
+            }
         }
     }
 }

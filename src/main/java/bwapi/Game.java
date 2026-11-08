@@ -692,16 +692,16 @@ public class Game {
      * given build tile.
      */
     public List<Unit> getUnitsOnTile(final int tileX, final int tileY, final UnitFilter pred) {
-        final TilePosition tile = new TilePosition(tileX, tileY);
-        if (!tile.isValid(this)) {
+        final int x = tileX * TilePosition.SIZE_IN_PIXELS;
+        final int y = tileY * TilePosition.SIZE_IN_PIXELS;
+        if (tileX < 0 || tileY < 0 || x >= mapPixelWidth() || y >= mapPixelHeight()) {
             return Collections.emptyList();
         }
-        final Position p = tile.toPosition();
-        return getUnitsInRectangle(p.x, p.y, p.x + 32, p.y + 32, pred);
+        return getUnitsInRectangle(x, y, x + 32, y + 32, pred);
     }
 
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom) {
-        return getUnitsInRectangle(left, top, right, bottom, u -> true);
+        return getUnitsInRectangle(left, top, right, bottom, null);
     }
 
     /**
@@ -716,13 +716,17 @@ public class Game {
      * given rectangle bounds.
      */
     public List<Unit> getUnitsInRectangle(final int left, final int top, final int right, final int bottom, final UnitFilter pred) {
-        return getAllUnits().stream()
-                .filter(u -> left <= u.getRight() && top <= u.getBottom() && right >= u.getLeft() && bottom >= u.getTop() && pred.test(u))
-                .collect(Collectors.toList());
+        final List<Unit> result = new ArrayList<>();
+        for (final Unit u : getAllUnits()) {
+            if (Unit.overlapsRectangle(u, left, top, right, bottom) && (pred == null || pred.test(u))) {
+                result.add(u);
+            }
+        }
+        return result;
     }
 
     public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom) {
-        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, u -> true);
+        return getUnitsInRectangle(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y, null);
     }
 
     public List<Unit> getUnitsInRectangle(final Position leftTop, final Position rightBottom, final UnitFilter pred) {
@@ -1105,13 +1109,13 @@ public class Game {
      */
     public boolean canBuildHere(final TilePosition position, final UnitType type, final Unit builder, final boolean checkExplored) {
         // lt = left top, rb = right bottom
-        final TilePosition lt = builder != null && type.isAddon() ?
-                position.add(new TilePosition(4, 1)) : // addon build offset
-                position;
-        final TilePosition rb = lt.add(type.tileSize());
+        final int ltX = builder != null && type.isAddon() ? position.x + 4 : position.x;
+        final int ltY = builder != null && type.isAddon() ? position.y + 1 : position.y;
+        final int rbX = ltX + type.tileWidth();
+        final int rbY = ltY + type.tileHeight();
 
         // Map limit check
-        if (!lt.isValid(this) || !(rb.toPosition().subtract(new Position(1, 1)).isValid(this))) {
+        if (!isValidTile(ltX, ltY) || !isValidPosition(rbX * TilePosition.SIZE_IN_PIXELS - 1, rbY * TilePosition.SIZE_IN_PIXELS - 1)) {
             return false;
         }
 
@@ -1119,7 +1123,8 @@ public class Game {
         //matches one of them (and the type is still vespene geyser)
         if (type.isRefinery()) {
             for (final Unit g : getGeysers()) {
-                if (g.getTilePosition().equals(lt)) {
+                final TilePosition tp = g.getTilePosition();
+                if (tp.x == ltX && tp.y == ltY) {
                     return !g.isVisible() || g.getType() == Resource_Vespene_Geyser;
                 }
             }
@@ -1127,8 +1132,8 @@ public class Game {
         }
 
         // Tile buildability check
-        for (int x = lt.x; x < rb.x; ++x) {
-            for (int y = lt.y; y < rb.y; ++y) {
+        for (int x = ltX; x < rbX; ++x) {
+            for (int y = ltY; y < rbY; ++y) {
                 // Check if tile is buildable/unoccupied and explored.
                 if (!isBuildable(x, y) || (checkExplored && !isExplored(x, y))) {
                     return false;
@@ -1136,29 +1141,39 @@ public class Game {
             }
         }
 
+        final int targPosX = ltX * TilePosition.SIZE_IN_PIXELS + (type.tileWidth() * TilePosition.SIZE_IN_PIXELS) / 2;
+        final int targPosY = ltY * TilePosition.SIZE_IN_PIXELS + (type.tileHeight() * TilePosition.SIZE_IN_PIXELS) / 2;
+
         // Check if builder is capable of reaching the building site
         if (builder != null) {
-            if (!builder.getType().isBuilding()) {
-                if (!builder.hasPath(lt.toPosition().add(type.tileSize().toPosition().divide(2)))) {
+            final UnitType builderType = builder.getType();
+            if (!builderType.isBuilding()) {
+                if (!builder.hasPath(new Position(targPosX, targPosY))) {
                     return false;
                 }
-            } else if (!builder.getType().isFlyingBuilding() && type != Zerg_Nydus_Canal && !type.isFlagBeacon()) {
+            } else if (!builderType.isFlyingBuilding() && type != Zerg_Nydus_Canal && !type.isFlagBeacon()) {
                 return false;
             }
         }
 
         // Ground getUnit dimension check
         if (type != Special_Start_Location) {
-            final Position targPos = lt.toPosition().add(type.tileSize().toPosition().divide(2));
-            final List<Unit> unitsInRect = getUnitsInRectangle(
-                    targPos.subtract(new Position(type.dimensionLeft(), type.dimensionUp())),
-                    targPos.add(new Position(type.dimensionRight(), type.dimensionDown())),
-                    u -> !u.isFlying() && !u.isLoaded() && (builder != u || type == Zerg_Nydus_Canal));
+            final int rectLeft = targPosX - type.dimensionLeft();
+            final int rectTop = targPosY - type.dimensionUp();
+            final int rectRight = targPosX + type.dimensionRight();
+            final int rectBottom = targPosY + type.dimensionDown();
+            final boolean isAddon = type.isAddon();
+            final boolean isNydus = type == Zerg_Nydus_Canal;
 
-            for (final Unit u : unitsInRect) {
-                // Addons can be placed over units that can move, pushing them out of the way
-                if (!(type.isAddon() && u.getType().canMove())) {
-                    return false;
+            for (final Unit u : getAllUnits()) {
+                if (Unit.overlapsRectangle(u, rectLeft, rectTop, rectRight, rectBottom)
+                        && !u.isFlying()
+                        && !u.isLoaded()
+                        && (builder != u || isNydus)) {
+                    // Addons can be placed over units that can move, pushing them out of the way
+                    if (!(isAddon && u.getType().canMove())) {
+                        return false;
+                    }
                 }
             }
 
@@ -1166,8 +1181,8 @@ public class Game {
             // Note: Zerg structures that don't require creep can still be placed on creep
             final boolean needsCreep = type.requiresCreep();
             if (type.getRace() != Zerg || needsCreep) {
-                for (int x = lt.x; x < rb.x; ++x) {
-                    for (int y = lt.y; y < rb.y; ++y) {
+                for (int x = ltX; x < rbX; ++x) {
+                    for (int y = ltY; y < rbY; ++y) {
                         if (needsCreep != hasCreep(x, y)) {
                             return false;
                         }
@@ -1176,7 +1191,7 @@ public class Game {
             }
 
             // Power Check
-            if (type.requiresPsi() && !hasPower(lt, type)) {
+            if (type.requiresPsi() && !hasPower(ltX, ltY, type)) {
                 return false;
             }
 
@@ -1189,19 +1204,19 @@ public class Game {
                 if ((isVisible(tp) || isVisible(tp.x + 1, tp.y)) && !m.exists()) {
                     continue; // tile position is visible, but mineral is not => mineral does not exist
                 }
-                if (tp.x > lt.x - 5 &&
-                        tp.y > lt.y - 4 &&
-                        tp.x < lt.x + 7 &&
-                        tp.y < lt.y + 6) {
+                if (tp.x > ltX - 5 &&
+                        tp.y > ltY - 4 &&
+                        tp.x < ltX + 7 &&
+                        tp.y < ltY + 6) {
                     return false;
                 }
             }
             for (final Unit g : getStaticGeysers()) {
                 final TilePosition tp = g.getInitialTilePosition();
-                if (tp.x > lt.x - 7 &&
-                        tp.y > lt.y - 5 &&
-                        tp.x < lt.x + 7 &&
-                        tp.y < lt.y + 6) {
+                if (tp.x > ltX - 7 &&
+                        tp.y > ltY - 5 &&
+                        tp.x < ltX + 7 &&
+                        tp.y < ltY + 6) {
                     return false;
                 }
             }
@@ -1211,7 +1226,7 @@ public class Game {
         // then lands at the new location before building the addon), so we need to do similar checks for the
         // location that the building will be when it builds the addon.
         if (builder != null && !builder.getType().isAddon() && type.isAddon()) {
-            return canBuildHere(lt.subtract(new TilePosition(4, 1)), builder.getType(), builder, checkExplored);
+            return canBuildHere(new TilePosition(ltX - 4, ltY - 1), builder.getType(), builder, checkExplored);
         }
 
         //if the build site passes all these tests, return true.
