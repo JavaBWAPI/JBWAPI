@@ -43,6 +43,7 @@ public final class ChokePoint {
     private final Graph graph;
     private final boolean isPseudo;
     private final int index;
+    private final String mapHash;
     private final Pair<Area, Area> areas;
     private final WalkPosition[] nodes;
     private final List<Pair<WalkPosition, WalkPosition>> nodesInArea;
@@ -64,6 +65,7 @@ public final class ChokePoint {
 
         this.graph = graph;
         this.index = index;
+        this.mapHash = graph.getMap().game.mapHash();
         this.areas = new Pair<>(area1, area2);
         this.geometry = geometry;
 
@@ -313,14 +315,13 @@ public final class ChokePoint {
             return false;
         } else {
             final ChokePoint that = (ChokePoint) object;
-            // Parallel connections can share areas or even a center, but not a graph/index.
-            return this.graph == that.graph && this.index == that.index;
+            return this.index == that.index && Objects.equals(this.mapHash, that.mapHash);
         }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(graph, index);
+        return Objects.hash(this.index, this.mapHash);
     }
 
     /**
