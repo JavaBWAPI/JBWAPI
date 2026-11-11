@@ -1,14 +1,19 @@
 package bwapi;
 
+import bwem.Area;
 import bwem.BWEM;
 import bwem.BWMap;
+import bwem.ChokePoint;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BWEMTest {
     static class BWEMMap{
@@ -67,12 +72,43 @@ public class BWEMTest {
     }
 
     @Test
+    public void chokePointsFromSameMapAreEqual() throws IOException {
+        BWEM first = new BWEM(GameBuilder.createGame("(2)Destination.scx"));
+        first.initialize();
+        BWEM second = new BWEM(GameBuilder.createGame("(2)Destination.scx"));
+        second.initialize();
+        assertEquals(first.getMap().getChokePoints(), second.getMap().getChokePoints());
+        assertEquals(new HashSet<>(first.getMap().getChokePoints()), new HashSet<>(second.getMap().getChokePoints()));
+    }
+
+    @Test
+    public void chokePointsFromDifferentMapsAreDistinct() throws IOException {
+        BWEM first = new BWEM(GameBuilder.createGame("(2)Benzene.scx"));
+        first.initialize();
+        BWEM second = new BWEM(GameBuilder.createGame("(2)Destination.scx"));
+        second.initialize();
+        assertTrue(Collections.disjoint(first.getMap().getChokePoints(), second.getMap().getChokePoints()));
+    }
+
+    @Test
     public void checkSSCAITMaps() throws IOException {
         for (String mapName : mapData.keySet()) {
             Game game = GameBuilder.createGame(mapName);
             BWEM bwem = new BWEM(game);
             bwem.initialize();
-            assertEquals(new BWEMMap(bwem.getMap()), mapData.get(mapName));
+            BWMap map = bwem.getMap();
+            assertEquals(new BWEMMap(map), mapData.get(mapName));
+            assertEquals(mapName, map.getChokePoints().size(), new HashSet<>(map.getChokePoints()).size());
+
+            for (Area area : map.getAreas()) {
+                for (ChokePoint firstChokePoint : area.getChokePoints()) {
+                    for (ChokePoint secondChokePoint : area.getChokePoints()) {
+                        if (!firstChokePoint.isBlocked() && !secondChokePoint.isBlocked()) {
+                            assertTrue(mapName, firstChokePoint.accessibleFrom(secondChokePoint));
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -43,6 +43,7 @@ public final class ChokePoint {
     private final Graph graph;
     private final boolean isPseudo;
     private final int index;
+    private final String mapHash;
     private final Pair<Area, Area> areas;
     private final WalkPosition[] nodes;
     private final List<Pair<WalkPosition, WalkPosition>> nodesInArea;
@@ -64,6 +65,7 @@ public final class ChokePoint {
 
         this.graph = graph;
         this.index = index;
+        this.mapHash = graph.getMap().game.mapHash();
         this.areas = new Pair<>(area1, area2);
         this.geometry = geometry;
 
@@ -313,25 +315,13 @@ public final class ChokePoint {
             return false;
         } else {
             final ChokePoint that = (ChokePoint) object;
-            final boolean lel = this.areas.getLeft().equals(that.areas.getLeft());
-            final boolean ler = this.areas.getLeft().equals(that.areas.getRight());
-            final boolean rer = this.areas.getRight().equals(that.areas.getRight());
-            final boolean rel = this.areas.getRight().equals(that.areas.getLeft());
-            return lel && rer
-                    || ler && rel; /* true if area pairs are an exact match or if one pair is reversed. */
+            return this.index == that.index && Objects.equals(this.mapHash, that.mapHash);
         }
     }
 
     @Override
     public int hashCode() {
-        int idLeft = areas.getLeft().getId().intValue();
-        int idRight = areas.getRight().getId().intValue();
-        if (idLeft > idRight) {
-            final int idLeftTmp = idLeft;
-            idLeft = idRight;
-            idRight = idLeftTmp;
-        }
-        return Objects.hash(idLeft, idRight);
+        return Objects.hash(this.index, this.mapHash);
     }
 
     /**
