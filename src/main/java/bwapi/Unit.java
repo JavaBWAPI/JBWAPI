@@ -59,8 +59,11 @@ public class Unit implements Comparable<Unit> {
     private int lastCommandFrame;
     private UnitCommand lastCommand;
 
-    // Don't make non-latcom users pay for latcom in memory usage
+    // Don't make non-latcom users (or uncommanded/enemy/neutral units) pay for latcom in memory usage.
+    // self() is only called by CommandTemp when mutating latency-compensated state; getters check hasLatCom()
+    // so we don't allocate 37 Cache objects per unit merely by reading unit properties.
     private UnitSelf self = null;
+
     UnitSelf self() {
         if (self == null) {
             self = new UnitSelf();
@@ -68,12 +71,17 @@ public class Unit implements Comparable<Unit> {
         return self;
     }
 
+    boolean hasLatCom() {
+        return self != null && game.isLatComEnabled();
+    }
+
 
     Unit(final UnitData unitData, int id, final Game game) {
         this.unitData = unitData;
         this.game = game;
 
-        updatePosition(0);
+        position = new Position(unitData.getPositionX(), unitData.getPositionY());
+        lastPositionUpdate = 0;
 
         initialType = getType();
         initialResources = getResources();
@@ -153,8 +161,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getInitialType
      */
     public UnitType getType() {
-        if (game.isLatComEnabled() && self().type.valid(game.getFrameCount())) {
-            return self().type.get();
+        if (hasLatCom() && self.type.valid(game.getFrameCount())) {
+            return self.type.get();
         }
         return UnitType.idToEnum[unitData.getType()];
     }
@@ -310,8 +318,8 @@ public class Unit implements Comparable<Unit> {
      */
     public int getHitPoints() {
         int hitpoints = unitData.getHitPoints();
-        if (game.isLatComEnabled() && self().hitPoints.valid(game.getFrameCount())) {
-            return hitpoints + self().hitPoints.get();
+        if (hasLatCom() && self.hitPoints.valid(game.getFrameCount())) {
+            return hitpoints + self.hitPoints.get();
         }
         return hitpoints;
     }
@@ -337,8 +345,8 @@ public class Unit implements Comparable<Unit> {
      */
     public int getEnergy() {
         int energy = unitData.getEnergy();
-        if (game.isLatComEnabled() && self().energy.valid(game.getFrameCount())) {
-            return energy + self().energy.get();
+        if (hasLatCom() && self.energy.valid(game.getFrameCount())) {
+            return energy + self.energy.get();
         }
         return energy;
     }
@@ -388,26 +396,41 @@ public class Unit implements Comparable<Unit> {
         }
         /////// Compute distance
 
+        final UnitType type = getType();
+        final Position pos = this.position != null ? this.position : getPosition();
+        final int left, right, top, bottom;
+        if (type != null && pos != null) {
+            left = pos.x - type.dimensionLeft();
+            right = pos.x + type.dimensionRight();
+            top = pos.y - type.dimensionUp();
+            bottom = pos.y + type.dimensionDown();
+        } else {
+            left = getLeft();
+            right = getRight();
+            top = getTop();
+            bottom = getBottom();
+        }
+
         // compute x distance
-        int xDist = getLeft() - target.x;
+        int xDist = left - target.x;
         if (xDist < 0) {
-            xDist = target.x - (getRight() + 1);
+            xDist = target.x - (right + 1);
             if (xDist < 0) {
                 xDist = 0;
             }
         }
 
         // compute y distance
-        int yDist = getTop() - target.y;
+        int yDist = top - target.y;
         if (yDist < 0) {
-            yDist = target.y - (getBottom() + 1);
+            yDist = target.y - (bottom + 1);
             if (yDist < 0) {
                 yDist = 0;
             }
         }
 
         // compute actual distance
-        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+        return Point.getApproxDistance(0, 0, xDist, yDist);
     }
 
     public int getDistance(final Unit target) {
@@ -423,32 +446,57 @@ public class Unit implements Comparable<Unit> {
 
         /////// Compute distance
 
+        final UnitType thisType = getType();
+        final Position thisPos = this.position != null ? this.position : getPosition();
+        final int thisLeft, thisRight, thisTop, thisBottom;
+        if (thisType != null && thisPos != null) {
+            thisLeft = thisPos.x - thisType.dimensionLeft();
+            thisRight = thisPos.x + thisType.dimensionRight();
+            thisTop = thisPos.y - thisType.dimensionUp();
+            thisBottom = thisPos.y + thisType.dimensionDown();
+        } else {
+            thisLeft = getLeft();
+            thisRight = getRight();
+            thisTop = getTop();
+            thisBottom = getBottom();
+        }
+
         // retrieve left/top/right/bottom values for calculations
-        final int left = target.getLeft() - 1;
-        final int top = target.getTop() - 1;
-        final int right = target.getRight() + 1;
-        final int bottom = target.getBottom() + 1;
+        final UnitType targetType = target.getType();
+        final Position targetPos = target.position != null ? target.position : target.getPosition();
+        final int left, top, right, bottom;
+        if (targetType != null && targetPos != null) {
+            left = targetPos.x - targetType.dimensionLeft() - 1;
+            top = targetPos.y - targetType.dimensionUp() - 1;
+            right = targetPos.x + targetType.dimensionRight() + 1;
+            bottom = targetPos.y + targetType.dimensionDown() + 1;
+        } else {
+            left = target.getLeft() - 1;
+            top = target.getTop() - 1;
+            right = target.getRight() + 1;
+            bottom = target.getBottom() + 1;
+        }
 
         // compute x distance
-        int xDist = getLeft() - right;
+        int xDist = thisLeft - right;
         if (xDist < 0) {
-            xDist = left - getRight();
+            xDist = left - thisRight;
             if (xDist < 0) {
                 xDist = 0;
             }
         }
 
         // compute y distance
-        int yDist = getTop() - bottom;
+        int yDist = thisTop - bottom;
         if (yDist < 0) {
-            yDist = top - getBottom();
+            yDist = top - thisBottom;
             if (yDist < 0) {
                 yDist = 0;
             }
         }
 
         // compute actual distance
-        return Position.Origin.getApproxDistance(new Position(xDist, yDist));
+        return Point.getApproxDistance(0, 0, xDist, yDist);
     }
 
     /**
@@ -804,8 +852,8 @@ public class Unit implements Comparable<Unit> {
      * @see #isPlagued
      */
     public int getStimTimer() {
-        if (game.isLatComEnabled() && self().stimTimer.valid(game.getFrameCount())) {
-            return self().stimTimer.get();
+        if (hasLatCom() && self.stimTimer.valid(game.getFrameCount())) {
+            return self.stimTimer.get();
         }
         return unitData.getStimTimer();
     }
@@ -819,8 +867,8 @@ public class Unit implements Comparable<Unit> {
      * incomplete unit will be when completed.
      */
     public UnitType getBuildType() {
-        if (game.isLatComEnabled() && self().buildType.valid(game.getFrameCount())) {
-            return self().buildType.get();
+        if (hasLatCom() && self.buildType.valid(game.getFrameCount())) {
+            return self.buildType.get();
         }
         return UnitType.idToEnum[unitData.getBuildType()];
     }
@@ -845,8 +893,8 @@ public class Unit implements Comparable<Unit> {
      * It exists as a more performant alternative to getTrainingQueue().
      */
     public UnitType getTrainingQueueAt(int i) {
-        if (game.isLatComEnabled() && self().trainingQueue[i].valid(game.getFrameCount())) {
-            return self().trainingQueue[i].get();
+        if (hasLatCom() && self.trainingQueue[i].valid(game.getFrameCount())) {
+            return self.trainingQueue[i].get();
         }
         return UnitType.idToEnum[unitData.getTrainingQueue(i)];
     }
@@ -859,8 +907,8 @@ public class Unit implements Comparable<Unit> {
      */
     public int getTrainingQueueCount() {
         int count = unitData.getTrainingQueueCount();
-        if (game.isLatComEnabled() && self().trainingQueueCount.valid(game.getFrameCount())) {
-            return count + self().trainingQueueCount.get();
+        if (hasLatCom() && self.trainingQueueCount.valid(game.getFrameCount())) {
+            return count + self.trainingQueueCount.get();
         }
         return count;
     }
@@ -876,8 +924,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRemainingResearchTime
      */
     public TechType getTech() {
-        if (game.isLatComEnabled() && self().tech.valid(game.getFrameCount())) {
-            return self().tech.get();
+        if (hasLatCom() && self.tech.valid(game.getFrameCount())) {
+            return self.tech.get();
         }
         return TechType.idToEnum[unitData.getTech()];
     }
@@ -893,8 +941,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRemainingUpgradeTime
      */
     public UpgradeType getUpgrade() {
-        if (game.isLatComEnabled() && self().upgrade.valid(game.getFrameCount())) {
-            return self().upgrade.get();
+        if (hasLatCom() && self.upgrade.valid(game.getFrameCount())) {
+            return self.upgrade.get();
         }
         return UpgradeType.idToEnum[unitData.getUpgrade()];
     }
@@ -906,8 +954,8 @@ public class Unit implements Comparable<Unit> {
      * @return Number of frames remaining until the unit's completion.
      */
     public int getRemainingBuildTime() {
-        if (game.isLatComEnabled() && self().remainingBuildTime.valid(game.getFrameCount())) {
-            return self().remainingBuildTime.get();
+        if (hasLatCom() && self.remainingBuildTime.valid(game.getFrameCount())) {
+            return self.remainingBuildTime.get();
         }
         return unitData.getRemainingBuildTime();
     }
@@ -927,8 +975,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getTrainingQueue
      */
     public int getRemainingTrainTime() {
-        if (game.isLatComEnabled() && self().remainingTrainTime.valid(game.getFrameCount())) {
-            return self().remainingTrainTime.get();
+        if (hasLatCom() && self.remainingTrainTime.valid(game.getFrameCount())) {
+            return self.remainingTrainTime.get();
         }
         return unitData.getRemainingTrainTime();
     }
@@ -946,8 +994,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getTech
      */
     public int getRemainingResearchTime() {
-        if (game.isLatComEnabled() && self().remainingResearchTime.valid(game.getFrameCount())) {
-            return self().remainingResearchTime.get();
+        if (hasLatCom() && self.remainingResearchTime.valid(game.getFrameCount())) {
+            return self.remainingResearchTime.get();
         }
         return unitData.getRemainingResearchTime();
     }
@@ -963,8 +1011,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getUpgrade
      */
     public int getRemainingUpgradeTime() {
-        if (game.isLatComEnabled() && self().remainingUpgradeTime.valid(game.getFrameCount())) {
-            return self().remainingUpgradeTime.get();
+        if (hasLatCom() && self.remainingUpgradeTime.valid(game.getFrameCount())) {
+            return self.remainingUpgradeTime.get();
         }
         return unitData.getRemainingUpgradeTime();
     }
@@ -985,8 +1033,8 @@ public class Unit implements Comparable<Unit> {
      * another unit.
      */
     public Unit getBuildUnit() {
-        if (game.isLatComEnabled() && self().buildUnit.valid(game.getFrameCount())) {
-            return game.getUnit(self().buildUnit.get());
+        if (hasLatCom() && self.buildUnit.valid(game.getFrameCount())) {
+            return game.getUnit(self.buildUnit.get());
         }
         return game.getUnit(unitData.getBuildUnit());
     }
@@ -1000,8 +1048,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getOrderTarget
      */
     public Unit getTarget() {
-        if (game.isLatComEnabled() && self().target.valid(game.getFrameCount())) {
-            return game.getUnit(self().target.get());
+        if (hasLatCom() && self.target.valid(game.getFrameCount())) {
+            return game.getUnit(self.target.get());
         }
         return game.getUnit(unitData.getTarget());
     }
@@ -1013,8 +1061,8 @@ public class Unit implements Comparable<Unit> {
      * @return Target position of a movement action.
      */
     public Position getTargetPosition() {
-        if (game.isLatComEnabled() && self().targetPositionX.valid(game.getFrameCount())) {
-            return new Position(self().targetPositionX.get(), self().targetPositionY.get());
+        if (hasLatCom() && self.targetPositionX.valid(game.getFrameCount())) {
+            return new Position(self.targetPositionX.get(), self.targetPositionY.get());
         }
         return new Position(unitData.getTargetPositionX(), unitData.getTargetPositionY());
     }
@@ -1026,8 +1074,8 @@ public class Unit implements Comparable<Unit> {
      * @return The primary {@link Order} that the unit is executing.
      */
     public Order getOrder() {
-        if (game.isLatComEnabled() && self().order.valid(game.getFrameCount())) {
-            return self().order.get();
+        if (hasLatCom() && self.order.valid(game.getFrameCount())) {
+            return self.order.get();
         }
         return Order.idToEnum[unitData.getOrder()];
     }
@@ -1040,8 +1088,8 @@ public class Unit implements Comparable<Unit> {
      * @return The secondary {@link Order} that the unit is executing.
      */
     public Order getSecondaryOrder() {
-        if (game.isLatComEnabled() && self().secondaryOrder.valid(game.getFrameCount())) {
-            return self().secondaryOrder.get();
+        if (hasLatCom() && self.secondaryOrder.valid(game.getFrameCount())) {
+            return self.secondaryOrder.get();
         }
         return Order.idToEnum[unitData.getSecondaryOrder()];
     }
@@ -1057,8 +1105,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getOrder
      */
     public Unit getOrderTarget() {
-        if (game.isLatComEnabled() && self().orderTarget.valid(game.getFrameCount())) {
-            return game.getUnit(self().orderTarget.get());
+        if (hasLatCom() && self.orderTarget.valid(game.getFrameCount())) {
+            return game.getUnit(self.orderTarget.get());
         }
         return game.getUnit(unitData.getOrderTarget());
     }
@@ -1073,8 +1121,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getOrder
      */
     public Position getOrderTargetPosition() {
-        if (game.isLatComEnabled() && self().orderTargetPositionX.valid(game.getFrameCount())) {
-            return new Position(self().orderTargetPositionX.get(), self().orderTargetPositionY.get());
+        if (hasLatCom() && self.orderTargetPositionX.valid(game.getFrameCount())) {
+            return new Position(self.orderTargetPositionX.get(), self.orderTargetPositionY.get());
         }
         return new Position(unitData.getOrderTargetPositionX(), unitData.getOrderTargetPositionY());
     }
@@ -1091,8 +1139,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRallyUnit
      */
     public Position getRallyPosition() {
-        if (game.isLatComEnabled() && self().rallyPositionX.valid(game.getFrameCount())) {
-            return new Position(self().rallyPositionX.get(), self().rallyPositionY.get());
+        if (hasLatCom() && self.rallyPositionX.valid(game.getFrameCount())) {
+            return new Position(self.rallyPositionX.get(), self.rallyPositionY.get());
         }
         return new Position(unitData.getRallyPositionX(), unitData.getRallyPositionY());
     }
@@ -1110,8 +1158,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRallyPosition
      */
     public Unit getRallyUnit() {
-        if (game.isLatComEnabled() && self().rallyUnit.valid(game.getFrameCount())) {
-            return game.getUnit(self().rallyUnit.get());
+        if (hasLatCom() && self.rallyUnit.valid(game.getFrameCount())) {
+            return game.getUnit(self.rallyUnit.get());
         }
         return game.getUnit(unitData.getRallyUnit());
     }
@@ -1527,8 +1575,8 @@ public class Unit implements Comparable<Unit> {
      * @return true if this unit is completed, and false if it is under construction or inaccessible.
      */
     public boolean isCompleted() {
-        if (game.isLatComEnabled() && self().isCompleted.valid(game.getFrameCount())) {
-            return self().isCompleted.get();
+        if (hasLatCom() && self.isCompleted.valid(game.getFrameCount())) {
+            return self.isCompleted.get();
         }
         return unitData.isCompleted();
     }
@@ -1544,8 +1592,8 @@ public class Unit implements Comparable<Unit> {
      * @see #haltConstruction
      */
     public boolean isConstructing() {
-        if (game.isLatComEnabled() && self().isConstructing.valid(game.getFrameCount())) {
-            return self().isConstructing.get();
+        if (hasLatCom() && self.isConstructing.valid(game.getFrameCount())) {
+            return self.isConstructing.get();
         }
         return unitData.isConstructing();
     }
@@ -1607,8 +1655,8 @@ public class Unit implements Comparable<Unit> {
 
 
     boolean isGathering() {
-        if (game.isLatComEnabled() && self().isGathering.valid(game.getFrameCount())) {
-            return self().isGathering.get();
+        if (hasLatCom() && self.isGathering.valid(game.getFrameCount())) {
+            return self.isGathering.get();
         }
         return unitData.isGathering();
     }
@@ -1722,8 +1770,8 @@ public class Unit implements Comparable<Unit> {
      * @see Unit#stop
      */
     public boolean isIdle() {
-        if (game.isLatComEnabled() && self().isIdle.valid(game.getFrameCount())) {
-            return self().isIdle.get();
+        if (hasLatCom() && self.isIdle.valid(game.getFrameCount())) {
+            return self.isIdle.get();
         }
         return unitData.isIdle();
     }
@@ -1848,8 +1896,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRemainingBuildTime
      */
     public boolean isMorphing() {
-        if (game.isLatComEnabled() && self().isMorphing.valid(game.getFrameCount())) {
-            return self().isMorphing.get();
+        if (hasLatCom() && self.isMorphing.valid(game.getFrameCount())) {
+            return self.isMorphing.get();
         }
         return unitData.isMorphing();
     }
@@ -1861,8 +1909,8 @@ public class Unit implements Comparable<Unit> {
      * @see #stop
      */
     public boolean isMoving() {
-        if (game.isLatComEnabled() && self().isMoving.valid(game.getFrameCount())) {
-            return self().isMoving.get();
+        if (hasLatCom() && self.isMoving.valid(game.getFrameCount())) {
+            return self.isMoving.get();
         }
         return unitData.isMoving();
     }
@@ -2007,8 +2055,8 @@ public class Unit implements Comparable<Unit> {
      * @see #getRemainingTrainTime
      */
     public boolean isTraining() {
-        if (game.isLatComEnabled() && self().isTraining.valid(game.getFrameCount())) {
-            return self().isTraining.get();
+        if (hasLatCom() && self.isTraining.valid(game.getFrameCount())) {
+            return self.isTraining.get();
         }
         return unitData.isTraining();
     }
@@ -5845,7 +5893,7 @@ public class Unit implements Comparable<Unit> {
             return false;
         }
 
-        return isTraining() && slot >= 0 && getTrainingQueue().size() > slot;
+        return isTraining() && slot >= 0 && getTrainingQueueCount() > slot;
     }
 
     public boolean canCancelMorph() {
@@ -6406,10 +6454,28 @@ public class Unit implements Comparable<Unit> {
         return id - other.id;
     }
 
+    static boolean overlapsRectangle(final Unit u, final int rectLeft, final int rectTop, final int rectRight, final int rectBottom) {
+        final Position pos = u.position;
+        if (pos != null) {
+            final UnitType type = u.getType();
+            if (type != null) {
+                return rectLeft <= pos.x + type.dimensionRight()
+                        && rectTop <= pos.y + type.dimensionDown()
+                        && rectRight >= pos.x - type.dimensionLeft()
+                        && rectBottom >= pos.y - type.dimensionUp();
+            }
+        }
+        return rectLeft <= u.getRight() && rectTop <= u.getBottom() && rectRight >= u.getLeft() && rectBottom >= u.getTop();
+    }
+
     void updatePosition(final int frame) {
         if (frame > lastPositionUpdate) {
             lastPositionUpdate = frame;
-            position = new Position(unitData.getPositionX(), unitData.getPositionY());
+            final int newX = unitData.getPositionX();
+            final int newY = unitData.getPositionY();
+            if (((position.x ^ newX) | (position.y ^ newY)) != 0) {
+                position = new Position(newX, newY);
+            }
         }
     }
 }

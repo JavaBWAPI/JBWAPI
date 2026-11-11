@@ -2,9 +2,12 @@ package bwapi;
 
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -60,5 +63,52 @@ public class CommandTempTest {
         cmd.execute(false);
 
         assertEquals(Collections.singletonList(UnitType.Terran_Marine), unit.getTrainingQueue());
+    }
+
+    @Test
+    public void unitSelfAndPlayerSelfShouldOnlyBeAllocatedOnCommandWriteInFrame0() throws IOException {
+        Game game = GameBuilder.createGame();
+        game.onFrame(0);
+
+        assertEquals(0, game.getFrameCount());
+        assertTrue(game.isLatComEnabled());
+
+        // Reading unit and player getters across all initial units on Frame 0 must not allocate UnitSelf/PlayerSelf
+        for (Unit u : game.getAllUnits()) {
+            u.getType();
+            u.getOrder();
+            u.isIdle();
+            u.getHitPoints();
+            assertFalse(u.hasLatCom());
+        }
+        for (Player p : game.getPlayers()) {
+            p.minerals();
+            p.gas();
+            p.supplyUsed();
+            assertFalse(p.hasLatCom());
+        }
+
+        // Issue a real command on Frame 0 to a friendly worker and resource depot
+        Player self = game.self();
+        int initialMinerals = self.minerals();
+        Unit worker = self.getUnits().stream().filter(u -> u.getType().isWorker()).findFirst().orElseThrow(AssertionError::new);
+        Unit depot = self.getUnits().stream().filter(u -> u.getType().isResourceDepot()).findFirst().orElseThrow(AssertionError::new);
+
+        Position moveTarget = new Position(200, 200);
+        assertTrue(worker.move(moveTarget));
+        assertTrue(worker.hasLatCom());
+        assertEquals(Order.Move, worker.getOrder());
+        assertEquals(moveTarget, worker.getTargetPosition());
+
+        UnitType workerType = self.getRace().getWorker();
+        assertTrue(depot.train(workerType));
+        assertTrue(self.hasLatCom());
+        assertEquals(initialMinerals - workerType.mineralPrice(), self.minerals());
+
+        // Neutral units (minerals/geysers) and other players still have no UnitSelf/PlayerSelf allocated
+        for (Unit mineral : game.getMinerals()) {
+            assertFalse(mineral.hasLatCom());
+        }
+        assertFalse(game.neutral().hasLatCom());
     }
 }

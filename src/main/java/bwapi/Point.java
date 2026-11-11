@@ -35,7 +35,7 @@ public abstract class Point<T extends Point<T>> implements Comparable<Point<T>> 
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    private static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
+    static int getApproxDistance(final int x1, final int y1, final int x2, final int y2) {
         int max = Math.abs(x1 - x2);
         int min = Math.abs(y1 - y2);
         if (max < min) {

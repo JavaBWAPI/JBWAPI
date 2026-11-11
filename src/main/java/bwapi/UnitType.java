@@ -265,7 +265,7 @@ public enum UnitType {
      * @return The maximum width of all unit types, in pixels.
      */
     public static int maxUnitWidth() {
-        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::width)).get().width();
+        return UnitTypeContainer.maxUnitWidth;
     }
 
     /**
@@ -275,7 +275,7 @@ public enum UnitType {
      * @return The maximum height of all unit types, in pixels.
      */
     public static int maxUnitHeight() {
-        return Arrays.stream(UnitType.values()).max(Comparator.comparingInt(UnitType::height)).get().height();
+        return UnitTypeContainer.maxUnitHeight;
     }
 
     /**
@@ -298,17 +298,7 @@ public enum UnitType {
      * Returns pair({@link UnitType#None},0) If this unit type cannot be made by the player.
      */
     public Pair<UnitType, Integer> whatBuilds() {
-        // Retrieve the type
-        final UnitType type = UnitTypeContainer.whatBuilds[id];
-        int count = 1;
-        // Set count to 0 if there is no whatBuilds and 2 if it's an archon
-        if (type == UnitType.None) {
-            count = 0;
-        } else if (this == UnitType.Protoss_Archon || this == UnitType.Protoss_Dark_Archon) {
-            count = 2;
-        }
-        // Return the desired pair
-        return new Pair<>(type, count);
+        return UnitTypeContainer.whatBuildsPairs[id];
     }
 
     /**
@@ -365,7 +355,7 @@ public enum UnitType {
      * @return List of TechTypes containing ability information.
      */
     public List<TechType> abilities() {
-        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.unitTechs[id]));
+        return UnitTypeContainer.unitTechsLists[id];
     }
 
     /**
@@ -374,7 +364,7 @@ public enum UnitType {
      * @return List of UpgradeTypes containing upgrade types that will impact this unit type.
      */
     public List<UpgradeType> upgrades() {
-        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgrades[id]));
+        return UnitTypeContainer.upgradesLists[id];
     }
 
     /**
@@ -578,7 +568,7 @@ public enum UnitType {
      * @return {@link TilePosition} containing the width (x) and height (y) of the unit type, in tiles.
      */
     public TilePosition tileSize() {
-        return new TilePosition(tileWidth(), tileHeight());
+        return UnitTypeContainer.tileSizes[id];
     }
 
     /**
@@ -1194,7 +1184,7 @@ public enum UnitType {
      * @since 4.1.2
      */
     public List<UnitType> buildsWhat() {
-        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.buildsWhat[id]));
+        return UnitTypeContainer.buildsWhatLists[id];
     }
 
     /**
@@ -1209,7 +1199,7 @@ public enum UnitType {
      * @since 4.1.2
      */
     public List<TechType> researchesWhat() {
-        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.researchesWhat[id]));
+        return UnitTypeContainer.researchesWhatLists[id];
     }
 
     /**
@@ -1223,7 +1213,7 @@ public enum UnitType {
      * @since 4.1.2
      */
     public List<UpgradeType> upgradesWhat() {
-        return Collections.unmodifiableList(Arrays.asList(UnitTypeContainer.upgradesWhat[id]));
+        return UnitTypeContainer.upgradesWhatLists[id];
     }
 
     /**

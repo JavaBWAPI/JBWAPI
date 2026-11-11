@@ -6,7 +6,6 @@ import bwapi.ClientData.RegionData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Region objects are created by Starcraft: Broodwar to contain several tiles with the same
