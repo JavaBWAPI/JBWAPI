@@ -8,6 +8,7 @@ import java.util.ArrayList;
 class SideEffectQueue {
 
     private ArrayList<SideEffect> queue = new ArrayList<>();
+    private ArrayList<SideEffect> flushQueue = new ArrayList<>();
 
     /**
      * Includes a side effect to be sent back to BWAPI in the future.
@@ -25,8 +26,19 @@ class SideEffectQueue {
      * @param liveGameData
      * The live game frame's data, using the BWAPI shared memory.
      */
-    synchronized void flushTo(ClientData.GameData liveGameData) {
-        queue.forEach(x -> x.apply(liveGameData));
-        queue.clear();
+    void flushTo(ClientData.GameData liveGameData) {
+        final ArrayList<SideEffect> toFlush;
+        synchronized (this) {
+            if (queue.isEmpty()) {
+                return;
+            }
+            toFlush = queue;
+            queue = flushQueue;
+            flushQueue = toFlush;
+        }
+        for (int i = 0, size = toFlush.size(); i < size; i++) {
+            toFlush.get(i).apply(liveGameData);
+        }
+        toFlush.clear();
     }
 }
