@@ -20,8 +20,13 @@ class SynchronizationEnvironment {
     private int onEndFrame;
     private long bwapiDelayMs;
     private final Map<Integer, Runnable> onFrames;
+    private final Map<Integer, Runnable> onClientFrames;
 
     SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration) {
+        this(bwClientConfiguration, GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
+    }
+
+    SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration, final WrappedBuffer newGameState) {
         BWEventListener listener = mock(BWEventListener.class);
 
         configuration = bwClientConfiguration;
@@ -31,8 +36,8 @@ class SynchronizationEnvironment {
         onEndFrame = -1;
         bwapiDelayMs = 0;
         onFrames = new HashMap<>();
+        onClientFrames = new HashMap<>();
 
-        WrappedBuffer newGameState = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
         when(client.mapFile()).thenReturn(newGameState);
         when(client.liveClientData()).thenReturn(new ClientData());
         client.liveClientData().setBuffer(client.mapFile());
@@ -75,6 +80,10 @@ class SynchronizationEnvironment {
         onFrames.put(frame, runnable);
     }
 
+    void onClientFrame(Integer frame, Runnable runnable) {
+        onClientFrames.put(frame, runnable);
+    }
+
     void setBwapiDelayMs(long milliseconds) {
         bwapiDelayMs = milliseconds;
     }
@@ -88,7 +97,7 @@ class SynchronizationEnvironment {
         if (configuration.getAsync()) {
             final long MEGABYTE = 1024 * 1024;
             long memoryFree = Runtime.getRuntime().freeMemory() / MEGABYTE;
-            long memoryRequired = configuration.getAsyncFrameBufferCapacity() * ClientData.GameData.SIZE / MEGABYTE;
+            long memoryRequired = (long) configuration.getAsyncFrameBufferCapacity() * FrameBuffer.BUFFER_SIZE / MEGABYTE;
             assertTrue(
                     "Unit test needs to be run with sufficient memory to allocate frame buffer. Has "
                             + memoryFree
@@ -125,6 +134,9 @@ class SynchronizationEnvironment {
         } else {
             client.liveClientData().gameData().setIsInGame(false);
             client.liveClientData().gameData().setEventCount(0);
+        }
+        if (onClientFrames.containsKey(liveFrame())) {
+            onClientFrames.get(liveFrame()).run();
         }
     }
 }

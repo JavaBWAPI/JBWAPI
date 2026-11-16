@@ -2,11 +2,31 @@ package bwapi;
 
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
 
 public class SynchronizationTest {
+    private static int scanBlackhole;
+
+    private static void scanVisibilityAndOrderTarget(Game game, Unit unit, long maxIterations) {
+        int acc = 0;
+        for (long i = 0; i < maxIterations; i++) {
+            if (game.isVisible(2, 0)) {
+                // On every valid frame where tile (2, 0) is visible, unit has a non-null orderTarget.
+                // If Slice 2 (isVisible, via packedBuffer) reads the new liveData frame while
+                // Slice 1 (orderTarget, via buffer) reads the previous PackedWrappedBuffer slot,
+                // getOrderTarget() returns null and crashes with NullPointerException.
+                acc += unit.getOrderTarget().getX();
+                break;
+            }
+            acc += game.isVisible(1, 0) ? 1 : 0;
+        }
+        scanBlackhole = acc;
+    }
 
     private void sleepUnchecked(long milliseconds) {
         try {
@@ -28,6 +48,172 @@ public class SynchronizationTest {
         assertTrue(
             message + ": " + describeApproximateExpectation(expected, actual, margin),
             measureApproximateEquality(expected, actual, margin));
+    }
+
+    @Test
+    public void asyncUnsafe_StartsBotBeforeCopyCompletes() {
+        CountDownLatch botStarted = new CountDownLatch(1);
+        AtomicBoolean overlapped = new AtomicBoolean();
+        WrappedBuffer live = new WrappedBuffer(ClientData.GameData.SIZE) {
+            private boolean firstCopy = true;
+
+            @Override long getAddress() {
+                if (firstCopy) {
+                    firstCopy = false;
+                    try {
+                        // Hold the first copy until the bot starts reading the live frame.
+                        overlapped.set(botStarted.await(5, TimeUnit.SECONDS));
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                return super.getAddress();
+            }
+        };
+        WrappedBuffer fixture = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        fixture.getBuffer().rewind();
+        live.getBuffer().put(fixture.getBuffer());
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withAsyncFrameBufferCapacity(2)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+        environment.onFrame(0, botStarted::countDown);
+        environment.runGame(6);
+        assertTrue("Unsafe async must overlap bot execution with the frame copy", overlapped.get());
+    }
+
+    @Test
+    public void asyncUnsafe_SwapsFromLiveDataToFrameBufferAfterCopy() {
+        CountDownLatch releaseCopy = new CountDownLatch(1);
+        WrappedBuffer live = new WrappedBuffer(ClientData.GameData.SIZE) {
+            private boolean firstCopy = true;
+
+            @Override
+            long getAddress() {
+                if (firstCopy) {
+                    firstCopy = false;
+                    try {
+                        releaseCopy.await(5, TimeUnit.SECONDS);
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                return super.getAddress();
+            }
+        };
+        WrappedBuffer fixture = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        fixture.getBuffer().rewind();
+        live.getBuffer().put(fixture.getBuffer());
+
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withUnlimitedFrameZero(false)
+                .withMaxFrameDurationMs(100)
+                .withAsyncFrameBufferCapacity(3)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+
+        environment.onFrame(0, () -> {
+            assertSame("Bot should read liveData while copyBuffer is in progress",
+                    live, ((PackedWrappedBuffer) environment.bwClient.getGame().botClientData().buffer).slice2);
+            releaseCopy.countDown();
+            sleepUnchecked(15);
+            assertNotSame("Bot should swap onto packed FrameBuffer slot right after copy completes (before frame timeout)",
+                    live, ((PackedWrappedBuffer) environment.bwClient.getGame().botClientData().buffer).slice2);
+        });
+
+        environment.runGame(5);
+    }
+
+    @Test
+    public void asyncUnsafe_TimeoutDoesNotSplitBrainSlices() {
+        WrappedBuffer live = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withUnlimitedFrameZero(true)
+                .withMaxFrameDurationMs(8)
+                .withAsyncFrameBufferCapacity(4)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+        ClientData.GameData liveGameData = environment.liveGameData();
+        final int unitId = 0;
+        liveGameData.setInitialUnitCount(Math.max(1, liveGameData.getInitialUnitCount()));
+        liveGameData.getUnits(unitId).setPositionX(64);
+
+        // Warm up both branches on Frame 0 (while liveData is frozen) so C2 compiles without uncommon traps.
+        environment.onFrame(0, () -> {
+            Game game = environment.bwClient.getGame();
+            Unit unit = game.getUnit(unitId);
+            for (int w = 0; w < 30_000; w++) {
+                if ((w & 1) == 0) {
+                    liveGameData.getUnits(unitId).setOrderTarget(-1);
+                    liveGameData.setIsVisible(1, 0, true);
+                    liveGameData.setIsVisible(2, 0, false);
+                } else {
+                    liveGameData.getUnits(unitId).setOrderTarget(unitId);
+                    liveGameData.setIsVisible(1, 0, false);
+                    liveGameData.setIsVisible(2, 0, true);
+                }
+                scanVisibilityAndOrderTarget(game, unit, 1_000);
+            }
+            liveGameData.getUnits(unitId).setOrderTarget(-1);
+            liveGameData.setIsVisible(1, 0, true);
+            liveGameData.setIsVisible(2, 0, false);
+        });
+
+        final int cycles = 15;
+        CountDownLatch previousTimeoutFrameDone = null;
+        for (int c = 0; c < cycles; c++) {
+            final int timeoutFrame = 2 * c + 1;
+            final int nextLiveFrame = 2 * c + 2;
+            final CountDownLatch waitPrevious = previousTimeoutFrameDone;
+            final CountDownLatch timeoutFrameDone = new CountDownLatch(1);
+            previousTimeoutFrameDone = timeoutFrameDone;
+
+            environment.onClientFrame(timeoutFrame, () -> {
+                if (waitPrevious != null) {
+                    try {
+                        assertTrue(waitPrevious.await(5, TimeUnit.SECONDS));
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    // Allow the bot thread to dequeue nextLiveFrame so frameBuffer is empty and unsafeReadReady triggers.
+                    sleepUnchecked(5);
+                }
+                liveGameData.getUnits(unitId).setOrderTarget(-1);
+                liveGameData.setIsVisible(1, 0, true);
+                liveGameData.setIsVisible(2, 0, false);
+            });
+
+            environment.onFrame(timeoutFrame, () -> {
+                try {
+                    Game game = environment.bwClient.getGame();
+                    Unit unit = game.getUnit(unitId);
+                    // Simulate early-frame work (~2ms) before entering a hot loop that overruns the 8ms frame limit.
+                    sleepUnchecked(2);
+                    scanVisibilityAndOrderTarget(game, unit, 50_000_000L);
+                } finally {
+                    timeoutFrameDone.countDown();
+                }
+            });
+
+            environment.onClientFrame(nextLiveFrame, () -> {
+                // Populate orderTarget in Slice 1 well before exposing tile (2, 0) in Slice 2,
+                // so orderTarget == -1 only exists in timeoutFrame's PackedWrappedBuffer slot.
+                liveGameData.getUnits(unitId).setOrderTarget(unitId);
+                UnsafeTools.getUnsafe().storeFence();
+                sleepUnchecked(2);
+                liveGameData.setIsVisible(1, 0, false);
+                liveGameData.setIsVisible(2, 0, true);
+            });
+        }
+
+        environment.runGame(2 * cycles + 2);
+        assertTrue(scanBlackhole >= 0);
     }
 
     @Test
@@ -322,5 +508,47 @@ public class SynchronizationTest {
         environmentAsync.onFrame(1, () -> { assertFalse(environmentAsync.bwClient.getGame().isLatComEnabled()); });
         environmentAsync.onFrame(2, () -> { assertThrows(IllegalStateException.class, () -> environmentAsync.bwClient.getGame().setLatCom(true)); });
         environmentAsync.runGame(3);
+    }
+
+    @Test
+    public void sideEffectQueue_DoesNotBlockEnqueueDuringFlush() throws Exception {
+        SideEffectQueue queue = new SideEffectQueue();
+        CountDownLatch inFlush = new CountDownLatch(1);
+        CountDownLatch enqueueDone = new CountDownLatch(1);
+        AtomicBoolean secondApplied = new AtomicBoolean(false);
+
+        SideEffect first = org.mockito.Mockito.mock(SideEffect.class);
+        org.mockito.Mockito.doAnswer(inv -> {
+            inFlush.countDown();
+            assertTrue("enqueue should not be blocked while flushTo is applying side effects",
+                    enqueueDone.await(5, TimeUnit.SECONDS));
+            return null;
+        }).when(first).apply(null);
+
+        SideEffect second = org.mockito.Mockito.mock(SideEffect.class);
+        org.mockito.Mockito.doAnswer(inv -> {
+            secondApplied.set(true);
+            return null;
+        }).when(second).apply(null);
+
+        queue.enqueue(first);
+
+        Thread enqueuer = new Thread(() -> {
+            try {
+                assertTrue(inFlush.await(5, TimeUnit.SECONDS));
+                queue.enqueue(second);
+                enqueueDone.countDown();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        enqueuer.start();
+
+        queue.flushTo(null);
+        enqueuer.join(5000);
+        assertFalse("Second side effect should remain queued for the next flush", secondApplied.get());
+
+        queue.flushTo(null);
+        assertTrue("Second side effect should be applied on the next flush", secondApplied.get());
     }
 }

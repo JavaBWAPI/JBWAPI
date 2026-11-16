@@ -2,11 +2,14 @@ package bwapi;
 
 import com.sun.jna.Pointer;
 
-final class ClientData {
-    private WrappedBuffer buffer;
+class ClientData {
+    WrappedBuffer buffer;
     private GameData gameData;
     ClientData() {
-        gameData = new ClientData.GameData(0);
+        gameData = createGameData(0);
+    }
+    GameData createGameData(int offset) {
+        return new ClientData.GameData(offset);
     }
     GameData gameData() {
         return gameData;
@@ -68,7 +71,7 @@ final class ClientData {
     }
     class GameData {
         static final int SIZE = 33017048;
-        private int myOffset;
+        protected int myOffset;
         GameData(int myOffset) {
           this.myOffset = myOffset;
         }
@@ -729,7 +732,7 @@ final class ClientData {
     }
     class Position {
         static final int SIZE = 8;
-        private int myOffset;
+        protected int myOffset;
         Position(int myOffset) {
           this.myOffset = myOffset;
         }
@@ -750,7 +753,7 @@ final class ClientData {
     }
     class Event {
         static final int SIZE = 12;
-        private int myOffset;
+        protected int myOffset;
         Event(int myOffset) {
           this.myOffset = myOffset;
         }
@@ -778,7 +781,7 @@ final class ClientData {
     }
     class RegionData {
         static final int SIZE = 1068;
-        private int myOffset;
+        protected int myOffset;
         RegionData(int myOffset) {
           this.myOffset = myOffset;
         }

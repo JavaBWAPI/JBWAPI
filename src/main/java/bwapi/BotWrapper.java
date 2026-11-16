@@ -48,16 +48,17 @@ class BotWrapper {
 
     protected void handleEvents() {
         ClientData.GameData botGameData = botGame.botClientData().gameData();
+        final int eventCount = botGameData.getEventCount();
 
         // Populate gameOver before invoking event handlers (in case the bot throws)
-        for (int i = 0; i < botGameData.getEventCount(); i++) {
+        for (int i = 0; i < eventCount; i++) {
             gameOver = gameOver || botGameData.getEvents(i).getType() == EventType.MatchEnd;
         }
 
         performanceMetrics.getBotResponse().timeIf(
             ! gameOver && (botGameData.getFrameCount() > 0 || ! configuration.getUnlimitedFrameZero()),
             () -> {
-                for (int i = 0; i < botGameData.getEventCount(); i++) {
+                for (int i = 0; i < eventCount; i++) {
                     EventHandler.operation(eventListener, botGame, botGameData.getEvents(i));
                 }
             });
