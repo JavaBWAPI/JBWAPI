@@ -121,14 +121,9 @@ class FrameBuffer {
         // Copy dynamic game information into the current frame buffer slot.
         // Static information (e.g. walkability/buildability/regions) is accessed
         // directly from the main shared memory buffer by ClientDataAsync.
-        if (stepGame == 0) {
-            copyBuffer(liveData, dataBuffer.get(indexGame()));
-        } else {
-            performanceMetrics.getCopyingToBuffer().time(() -> {
-                WrappedBuffer dataTarget = dataBuffer.get(indexGame());
-                copyBuffer(liveData, dataTarget);
-            });
-        }
+        performanceMetrics.getCopyingToBuffer().timeIf(
+            stepGame > 0 || !configuration.getUnlimitedFrameZero(),
+            () -> copyBuffer(liveData, dataBuffer.get(indexGame())));
 
         lockSize.lock();
         try {

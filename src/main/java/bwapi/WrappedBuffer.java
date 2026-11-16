@@ -29,6 +29,11 @@ class WrappedBuffer {
         this.address = address;
     }
 
+    WrappedBuffer(final WrappedBuffer other) {
+        this.buffer = other.buffer;
+        this.address = other.address;
+    }
+
     byte getByte(final int offset) {
         return unsafe.getByte(address + offset);
     }

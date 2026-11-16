@@ -10,6 +10,23 @@ import java.util.stream.IntStream;
 import static org.junit.Assert.*;
 
 public class SynchronizationTest {
+    private static int scanBlackhole;
+
+    private static void scanVisibilityAndOrderTarget(Game game, Unit unit, long maxIterations) {
+        int acc = 0;
+        for (long i = 0; i < maxIterations; i++) {
+            if (game.isVisible(2, 0)) {
+                // On every valid frame where tile (2, 0) is visible, unit has a non-null orderTarget.
+                // If Slice 2 (isVisible, via packedBuffer) reads the new liveData frame while
+                // Slice 1 (orderTarget, via buffer) reads the previous PackedWrappedBuffer slot,
+                // getOrderTarget() returns null and crashes with NullPointerException.
+                acc += unit.getOrderTarget().getX();
+                break;
+            }
+            acc += game.isVisible(1, 0) ? 1 : 0;
+        }
+        scanBlackhole = acc;
+    }
 
     private void sleepUnchecked(long milliseconds) {
         try {
@@ -68,31 +85,135 @@ public class SynchronizationTest {
     }
 
     @Test
-    public void asyncUnsafe_KeepsLiveDataOnTimeAndSwapsToFrameBufferOnTimeout() {
-        WrappedBuffer live = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+    public void asyncUnsafe_SwapsFromLiveDataToFrameBufferAfterCopy() {
+        CountDownLatch releaseCopy = new CountDownLatch(1);
+        WrappedBuffer live = new WrappedBuffer(ClientData.GameData.SIZE) {
+            private boolean firstCopy = true;
+
+            @Override
+            long getAddress() {
+                if (firstCopy) {
+                    firstCopy = false;
+                    try {
+                        releaseCopy.await(5, TimeUnit.SECONDS);
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                return super.getAddress();
+            }
+        };
+        WrappedBuffer fixture = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        fixture.getBuffer().rewind();
+        live.getBuffer().put(fixture.getBuffer());
+
         BWClientConfiguration config = new BWClientConfiguration.Builder()
                 .withAsync(true)
                 .withAsyncUnsafe(true)
                 .withUnlimitedFrameZero(false)
-                .withMaxFrameDurationMs(30)
+                .withMaxFrameDurationMs(100)
                 .withAsyncFrameBufferCapacity(3)
                 .build();
         SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
 
-        environment.onFrame(1, () -> {
-            sleepUnchecked(5);
-            assertSame("On-time frame should stay on liveData without mid-frame swap",
-                    live, environment.bwClient.getGame().botClientData().buffer);
-        });
-        environment.onFrame(2, () -> {
-            assertSame("Start of frame should read liveData",
-                    live, environment.bwClient.getGame().botClientData().buffer);
-            sleepUnchecked(80);
-            assertTrue("Timed-out frame should swap bot onto PackedWrappedBuffer",
-                    environment.bwClient.getGame().botClientData().buffer instanceof PackedWrappedBuffer);
+        environment.onFrame(0, () -> {
+            assertSame("Bot should read liveData while copyBuffer is in progress",
+                    live, ((PackedWrappedBuffer) environment.bwClient.getGame().botClientData().buffer).slice2);
+            releaseCopy.countDown();
+            sleepUnchecked(15);
+            assertNotSame("Bot should swap onto packed FrameBuffer slot right after copy completes (before frame timeout)",
+                    live, ((PackedWrappedBuffer) environment.bwClient.getGame().botClientData().buffer).slice2);
         });
 
         environment.runGame(5);
+    }
+
+    @Test
+    public void asyncUnsafe_TimeoutDoesNotSplitBrainSlices() {
+        WrappedBuffer live = GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH);
+        BWClientConfiguration config = new BWClientConfiguration.Builder()
+                .withAsync(true)
+                .withAsyncUnsafe(true)
+                .withUnlimitedFrameZero(true)
+                .withMaxFrameDurationMs(8)
+                .withAsyncFrameBufferCapacity(4)
+                .build();
+        SynchronizationEnvironment environment = new SynchronizationEnvironment(config, live);
+        ClientData.GameData liveGameData = environment.liveGameData();
+        final int unitId = 0;
+        liveGameData.setInitialUnitCount(Math.max(1, liveGameData.getInitialUnitCount()));
+        liveGameData.getUnits(unitId).setPositionX(64);
+
+        // Warm up both branches on Frame 0 (while liveData is frozen) so C2 compiles without uncommon traps.
+        environment.onFrame(0, () -> {
+            Game game = environment.bwClient.getGame();
+            Unit unit = game.getUnit(unitId);
+            for (int w = 0; w < 30_000; w++) {
+                if ((w & 1) == 0) {
+                    liveGameData.getUnits(unitId).setOrderTarget(-1);
+                    liveGameData.setIsVisible(1, 0, true);
+                    liveGameData.setIsVisible(2, 0, false);
+                } else {
+                    liveGameData.getUnits(unitId).setOrderTarget(unitId);
+                    liveGameData.setIsVisible(1, 0, false);
+                    liveGameData.setIsVisible(2, 0, true);
+                }
+                scanVisibilityAndOrderTarget(game, unit, 1_000);
+            }
+            liveGameData.getUnits(unitId).setOrderTarget(-1);
+            liveGameData.setIsVisible(1, 0, true);
+            liveGameData.setIsVisible(2, 0, false);
+        });
+
+        final int cycles = 15;
+        CountDownLatch previousTimeoutFrameDone = null;
+        for (int c = 0; c < cycles; c++) {
+            final int timeoutFrame = 2 * c + 1;
+            final int nextLiveFrame = 2 * c + 2;
+            final CountDownLatch waitPrevious = previousTimeoutFrameDone;
+            final CountDownLatch timeoutFrameDone = new CountDownLatch(1);
+            previousTimeoutFrameDone = timeoutFrameDone;
+
+            environment.onClientFrame(timeoutFrame, () -> {
+                if (waitPrevious != null) {
+                    try {
+                        assertTrue(waitPrevious.await(5, TimeUnit.SECONDS));
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    // Allow the bot thread to dequeue nextLiveFrame so frameBuffer is empty and unsafeReadReady triggers.
+                    sleepUnchecked(5);
+                }
+                liveGameData.getUnits(unitId).setOrderTarget(-1);
+                liveGameData.setIsVisible(1, 0, true);
+                liveGameData.setIsVisible(2, 0, false);
+            });
+
+            environment.onFrame(timeoutFrame, () -> {
+                try {
+                    Game game = environment.bwClient.getGame();
+                    Unit unit = game.getUnit(unitId);
+                    // Simulate early-frame work (~2ms) before entering a hot loop that overruns the 8ms frame limit.
+                    sleepUnchecked(2);
+                    scanVisibilityAndOrderTarget(game, unit, 50_000_000L);
+                } finally {
+                    timeoutFrameDone.countDown();
+                }
+            });
+
+            environment.onClientFrame(nextLiveFrame, () -> {
+                // Populate orderTarget in Slice 1 well before exposing tile (2, 0) in Slice 2,
+                // so orderTarget == -1 only exists in timeoutFrame's PackedWrappedBuffer slot.
+                liveGameData.getUnits(unitId).setOrderTarget(unitId);
+                UnsafeTools.getUnsafe().storeFence();
+                sleepUnchecked(2);
+                liveGameData.setIsVisible(1, 0, false);
+                liveGameData.setIsVisible(2, 0, true);
+            });
+        }
+
+        environment.runGame(2 * cycles + 2);
+        assertTrue(scanBlackhole >= 0);
     }
 
     @Test

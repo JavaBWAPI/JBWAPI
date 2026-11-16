@@ -71,7 +71,7 @@ public class ClientDataAsyncTest {
         assertTrue(data.gameData().isVisible(0, 0));
         data.setBuffer(live);
         assertTrue(data.gameData().isVisible(0, 0));
-        assertSame(live, data.buffer);
+        assertSame(live, ((PackedWrappedBuffer) data.buffer).slice2);
     }
 
     @Test

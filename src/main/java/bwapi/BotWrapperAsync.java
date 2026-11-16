@@ -24,10 +24,8 @@ class BotWrapperAsync extends BotWrapper {
     @Override
     void startNewGame(WrappedBuffer liveData, PerformanceMetrics performanceMetrics) {
         frameBuffer.initialize(liveData, performanceMetrics);
-
         this.performanceMetrics = performanceMetrics;
-        ClientDataAsync clientDataAsync = new ClientDataAsync(liveData);
-        botGame = new Game(clientDataAsync);
+        botGame = new Game(new ClientDataAsync(liveData));
         botGame.setConfiguration(configuration);
         botGame.botClientData().setBuffer(liveData);
         gameOver = false;
@@ -87,9 +85,19 @@ class BotWrapperAsync extends BotWrapper {
         }
         frameBuffer.lockSize.lock();
         try {
+            // Unsafe mode: Move the bot off of live data onto the frame buffer
+            // as soon as the copy completes (~0.05-0.35ms) so any cached buffer reference
+            // has the remainder of the frame while liveData is still frozen to transition
+            // before control returns to StarCraft.
+            if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
+                configuration.log("Main: Weaning bot off live data");
+                unsafeReadReady = false;
+                botGame.botClientData().setBuffer(frameBuffer.peek());
+            }
+
             while (!frameBuffer.empty()) {
                 // Make bot exceptions fall through to the main thread.
-                Throwable lastThrow = getLastBotThrow();
+                Throwable lastThrow = lastBotThrow;
                 if (lastThrow != null) {
                     configuration.log("Main: Rethrowing bot throwable");
                     throw new RuntimeException(lastThrow);
@@ -101,14 +109,6 @@ class BotWrapperAsync extends BotWrapper {
                 } else {
                     long remainingNanos = endNanos - System.nanoTime();
                     if (remainingNanos <= 0) {
-                        // Unsafe mode: Move the bot off of live data onto the frame buffer
-                        // only when the frame times out and control is about to return to StarCraft.
-                        // When the bot finishes on time, liveData remains frozen for the entire frame.
-                        if (configuration.getAsyncUnsafe() && frameBuffer.size() == 1) {
-                            configuration.log("Main: Weaning bot off live data");
-                            unsafeReadReady = false;
-                            botGame.botClientData().setBuffer(frameBuffer.peek());
-                        }
                         configuration.log("Main: Out of time in frame #" + frame);
                         break;
                     }
@@ -135,10 +135,6 @@ class BotWrapperAsync extends BotWrapper {
                 botThread.join();
             } catch (InterruptedException ignored) {}
         }
-    }
-
-    Throwable getLastBotThrow() {
-        return lastBotThrow;
     }
 
     private Thread createBotThread() {

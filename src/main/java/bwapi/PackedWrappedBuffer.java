@@ -4,7 +4,7 @@ package bwapi;
  * Packed off-heap buffer for asynchronous frame slots that stores only dynamic game data slices
  * and exposes pre-shifted slice views so static BWAPI offsets work without runtime branching.
  */
-class PackedWrappedBuffer extends WrappedBuffer {
+final class PackedWrappedBuffer extends WrappedBuffer {
     static final int STATICTILES_START = 3447004;
     static final int STATICTILES_END = 4823260;
     static final int REGION_START = 5085404;
@@ -15,11 +15,7 @@ class PackedWrappedBuffer extends WrappedBuffer {
     static final int DYNAMIC_SLICE2_SIZE = REGION_START - STATICTILES_END;
     static final int DYNAMIC_SLICE3_SIZE = STRINGSSHAPES_START - REGION_END;
 
-    static final int DEST_SLICE1_OFFSET = 0;
-    static final int DEST_SLICE2_OFFSET = DYNAMIC_SLICE1_SIZE;
-    static final int DEST_SLICE3_OFFSET = DEST_SLICE2_OFFSET + DYNAMIC_SLICE2_SIZE;
-
-    static final int BUFFER_SIZE = DEST_SLICE3_OFFSET + DYNAMIC_SLICE3_SIZE;
+    static final int BUFFER_SIZE = DYNAMIC_SLICE1_SIZE + DYNAMIC_SLICE2_SIZE + DYNAMIC_SLICE3_SIZE;
 
     static final int DELTA_RANGE2 = STATICTILES_END - STATICTILES_START;
     static final int DELTA_RANGE3 = DELTA_RANGE2 + (REGION_END - REGION_START);
@@ -39,7 +35,7 @@ class PackedWrappedBuffer extends WrappedBuffer {
     }
 
     PackedWrappedBuffer(final WrappedBuffer unpacked) {
-        super(null, 0L);
+        super(unpacked);
         this.slice2 = unpacked;
         this.slice3 = unpacked;
     }

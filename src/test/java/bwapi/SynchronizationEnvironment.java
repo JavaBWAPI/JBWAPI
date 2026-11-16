@@ -20,6 +20,7 @@ class SynchronizationEnvironment {
     private int onEndFrame;
     private long bwapiDelayMs;
     private final Map<Integer, Runnable> onFrames;
+    private final Map<Integer, Runnable> onClientFrames;
 
     SynchronizationEnvironment(final BWClientConfiguration bwClientConfiguration) {
         this(bwClientConfiguration, GameBuilder.binToBufferUnchecked(GameBuilder.DEFAULT_BUFFER_PATH));
@@ -35,6 +36,7 @@ class SynchronizationEnvironment {
         onEndFrame = -1;
         bwapiDelayMs = 0;
         onFrames = new HashMap<>();
+        onClientFrames = new HashMap<>();
 
         when(client.mapFile()).thenReturn(newGameState);
         when(client.liveClientData()).thenReturn(new ClientData());
@@ -76,6 +78,10 @@ class SynchronizationEnvironment {
 
     void onFrame(Integer frame, Runnable runnable) {
         onFrames.put(frame, runnable);
+    }
+
+    void onClientFrame(Integer frame, Runnable runnable) {
+        onClientFrames.put(frame, runnable);
     }
 
     void setBwapiDelayMs(long milliseconds) {
@@ -128,6 +134,9 @@ class SynchronizationEnvironment {
         } else {
             client.liveClientData().gameData().setIsInGame(false);
             client.liveClientData().gameData().setEventCount(0);
+        }
+        if (onClientFrames.containsKey(liveFrame())) {
+            onClientFrames.get(liveFrame()).run();
         }
     }
 }

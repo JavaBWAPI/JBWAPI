@@ -4,7 +4,7 @@ import com.sun.jna.Pointer;
 
 class ClientData {
     WrappedBuffer buffer;
-    GameData gameData;
+    private GameData gameData;
     ClientData() {
         gameData = createGameData(0);
     }
@@ -19,9 +19,6 @@ class ClientData {
     }
     void setPointer(Pointer pointer) {
         setBuffer(new WrappedBuffer(pointer, GameData.SIZE));
-    }
-    WrappedBuffer getStaticBuffer() {
-        return buffer;
     }
     class UnitCommand {
         static final int SIZE = 24;
@@ -784,100 +781,100 @@ class ClientData {
     }
     class RegionData {
         static final int SIZE = 1068;
-        private int myOffset;
+        protected int myOffset;
         RegionData(int myOffset) {
           this.myOffset = myOffset;
         }
         int getId() {
             int offset = myOffset + 0;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setId(int value) {
-            getStaticBuffer().putInt(myOffset + 0, value);
+            buffer.putInt(myOffset + 0, value);
         }
         int islandID() {
             int offset = myOffset + 4;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setIslandID(int value) {
-            getStaticBuffer().putInt(myOffset + 4, value);
+            buffer.putInt(myOffset + 4, value);
         }
         int getCenter_x() {
             int offset = myOffset + 8;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setCenter_x(int value) {
-            getStaticBuffer().putInt(myOffset + 8, value);
+            buffer.putInt(myOffset + 8, value);
         }
         int getCenter_y() {
             int offset = myOffset + 12;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setCenter_y(int value) {
-            getStaticBuffer().putInt(myOffset + 12, value);
+            buffer.putInt(myOffset + 12, value);
         }
         int getPriority() {
             int offset = myOffset + 16;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setPriority(int value) {
-            getStaticBuffer().putInt(myOffset + 16, value);
+            buffer.putInt(myOffset + 16, value);
         }
         int getLeftMost() {
             int offset = myOffset + 20;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setLeftMost(int value) {
-            getStaticBuffer().putInt(myOffset + 20, value);
+            buffer.putInt(myOffset + 20, value);
         }
         int getRightMost() {
             int offset = myOffset + 24;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setRightMost(int value) {
-            getStaticBuffer().putInt(myOffset + 24, value);
+            buffer.putInt(myOffset + 24, value);
         }
         int getTopMost() {
             int offset = myOffset + 28;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setTopMost(int value) {
-            getStaticBuffer().putInt(myOffset + 28, value);
+            buffer.putInt(myOffset + 28, value);
         }
         int getBottomMost() {
             int offset = myOffset + 32;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setBottomMost(int value) {
-            getStaticBuffer().putInt(myOffset + 32, value);
+            buffer.putInt(myOffset + 32, value);
         }
         int getNeighborCount() {
             int offset = myOffset + 36;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setNeighborCount(int value) {
-            getStaticBuffer().putInt(myOffset + 36, value);
+            buffer.putInt(myOffset + 36, value);
         }
         int getNeighbors(int i) {
             int offset = myOffset + 40 + 4 * 1 * i;
-            return getStaticBuffer().getInt(offset);
+            return buffer.getInt(offset);
         }
         void setNeighbors(int i, int value) {
-            getStaticBuffer().putInt(myOffset + 40 + 4 * 1 * i, value);
+            buffer.putInt(myOffset + 40 + 4 * 1 * i, value);
         }
         boolean isAccessible() {
             int offset = myOffset + 1064;
-            return getStaticBuffer().getByte(offset) != 0;
+            return buffer.getByte(offset) != 0;
         }
         void setIsAccessible(boolean value) {
-            getStaticBuffer().putByte(myOffset + 1064, (byte) (value ? 1 : 0));
+            buffer.putByte(myOffset + 1064, (byte) (value ? 1 : 0));
         }
         boolean isHigherGround() {
             int offset = myOffset + 1065;
-            return getStaticBuffer().getByte(offset) != 0;
+            return buffer.getByte(offset) != 0;
         }
         void setIsHigherGround(boolean value) {
-            getStaticBuffer().putByte(myOffset + 1065, (byte) (value ? 1 : 0));
+            buffer.putByte(myOffset + 1065, (byte) (value ? 1 : 0));
         }
     }
     class ForceData {
@@ -2008,3 +2005,4 @@ class ClientData {
         }
     }
 }
+
